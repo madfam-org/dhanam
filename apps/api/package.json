@@ -100,7 +100,7 @@
     "@dhanam/config": "workspace:*",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/schematics": "^10.1.0",
-    "@nestjs/testing": "^10.3.0",
+    "@nestjs/testing": "^11.1.11",
     "@types/express": "^5.0.5",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.11.0",
