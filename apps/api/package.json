@@ -81,7 +81,7 @@
     "ioredis": "^5.8.2",
     "joi": "^18.0.1",
     "jstat": "^1.9.6",
-    "mx-platform-node": "^0.21.0",
+    "mx-platform-node": "^1.12.1",
     "nodemailer": "^7.0.9",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
