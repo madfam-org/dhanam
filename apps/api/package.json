@@ -75,7 +75,7 @@
     "@types/speakeasy": "^2.0.10",
     "@types/uuid": "^11.0.0",
     "argon2": "^0.44.0",
-    "axios": "^1.13.3",
+    "axios": "^1.13.5",
     "bcryptjs": "^3.0.3",
     "belvo": "^0.28.0",
     "bitcoinjs-lib": "^7.0.1",
