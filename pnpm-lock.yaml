@@ -443,8 +443,8 @@ importers:
         specifier: ~3.0.9
         version: 3.0.9(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1))(react@18.3.1)
       expo-web-browser:
-        specifier: ~13.0.3
-        version: 13.0.3(expo@54.0.33)
+        specifier: ~15.0.10
+        version: 15.0.10(expo@54.0.33)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1))
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -6703,6 +6703,12 @@ packages:
     resolution: {integrity: sha512-HXb7y82ApVJtqk8tManyudtTrCtx8xcUnVzmJECeHCB0SsWSQ+penVLZxJkcyATWoJOsFMnfVSVdrTcpKKGszQ==}
     peerDependencies:
       expo: '*'
+
+  expo-web-browser@15.0.10:
+    resolution: {integrity: sha512-fvDhW4bhmXAeWFNFiInmsGCK83PAqAcQaFyp/3pE/jbdKmFKoRCWr46uZGIfN4msLK/OODhaQ/+US7GSJNDHJg==}
+    peerDependencies:
+      expo: '*'
+      react-native: '*'
 
   expo@54.0.33:
     resolution: {integrity: sha512-3yOEfAKqo+gqHcV8vKcnq0uA5zxlohnhA3fu4G43likN8ct5ZZ3LjAh9wDdKteEkoad3tFPvwxmXW711S5OHUw==}
@@ -18105,6 +18111,11 @@ snapshots:
   expo-web-browser@13.0.3(expo@54.0.33):
     dependencies:
       expo: 54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@3.2.3(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1)))(expo-router@3.5.24)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1))(react@18.3.1)
+
+  expo-web-browser@15.0.10(expo@54.0.33)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1)):
+    dependencies:
+      expo: 54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@3.2.3(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1)))(expo-router@3.5.24)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1))(react@18.3.1)
+      react-native: 0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1)
 
   expo@54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@3.2.3(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1)))(expo-router@3.5.24)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.10)(react@18.3.1))(react@18.3.1):
     dependencies:
