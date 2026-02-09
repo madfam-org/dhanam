@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.980.0",
-    "@aws-sdk/s3-request-presigner": "^3.980.0",
+    "@aws-sdk/s3-request-presigner": "^3.986.0",
     "@dhanam/esg": "workspace:*",
     "@dhanam/shared": "workspace:*",
     "@dhanam/simulations": "workspace:*",
