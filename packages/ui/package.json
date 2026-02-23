@@ -54,8 +54,8 @@
     "@radix-ui/react-toast": "^1.2.15",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.563.0",
-    "tailwind-merge": "^3.4.0"
+    "lucide-react": "^0.575.0",
+    "tailwind-merge": "^3.5.0"
   },
   "peerDependencies": {
     "react": "^18.2.0",
