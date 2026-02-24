@@ -10,7 +10,7 @@ resources:
 # Image transformer: maps short names to full GHCR paths
 # CI workflows update these entries with @sha256:... digests after each build
 images:
-- digest: sha256:bdc6599224e6de547b8b1e2f7b30252e212b4babc0db2d3a9717850546b42a12
+- digest: sha256:4b4d48dd9657966db17ab0f99f32752d3176e3bfe0be131b56d55e0e0e69aa53
   name: dhanam-admin
   newName: ghcr.io/madfam-org/dhanam/admin
 - digest: sha256:5e11d4bf5b4c1dae7fe38ebd084a394ec9f141c7b8792f088ed4ff929bf8f382
