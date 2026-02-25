@@ -98,14 +98,37 @@ interface JanuaJwtPayload {
   email: string;
   email_verified: boolean;
   name: string;
+  aud: string;           // Per-client audience (e.g., 'dhanam-api')
   org_id: string;        // Janua organization (maps to Space)
   roles: string[];       // ['user', 'admin', 'premium']
+  tier: 'community' | 'pro' | 'enterprise';
+  sub_status: 'active' | 'inactive' | 'suspended';
+  is_admin: boolean;
   mfa_enabled: boolean;
   iat: number;
   exp: number;
   iss: 'https://auth.madfam.io';
+  jti: string;           // Unique token identifier
 }
 ```
+
+### Per-Client Audience Claim
+
+Each OAuth client registered with Janua receives a unique `aud` (audience) claim
+in issued tokens. Dhanam's registered audience is `dhanam-api`. The Janua strategy
+validates this claim to ensure tokens issued for other MADFAM apps (e.g., Enclii,
+Tezca) cannot be used to access Dhanam's API.
+
+**Default**: `JANUA_AUDIENCE=dhanam-api` (set in `.env.example` and as fallback in
+`janua.strategy.ts`)
+
+### SDK Migration
+
+As of February 2026, the frontend uses `@janua/react-sdk` (replacing the earlier
+`janua-sdk-stub.tsx`). The real SDK provides PKCE, automatic token refresh, and
+proactive session management. The `JanuaAuthBridge` component in
+`apps/web/src/providers/JanuaAuthBridge.tsx` syncs Janua auth state with Dhanam's
+local Zustand auth store.
 
 ### Security Features
 

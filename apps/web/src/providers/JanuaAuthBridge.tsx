@@ -1,23 +1,12 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
-// TODO: Replace with '@janua/react-sdk' once published to npm.madfam.io
-import { JanuaProvider, useJanua } from '~/lib/janua-sdk-stub';
+import { JanuaProvider, useJanua, type JanuaConfig } from '@janua/react-sdk';
 import { useAuth } from '~/lib/hooks/use-auth';
 import type { UserProfile, AuthTokens, Locale } from '@dhanam/shared';
 
-// Janua config type matches what JanuaProvider expects
-interface JanuaConfig {
-  baseURL: string;
-  apiKey: string;
-  environment: 'development' | 'production';
-  debug: boolean;
-}
-
 const januaConfig: JanuaConfig = {
   baseURL: process.env.NEXT_PUBLIC_JANUA_API_URL || 'http://localhost:3001',
-  apiKey: process.env.NEXT_PUBLIC_JANUA_API_KEY || '',
-  environment: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   debug: process.env.NODE_ENV !== 'production',
 };
 
