@@ -185,14 +185,19 @@ export class BillingService {
       throw new Error('User not found');
     }
 
-    // Check if already premium
+    // Check if already on the requested tier (or higher)
     const currentUser = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { subscriptionTier: true },
     });
 
-    if (currentUser?.subscriptionTier === 'pro') {
-      throw new Error('User is already on pro tier');
+    const requestedPlan = options.plan || 'pro';
+    const tierRank = { community: 0, essentials: 1, pro: 2 };
+    const currentRank = tierRank[currentUser?.subscriptionTier as keyof typeof tierRank] ?? 0;
+    const requestedRank = tierRank[requestedPlan as keyof typeof tierRank] ?? 2;
+
+    if (currentRank >= requestedRank) {
+      throw new Error(`User is already on ${currentUser?.subscriptionTier} tier`);
     }
 
     const webUrl = this.config.get<string>('WEB_URL', 'http://localhost:3000');
@@ -301,10 +306,19 @@ export class BillingService {
       });
     }
 
-    const priceId = this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
+    // Route to correct Stripe price based on plan
+    const plan = options.plan || 'pro';
+    const priceId =
+      plan === 'essentials'
+        ? this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID')
+        : this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
+
+    if (!priceId) {
+      throw new Error(`No Stripe price configured for plan: ${plan}`);
+    }
 
     // Build metadata including orgId for external app linking
-    const metadata: Record<string, string> = { userId: user.id };
+    const metadata: Record<string, string> = { userId: user.id, plan };
     if (options.orgId) {
       metadata.orgId = options.orgId;
     }
@@ -806,7 +820,11 @@ export class BillingService {
       });
     }
 
-    const priceId = this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
+    // Route to correct Stripe price based on plan
+    const priceId =
+      plan === 'essentials'
+        ? this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID')
+        : this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
 
     const session = await this.stripe.createCheckoutSession({
       customerId,

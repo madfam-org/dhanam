@@ -24,6 +24,7 @@ export const dashboard = {
     gaming: 'Gaming',
     retirement: 'Aposentadoria',
     scenarios: 'Cenários',
+    billing: 'Faturamento',
   },
   header: {
     greeting: 'Olá, {{name}}',

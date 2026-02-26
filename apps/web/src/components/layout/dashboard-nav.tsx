@@ -21,6 +21,7 @@ import {
   ScrollText,
   Landmark,
   Gamepad2,
+  CreditCard,
 } from 'lucide-react';
 
 const navigation = [
@@ -38,6 +39,7 @@ const navigation = [
   { key: 'retirement' as const, href: '/retirement', icon: Target },
   { key: 'scenarios' as const, href: '/scenarios', icon: AlertTriangle },
   { key: 'reports' as const, href: '/reports', icon: FileText },
+  { key: 'billing' as const, href: '/billing', icon: CreditCard },
   { key: 'settings' as const, href: '/settings', icon: Settings },
 ];
 

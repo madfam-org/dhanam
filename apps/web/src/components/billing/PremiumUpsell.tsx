@@ -26,7 +26,7 @@ export function PremiumUpsell({ feature, context = 'generic' }: PremiumUpsellPro
   const handleUpgrade = () => {
     // Track click
     analytics.trackPremiumUpsellClicked(context, feature);
-    analytics.trackUpgradeInitiated('premium', 9.99);
+    analytics.trackUpgradeInitiated('premium', 4.99);
 
     router.push('/billing/upgrade');
   };
@@ -38,18 +38,18 @@ export function PremiumUpsell({ feature, context = 'generic' }: PremiumUpsellPro
       case 'feature_locked':
         return `Unlock ${feature || 'Premium Features'}`;
       default:
-        return 'Upgrade to Premium';
+        return 'Upgrade Your Plan';
     }
   };
 
   const getDescription = () => {
     switch (context) {
       case 'limit_reached':
-        return `You've used your daily free simulations. Upgrade for unlimited access.`;
+        return `You've used your daily free simulations. Upgrade for more access.`;
       case 'feature_locked':
-        return `${feature || 'This feature'} is available exclusively for Premium members.`;
+        return `${feature || 'This feature'} is available on paid plans.`;
       default:
-        return 'Get unlimited access to all features and unlock your financial potential.';
+        return 'Get more features and higher limits to unlock your financial potential.';
     }
   };
 
@@ -59,87 +59,63 @@ export function PremiumUpsell({ feature, context = 'generic' }: PremiumUpsellPro
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
           <CardTitle>{getTitle()}</CardTitle>
-          <Badge className="ml-auto bg-gradient-to-r from-blue-600 to-purple-600">Premium</Badge>
         </div>
         <CardDescription>{getDescription()}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Features List */}
-        <div className="space-y-3">
-          <h4 className="font-semibold text-sm">Premium Benefits:</h4>
-          <ul className="space-y-2">
-            <li className="flex items-start gap-2 text-sm">
-              <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-              <span>
-                <strong>Unlimited Monte Carlo Simulations</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Run as many financial projections as you need
-                </span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm">
-              <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-              <span>
-                <strong>Advanced Goal Probability Tracking</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Calculate success probability for all your financial goals
-                </span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm">
-              <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-              <span>
-                <strong>Retirement Planning Tools</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Two-phase simulation with withdrawal projections
-                </span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm">
-              <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-              <span>
-                <strong>Scenario Analysis</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Stress test your portfolio against market crashes
-                </span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm">
-              <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-              <span>
-                <strong>Advanced Visualizations</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Interactive charts and confidence intervals
-                </span>
-              </span>
-            </li>
-            <li className="flex items-start gap-2 text-sm">
-              <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-              <span>
-                <strong>Priority Support</strong>
-                <br />
-                <span className="text-muted-foreground">
-                  Get help from our team within 24 hours
-                </span>
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        {/* Pricing */}
-        <div className="border rounded-lg p-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold">$9.99</span>
-            <span className="text-muted-foreground">/month</span>
+        {/* Pricing Tiers */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Essentials */}
+          <div className="border rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="font-semibold text-sm">Essentials</h4>
+              <Badge variant="secondary">Popular</Badge>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-bold">$4.99</span>
+              <span className="text-muted-foreground text-sm">/month</span>
+            </div>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                10 simulations/day
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                AI categorization
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                Bank sync (Belvo + Bitso)
+              </li>
+            </ul>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            Cancel anytime • 30-day money-back guarantee
-          </p>
+
+          {/* Pro */}
+          <div className="border rounded-lg p-4 space-y-3 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-primary/30">
+            <div className="flex items-center justify-between">
+              <h4 className="font-semibold text-sm">Pro</h4>
+              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">Best Value</Badge>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-bold">$11.99</span>
+              <span className="text-muted-foreground text-sm">/month</span>
+            </div>
+            <ul className="space-y-1.5 text-sm text-muted-foreground">
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                Unlimited everything
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                All connections
+              </li>
+              <li className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                Priority support
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* CTA Button */}
@@ -149,11 +125,11 @@ export function PremiumUpsell({ feature, context = 'generic' }: PremiumUpsellPro
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
         >
           <Zap className="mr-2 h-5 w-5" />
-          Upgrade to Premium Now
+          View All Plans
         </Button>
 
         <p className="text-xs text-center text-muted-foreground">
-          Join thousands of users making smarter financial decisions
+          30-day money-back guarantee. Cancel anytime.
         </p>
       </CardContent>
     </Card>
