@@ -49,6 +49,7 @@ export class StripeService {
     successUrl: string;
     cancelUrl: string;
     metadata?: Record<string, string>;
+    couponId?: string;
   }): Promise<Stripe.Checkout.Session> {
     this.logger.log(`Creating checkout session for customer: ${params.customerId}`);
 
@@ -65,7 +66,8 @@ export class StripeService {
       cancel_url: params.cancelUrl,
       metadata: params.metadata || {},
       billing_address_collection: 'auto',
-      allow_promotion_codes: true,
+      allow_promotion_codes: !params.couponId, // disable promo codes when coupon is applied
+      discounts: params.couponId ? [{ coupon: params.couponId }] : undefined,
       subscription_data: {
         metadata: params.metadata || {},
       },

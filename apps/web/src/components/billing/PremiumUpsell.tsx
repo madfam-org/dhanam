@@ -129,7 +129,7 @@ export function PremiumUpsell({ feature, context = 'generic' }: PremiumUpsellPro
         </Button>
 
         <p className="text-xs text-center text-muted-foreground">
-          30-day money-back guarantee. Cancel anytime.
+          Cancel anytime.
         </p>
       </CardContent>
     </Card>

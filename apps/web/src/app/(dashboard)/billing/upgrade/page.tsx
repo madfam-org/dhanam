@@ -15,36 +15,24 @@ interface PricingTier {
   id: string;
   name: string;
   price: string;
+  introPrice?: string;
   priceNote: string;
   description: string;
   features: string[];
   cta: string;
   popular?: boolean;
-  current?: boolean;
   plan: string;
 }
 
+const INTRO_PRICE = '$0.99';
+const INTRO_MONTHS = 3;
+
 const PRICING_TIERS: PricingTier[] = [
-  {
-    id: 'community',
-    name: 'Community',
-    price: 'Free',
-    priceNote: 'forever',
-    description: 'Get started with basic financial tracking',
-    features: [
-      '5 ESG calculations/day',
-      '2 Monte Carlo simulations/day',
-      '1 financial space',
-      '500 API requests/day',
-      'Basic charts & reports',
-    ],
-    cta: 'Current Plan',
-    plan: 'community',
-  },
   {
     id: 'essentials',
     name: 'Essentials',
     price: '$4.99',
+    introPrice: INTRO_PRICE,
     priceNote: '/month',
     description: 'AI categorization and bank sync for growing finances',
     features: [
@@ -66,6 +54,7 @@ const PRICING_TIERS: PricingTier[] = [
     id: 'pro',
     name: 'Pro',
     price: '$11.99',
+    introPrice: INTRO_PRICE,
     priceNote: '/month',
     description: 'Unlimited access for serious wealth management',
     features: [
@@ -101,7 +90,7 @@ export default function UpgradePage() {
   const currentTier = status?.tier || 'community';
 
   const handleSubscribe = async (plan: string) => {
-    if (plan === 'community' || plan === currentTier) return;
+    if (plan === currentTier) return;
 
     setLoadingPlan(plan);
     analytics.trackUpgradeInitiated('premium', plan === 'essentials' ? 4.99 : 11.99);
@@ -120,7 +109,7 @@ export default function UpgradePage() {
   };
 
   return (
-    <div className="space-y-6 p-6 max-w-5xl">
+    <div className="space-y-6 p-6 max-w-4xl">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.push('/billing')}>
           <ArrowLeft className="h-4 w-4 mr-1" />
@@ -129,17 +118,23 @@ export default function UpgradePage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Choose Your Plan</h1>
           <p className="text-muted-foreground">
-            Unlock more features and remove daily limits.
+            Connect your accounts and take control of your finances.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Intro offer banner */}
+      <div className="rounded-lg bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-primary/20 p-4 text-center">
+        <p className="text-sm font-medium">
+          <Sparkles className="inline h-4 w-4 mr-1 text-primary" />
+          Launch offer: <span className="font-bold">{INTRO_PRICE}/mo for your first {INTRO_MONTHS} months</span> on any plan
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {PRICING_TIERS.map((tier) => {
           const isCurrent = tier.id === currentTier;
-          const isDowngrade =
-            (currentTier === 'pro' && tier.id !== 'pro') ||
-            (currentTier === 'essentials' && tier.id === 'community');
+          const isDowngrade = currentTier === 'pro' && tier.id === 'essentials';
 
           return (
             <Card
@@ -171,9 +166,24 @@ export default function UpgradePage() {
                 <CardTitle className="text-xl">{tier.name}</CardTitle>
                 <CardDescription>{tier.description}</CardDescription>
                 <div className="flex items-baseline gap-1 pt-2">
-                  <span className="text-3xl font-bold">{tier.price}</span>
-                  <span className="text-muted-foreground text-sm">{tier.priceNote}</span>
+                  {tier.introPrice && !isCurrent ? (
+                    <>
+                      <span className="text-3xl font-bold">{tier.introPrice}</span>
+                      <span className="text-muted-foreground text-sm">/mo</span>
+                      <span className="text-muted-foreground text-sm ml-2 line-through">{tier.price}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-3xl font-bold">{tier.price}</span>
+                      <span className="text-muted-foreground text-sm">{tier.priceNote}</span>
+                    </>
+                  )}
                 </div>
+                {tier.introPrice && !isCurrent && (
+                  <p className="text-xs text-muted-foreground">
+                    {tier.introPrice}/mo for {INTRO_MONTHS} months, then {tier.price}/mo
+                  </p>
+                )}
               </CardHeader>
 
               <CardContent className="space-y-4">
@@ -214,8 +224,7 @@ export default function UpgradePage() {
       </div>
 
       <p className="text-xs text-center text-muted-foreground">
-        All plans include a 30-day money-back guarantee. Cancel anytime.
-        Prices in USD. MXN pricing available at checkout for Mexican users.
+        Cancel anytime. Prices in USD. MXN pricing available at checkout for Mexican users.
       </p>
     </div>
   );

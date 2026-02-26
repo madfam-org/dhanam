@@ -37,7 +37,9 @@ export interface UpgradeOptions {
  * - **Stripe**: Fallback/Direct integration
  *
  * ## Subscription Tiers
- * - **Community**: Self-hosted or free cloud trial (5 ESG calcs, 2 simulations/day)
+ * - **Community**: Self-hosted users only. NOT available as a SaaS option.
+ *   Users who self-host get community features with their own infrastructure.
+ *   SaaS users should always have 'essentials' or 'pro' after completing checkout.
  * - **Essentials**: $4.99/mo — AI categorization, bank sync, 10 simulations/day
  * - **Pro**: $11.99/mo — Unlimited usage, all features
  *
@@ -323,6 +325,9 @@ export class BillingService {
       metadata.orgId = options.orgId;
     }
 
+    // Apply intro coupon if configured (e.g., $0.99/mo for first 3 months)
+    const introCouponId = this.config.get<string>('STRIPE_INTRO_COUPON_ID');
+
     const session = await this.stripe.createCheckoutSession({
       customerId,
       priceId,
@@ -330,6 +335,7 @@ export class BillingService {
         options.successUrl || `${webUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: options.cancelUrl || `${webUrl}/billing/cancel`,
       metadata,
+      couponId: introCouponId,
     });
 
     await this.audit.log({

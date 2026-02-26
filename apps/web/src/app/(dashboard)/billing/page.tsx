@@ -25,7 +25,7 @@ const TIER_CONFIG = {
   community: {
     label: 'Community',
     color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    description: 'Free tier with basic features',
+    description: 'Self-hosted tier',
   },
   essentials: {
     label: 'Essentials',
@@ -129,6 +129,10 @@ export default function BillingPage() {
             </div>
           )}
 
+          {tier === 'community' && (
+            <p className="text-sm text-muted-foreground">No active subscription.</p>
+          )}
+
           <div className="flex gap-3">
             {tier === 'community' && (
               <Button
@@ -136,7 +140,7 @@ export default function BillingPage() {
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 <Zap className="mr-2 h-4 w-4" />
-                Upgrade Plan
+                Choose a Plan
               </Button>
             )}
             {tier === 'essentials' && (

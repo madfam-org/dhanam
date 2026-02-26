@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { DashboardNav } from '~/components/layout/dashboard-nav';
 import { DashboardHeader } from '~/components/layout/dashboard-header';
 import { DemoModeBanner } from '~/components/demo/demo-mode-banner';
+import { SubscriptionBanner } from '~/components/billing/SubscriptionBanner';
 import { DemoTour } from '~/components/demo/demo-tour';
 import { KeyboardShortcuts } from '~/components/keyboard-shortcuts';
 import { PageTransition } from '~/components/motion/page-transition';
@@ -105,6 +106,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <DemoNavigationProvider>
       <div className="min-h-screen bg-background">
         <DashboardHeader />
+        <SubscriptionBanner />
         <DemoModeBanner />
         <DemoTour />
         <KeyboardShortcuts />
