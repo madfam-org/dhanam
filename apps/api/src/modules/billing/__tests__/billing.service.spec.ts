@@ -146,7 +146,8 @@ describe('BillingService', () => {
         priceId: 'price_premium123',
         successUrl: 'http://localhost:3000/billing/success?session_id={CHECKOUT_SESSION_ID}',
         cancelUrl: 'http://localhost:3000/billing/cancel',
-        metadata: { userId: 'user-123' },
+        metadata: { userId: 'user-123', plan: 'pro' },
+        couponId: undefined,
       });
       expect(audit.log).toHaveBeenCalled();
       expect(result).toEqual({ checkoutUrl: 'https://checkout.stripe.com/pay/cs_test123', provider: 'stripe' });
