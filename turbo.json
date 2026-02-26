@@ -57,6 +57,11 @@
     },
     "clean": {
       "cache": false
+    },
+    "publish": {
+      "dependsOn": ["build", "typecheck", "test"],
+      "cache": false,
+      "outputs": []
     }
   }
 }

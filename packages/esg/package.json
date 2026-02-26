@@ -42,5 +42,9 @@
     "type": "git",
     "url": "https://github.com/madfam-io/dhanam.git",
     "directory": "packages/esg"
+  },
+  "publishConfig": {
+    "registry": "https://npm.madfam.io",
+    "access": "restricted"
   }
 }

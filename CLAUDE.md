@@ -34,6 +34,7 @@ Dhanam uses **Enclii** (MADFAM's own deployment platform) for ALL production dep
 **GitHub Actions Workflows** (`.github/workflows/`):
 - `ci.yml`, `lint.yml`, `test-coverage.yml` - CI/CD quality gates (run on all PRs)
 - `check-migrations.yml` - Database migration validation
+- `publish-packages.yml` - Tag-triggered npm publish to npm.madfam.io (manual dispatch with dry-run)
 - `deploy-enclii.yml`, `deploy-k8s.yml`, `deploy-web-k8s.yml` - Manual/fallback deployment options
 - Primary production deployment is via **Enclii auto-deploy**, not GitHub Actions
 
@@ -73,6 +74,7 @@ apps/
 ├─ mobile/        # React Native + Expo app
 └─ web/           # Next.js 15 user dashboard (port 3040)
 packages/
+├─ billing-sdk/   # Typed client for Dhanam billing API (@dhanam/billing-sdk)
 ├─ config/        # ESLint, tsconfig, prettier presets
 ├─ esg/           # Dhanam ESG adapters
 ├─ shared/        # Shared TS utils, types, i18n

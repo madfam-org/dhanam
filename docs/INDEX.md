@@ -55,6 +55,7 @@
 | [@dhanam/config](../packages/config/README.md) | ESLint & TypeScript configurations |
 | [@dhanam/esg](../packages/esg/README.md) | ESG scoring for crypto assets |
 | [@dhanam/simulations](../packages/simulations/README.md) | Monte Carlo & scenario analysis |
+| [@dhanam/billing-sdk](../packages/billing-sdk/README.md) | Billing API client (checkout, subscriptions, webhooks) |
 | [@dhanam/ui](../packages/ui/README.md) | Reusable UI components |
 
 ## Module Documentation

@@ -5,7 +5,7 @@
 - Production URLs: app.dhan.am (web), api.dhan.am (API), admin.dhan.am (admin)
 - Part of the MADFAM ecosystem — uses Janua for auth (OIDC SSO) and Enclii for deployment (bare metal K8s)
 - Stack: Next.js 15/16, React Native + Expo, NestJS (Fastify), PostgreSQL (Prisma), Redis (BullMQ)
-- Monorepo: Turborepo + pnpm — 4 apps, 5 packages
+- Monorepo: Turborepo + pnpm — 4 apps, 6 packages
 - API: 32 fully implemented modules with Swagger docs
 - Test coverage: 80%+ across the codebase
 - License: AGPL-3.0
@@ -64,6 +64,7 @@ dhanam/
 │   ├── esg/           # Dhanam ESG scoring adapters for crypto assets
 │   ├── shared/        # Shared TypeScript types, utils, constants, i18n (EN/ES)
 │   ├── simulations/   # Monte Carlo engine, scenario analysis, retirement projections
+│   ├── billing-sdk/   # Typed client for Dhanam billing API (checkout, subscriptions, webhooks)
 │   └── ui/            # Reusable UI components built on shadcn-ui
 ├── infra/
 │   └── docker/        # Docker Compose for local dev (postgres, redis, mailhog)
@@ -346,6 +347,7 @@ Secrets: dhanam-secrets, dhanam-billing-secrets, ghcr-credentials.
 
 - `ci.yml`, `lint.yml`, `test-coverage.yml` — Quality gates on all PRs
 - `check-migrations.yml` — Database migration validation
+- `publish-packages.yml` — Tag-triggered npm publish to npm.madfam.io (manual dispatch with dry-run)
 - `deploy-enclii.yml`, `deploy-k8s.yml` — Manual/fallback deployment options
 
 ---

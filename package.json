@@ -31,7 +31,8 @@
     "db:seed": "turbo db:seed",
     "db:studio": "turbo db:studio",
     "dev:infra": "docker compose -f infra/docker/docker-compose.yml up -d",
-    "dev:infra:down": "docker compose -f infra/docker/docker-compose.yml down"
+    "dev:infra:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "publish:packages": "turbo publish --filter='./packages/*'"
   },
   "lint-staged": {
     "apps/web/**/*.{ts,tsx}": [

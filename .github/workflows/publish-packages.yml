@@ -1,0 +1,139 @@
+name: Publish Package
+
+on:
+  push:
+    tags:
+      - '@dhanam/shared@*'
+      - '@dhanam/esg@*'
+      - '@dhanam/simulations@*'
+      - '@dhanam/billing-sdk@*'
+
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish'
+        required: true
+        type: choice
+        options:
+          - '@dhanam/shared'
+          - '@dhanam/esg'
+          - '@dhanam/simulations'
+          - '@dhanam/billing-sdk'
+      dry_run:
+        description: 'Dry run (no actual publish)'
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    name: Resolve package & version
+    runs-on: ubuntu-latest
+    outputs:
+      package_name: ${{ steps.meta.outputs.package_name }}
+      package_dir: ${{ steps.meta.outputs.package_dir }}
+      version: ${{ steps.meta.outputs.version }}
+      dry_run: ${{ steps.meta.outputs.dry_run }}
+    steps:
+      - name: Parse tag or dispatch input
+        id: meta
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            PACKAGE="${{ inputs.package }}"
+            DRY_RUN="${{ inputs.dry_run }}"
+          else
+            # Tag format: @dhanam/<name>@<version>
+            TAG="${GITHUB_REF#refs/tags/}"
+            PACKAGE="${TAG%@[0-9]*}"
+            DRY_RUN="false"
+          fi
+
+          # Extract directory name from package name
+          DIR="${PACKAGE#@dhanam/}"
+
+          echo "package_name=${PACKAGE}" >> "$GITHUB_OUTPUT"
+          echo "package_dir=packages/${DIR}" >> "$GITHUB_OUTPUT"
+          echo "dry_run=${DRY_RUN}" >> "$GITHUB_OUTPUT"
+
+          # Resolve version from tag or package.json (will be verified later)
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+            VERSION="${TAG##*@}"
+            echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    name: Publish ${{ needs.resolve.outputs.package_name }}
+    needs: resolve
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Authenticate to npm.madfam.io
+        run: |
+          echo "//npm.madfam.io/:_authToken=${NPM_MADFAM_TOKEN}" >> ~/.npmrc
+        env:
+          NPM_MADFAM_TOKEN: ${{ secrets.NPM_MADFAM_TOKEN }}
+
+      - name: Build all packages
+        run: pnpm build:packages
+
+      - name: Typecheck target package
+        run: pnpm --filter '${{ needs.resolve.outputs.package_name }}' typecheck
+
+      - name: Test target package
+        run: pnpm --filter '${{ needs.resolve.outputs.package_name }}' test
+
+      - name: Verify version matches tag
+        if: needs.resolve.outputs.version != ''
+        working-directory: ${{ needs.resolve.outputs.package_dir }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${{ needs.resolve.outputs.version }}"
+          if [ "${PKG_VERSION}" != "${TAG_VERSION}" ]; then
+            echo "::error::Version mismatch: package.json has ${PKG_VERSION} but tag is ${TAG_VERSION}"
+            exit 1
+          fi
+          echo "Version verified: ${PKG_VERSION}"
+
+      - name: Publish (dry run)
+        if: needs.resolve.outputs.dry_run == 'true'
+        working-directory: ${{ needs.resolve.outputs.package_dir }}
+        run: pnpm publish --dry-run --no-git-checks
+
+      - name: Publish
+        if: needs.resolve.outputs.dry_run != 'true'
+        working-directory: ${{ needs.resolve.outputs.package_dir }}
+        run: pnpm publish --no-git-checks
+
+      - name: Create GitHub Release
+        if: needs.resolve.outputs.dry_run != 'true' && needs.resolve.outputs.version != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ needs.resolve.outputs.package_name }}@${{ needs.resolve.outputs.version }}"
+          gh release create "${TAG}" \
+            --title "${TAG}" \
+            --generate-notes \
+            --verify-tag
