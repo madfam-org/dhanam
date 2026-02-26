@@ -20,8 +20,8 @@ WORKDIR /app
 # =============================================================================
 FROM base AS deps
 
-# Copy workspace configuration
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy workspace configuration and registry config
+COPY .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json ./apps/web/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/config/package.json ./packages/config/
