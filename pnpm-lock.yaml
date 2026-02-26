@@ -443,8 +443,8 @@ importers:
         specifier: ~3.0.9
         version: 3.0.9(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))(react@18.3.1)
       expo-web-browser:
-        specifier: ~13.0.3
-        version: 13.0.3(expo@54.0.33)
+        specifier: ~55.0.9
+        version: 55.0.9(expo@54.0.33)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -6755,6 +6755,12 @@ packages:
     resolution: {integrity: sha512-HXb7y82ApVJtqk8tManyudtTrCtx8xcUnVzmJECeHCB0SsWSQ+penVLZxJkcyATWoJOsFMnfVSVdrTcpKKGszQ==}
     peerDependencies:
       expo: '*'
+
+  expo-web-browser@55.0.9:
+    resolution: {integrity: sha512-PvAVsG401QmZabtTsYh1cYcpPiqvBPs8oiOkSrp0jIXnneiM466HxmeNtvo+fNxqJ2nwOBz9qLPiWRO91VBfsQ==}
+    peerDependencies:
+      expo: '*'
+      react-native: '*'
 
   expo@54.0.33:
     resolution: {integrity: sha512-3yOEfAKqo+gqHcV8vKcnq0uA5zxlohnhA3fu4G43likN8ct5ZZ3LjAh9wDdKteEkoad3tFPvwxmXW711S5OHUw==}
@@ -17628,7 +17634,7 @@ snapshots:
       '@typescript-eslint/parser': 8.56.1(eslint@8.57.1)(typescript@5.9.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
@@ -17659,7 +17665,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.3
@@ -17689,14 +17695,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.56.1(eslint@8.57.1)(typescript@5.9.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -17722,7 +17728,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.56.1(eslint@8.57.1)(typescript@5.9.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -18165,6 +18171,11 @@ snapshots:
   expo-web-browser@13.0.3(expo@54.0.33):
     dependencies:
       expo: 54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@3.2.3(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1)))(expo-router@3.5.24)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))(react@18.3.1)
+
+  expo-web-browser@55.0.9(expo@54.0.33)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1)):
+    dependencies:
+      expo: 54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@3.2.3(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1)))(expo-router@3.5.24)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))(react@18.3.1)
+      react-native: 0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1)
 
   expo@54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@3.2.3(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1)))(expo-router@3.5.24)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))(react@18.3.1):
     dependencies:
