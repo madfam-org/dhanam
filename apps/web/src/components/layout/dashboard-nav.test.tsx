@@ -8,7 +8,7 @@ jest.mock('@dhanam/shared', () => {
     budgets: 'Budgets', zeroBased: 'Zero-Based', goals: 'Goals',
     households: 'Households', estatePlanning: 'Estate Planning', analytics: 'Analytics',
     esgInsights: 'ESG Insights', gaming: 'Gaming', retirement: 'Retirement',
-    scenarios: 'Scenarios', reports: 'Reports', settings: 'Settings',
+    scenarios: 'Scenarios', reports: 'Reports', billing: 'Billing', settings: 'Settings',
     wealth: 'Wealth', spaces: 'Spaces', help: 'Help',
   };
   const resolve = (key: string): string => {
@@ -70,6 +70,7 @@ jest.mock('lucide-react', () => {
     ScrollText: icon('ScrollText'),
     Landmark: icon('Landmark'),
     Gamepad2: icon('Gamepad2'),
+    CreditCard: icon('CreditCard'),
   };
 });
 
@@ -101,6 +102,7 @@ const expectedLinks = [
   { name: 'Retirement', href: '/retirement' },
   { name: 'Scenarios', href: '/scenarios' },
   { name: 'Reports', href: '/reports' },
+  { name: 'Billing', href: '/billing' },
   { name: 'Settings', href: '/settings' },
 ];
 

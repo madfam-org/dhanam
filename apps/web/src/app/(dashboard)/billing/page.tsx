@@ -4,17 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
 import { Button } from '@dhanam/ui';
 import { Badge } from '@dhanam/ui';
-import { Separator } from '@dhanam/ui';
-import {
-  CreditCard,
-  ExternalLink,
-  Loader2,
-  Crown,
-  Zap,
-  Calendar,
-  Receipt,
-} from 'lucide-react';
-import { billingApi, SubscriptionStatus, BillingEvent } from '@/lib/api/billing';
+import { CreditCard, ExternalLink, Loader2, Crown, Zap, Calendar, Receipt } from 'lucide-react';
+import { billingApi, BillingEvent } from '@/lib/api/billing';
 import { UsageOverview } from '@/components/billing/UsageIndicator';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -56,7 +47,7 @@ function formatCurrency(amount: number, currency: string): string {
 }
 
 export default function BillingPage() {
-  const { t } = useTranslation('dashboard');
+  useTranslation('dashboard');
   const router = useRouter();
   const [isOpeningPortal, setIsOpeningPortal] = useState(false);
 
@@ -144,10 +135,7 @@ export default function BillingPage() {
               </Button>
             )}
             {tier === 'essentials' && (
-              <Button
-                onClick={() => router.push('/billing/upgrade')}
-                variant="outline"
-              >
+              <Button onClick={() => router.push('/billing/upgrade')} variant="outline">
                 <Zap className="mr-2 h-4 w-4" />
                 Upgrade to Pro
               </Button>

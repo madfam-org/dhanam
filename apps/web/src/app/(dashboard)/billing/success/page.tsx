@@ -39,8 +39,8 @@ export default function BillingSuccessPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            You now have access to unlimited simulations, goal tracking, scenario analysis,
-            and all advanced features. Thank you for supporting Dhanam!
+            You now have access to unlimited simulations, goal tracking, scenario analysis, and all
+            advanced features. Thank you for supporting Dhanam!
           </p>
           <div className="flex flex-col gap-2">
             <Button onClick={() => router.push('/dashboard')}>

@@ -36,7 +36,12 @@ const TIER_RANK: Record<SubscriptionTier, number> = {
  *   <LifeBeatComponent />
  * </PremiumGate>
  */
-export function PremiumGate({ children, feature, fallback, requiredTier = 'essentials' }: PremiumGateProps) {
+export function PremiumGate({
+  children,
+  feature,
+  fallback,
+  requiredTier = 'essentials',
+}: PremiumGateProps) {
   const { user } = useAuth();
   const userTier = (user?.subscriptionTier as SubscriptionTier) || 'community';
   const hasAccess = TIER_RANK[userTier] >= TIER_RANK[requiredTier];

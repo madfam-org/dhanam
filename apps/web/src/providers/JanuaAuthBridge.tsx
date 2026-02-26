@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
-import { JanuaProvider, useJanua, type JanuaConfig } from '@janua/react-sdk';
+import { JanuaProvider, useJanua } from '@janua/react-sdk';
 import { useAuth } from '~/lib/hooks/use-auth';
 import type { UserProfile, AuthTokens, Locale } from '@dhanam/shared';
 
-const januaConfig: JanuaConfig = {
+const januaConfig: React.ComponentProps<typeof JanuaProvider>['config'] = {
   baseURL: process.env.NEXT_PUBLIC_JANUA_API_URL || 'http://localhost:3001',
   debug: process.env.NODE_ENV !== 'production',
 };

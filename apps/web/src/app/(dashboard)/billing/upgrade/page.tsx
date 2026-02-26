@@ -102,7 +102,7 @@ export default function UpgradePage() {
         cancelUrl: `${window.location.origin}/billing/upgrade`,
       });
       window.location.href = checkoutUrl;
-    } catch (err) {
+    } catch {
       toast.error('Unable to start checkout. Please try again.');
       setLoadingPlan(null);
     }
@@ -127,7 +127,11 @@ export default function UpgradePage() {
       <div className="rounded-lg bg-gradient-to-r from-blue-600/10 to-purple-600/10 border border-primary/20 p-4 text-center">
         <p className="text-sm font-medium">
           <Sparkles className="inline h-4 w-4 mr-1 text-primary" />
-          Launch offer: <span className="font-bold">{INTRO_PRICE}/mo for your first {INTRO_MONTHS} months</span> on any plan
+          Launch offer:{' '}
+          <span className="font-bold">
+            {INTRO_PRICE}/mo for your first {INTRO_MONTHS} months
+          </span>{' '}
+          on any plan
         </p>
       </div>
 
@@ -140,9 +144,7 @@ export default function UpgradePage() {
             <Card
               key={tier.id}
               className={`relative ${
-                tier.popular
-                  ? 'border-primary shadow-lg'
-                  : ''
+                tier.popular ? 'border-primary shadow-lg' : ''
               } ${isCurrent ? 'ring-2 ring-primary' : ''}`}
             >
               {tier.popular && !isCurrent && (
@@ -170,7 +172,9 @@ export default function UpgradePage() {
                     <>
                       <span className="text-3xl font-bold">{tier.introPrice}</span>
                       <span className="text-muted-foreground text-sm">/mo</span>
-                      <span className="text-muted-foreground text-sm ml-2 line-through">{tier.price}</span>
+                      <span className="text-muted-foreground text-sm ml-2 line-through">
+                        {tier.price}
+                      </span>
                     </>
                   ) : (
                     <>
@@ -211,11 +215,7 @@ export default function UpgradePage() {
                   ) : (
                     !isCurrent && !isDowngrade && <Zap className="mr-2 h-4 w-4" />
                   )}
-                  {isCurrent
-                    ? 'Current Plan'
-                    : isDowngrade
-                      ? 'Downgrade via Portal'
-                      : tier.cta}
+                  {isCurrent ? 'Current Plan' : isDowngrade ? 'Downgrade via Portal' : tier.cta}
                 </Button>
               </CardContent>
             </Card>

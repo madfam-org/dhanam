@@ -95,7 +95,9 @@ export function PremiumUpsell({ feature, context = 'generic' }: PremiumUpsellPro
           <div className="border rounded-lg p-4 space-y-3 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-primary/30">
             <div className="flex items-center justify-between">
               <h4 className="font-semibold text-sm">Pro</h4>
-              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">Best Value</Badge>
+              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                Best Value
+              </Badge>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-2xl font-bold">$11.99</span>
@@ -128,9 +130,7 @@ export function PremiumUpsell({ feature, context = 'generic' }: PremiumUpsellPro
           View All Plans
         </Button>
 
-        <p className="text-xs text-center text-muted-foreground">
-          Cancel anytime.
-        </p>
+        <p className="text-xs text-center text-muted-foreground">Cancel anytime.</p>
       </CardContent>
     </Card>
   );
