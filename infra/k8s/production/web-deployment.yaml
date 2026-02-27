@@ -79,7 +79,7 @@ spec:
               value: "jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t"
             # Janua OAuth API (Required for SSO button visibility)
             - name: NEXT_PUBLIC_JANUA_API_URL
-              value: "https://api.janua.dev"
+              value: "https://auth.madfam.io"
             - name: OIDC_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
