@@ -20,6 +20,7 @@ import { StripeService } from './stripe.service';
 export interface UpgradeOptions {
   orgId?: string;
   plan?: string;
+  product?: string;
   successUrl?: string;
   cancelUrl?: string;
   countryCode?: string;
@@ -780,7 +781,7 @@ export class BillingService {
    * Create a checkout session for an external (unauthenticated) caller.
    * Returns the Stripe/Janua checkout URL.
    */
-  async createExternalCheckout(userId: string, plan: string, returnUrl: string): Promise<string> {
+  async createExternalCheckout(userId: string, plan: string, returnUrl: string, product?: string): Promise<string> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {

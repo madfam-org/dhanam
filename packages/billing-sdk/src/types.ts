@@ -2,15 +2,23 @@
 // Enums & Literals
 // ────────────────────────────────────────────────
 
-/** Subscription tier levels */
-export type SubscriptionTier = 'community' | 'essentials' | 'pro';
+/** Product identifiers in the MADFAM ecosystem */
+export type ProductId = 'enclii' | 'tezca' | 'yantra4d' | 'dhanam';
 
-/** Plan slug for checkout and upgrade flows */
+/** Subscription tier levels */
+export type SubscriptionTier = 'community' | 'essentials' | 'pro' | 'madfam';
+
+/** Plan slug for checkout and upgrade flows (optionally product-prefixed) */
 export type PlanSlug =
   | 'essentials'
   | 'pro'
+  | 'madfam'
   | 'essentials_yearly'
-  | 'pro_yearly';
+  | 'pro_yearly'
+  | 'madfam_yearly'
+  | `${ProductId}_essentials`
+  | `${ProductId}_pro`
+  | `${ProductId}_madfam`;
 
 /** Supported billing payment providers */
 export type BillingProvider = 'conekta' | 'polar' | 'stripe';
@@ -78,6 +86,8 @@ export interface CheckoutOptions {
   plan: PlanSlug;
   userId: string;
   returnUrl: string;
+  /** Product being upgraded (defaults to 'dhanam') */
+  product?: ProductId;
 }
 
 /** Options for initiating an authenticated upgrade */
@@ -87,6 +97,8 @@ export interface UpgradeOptions {
   orgId?: string;
   plan?: string;
   countryCode?: string;
+  /** Product being upgraded (defaults to 'dhanam') */
+  product?: ProductId;
 }
 
 /** Result of a checkout or upgrade request */

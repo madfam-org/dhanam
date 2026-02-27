@@ -79,7 +79,8 @@ export class BillingController {
     const checkoutUrl = await this.billingService.createExternalCheckout(
       query.user_id,
       query.plan,
-      query.return_url
+      query.return_url,
+      query.product,
     );
 
     return reply.status(302).redirect(checkoutUrl);
@@ -99,6 +100,7 @@ export class BillingController {
     return this.billingService.upgradeToPremium(req.user.id, {
       orgId: dto.orgId,
       plan: dto.plan,
+      product: dto.product,
       successUrl: dto.successUrl,
       cancelUrl: dto.cancelUrl,
       countryCode: dto.countryCode,
