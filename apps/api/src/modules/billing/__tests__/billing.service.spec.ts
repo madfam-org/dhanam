@@ -189,6 +189,37 @@ describe('BillingService', () => {
         'User is already on pro tier'
       );
     });
+
+    it('should pass product in options through to upgrade flow', async () => {
+      prisma.user.findUnique
+        .mockResolvedValueOnce(mockUser as any)
+        .mockResolvedValueOnce(mockUser as any);
+
+      const mockCustomer = { id: 'cus_new123' } as Stripe.Customer;
+      const mockSession = {
+        id: 'cs_test123',
+        url: 'https://checkout.stripe.com/pay/cs_test123',
+      } as Stripe.Checkout.Session;
+
+      stripe.createCustomer.mockResolvedValue(mockCustomer);
+      stripe.createCheckoutSession.mockResolvedValue(mockSession);
+      prisma.user.update.mockResolvedValue({ ...mockUser, stripeCustomerId: 'cus_new123' } as any);
+
+      const result = await service.upgradeToPremium('user-123', {
+        plan: 'enclii_pro',
+        product: 'enclii',
+      });
+
+      expect(result).toEqual({
+        checkoutUrl: 'https://checkout.stripe.com/pay/cs_test123',
+        provider: 'stripe',
+      });
+      expect(audit.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'BILLING_UPGRADE_INITIATED',
+        })
+      );
+    });
   });
 
   describe('createPortalSession', () => {
@@ -632,6 +663,44 @@ describe('BillingService', () => {
       expect(stripe.createCustomer).not.toHaveBeenCalled();
       expect(stripe.createCheckoutSession).toHaveBeenCalledWith(
         expect.objectContaining({ customerId: 'cus_existing' })
+      );
+    });
+
+    it('should accept product parameter', async () => {
+      const userWithCountry = {
+        ...mockUser,
+        countryCode: 'US',
+        billingProvider: null,
+        januaCustomerId: null,
+      };
+      prisma.user.findUnique.mockResolvedValue(userWithCountry as any);
+
+      const mockCustomer = { id: 'cus_new123' } as any;
+      const mockSession = {
+        id: 'cs_test_product',
+        url: 'https://checkout.stripe.com/pay/cs_test_product',
+      } as any;
+
+      stripe.createCustomer.mockResolvedValue(mockCustomer);
+      stripe.createCheckoutSession.mockResolvedValue(mockSession);
+      prisma.user.update.mockResolvedValue({ ...userWithCountry, stripeCustomerId: 'cus_new123' } as any);
+
+      const result = await service.createExternalCheckout(
+        'user-123',
+        'enclii_pro',
+        'https://app.enclii.dev/billing',
+        'enclii'
+      );
+
+      expect(result).toBe('https://checkout.stripe.com/pay/cs_test_product');
+      expect(audit.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'BILLING_UPGRADE_INITIATED',
+          metadata: expect.objectContaining({
+            plan: 'enclii_pro',
+            source: 'external',
+          }),
+        })
       );
     });
   });

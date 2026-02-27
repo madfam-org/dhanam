@@ -1,4 +1,6 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
+
+const VALID_PRODUCTS = ['enclii', 'tezca', 'yantra4d', 'dhanam'] as const;
 
 export class UpgradeToPremiumDto {
   @IsOptional()
@@ -10,7 +12,7 @@ export class UpgradeToPremiumDto {
   cancelUrl?: string;
 
   /**
-   * Janua organization ID (for external app integration, e.g., Enclii)
+   * Janua organization ID (for external app integration)
    * When provided, the subscription is linked to this organization
    */
   @IsOptional()
@@ -18,12 +20,19 @@ export class UpgradeToPremiumDto {
   orgId?: string;
 
   /**
-   * Plan ID (e.g., 'enclii_sovereign', 'dhanam_premium')
+   * Plan ID (e.g., 'enclii_pro', 'tezca_pro', 'dhanam_pro')
    * Used to select the appropriate product/price in the payment provider
    */
   @IsOptional()
   @IsString()
   plan?: string;
+
+  /**
+   * Product being upgraded (defaults to 'dhanam')
+   */
+  @IsOptional()
+  @IsIn(VALID_PRODUCTS)
+  product?: (typeof VALID_PRODUCTS)[number];
 
   /**
    * Country code for provider routing (e.g., 'MX', 'US')

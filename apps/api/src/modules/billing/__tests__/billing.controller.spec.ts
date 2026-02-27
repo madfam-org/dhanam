@@ -96,6 +96,7 @@ describe('BillingController', () => {
       expect(billingService.upgradeToPremium).toHaveBeenCalledWith('user-123', {
         orgId: undefined,
         plan: undefined,
+        product: undefined,
         successUrl: undefined,
         cancelUrl: undefined,
         countryCode: undefined,
@@ -121,9 +122,33 @@ describe('BillingController', () => {
       expect(billingService.upgradeToPremium).toHaveBeenCalledWith('user-123', {
         orgId: 'org_enclii_123',
         plan: 'enclii_sovereign',
+        product: undefined,
         successUrl: 'https://app.enclii.dev/billing/callback?status=success',
         cancelUrl: 'https://app.enclii.dev/billing/callback?status=cancel',
         countryCode: 'MX',
+      });
+      expect(result).toEqual({ checkoutUrl: mockCheckoutUrl });
+    });
+
+    it('should pass product field to billing service', async () => {
+      const mockRequest = { user: mockUser };
+      const mockCheckoutUrl = 'https://checkout.stripe.com/pay/cs_test123';
+      const dto = {
+        plan: 'enclii_pro',
+        product: 'enclii' as const,
+      };
+
+      billingService.upgradeToPremium.mockResolvedValue({ checkoutUrl: mockCheckoutUrl });
+
+      const result = await controller.upgradeToPremium(mockRequest, dto);
+
+      expect(billingService.upgradeToPremium).toHaveBeenCalledWith('user-123', {
+        orgId: undefined,
+        plan: 'enclii_pro',
+        product: 'enclii',
+        successUrl: undefined,
+        cancelUrl: undefined,
+        countryCode: undefined,
       });
       expect(result).toEqual({ checkoutUrl: mockCheckoutUrl });
     });
@@ -468,11 +493,35 @@ describe('BillingController', () => {
       expect(billingService.createExternalCheckout).toHaveBeenCalledWith(
         'user-123',
         'pro',
-        'https://app.dhan.am/billing'
+        'https://app.dhan.am/billing',
+        undefined
       );
       expect(mockReply.status).toHaveBeenCalledWith(302);
       expect(mockReply.redirect).toHaveBeenCalledWith(
         'https://checkout.stripe.com/pay/cs_test123'
+      );
+    });
+
+    it('should pass product query param to billing service', async () => {
+      billingService.createExternalCheckout.mockResolvedValue(
+        'https://checkout.stripe.com/pay/cs_test456'
+      );
+
+      await controller.publicCheckout(
+        {
+          user_id: 'user-123',
+          plan: 'enclii_pro',
+          return_url: 'https://app.enclii.dev/billing',
+          product: 'enclii',
+        } as any,
+        mockReply
+      );
+
+      expect(billingService.createExternalCheckout).toHaveBeenCalledWith(
+        'user-123',
+        'enclii_pro',
+        'https://app.enclii.dev/billing',
+        'enclii'
       );
     });
 

@@ -1,6 +1,6 @@
 {
   "name": "@dhanam/billing-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Dhanam billing SDK — checkout, subscriptions, and webhook verification",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

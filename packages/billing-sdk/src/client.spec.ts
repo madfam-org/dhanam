@@ -36,6 +36,41 @@ describe('DhanamClient', () => {
       });
       expect(url).toContain('https://api.dhan.am/billing/checkout?');
     });
+
+    it('includes product param when provided', () => {
+      const client = new DhanamClient({ baseUrl });
+      const url = client.buildCheckoutUrl({
+        plan: 'pro',
+        userId: 'usr_456',
+        returnUrl: 'https://app.enclii.dev/billing',
+        product: 'enclii',
+      });
+      expect(url).toContain('&product=enclii');
+      expect(url).toContain('plan=pro');
+      expect(url).toContain('user_id=usr_456');
+    });
+
+    it('omits product param when not provided', () => {
+      const client = new DhanamClient({ baseUrl });
+      const url = client.buildCheckoutUrl({
+        plan: 'essentials',
+        userId: 'usr_789',
+        returnUrl: 'https://app.dhan.am/success',
+      });
+      expect(url).not.toContain('product=');
+    });
+
+    it('accepts product-prefixed plan slugs', () => {
+      const client = new DhanamClient({ baseUrl });
+      const url = client.buildCheckoutUrl({
+        plan: 'tezca_pro',
+        userId: 'usr_tezca',
+        returnUrl: 'https://tezca.mx/billing',
+        product: 'tezca',
+      });
+      expect(url).toContain('plan=tezca_pro');
+      expect(url).toContain('product=tezca');
+    });
   });
 
   describe('upgrade', () => {
@@ -71,6 +106,23 @@ describe('DhanamClient', () => {
           headers: expect.objectContaining({ Authorization: 'Bearer dynamic_token' }),
         }),
       );
+    });
+
+    it('sends product field in request body when provided', async () => {
+      const fetch = mockFetch(200, { checkoutUrl: 'https://pay.example.com', provider: 'stripe' });
+      const client = new DhanamClient({ baseUrl, token: 'tok_abc', fetch });
+
+      await client.upgrade({ plan: 'enclii_pro', product: 'enclii' });
+
+      expect(fetch).toHaveBeenCalledWith('https://api.dhan.am/billing/upgrade', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer tok_abc',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plan: 'enclii_pro', product: 'enclii' }),
+      });
     });
   });
 

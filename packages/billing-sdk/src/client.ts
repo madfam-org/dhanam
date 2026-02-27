@@ -51,6 +51,9 @@ export class DhanamClient {
       user_id: opts.userId,
       return_url: opts.returnUrl,
     });
+    if (opts.product) {
+      params.set('product', opts.product);
+    }
     return `${this.baseUrl}/billing/checkout?${params.toString()}`;
   }
 

@@ -7,9 +7,45 @@
 Dhanam's billing system supports:
 
 - **Multi-Provider Payments**: Janua (Conekta MX, Polar international), Stripe (fallback)
+- **Multi-Product Billing**: Consolidated billing across MADFAM ecosystem products (Enclii, Tezca, Yantra4D, Dhanam)
 - **Subscription Tiers**: Free and Premium with usage-based limits
 - **Usage Tracking**: Per-feature metering with daily limits
 - **Webhook Processing**: Real-time subscription and payment events
+
+## Product Identifiers
+
+The billing system supports consolidated billing across multiple MADFAM products. Each product is identified by a `ProductId`:
+
+| ProductId | Product | Description |
+|-----------|---------|-------------|
+| `enclii` | Enclii | DevOps platform |
+| `tezca` | Tezca | Legal tech platform |
+| `yantra4d` | Yantra4D | 3D/CAD platform |
+| `dhanam` | Dhanam | Financial planning (default) |
+
+### Product-Prefixed Plan Slugs
+
+Plans can be prefixed with a product identifier to route billing to the correct product context:
+
+| Plan Slug | Tier | Product |
+|-----------|------|---------|
+| `essentials` | Essentials | Dhanam (default) |
+| `pro` | Pro | Dhanam (default) |
+| `madfam` | MADFAM | Dhanam (default) |
+| `enclii_essentials` | Essentials | Enclii |
+| `enclii_pro` | Pro | Enclii |
+| `enclii_madfam` | MADFAM | Enclii |
+| `tezca_essentials` | Essentials | Tezca |
+| `tezca_pro` | Pro | Tezca |
+| `tezca_madfam` | MADFAM | Tezca |
+| `yantra4d_essentials` | Essentials | Yantra4D |
+| `yantra4d_pro` | Pro | Yantra4D |
+| `yantra4d_madfam` | MADFAM | Yantra4D |
+| `dhanam_essentials` | Essentials | Dhanam |
+| `dhanam_pro` | Pro | Dhanam |
+| `dhanam_madfam` | MADFAM | Dhanam |
+
+Yearly variants (`essentials_yearly`, `pro_yearly`, `madfam_yearly`) are also supported.
 
 ## Subscription Tiers
 
@@ -58,6 +94,7 @@ Direct Stripe integration serves as fallback when Janua is unavailable.
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/billing/upgrade` | Initiate premium upgrade |
+| `GET` | `/billing/checkout` | Public checkout redirect (no auth) |
 | `POST` | `/billing/portal` | Create billing portal session |
 | `GET` | `/billing/usage` | Get current usage metrics |
 | `GET` | `/billing/history` | Get billing event history |
@@ -93,6 +130,68 @@ const response = await fetch('/api/billing/upgrade', {
 
 // Redirect user to checkout URL
 window.location.href = response.checkoutUrl;
+```
+
+### Upgrade with Product Context
+
+When initiating an upgrade from an external MADFAM product (e.g., Enclii), include the `product` and product-prefixed `plan` fields:
+
+```typescript
+// From Enclii
+const response = await fetch('/api/billing/upgrade', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${accessToken}`,
+  },
+  body: JSON.stringify({
+    plan: 'enclii_pro',
+    product: 'enclii',
+    successUrl: 'https://app.enclii.dev/billing/success',
+    cancelUrl: 'https://app.enclii.dev/billing/cancel',
+  }),
+});
+```
+
+### Public Checkout with Product Parameter
+
+The public checkout endpoint accepts a `product` query parameter to identify the originating product:
+
+```
+GET /billing/checkout?plan=enclii_pro&user_id=usr_123&return_url=https://app.enclii.dev/billing&product=enclii
+```
+
+Query parameters:
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `plan` | Yes | Plan slug (optionally product-prefixed) |
+| `user_id` | Yes | Janua user ID (UUID) |
+| `return_url` | Yes | URL to redirect after checkout |
+| `product` | No | Product identifier (defaults to `dhanam`) |
+
+### Using the Billing SDK
+
+```typescript
+import { DhanamClient } from '@dhanam/billing-sdk';
+
+const client = new DhanamClient({
+  baseUrl: 'https://api.dhan.am',
+  token: accessToken,
+});
+
+// Build checkout URL with product context
+const checkoutUrl = client.buildCheckoutUrl({
+  plan: 'tezca_pro',
+  userId: 'usr_123',
+  returnUrl: 'https://tezca.mx/billing/success',
+  product: 'tezca',
+});
+
+// Upgrade with product field
+const { checkoutUrl, provider } = await client.upgrade({
+  plan: 'enclii_pro',
+  product: 'enclii',
+});
 ```
 
 ### Check Usage Limits
@@ -349,4 +448,4 @@ All billing operations are logged:
 
 **Module**: `apps/api/src/modules/billing/`
 **Status**: Production
-**Last Updated**: January 2025
+**Last Updated**: February 2026
