@@ -65,7 +65,7 @@ export class JanuaBillingService {
   private readonly enabled: boolean;
 
   constructor(private config: ConfigService) {
-    this.januaApiUrl = this.config.get<string>('JANUA_API_URL', 'http://janua-api:8001');
+    this.januaApiUrl = this.config.get<string>('JANUA_API_URL', '');
     this.januaApiKey = this.config.get<string>('JANUA_API_KEY', '');
     this.enabled = this.config.get<boolean>('JANUA_BILLING_ENABLED', true);
 

@@ -69,9 +69,13 @@ export class JanuaStrategy extends PassportStrategy(Strategy, 'janua') {
 
   constructor(private prisma: PrismaService) {
     // Get OIDC configuration from environment
-    const jwksUri = process.env.JANUA_JWKS_URI || 'https://auth.madfam.io/.well-known/jwks.json';
-    const issuer = process.env.JANUA_ISSUER || 'https://auth.madfam.io';
+    const jwksUri = process.env.JANUA_JWKS_URI;
+    const issuer = process.env.JANUA_ISSUER;
     const audience = process.env.JANUA_AUDIENCE || 'dhanam-api';
+
+    if (!jwksUri || !issuer) {
+      throw new Error('JANUA_JWKS_URI and JANUA_ISSUER env vars are required');
+    }
 
     super({
       // Extract JWT from Authorization: Bearer <token> header

@@ -85,11 +85,11 @@ jobs:
           provenance: false
           sbom: false
           build-args: |
-            NEXT_PUBLIC_API_URL=https://api.dhan.am/v1
-            NEXT_PUBLIC_BASE_URL=https://app.dhan.am
-            NEXT_PUBLIC_OIDC_ISSUER=https://auth.madfam.io
-            NEXT_PUBLIC_OIDC_CLIENT_ID=jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t
-            NEXT_PUBLIC_JANUA_API_URL=https://auth.madfam.io
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_BASE_URL=${{ vars.NEXT_PUBLIC_BASE_URL }}
+            NEXT_PUBLIC_OIDC_ISSUER=${{ vars.NEXT_PUBLIC_OIDC_ISSUER }}
+            NEXT_PUBLIC_OIDC_CLIENT_ID=${{ vars.NEXT_PUBLIC_OIDC_CLIENT_ID }}
+            NEXT_PUBLIC_JANUA_API_URL=${{ vars.NEXT_PUBLIC_JANUA_API_URL }}
 
       - name: Sign image with cosign
         if: steps.build.outcome == 'success'

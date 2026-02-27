@@ -62,7 +62,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://api.dhan.am https://us.i.posthog.com https://auth.madfam.io",
+              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am'} https://us.i.posthog.com ${process.env.NEXT_PUBLIC_OIDC_ISSUER || 'https://auth.madfam.io'}`,
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
