@@ -538,8 +538,8 @@ importers:
         specifier: ~8.0.9
         version: 8.0.11(expo@54.0.33)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))(react@18.3.1)
       expo-local-authentication:
-        specifier: ~17.0.8
-        version: 17.0.8(expo@54.0.33)
+        specifier: ~55.0.8
+        version: 55.0.8(expo@54.0.33)
       expo-notifications:
         specifier: ~0.32.13
         version: 0.32.16(expo@54.0.33)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))(react@18.3.1)
@@ -7398,8 +7398,8 @@ packages:
       react: 18.3.1
       react-native: '*'
 
-  expo-local-authentication@17.0.8:
-    resolution: {integrity: sha512-Q5fXHhu6w3pVPlFCibU72SYIAN+9wX7QpFn9h49IUqs0Equ44QgswtGrxeh7fdnDqJrrYGPet5iBzjnE70uolA==}
+  expo-local-authentication@55.0.8:
+    resolution: {integrity: sha512-Rv0mv8z8yvTMm+oR7Q0DmpN/FIjdEV5z9NJoZNVI7CyUVV9vFkCALjF95mcCO4VCmuPHDbzKPD50IzM1c5vNQg==}
     peerDependencies:
       expo: '*'
 
@@ -19881,7 +19881,7 @@ snapshots:
       - expo
       - supports-color
 
-  expo-local-authentication@17.0.8(expo@54.0.33):
+  expo-local-authentication@55.0.8(expo@54.0.33):
     dependencies:
       expo: 54.0.33(@babel/core@7.29.0)(@expo/metro-runtime@3.2.3(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1)))(expo-router@3.5.24)(react-native@0.83.1(@babel/core@7.29.0)(@types/react@19.2.14)(react@18.3.1))(react@18.3.1)
       invariant: 2.2.4
