@@ -271,7 +271,7 @@ jobs:
         run: pnpm audit --audit-level=high || true
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
