@@ -4,6 +4,30 @@ metadata:
   name: dhanam
   project: dhanam
 spec:
+  status:
+    enabled: true
+    entries:
+      - name: Dhanam API
+        url: https://api.dhan.am/health
+        href: https://api.dhan.am
+        group: Dhanam
+        family: MADFAM Platform
+        description: Financial platform API
+      - name: Dhanam Admin
+        url: https://admin.dhan.am
+        group: Dhanam
+        family: MADFAM Platform
+        description: Financial operations console
+      - name: Dhanam Web
+        url: https://dhan.am
+        group: Dhanam
+        family: MADFAM Platform
+        description: Landing page
+      - name: Dhanam App
+        url: https://app.dhan.am
+        group: Dhanam
+        family: MADFAM Platform
+        description: User application
   runtime:
     port: 80
     replicas: 1
