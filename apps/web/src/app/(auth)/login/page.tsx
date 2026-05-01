@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@dhanam/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
 import { Alert, AlertDescription, Button, Separator } from '@dhanam/ui';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { authApi } from '~/lib/api/auth';
@@ -104,17 +104,6 @@ export default function LoginPage() {
             {guestLoginMutation.isPending ? t('accessingDemo') : t('tryDemo')}
           </Button>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <div className="text-sm text-muted-foreground">
-            {t('noAccount')}{' '}
-            <Link href="/register" className="text-primary hover:underline">
-              {t('signUp')}
-            </Link>
-          </div>
-          <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-            {t('forgotPassword')}
-          </Link>
-        </CardFooter>
       </Card>
     </div>
   );

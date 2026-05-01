@@ -16,6 +16,7 @@ import dynamic from 'next/dynamic';
 const UserButton = dynamic(() => import('@janua/react-sdk').then((mod) => mod.UserButton), {
   ssr: false,
 });
+import { useAuth as useJanuaAuth } from '@janua/react-sdk';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaces } from '~/lib/hooks/use-spaces';
 import { useSpaceStore } from '~/stores/space';
@@ -43,12 +44,15 @@ export function DashboardHeader() {
   const { t } = useTranslation('dashboard');
   const { demoHref } = useDemoNavigation();
 
+  const { signOut: januaSignOut } = useJanuaAuth();
+
   const handleLogout = async () => {
     // Clear demo-mode cookie on logout
     if (typeof document !== 'undefined') {
       document.cookie = 'demo-mode=; path=/; max-age=0; SameSite=Lax';
     }
     await logout();
+    await januaSignOut();
     router.push('/login');
   };
 
