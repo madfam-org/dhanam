@@ -11,6 +11,7 @@ Extend Dhanam's autonomous family office with sophisticated trading, scheduling,
 ### 1. Advanced Order Types ⭐ **Priority: High**
 
 **Capabilities:**
+
 - Stop-loss orders (sell when price drops below threshold)
 - Take-profit orders (sell when price reaches target)
 - Trailing stop orders (dynamic stop-loss that follows price)
@@ -18,6 +19,7 @@ Extend Dhanam's autonomous family office with sophisticated trading, scheduling,
 - Good-til-canceled (GTC) orders
 
 **Database Changes:**
+
 ```prisma
 // Add to schema.prisma
 enum AdvancedOrderType {
@@ -42,6 +44,7 @@ model TransactionOrder {
 ```
 
 **Implementation:**
+
 - Price monitoring service (cron job every 5 minutes)
 - Trigger evaluation logic
 - Automatic order conversion (advanced → market order)
@@ -52,12 +55,14 @@ model TransactionOrder {
 ### 2. Scheduled & Recurring Orders ⭐ **Priority: High**
 
 **Capabilities:**
+
 - One-time scheduled orders (execute at specific datetime)
 - Recurring orders (daily/weekly/monthly)
 - Dollar-cost averaging (DCA) automation
 - Scheduled rebalancing
 
 **Database Changes:**
+
 ```prisma
 enum RecurrencePattern {
   once
@@ -82,6 +87,7 @@ model TransactionOrder {
 ```
 
 **Implementation:**
+
 - Scheduling service (cron job every hour)
 - Recurrence calculator
 - DCA strategy templates
@@ -92,12 +98,14 @@ model TransactionOrder {
 ### 3. Multi-Currency FX Conversion ⭐ **Priority: Medium**
 
 **Capabilities:**
+
 - Real-time exchange rates from multiple sources
 - Automatic currency conversion in rebalancing
 - Multi-currency portfolio views
 - FX fee calculation
 
 **Database Changes:**
+
 ```prisma
 model ExchangeRate {
   id            String   @id @default(uuid())
@@ -132,6 +140,7 @@ model FxConversion {
 ```
 
 **Implementation:**
+
 - Exchange rate fetcher service
 - Rate caching (15-minute TTL)
 - FX provider abstraction (Banxico, ECB, Wise API)
@@ -142,12 +151,14 @@ model FxConversion {
 ### 4. Tax-Loss Harvesting ⭐ **Priority: Medium**
 
 **Capabilities:**
+
 - Identify realized losses for tax purposes
 - Wash sale detection (30-day rule)
 - Tax-lot tracking (FIFO, LIFO, specific identification)
 - Annual tax report generation
 
 **Database Changes:**
+
 ```prisma
 enum TaxLotMethod {
   fifo  // First in, first out
@@ -225,6 +236,7 @@ model TaxHarvestingOpportunity {
 ```
 
 **Implementation:**
+
 - Tax lot tracking service
 - Wash sale detector
 - Opportunity scanner (daily cron)
@@ -235,12 +247,14 @@ model TaxHarvestingOpportunity {
 ### 5. Portfolio Backtesting ⭐ **Priority: Low**
 
 **Capabilities:**
+
 - Historical strategy testing
 - Performance metrics calculation
 - Risk analysis (Sharpe ratio, max drawdown)
 - What-if scenarios
 
 **Database Changes:**
+
 ```prisma
 model BacktestStrategy {
   id                String   @id @default(uuid())
@@ -279,6 +293,7 @@ model BacktestStrategy {
 ```
 
 **Implementation:**
+
 - Historical price data fetcher
 - Backtest simulator
 - Performance calculator
@@ -289,21 +304,25 @@ model BacktestStrategy {
 ## Implementation Priority
 
 ### Phase 3a (Week 1):
+
 1. ✅ Advanced order types (stop-loss, take-profit, trailing stop)
 2. ✅ Price monitoring service
 3. ✅ Scheduled execution
 
 ### Phase 3b (Week 2):
+
 4. ✅ Recurring orders
 5. ✅ Multi-currency FX conversion
 6. ✅ Exchange rate service
 
 ### Phase 3c (Week 3):
+
 7. ✅ Tax-loss harvesting basics
 8. ✅ Tax lot tracking
 9. ✅ Wash sale detection
 
 ### Phase 3d (Week 4):
+
 10. ✅ Backtesting framework
 11. ✅ Performance metrics
 12. ✅ Documentation
@@ -313,17 +332,20 @@ model BacktestStrategy {
 ## Technical Considerations
 
 ### Performance:
+
 - Price monitoring every 5 minutes (acceptable load)
 - Scheduled jobs run hourly (low impact)
 - FX rates cached for 15 minutes
 - Tax calculations run daily
 
 ### Security:
+
 - Advanced orders require same OTP verification
 - Scheduled orders respect order limits
 - Tax lot data is user-scoped and private
 
 ### Testing:
+
 - Mock price feeds for advanced order tests
 - Time-based tests for scheduling
 - Historical data fixtures for backtesting
@@ -383,6 +405,7 @@ Equip Dhanam to ingest, parse, and permanently archive any transactional documen
 **Endpoint:** `POST /v1/compliance/ingest`
 
 **Pipeline:**
+
 1. Accept `multipart/form-data` PDF or image (max 25 MB)
 2. Upload original to Cloudflare R2 under tier-based retention prefix:
    - Admin → `retention-20y/` (20 years)
@@ -397,12 +420,20 @@ Equip Dhanam to ingest, parse, and permanently archive any transactional documen
 
 ---
 
-### 2. Belvo Bank Feed Integration ⏳ **Pending credentials**
+### 2. Belvo Bank Feed Integration ✅ **Configured 2026-05-01**
 
-Once Belvo credentials are provisioned:
-- Activate `BELVO_SECRET_ID` / `BELVO_SECRET_PASSWORD` secrets via Enclii
-- Connect `admin@madfam.io` bank accounts (BBVA, Banorte, HSBC MX)
-- Sync transactions automatically; Dhanam will ingest bank statements through the compliance pipeline
+- Corrected secret names in Enclii: `BELVO_SECRET_KEY_ID` / `BELVO_SECRET_KEY_PASSWORD`
+- Configured `BELVO_BASE_URL`, `BELVO_ENV`, `CORS_ORIGINS`
+- Verified connection to Belvo Sandbox (Innovaciones MADFAM / Aldo)
+- **Pending:** Wait for deployment sync and test first bank link for `admin@madfam.io`.
+
+---
+
+### 3. Enclii Status Display Remediation ⏳ **In Investigation**
+
+- Identified bug where services show `0/0 replicas` despite being healthy.
+- Root cause: Missing live Kubernetes status enrichment in `switchyard-api` for externally managed deployments.
+- **Planned:** Implement `k8sClient.GetDeploymentStatusInfo` enrichment in `GetService` and `getProjectServicesOverview` handlers.
 
 ---
 
@@ -436,10 +467,12 @@ Once Belvo credentials are provisioned:
 - [x] Admin tier users can upload PDFs via `POST /v1/compliance/ingest` with 20-year retention
 - [x] Extraction engine falls back to Selva automatically on low-confidence documents
 - [x] `ComplianceRecord` model tracks Karafiel seal status per document
+- [x] Corrected Belvo secret names in Enclii configuration
 - [ ] Belvo bank feed active for `admin@madfam.io`
 - [ ] All `PENDING-*` compliance records re-sealed after Karafiel credentials provisioned
 - [ ] MCP tool registered in Selva for agentic ingestion
 - [ ] R2 lifecycle policies configured for all retention tiers
+- [ ] Fix Enclii `0/0 replicas` display bug (Switchyard API/UI status sync)
 
 ---
 
