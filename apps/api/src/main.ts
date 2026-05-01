@@ -16,6 +16,8 @@ import fastifyCsrfProtection from '@fastify/csrf-protection';
 import fastifyHelmet from '@fastify/helmet';
 // eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
 import fastifyRateLimit from '@fastify/rate-limit';
+// eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
+import fastifyMultipart from '@fastify/multipart';
 import { QueueService } from '@modules/jobs/queue.service';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -100,6 +102,15 @@ async function bootstrap() {
   // Compression
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
   await app.register(fastifyCompress as any, { encodings: ['gzip', 'deflate'] });
+
+  // Multipart form data (for compliance document uploads)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+  await app.register(fastifyMultipart as any, {
+    limits: {
+      fileSize: 25 * 1024 * 1024, // 25MB max per file
+      files: 1,                   // one file per request
+    },
+  });
 
   // Rate limiting
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
