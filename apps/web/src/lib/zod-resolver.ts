@@ -1,7 +1,6 @@
 import { zodResolver as originalZodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
-export function zodResolver(schema: any, options?: any) {
+export const zodResolver: typeof originalZodResolver = (schema: any, options?: any, factoryOptions?: any) => {
   const wrappedSchema = {
     ...schema,
     parse: (values: any, opts?: any) => {
@@ -43,5 +42,5 @@ export function zodResolver(schema: any, options?: any) {
     },
   };
 
-  return originalZodResolver(wrappedSchema, options);
-}
+  return originalZodResolver(wrappedSchema as any, options, factoryOptions);
+};
