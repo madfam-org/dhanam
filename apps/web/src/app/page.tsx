@@ -6,6 +6,7 @@ import { Button } from '@dhanam/ui';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useTranslation } from '@dhanam/shared';
 import { Globe } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Hero } from '@/components/landing/hero';
 import { ProblemSolution } from '@/components/landing/problem-solution';
@@ -21,11 +22,17 @@ function HomePageContent() {
   const analytics = useAnalytics();
   const { t } = useTranslation('landing');
 
-  const appUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am';
+  const appUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+  if (!appUrl && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+    throw new Error('NEXT_PUBLIC_BASE_URL is missing in non-development environment');
+  }
+
+  const resolvedAppUrl = appUrl || 'https://app.dhan.am';
 
   useEffect(() => {
     if (isAuthenticated) {
-      window.location.href = `${appUrl}/dashboard`;
+      window.location.href = `${resolvedAppUrl}/dashboard`;
     } else {
       analytics.trackPageView('Landing Page', '/');
     }
@@ -55,18 +62,19 @@ function HomePageContent() {
         expiresAt: new Date(Date.now() + 60 * 60 * 1000),
       });
 
-      window.location.href = `${appUrl}/dashboard`;
+      window.location.href = `${resolvedAppUrl}/dashboard`;
     } catch (error) {
       console.error('Guest login failed:', error);
+      toast.error('Failed to access demo session. Redirecting to demo menu.');
       analytics.track('demo_session_failed', { error: String(error) });
-      window.location.href = `${appUrl}/demo`;
+      window.location.href = `${resolvedAppUrl}/demo`;
     }
   };
 
   const handleSignUpClick = (plan?: string) => {
     analytics.track('signup_clicked', { source: 'landing_cta', plan });
     const planParam = plan ? `?plan=${plan}` : '';
-    window.location.href = `${appUrl}/register${planParam}`;
+    window.location.href = `${resolvedAppUrl}/register${planParam}`;
   };
 
   return (
@@ -79,10 +87,10 @@ function HomePageContent() {
             <h1 className="text-2xl font-bold">Dhanam</h1>
           </div>
           <div className="flex items-center gap-4">
-            <a href={`${appUrl}/login`}>
+            <a href={`${resolvedAppUrl}/login`}>
               <Button variant="ghost">{t('nav.login')}</Button>
             </a>
-            <a href={`${appUrl}/register`}>
+            <a href={`${resolvedAppUrl}/register`}>
               <Button>{t('nav.getStarted')}</Button>
             </a>
           </div>

@@ -94,6 +94,14 @@ jest.mock('lucide-react', () => ({
 describe('RegisterForm', () => {
   const mockOnSubmit = jest.fn();
 
+  beforeAll(() => {
+    // Mock scrollIntoView as react-hook-form uses it for focus management on error
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      value: jest.fn(),
+    });
+  });
+
   beforeEach(() => {
     mockOnSubmit.mockClear();
   });

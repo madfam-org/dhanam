@@ -1,4 +1,6 @@
-const DEFAULT_TIMEOUT_MS = 30_000;
+import { API_CONSTANTS } from './constants';
+
+const DEFAULT_TIMEOUT_MS = API_CONSTANTS.DEFAULT_TIMEOUT_MS;
 
 export function fetchWithTimeout(
   url: string,

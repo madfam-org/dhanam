@@ -28,7 +28,8 @@
     "clean": "rm -rf dist .turbo node_modules"
   },
   "dependencies": {
-    "@dhanam/shared": "workspace:*"
+    "@dhanam/shared": "workspace:*",
+    "next": "15.5.11"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

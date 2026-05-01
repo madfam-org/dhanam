@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from '@/lib/zod-resolver';
 import { z } from 'zod';
 import { Button, Input, Label } from '@dhanam/ui';
 import { LoginDto, useTranslation } from '@dhanam/shared';
@@ -36,6 +36,7 @@ export function LoginForm({ onSubmit, isLoading, showTotpField }: LoginFormProps
     formState: { errors },
   } = useForm<LoginDto>({
     resolver: zodResolver(loginSchema),
+    shouldFocusError: false,
   });
 
   return (

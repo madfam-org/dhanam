@@ -161,7 +161,7 @@ export class AuthController {
     }
   }
 
-  @Post('guest')
+  @Post(['guest', 'demo/guest'])
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login as guest for demo access' })
   @ApiResponse({
@@ -197,7 +197,7 @@ export class AuthController {
     };
   }
 
-  @Post('demo/login')
+  @Post(['demo/login', 'demo/persona'])
   @UseGuards(ThrottleAuthGuard)
   @Throttle({
     default: {

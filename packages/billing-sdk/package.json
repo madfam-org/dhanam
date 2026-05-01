@@ -47,5 +47,8 @@
     "sdk",
     "checkout",
     "subscriptions"
-  ]
+  ],
+  "dependencies": {
+    "next": "15.5.11"
+  }
 }

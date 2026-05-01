@@ -1,4 +1,27 @@
 const { withSentryConfig } = require('@sentry/nextjs');
+const { z } = require('zod');
+
+const envSchema = z.object({
+  NEXT_PUBLIC_BASE_URL: z.string().url(),
+  NEXT_PUBLIC_API_URL: z.string().url(),
+});
+
+if (
+  process.env.NODE_ENV !== 'development' &&
+  process.env.NODE_ENV !== 'test' &&
+  process.env.SKIP_ENV_VALIDATION !== 'true'
+) {
+  const parsed = envSchema.safeParse({
+    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  });
+
+  if (!parsed.success) {
+    console.error('❌ Invalid environment variables in non-development environment:');
+    console.error(parsed.error.flatten().fieldErrors);
+    throw new Error('Invalid environment variables for production build');
+  }
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

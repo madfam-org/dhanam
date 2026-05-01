@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useAuth } from '~/lib/hooks/use-auth';
+import { AUTH_CONSTANTS } from '~/lib/constants';
 
 /**
  * Accepts only same-origin relative paths beginning with a single '/' and
@@ -122,8 +123,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const currentTime = Date.now();
       const timeUntilExpiry = expiryTime - currentTime;
 
-      // Refresh token 2 minutes before expiry (tokens expire in 15 minutes)
-      const refreshTime = Math.max(timeUntilExpiry - 2 * 60 * 1000, 30 * 1000); // At least 30s
+      // Refresh token before expiry
+      const refreshTime = Math.max(
+        timeUntilExpiry - AUTH_CONSTANTS.TOKEN_REFRESH_BUFFER_MS,
+        AUTH_CONSTANTS.MINIMUM_REFRESH_INTERVAL_MS
+      );
 
       if (refreshTime > 0) {
         const refreshTimer = setTimeout(async () => {

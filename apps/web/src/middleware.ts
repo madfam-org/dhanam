@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { AUTH_CONSTANTS } from './lib/constants';
 
 // Paths that don't require authentication
 const publicPaths = [
@@ -110,7 +111,11 @@ export function middleware(request: NextRequest) {
   if (path.startsWith('/demo/')) {
     const demoPath = path.replace(/^\/demo/, '') || '/dashboard';
     const response = NextResponse.rewrite(new URL(demoPath, request.url));
-    response.cookies.set('demo-mode', 'true', { path: '/', maxAge: 7200, sameSite: 'lax' });
+    response.cookies.set('demo-mode', 'true', {
+      path: '/',
+      maxAge: AUTH_CONSTANTS.DEMO_COOKIE_MAX_AGE_S,
+      sameSite: 'lax',
+    });
     return response;
   }
 
@@ -121,7 +126,7 @@ export function middleware(request: NextRequest) {
   // Set geo cookie if not already set
   if (countryCode && !request.cookies.get('dhanam_geo')) {
     response.cookies.set('dhanam_geo', countryCode, {
-      maxAge: 365 * 24 * 60 * 60, // 1 year
+      maxAge: AUTH_CONSTANTS.GEO_COOKIE_MAX_AGE_S,
       path: '/',
       sameSite: 'lax',
     });
@@ -164,13 +169,13 @@ export function middleware(request: NextRequest) {
       // Set locale cookie
       const rewrite = NextResponse.rewrite(new URL(`/${locale}/landing`, request.url));
       rewrite.cookies.set('dhanam_locale', locale, {
-        maxAge: 365 * 24 * 60 * 60,
+        maxAge: AUTH_CONSTANTS.GEO_COOKIE_MAX_AGE_S,
         path: '/',
         sameSite: 'lax',
       });
       if (countryCode && !request.cookies.get('dhanam_geo')) {
         rewrite.cookies.set('dhanam_geo', countryCode, {
-          maxAge: 365 * 24 * 60 * 60,
+          maxAge: AUTH_CONSTANTS.GEO_COOKIE_MAX_AGE_S,
           path: '/',
           sameSite: 'lax',
         });

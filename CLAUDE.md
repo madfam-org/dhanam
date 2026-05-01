@@ -672,3 +672,12 @@ argocd` and the finalizer takes care of the namespace.
 - **API PORT**: Local API runs on port from `.env` (`PORT=8500`), not 4010. Set `NEXT_PUBLIC_API_URL=http://localhost:8500/v1` for the web app.
 - **Prisma migration**: After schema changes, run `npx prisma db push` against a running database before the API starts.
 - **SMTP env var**: The canonical name is `SMTP_PASSWORD` (not `SMTP_PASS`). K8s mounts `SMTP_PASSWORD`, and `email.service.ts` reads it directly via `configService.get('SMTP_PASSWORD')`.
+
+## Known Issues — Audit 2026-04-23
+
+See `/Users/aldoruizluna/labspace/claudedocs/ECOSYSTEM_AUDIT_2026-04-23.md` for the full ecosystem audit.
+
+- **🟡 UI: Silent error swallow on guest login** — `apps/web/src/app/page.tsx:59-62` catches + `console.error` + redirects to `/demo`; user sees no feedback. Add toast notification.
+- **🟡 UI: Hardcoded prod URL as fallback** — `apps/web/src/app/page.tsx:24` — `process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am'`. Throw in non-dev instead; Zod-validate in `next.config.ts`.
+- **🟡 T5: 5 form validation tests skipped** — `apps/web/src/components/forms/login-form.test.tsx:117`, `register-form.test.tsx:158, 172, 187, 201`. Un-skip and fix.
+- **🟡 T6: Demo auth endpoints return 404** — `/v1/auth/demo/guest` and `/v1/auth/demo/persona` not registered in router (blocks all E2E tests per BROWSER-TEST-REPORT.md).

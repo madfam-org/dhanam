@@ -173,7 +173,7 @@ export const auth = {
 
   // Placeholders
   placeholders: {
-    email: 'voce@exemplo.com',
+    email: 'você@exemplo.com',
     password: '••••••••',
     totpCode: '123456',
     fullName: 'João Silva',
