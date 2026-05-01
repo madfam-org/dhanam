@@ -365,3 +365,84 @@ model BacktestStrategy {
 **Dependencies:** Phase 2 completion, price data API integration
 
 **Risk:** Price data availability, FX rate source reliability, tax law complexity
+
+---
+
+## Phase 4: Compliance & Agentic Document Intelligence
+
+> **Status:** In Progress (started 2026-05-01)
+
+### Goals
+
+Equip Dhanam to ingest, parse, and permanently archive any transactional document (PDF receipts, invoices, CFDI, bank statements, images) with first-class compliance traceability via Karafiel and intelligent fallback to the Selva agentic inference network.
+
+---
+
+### 1. Compliance Document Ingestion ✅ **Shipped 2026-05-01**
+
+**Endpoint:** `POST /v1/compliance/ingest`
+
+**Pipeline:**
+1. Accept `multipart/form-data` PDF or image (max 25 MB)
+2. Upload original to Cloudflare R2 under tier-based retention prefix:
+   - Admin → `retention-20y/` (20 years)
+   - Premium → `retention-10y/` (10 years)
+   - Pro → `retention-7y/` (7 years)
+   - Essentials → `retention-5y/` (5 years)
+   - Community → `retention-3y/` (3 years)
+3. Extract structured transaction metadata via **GPT-4o-mini vision** (native)
+4. If confidence < 0.5 or extraction fails → **Selva fallback** (`X-Agent: dhanam-document-extractor`)
+5. Dispatch metadata + R2 URI to **Karafiel** for NOM-151 compliance seal
+6. Persist `ComplianceRecord` with Karafiel 1:1 link and retention label
+
+---
+
+### 2. Belvo Bank Feed Integration ⏳ **Pending credentials**
+
+Once Belvo credentials are provisioned:
+- Activate `BELVO_SECRET_ID` / `BELVO_SECRET_PASSWORD` secrets via Enclii
+- Connect `admin@madfam.io` bank accounts (BBVA, Banorte, HSBC MX)
+- Sync transactions automatically; Dhanam will ingest bank statements through the compliance pipeline
+
+---
+
+### 3. Karafiel Deep Integration 🔲 **Planned**
+
+- Activate `KARAFIEL_API_KEY` and `KARAFIEL_API_URL` secrets
+- Re-seal all `PENDING-*` compliance records created during mock period
+- Add cron job `reprocess-pending-compliance-records` to retry failed seals
+- Surface Karafiel seal status in Admin Dashboard
+
+---
+
+### 4. Agentic Ingestion via Selva MCP 🔲 **Planned**
+
+- Expose `dhanam.ingest_document(file_url, space_id, category)` as an MCP tool within Selva
+- Enables any Selva-powered agent (Chief of Staff, Autoswarm) to directly feed receipts and invoices into Dhanam without human intervention
+- Priority for `admin@madfam.io` MADFAM operations ingestion
+
+---
+
+### 5. R2 Lifecycle Policy Automation 🔲 **Planned**
+
+- Configure Cloudflare R2 bucket lifecycle rules via Terraform/Enclii to automatically expire objects at the correct prefix after retention period
+- Purge objects at `retention-3y/` after 3 years, `retention-20y/` after 20 years, etc.
+- Emit a `document.purged` webhook to Karafiel before deletion for audit trail
+
+---
+
+## Phase 4 Success Criteria
+
+- [x] Admin tier users can upload PDFs via `POST /v1/compliance/ingest` with 20-year retention
+- [x] Extraction engine falls back to Selva automatically on low-confidence documents
+- [x] `ComplianceRecord` model tracks Karafiel seal status per document
+- [ ] Belvo bank feed active for `admin@madfam.io`
+- [ ] All `PENDING-*` compliance records re-sealed after Karafiel credentials provisioned
+- [ ] MCP tool registered in Selva for agentic ingestion
+- [ ] R2 lifecycle policies configured for all retention tiers
+
+---
+
+**Estimated Completion:** 2026-06-01
+**Owner:** MADFAM Engineering
+**Dependencies:** Belvo credentials, Karafiel API key, Selva MCP registry

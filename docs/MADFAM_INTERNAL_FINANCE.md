@@ -15,9 +15,11 @@ pnpm db:seed:madfam
 ## Configuration Overview
 
 ### Admin User
-- **Email:** finance@madfam.org
-- **Role:** Owner of all MADFAM spaces
-- **SSO:** Should be linked to Janua identity system
+- **Email:** admin@madfam.io
+- **Role:** Owner / Top Admin — `isAdmin: true`, `subscriptionTier: admin`
+- **SSO:** Linked to Janua identity. Login at `https://app.dhan.am/login`
+- **Retention:** All documents ingested under this account use the **20-year** R2 archival prefix (`retention-20y/`)
+- **Karafiel:** One-to-one compliance link to Karafiel for all ingested transactional documents
 
 ### Spaces Created
 
@@ -87,9 +89,55 @@ The `finance@madfam.org` user should authenticate via Janua:
 // No additional configuration needed if Janua is running
 ```
 
-### Bank Feeds (Future)
+### Document Compliance Ingestion
+Dhanam now supports native PDF/image ingestion of transactional documents directly linked to Karafiel.
+
+#### Ingest a receipt or invoice
+
+```bash
+# Upload a PDF receipt (authenticated as admin@madfam.io)
+curl -X POST https://api.dhan.am/v1/compliance/ingest \
+  -H "Authorization: Bearer <ACCESS_TOKEN>" \
+  -F "file=@invoice-2026-04.pdf" \
+  -F "spaceId=<YOUR_SPACE_ID>" \
+  -F "category=invoice"
+```
+
+#### Response
+```json
+{
+  "complianceRecordId": "uuid",
+  "karafielId": "KAR-ABC123...",
+  "retentionPolicy": "20_YEARS",
+  "extractionEngine": "native",
+  "transactionSummary": {
+    "date": "2026-04-30",
+    "amount": 1250.00,
+    "currency": "MXN",
+    "merchant": "Proveedor SA de CV",
+    "confidence": 0.92
+  }
+}
+```
+
+The extraction engine will:
+1. **Native**: Use GPT-4o-mini vision to parse the document.
+2. **Selva fallback**: If confidence < 0.5, route automatically to Selva for deep agentic analysis.
+3. **Karafiel sealing**: Send extracted metadata + R2 storage URI to Karafiel for NOM-151 compliance.
+4. **20-year archival**: Original PDF stored under `spaces/{spaceId}/compliance/retention-20y/` in R2.
+
+#### Required secrets (activate via Enclii)
+```bash
+enclii secrets set OPENAI_API_KEY=sk-...         --service dhanam-api
+enclii secrets set SELVA_API_KEY=...              --service dhanam-api
+enclii secrets set KARAFIEL_API_KEY=...           --service dhanam-api
+enclii secrets set KARAFIEL_API_URL=https://api.karafiel.madfam.io  --service dhanam-api
+```
+
+### Bank Feeds (Pending Belvo activation)
 - **Plaid:** For US bank accounts
-- **Belvo:** For Mexican bank accounts (BBVA, Banorte, etc.)
+- **Belvo:** For Mexican bank accounts (BBVA, Banorte, etc.) — awaiting credentials
+- **Manual ingestion:** Use `POST /v1/compliance/ingest` to feed PDFs/images while Belvo is being provisioned
 
 ### Accounting Import (Future)
 - Import from QuickBooks/Xero via CSV

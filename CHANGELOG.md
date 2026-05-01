@@ -35,6 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Compliance document ingestion pipeline** (`POST /v1/compliance/ingest`): Native PDF/image extraction pipeline for transactional documents. Uses GPT-4o-mini vision for structured metadata extraction (date, amount, merchant, RFC, CFDI UUID, line items). Falls back automatically to **Selva** (agentic inference router) for complex or unrecognized formats. Uploads originals to Cloudflare R2 under tier-based retention prefixes (admin → 20 years, premium → 10 years, pro → 7 years). Dispatches structured transaction metadata to **Karafiel** for one-to-one compliance sealing and NOM-151 provenance anchoring. Results persisted in new `ComplianceRecord` model.
+- **`ComplianceRecord` database model**: Tracks document key, Karafiel seal ID (1:1), retention policy label, and extraction state (`NATIVE_SUCCESS`, `SELVA_PROCESSED`, `FAILED`).
+- **`KarafielService`**: Sends extracted transaction metadata + R2 provenance URI to Karafiel's compliance API. Degrades gracefully with a `PENDING-*` mock receipt when `KARAFIEL_API_KEY` is not configured.
+- **`DocumentExtractionService`**: Dual-engine document parser with native OpenAI vision extraction and automatic Selva fallback (confidence threshold 0.5).
+- **`@fastify/multipart` registration**: Multipart/form-data support added to the Fastify bootstrap (25 MB limit, 1 file per request).
+- **Login page UX**: Removed duplicate "Sign Up" link below Janua SSO widget.
+- **Sign out fix**: Dashboard header logout now calls Janua's `signOut()` to correctly destroy the SSO session, preventing automatic re-login.
+
 - **Analytics wiring**: PostHog event tracking wired into 12 frontend components — login (identifyUser), register (trackSignUp), logout (posthog.reset), onboarding steps, provider connections (Belvo/Plaid/Bitso), dashboard (trackViewNetWorth), category correction (trackTxnCategorized), budget creation (trackBudgetCreated)
 - **Lifecycle drip campaigns**: Automated email sequences via `DripCampaignTask` with 2 daily cron jobs — activation drips (day 1/3/7/14) and re-engagement drips (day 7/14 inactive). Backed by `DripEvent` Prisma model with idempotent unique constraint, 6 Handlebars templates, and PostHog tracking
 - **Auth provider separation (A1-A2)**: Extracted auth logic into `AuthProvider`/`MfaProvider` interfaces with `LocalAuthProvider` and `JanuaAuthProvider` implementations. `AUTH_MODE` env var (`local`|`janua`) selects the active provider at module init. `JwtAuthGuard` tries Janua RS256 first, falls back to local HS256 for demo/guest tokens. Security settings page links to Janua account in SSO mode. Frontend `auth.ts` supports both local and Janua auth endpoints
