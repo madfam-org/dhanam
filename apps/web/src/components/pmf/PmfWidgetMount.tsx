@@ -57,7 +57,7 @@ function isFlagEnabled(): boolean {
 }
 
 function getTulanaApiUrl(): string {
-  return process.env.NEXT_PUBLIC_TULANA_API_URL || 'https://api.tulana.madfam.io';
+  return process.env.NEXT_PUBLIC_TULANA_API_URL || 'https://tulana-api.madfam.io';
 }
 
 /**
