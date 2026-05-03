@@ -1,7 +1,9 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { EsgPortfolioSummary } from './esg-portfolio-summary';
+import React from 'react';
+
 import type { PortfolioEsgAnalysis } from '@/hooks/useEsg';
+
+import { EsgPortfolioSummary } from './esg-portfolio-summary';
 
 // Mock UI components
 jest.mock('@/components/ui/card', () => ({

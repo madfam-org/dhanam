@@ -1,24 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { cn } from '@dhanam/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import { Progress } from '@dhanam/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dhanam/ui';
+import { Budget, BudgetPeriod, useTranslation } from '@dhanam/shared';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,18 +10,41 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+  Label,
+  Progress,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@dhanam/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Loader2, PiggyBank, Settings, Pencil, Trash2, X, Check } from 'lucide-react';
-import { useSpaceStore } from '@/stores/space';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import { BudgetAnalytics } from '@/components/budgets/budget-analytics';
+import { RuleManager } from '@/components/budgets/rule-manager';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { budgetsApi, CategorySummary } from '@/lib/api/budgets';
 import { categoriesApi } from '@/lib/api/categories';
-import { Budget, BudgetPeriod } from '@dhanam/shared';
-import { useTranslation } from '@dhanam/shared';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { toast } from 'sonner';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { RuleManager } from '@/components/budgets/rule-manager';
-import { BudgetAnalytics } from '@/components/budgets/budget-analytics';
+import { useSpaceStore } from '@/stores/space';
 
 export default function BudgetsPage() {
   const { currentSpace } = useSpaceStore();

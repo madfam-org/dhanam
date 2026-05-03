@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useAuth } from '~/lib/hooks/use-auth';
+
 import { AUTH_CONSTANTS } from '~/lib/constants';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 /**
  * Accepts only same-origin relative paths beginning with a single '/' and

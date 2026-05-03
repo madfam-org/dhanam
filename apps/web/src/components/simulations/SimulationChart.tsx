@@ -1,7 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import type { MonthlySnapshot } from '@/hooks/useSimulations';
+import { useTranslation } from '@dhanam/shared';
 import {
   Line,
   XAxis,
@@ -12,7 +11,9 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { useTranslation } from '@dhanam/shared';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import type { MonthlySnapshot } from '@/hooks/useSimulations';
 
 interface SimulationChartProps {
   timeSeries: MonthlySnapshot[];

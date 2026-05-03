@@ -1,7 +1,5 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Brain, TrendingUp, Zap, Clock, DollarSign } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -15,6 +13,8 @@ import {
   TabsList,
   TabsTrigger,
 } from '@dhanam/ui';
+import { Brain, TrendingUp, Zap, Clock, DollarSign } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface MlInsights {
   period: string;

@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import { AdminNav } from '~/components/admin/admin-nav';
+
 import { AdminHeader } from '~/components/admin/admin-header';
-import { useAuth } from '~/lib/hooks/use-auth';
+import { AdminNav } from '~/components/admin/admin-nav';
 import { AdminProvider } from '~/contexts/AdminContext';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated } = useAuth();

@@ -1,6 +1,10 @@
 import { zodResolver as originalZodResolver } from '@hookform/resolvers/zod';
 
-export const zodResolver: typeof originalZodResolver = (schema: any, options?: any, factoryOptions?: any) => {
+export const zodResolver: typeof originalZodResolver = (
+  schema: any,
+  options?: any,
+  factoryOptions?: any
+) => {
   const wrappedSchema = {
     ...schema,
     parse: (values: any, opts?: any) => {

@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { adminApi, type ProviderHealth } from '~/lib/api/admin';
-import { ProviderStatusTable } from '~/components/admin/provider-status-table';
+import { Card, Skeleton, Button } from '@dhanam/ui';
 import { RefreshCw } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
+import { ProviderStatusTable } from '~/components/admin/provider-status-table';
+import { adminApi, type ProviderHealth } from '~/lib/api/admin';
 
 export default function ProvidersPage() {
   const [providers, setProviders] = useState<ProviderHealth[]>([]);

@@ -1,13 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Switch } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dhanam/ui';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Separator } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { usePreferences } from '@/contexts/PreferencesContext';
+import {
+  Switch,
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Separator,
+  Badge,
+} from '@dhanam/ui';
 /* eslint-disable @typescript-eslint/no-explicit-any -- Reason: React 19 compatibility; Lucide icons cast to any to bypass TS2786 JSX type errors */
 import {
   Bell,
@@ -19,6 +27,9 @@ import {
   AlertCircle,
   CheckCircle,
 } from 'lucide-react';
+import React, { useState } from 'react';
+
+import { usePreferences } from '@/contexts/PreferencesContext';
 
 // React 19 compatibility wrappers
 const BellIcon = Bell as any;

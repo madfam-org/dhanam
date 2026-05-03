@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
 import { Lightbulb } from 'lucide-react';
+import { useMemo } from 'react';
 
 export interface InsightsCardProps {
   netWorth?: number;

@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
+import { Account, AccountType, Currency, Provider, useTranslation } from '@dhanam/shared';
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -12,17 +15,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@dhanam/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dhanam/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
   MoreVertical,
@@ -34,15 +39,16 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
-import { useSpaceStore } from '@/stores/space';
-import { accountsApi } from '@/lib/api/accounts';
-import { Account, AccountType, Currency, Provider, useTranslation } from '@dhanam/shared';
-import { formatCurrency } from '@/lib/utils';
+import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
-import { BelvoConnect } from '@/components/providers/belvo-connect';
-import { PlaidConnect } from '@/components/providers/plaid-connect';
-import { BitsoConnect } from '@/components/providers/bitso-connect';
+
 import { AccountDetailSheet } from '@/components/accounts/account-detail-sheet';
+import { BelvoConnect } from '@/components/providers/belvo-connect';
+import { BitsoConnect } from '@/components/providers/bitso-connect';
+import { PlaidConnect } from '@/components/providers/plaid-connect';
+import { accountsApi } from '@/lib/api/accounts';
+import { formatCurrency } from '@/lib/utils';
+import { useSpaceStore } from '@/stores/space';
 
 const accountTypeIcons: Record<AccountType, React.ElementType> = {
   checking: Building2,

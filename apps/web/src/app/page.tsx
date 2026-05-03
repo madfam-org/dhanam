@@ -1,21 +1,21 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { Button } from '@dhanam/ui';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useTranslation } from '@dhanam/shared';
+import { Button } from '@dhanam/ui';
 import { Globe } from 'lucide-react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 
-import { Hero } from '@/components/landing/hero';
-import { ProblemSolution } from '@/components/landing/problem-solution';
-import { HowItWorks } from '@/components/landing/how-it-works';
 import { FeaturesGrid } from '@/components/landing/features-grid';
-import { SocialProof } from '@/components/landing/social-proof';
-import { Pricing } from '@/components/landing/pricing';
 import { FinalCta } from '@/components/landing/final-cta';
 import { Footer } from '@/components/landing/footer';
+import { Hero } from '@/components/landing/hero';
+import { HowItWorks } from '@/components/landing/how-it-works';
+import { Pricing } from '@/components/landing/pricing';
+import { ProblemSolution } from '@/components/landing/problem-solution';
+import { SocialProof } from '@/components/landing/social-proof';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 function HomePageContent() {
   const { isAuthenticated } = useAuth();

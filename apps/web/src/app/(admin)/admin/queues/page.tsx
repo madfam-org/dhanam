@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Skeleton } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Card } from '@dhanam/ui';
-import { adminApi, type QueueInfo } from '~/lib/api/admin';
-import { QueueCard } from '~/components/admin/queue-card';
+import { Skeleton, Button, Card } from '@dhanam/ui';
 import { RefreshCw } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
+import { QueueCard } from '~/components/admin/queue-card';
+import { adminApi, type QueueInfo } from '~/lib/api/admin';
 
 export default function QueuesPage() {
   const [queues, setQueues] = useState<QueueInfo[]>([]);

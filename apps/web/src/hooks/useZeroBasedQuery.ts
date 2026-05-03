@@ -3,7 +3,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { useSpaceStore } from '@/stores/space';
 import {
   zeroBasedApi,
   zeroBasedKeys,
@@ -22,6 +21,7 @@ import {
   CreateIncomeEventResponse,
   SetGoalResponse,
 } from '@/lib/api/zero-based';
+import { useSpaceStore } from '@/stores/space';
 
 // Default stale time: 30 seconds for budget data
 const DEFAULT_STALE_TIME = 30 * 1000;

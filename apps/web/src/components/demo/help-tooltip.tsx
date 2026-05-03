@@ -1,8 +1,8 @@
 'use client';
 
+import { useTranslation } from '@dhanam/shared';
 import { Info } from 'lucide-react';
 import { useState } from 'react';
-import { useTranslation } from '@dhanam/shared';
 
 interface HelpTooltipProps {
   content: string;

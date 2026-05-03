@@ -1,8 +1,8 @@
 'use client';
 
+import { Currency, useTranslation } from '@dhanam/shared';
+import { Card, CardContent, CardHeader, CardTitle, Badge } from '@dhanam/ui';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
 import { TrendingUp, TrendingDown, AlertTriangle, Calendar } from 'lucide-react';
 import {
   BarChart,
@@ -18,9 +18,9 @@ import {
   LineChart,
   Line,
 } from 'recharts';
+
 import { budgetsApi } from '@/lib/api/budgets';
 import { formatCurrency } from '@/lib/utils';
-import { Currency, useTranslation } from '@dhanam/shared';
 
 interface BudgetAnalyticsProps {
   spaceId: string;

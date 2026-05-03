@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from '@dhanam/shared';
+
 import { LegalPageLayout } from '~/components/legal/legal-page-layout';
 
 export default function CookiesPage() {

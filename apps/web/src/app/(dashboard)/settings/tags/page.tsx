@@ -1,25 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
+import { TAG_COLORS } from '@dhanam/shared';
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  Input,
+  Label,
 } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Plus, Pencil, Trash2, Tag } from 'lucide-react';
-import { useSpaceStore } from '@/stores/space';
-import { tagsApi, Tag as TagType, CreateTagDto, UpdateTagDto } from '@/lib/api/tags';
-import { TAG_COLORS } from '@dhanam/shared';
+import { useState } from 'react';
 import { toast } from 'sonner';
+
+import { tagsApi, Tag as TagType, CreateTagDto, UpdateTagDto } from '@/lib/api/tags';
+import { useSpaceStore } from '@/stores/space';
 
 export default function TagsSettingsPage() {
   const { currentSpace } = useSpaceStore();

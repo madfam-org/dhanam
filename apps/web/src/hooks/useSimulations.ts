@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
 import { FINANCIAL_DEFAULTS } from '@dhanam/shared';
-import { useAuth } from '@/lib/hooks/use-auth';
+import { useState, useRef, useEffect } from 'react';
+
 import { fetchWithTimeout } from '@/lib/fetch-with-timeout';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export interface MonteCarloConfig {
   initialBalance: number;

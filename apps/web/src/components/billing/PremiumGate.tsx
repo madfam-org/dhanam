@@ -1,7 +1,9 @@
 'use client';
 
 import { ReactNode } from 'react';
+
 import { useAuth } from '~/lib/hooks/use-auth';
+
 import { PremiumUpsell } from './PremiumUpsell';
 
 type SubscriptionTier = 'community' | 'essentials' | 'pro' | 'premium';

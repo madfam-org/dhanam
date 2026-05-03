@@ -1,8 +1,8 @@
 'use client';
 
 import { useTranslation, I18nContext } from '@dhanam/shared';
-import { useContext } from 'react';
 import { ExternalLink } from 'lucide-react';
+import { useContext } from 'react';
 
 const partnerLogos: Record<string, string> = {
   Belvo: '🏦',

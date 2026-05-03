@@ -1,8 +1,9 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BudgetAnalytics } from './budget-analytics';
 import { Currency } from '@dhanam/shared';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+
+import { BudgetAnalytics } from './budget-analytics';
 
 // Create a test query client
 const createTestQueryClient = () =>

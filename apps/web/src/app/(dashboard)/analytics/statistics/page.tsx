@@ -1,15 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  Label,
+} from '@dhanam/ui';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
 import { Loader2, BarChart3, ShoppingCart, Store, FolderOpen, Receipt } from 'lucide-react';
-import { useSpaceStore } from '@/stores/space';
+import { useState } from 'react';
+
 import { analyticsApi } from '@/lib/api/analytics';
 import { formatCurrency, formatDate } from '@/lib/utils';
+import { useSpaceStore } from '@/stores/space';
 
 function getDefaultDateRange() {
   const now = new Date();

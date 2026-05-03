@@ -1,14 +1,15 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { I18nProvider } from '@dhanam/shared';
-import { ThemeProvider } from '~/components/theme-provider';
-import { AuthProvider } from '~/components/auth-provider';
-import { PreferencesProvider } from '~/contexts/PreferencesContext';
-import PostHogProvider from '~/providers/PostHogProvider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect, useCallback, useRef, type ComponentType } from 'react';
+
+import { AuthProvider } from '~/components/auth-provider';
 import { CookieConsentBanner } from '~/components/cookie-consent-banner';
 import { PmfWidgetMount } from '~/components/pmf/PmfWidgetMount';
+import { ThemeProvider } from '~/components/theme-provider';
+import { PreferencesProvider } from '~/contexts/PreferencesContext';
+import PostHogProvider from '~/providers/PostHogProvider';
 
 /**
  * SSR-safe wrapper: @janua/react-sdk accesses browser APIs at module level,

@@ -1,15 +1,22 @@
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 
-jest.mock('@dhanam/ui', () =>
-  new Proxy({}, {
-    get: (_, prop) => {
-      if (prop === '__esModule') return false;
-      return React.forwardRef(({ children, ...props }: any, ref: any) => (
-        <div ref={ref} {...props}>{children}</div>
-      ));
-    },
-  }),
+jest.mock(
+  '@dhanam/ui',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, prop) => {
+          if (prop === '__esModule') return false;
+          return React.forwardRef(({ children, ...props }: any, ref: any) => (
+            <div ref={ref} {...props}>
+              {children}
+            </div>
+          ));
+        },
+      }
+    )
 );
 
 jest.mock('@dhanam/shared', () => ({
@@ -22,10 +29,15 @@ jest.mock('@dhanam/shared', () => ({
   }),
 }));
 
-jest.mock('lucide-react', () =>
-  new Proxy({}, {
-    get: () => (props: any) => <span {...props} />,
-  }),
+jest.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: () => (props: any) => <span {...props} />,
+      }
+    )
 );
 
 const mockUseQuery = jest.fn().mockReturnValue({ data: null, isLoading: false, isError: false });
@@ -85,7 +97,12 @@ describe('BudgetsPage', () => {
   });
 
   it('should render error state when query fails', () => {
-    mockUseQuery.mockReturnValue({ data: null, isLoading: false, isError: true, error: new Error('API error') });
+    mockUseQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+      isError: true,
+      error: new Error('API error'),
+    });
     const { container } = render(<BudgetsPage />);
     expect(container.textContent).toContain('somethingWentWrong');
     expect(container.textContent).toContain('loadFailed');

@@ -1,14 +1,15 @@
 'use client';
 
+import { RegisterDto, useTranslation } from '@dhanam/shared';
+import { Button, Checkbox, Input, Label } from '@dhanam/ui';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@/lib/zod-resolver';
 import { z } from 'zod';
-import Link from 'next/link';
-import { Button, Checkbox, Input, Label } from '@dhanam/ui';
-import { RegisterDto, useTranslation } from '@dhanam/shared';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+
 import { useGeoDefaults } from '@/lib/hooks/use-geo-defaults';
+import { zodResolver } from '@/lib/zod-resolver';
 
 interface RegisterFormProps {
   onSubmit: (data: RegisterDto) => void;

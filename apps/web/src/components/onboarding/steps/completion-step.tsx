@@ -1,10 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent } from '@dhanam/ui';
+import { Button, Card, CardContent } from '@dhanam/ui';
 import {
   CheckCircleIcon,
   ArrowRightIcon,
@@ -12,6 +8,10 @@ import {
   TrophyIcon,
   RocketIcon,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export function CompletionStep() {
   const router = useRouter();

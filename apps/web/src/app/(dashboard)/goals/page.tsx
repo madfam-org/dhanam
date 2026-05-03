@@ -1,20 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTranslation, FINANCIAL_DEFAULTS } from '@dhanam/shared';
-import { fireGoalConfetti } from '~/lib/celebrations';
-import { formatDate } from '~/lib/utils';
-import { useGoals, type Goal, type GoalProgress, type GoalSummary } from '@/hooks/useGoals';
-import { useSimulations, type GoalProbabilityResult } from '@/hooks/useSimulations';
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { useSpaceStore } from '@/stores/space';
-import { PremiumGate } from '~/components/billing/PremiumGate';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Target,
   TrendingUp,
@@ -26,13 +12,33 @@ import {
   Users,
   Pencil,
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { ShareGoalDialog } from '@/components/goals/share-goal-dialog';
-import { SharedGoalsList } from '@/components/goals/shared-goals-list';
+
 import { GoalActivityFeed } from '@/components/goals/goal-activity-feed';
-import { ShareManagementPanel } from '@/components/goals/share-management-panel';
 import { GoalEditDialog } from '@/components/goals/goal-edit-dialog';
-import type { UpdateGoalInput } from '@/hooks/useGoals';
+import { ShareGoalDialog } from '@/components/goals/share-goal-dialog';
+import { ShareManagementPanel } from '@/components/goals/share-management-panel';
+import { SharedGoalsList } from '@/components/goals/shared-goals-list';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import {
+  useGoals,
+  type Goal,
+  type GoalProgress,
+  type GoalSummary,
+  UpdateGoalInput,
+} from '@/hooks/useGoals';
+import { useSimulations, type GoalProbabilityResult } from '@/hooks/useSimulations';
+import { useSpaceStore } from '@/stores/space';
+import { PremiumGate } from '~/components/billing/PremiumGate';
+import { fireGoalConfetti } from '~/lib/celebrations';
+import { formatDate } from '~/lib/utils';
 
 export default function GoalsPage() {
   const { t } = useTranslation('goals');

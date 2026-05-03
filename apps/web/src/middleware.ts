@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+
 import { AUTH_CONSTANTS } from './lib/constants';
 
 // Paths that don't require authentication

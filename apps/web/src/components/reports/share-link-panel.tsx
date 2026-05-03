@@ -1,11 +1,9 @@
 'use client';
 
+import { formatDistanceToNow } from 'date-fns';
+import { Link2, Copy, Trash2, Loader2, Plus, Check } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,9 +14,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Link2, Copy, Trash2, Loader2, Plus, Check } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { reportsApi, type ShareToken } from '@/lib/api/reports';
-import { formatDistanceToNow } from 'date-fns';
 
 interface ShareLinkPanelProps {
   reportId: string;

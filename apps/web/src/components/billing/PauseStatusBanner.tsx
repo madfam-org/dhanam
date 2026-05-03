@@ -1,8 +1,7 @@
 'use client';
 
-import { PauseCircle } from 'lucide-react';
-
 import { Button } from '@dhanam/ui';
+import { PauseCircle } from 'lucide-react';
 
 interface PauseStatusBannerProps {
   pausedUntil: string | null;

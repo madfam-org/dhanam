@@ -1,7 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Button } from '@dhanam/ui';
 import { XCircle, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

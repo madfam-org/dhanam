@@ -16,6 +16,7 @@
  *     "Cannot read properties of null (reading 'useState')" errors).
  */
 import { render, waitFor } from '@testing-library/react';
+
 import { PmfWidgetMount } from '~/components/pmf/PmfWidgetMount';
 
 const mockUsePathname = jest.fn<string | null, []>(() => '/dashboard');

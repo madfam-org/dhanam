@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Button } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
+import { Button } from '@dhanam/ui';
 import { CheckCircle, Sparkles, Star } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
 import { billingApi, PricingResponse } from '~/lib/api/billing';
 
 interface PricingProps {

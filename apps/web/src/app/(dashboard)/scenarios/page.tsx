@@ -1,16 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  useSimulations,
-  type MonteCarloConfig,
-  type ScenarioComparisonResult,
-} from '@/hooks/useSimulations';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useTranslation } from '@dhanam/shared';
-import { PremiumGate } from '~/components/billing/PremiumGate';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2, TrendingDown, AlertTriangle, Info } from 'lucide-react';
+import { useState } from 'react';
+
+import { SimulationChart } from '@/components/simulations/SimulationChart';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -20,10 +18,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, TrendingDown, AlertTriangle, Info } from 'lucide-react';
-import { SimulationChart } from '@/components/simulations/SimulationChart';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import {
+  useSimulations,
+  type MonteCarloConfig,
+  type ScenarioComparisonResult,
+} from '@/hooks/useSimulations';
+import { PremiumGate } from '~/components/billing/PremiumGate';
 
 const SCENARIOS = [
   { value: 'BEAR_MARKET', severity: 'medium' },

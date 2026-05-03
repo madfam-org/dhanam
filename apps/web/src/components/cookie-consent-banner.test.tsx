@@ -1,6 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+
 import { CookieConsentBanner } from './cookie-consent-banner';
 
 jest.mock('@dhanam/ui', () => ({
@@ -11,7 +12,8 @@ jest.mock('@dhanam/shared', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
-        'cookieConsent.message': 'We use cookies to analyze site usage and improve your experience.',
+        'cookieConsent.message':
+          'We use cookies to analyze site usage and improve your experience.',
         'cookieConsent.accept': 'Accept',
         'cookieConsent.reject': 'Reject',
         'cookieConsent.learnMore': 'Learn more',
@@ -34,7 +36,9 @@ jest.mock('~/lib/posthog', () => ({
 
 function clearCookies() {
   document.cookie.split(';').forEach((c) => {
-    document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/');
+    document.cookie = c
+      .replace(/^ +/, '')
+      .replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/');
   });
 }
 

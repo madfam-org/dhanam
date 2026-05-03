@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { History, Download, Loader2, FileText } from 'lucide-react';
-import { reportsApi, type GeneratedReport } from '@/lib/api/reports';
 import { formatDistanceToNow } from 'date-fns';
+import { History, Download, Loader2, FileText } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { reportsApi, type GeneratedReport } from '@/lib/api/reports';
 
 interface ReportHistoryPanelProps {
   reportId: string;

@@ -1,6 +1,10 @@
 'use client';
 
+import { Share2, Loader2, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -10,10 +14,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -21,8 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Share2, Loader2, CheckCircle } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { reportsApi, type SavedReport } from '@/lib/api/reports';
 
 interface ShareReportDialogProps {

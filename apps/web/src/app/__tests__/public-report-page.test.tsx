@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen, act } from '@testing-library/react';
+import React from 'react';
 
 const mockParams = { token: 'abc-123' };
 
@@ -8,7 +8,11 @@ jest.mock('next/navigation', () => ({
 }));
 
 jest.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: any) => <div data-testid="card" {...props}>{children}</div>,
+  Card: ({ children, ...props }: any) => (
+    <div data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
   CardContent: ({ children }: any) => <div>{children}</div>,
   CardDescription: ({ children }: any) => <p>{children}</p>,
   CardHeader: ({ children }: any) => <div>{children}</div>,

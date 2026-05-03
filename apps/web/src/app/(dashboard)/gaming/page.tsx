@@ -1,27 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { Gamepad2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
 import { Currency, useTranslation, CHART_COLORS } from '@dhanam/shared';
-import { formatCurrency } from '~/lib/utils';
-
-import { PlatformSelector, type MetaversePlatform } from '@/components/gaming/platform-selector';
-import { MultiPlatformOverview } from '@/components/gaming/multi-platform-overview';
-import { EarningsByPlatform } from '@/components/gaming/earnings-by-platform';
-import { GuildTracker } from '@/components/gaming/guild-tracker';
-import { CrossChainView } from '@/components/gaming/cross-chain-view';
-import { LandPortfolio } from '@/components/gaming/land-portfolio';
-import { NftGallery } from '@/components/gaming/nft-gallery';
-import { GovernanceActivity } from '@/components/gaming/governance-activity';
-import { gamingApi } from '@/lib/api/gaming';
-import { useAuth } from '~/lib/hooks/use-auth';
-import { useSpaceStore } from '@/stores/space';
-import { Button } from '@dhanam/ui';
+import { Card, CardContent, CardHeader, CardTitle, Skeleton, Button } from '@dhanam/ui';
+import { useQuery } from '@tanstack/react-query';
+import { Gamepad2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { CrossChainView } from '@/components/gaming/cross-chain-view';
+import { EarningsByPlatform } from '@/components/gaming/earnings-by-platform';
+import { GovernanceActivity } from '@/components/gaming/governance-activity';
+import { GuildTracker } from '@/components/gaming/guild-tracker';
+import { LandPortfolio } from '@/components/gaming/land-portfolio';
+import { MultiPlatformOverview } from '@/components/gaming/multi-platform-overview';
+import { NftGallery } from '@/components/gaming/nft-gallery';
+import { PlatformSelector, type MetaversePlatform } from '@/components/gaming/platform-selector';
+import { gamingApi } from '@/lib/api/gaming';
+import { useSpaceStore } from '@/stores/space';
+import { useAuth } from '~/lib/hooks/use-auth';
+import { formatCurrency } from '~/lib/utils';
 
 // Fallback data for development mode (used for Diego + Guest only)
 const FALLBACK_PLATFORM_DATA = [

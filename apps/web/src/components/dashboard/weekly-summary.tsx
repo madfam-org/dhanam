@@ -1,10 +1,10 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 import { Currency } from '@dhanam/shared';
+import { Card, CardContent, CardHeader, CardTitle, Skeleton } from '@dhanam/ui';
+import { useQuery } from '@tanstack/react-query';
+import { TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
+
 import { analyticsApi } from '~/lib/api/analytics';
 import { analyticsKeys } from '~/lib/query-keys';
 import { formatCurrency } from '~/lib/utils';

@@ -1,15 +1,22 @@
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 
-jest.mock('@dhanam/ui', () =>
-  new Proxy({}, {
-    get: (_, prop) => {
-      if (prop === '__esModule') return false;
-      return React.forwardRef(({ children, ...props }: any, ref: any) => (
-        <div ref={ref} {...props}>{children}</div>
-      ));
-    },
-  }),
+jest.mock(
+  '@dhanam/ui',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, prop) => {
+          if (prop === '__esModule') return false;
+          return React.forwardRef(({ children, ...props }: any, ref: any) => (
+            <div ref={ref} {...props}>
+              {children}
+            </div>
+          ));
+        },
+      }
+    )
 );
 
 jest.mock('@dhanam/shared', () => ({
@@ -22,10 +29,15 @@ jest.mock('@dhanam/shared', () => ({
   }),
 }));
 
-jest.mock('lucide-react', () =>
-  new Proxy({}, {
-    get: () => (props: any) => <span {...props} />,
-  }),
+jest.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: () => (props: any) => <span {...props} />,
+      }
+    )
 );
 
 jest.mock('@tanstack/react-query', () => ({

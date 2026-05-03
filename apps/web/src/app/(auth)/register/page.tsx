@@ -1,18 +1,26 @@
 'use client';
 
-import { Component, type ReactNode } from 'react';
+import { useTranslation } from '@dhanam/shared';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@dhanam/ui';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import { Component, type ReactNode } from 'react';
+
+import { LocaleSwitcher } from '~/components/locale-switcher';
 
 const SignUp = dynamic(() => import('@janua/react-sdk').then((mod) => mod.SignUp), {
   ssr: false,
   loading: () => <div className="h-10 animate-pulse bg-muted rounded" />,
 });
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { useTranslation } from '@dhanam/shared';
-import { LocaleSwitcher } from '~/components/locale-switcher';
 
 /** Catches errors from Janua SDK components without crashing the page */
 class JanuaErrorBoundary extends Component<

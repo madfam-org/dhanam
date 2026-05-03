@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
 import { Button } from '@dhanam/ui';
 import { Zap, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
 import { useAuth } from '~/lib/hooks/use-auth';
 
 const DISMISS_KEY = 'subscription-banner-dismissed';

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import type { Transaction } from '@dhanam/shared';
 import { Card, CardContent, Button } from '@dhanam/ui';
+import { useQuery } from '@tanstack/react-query';
 import {
   Lightbulb,
   Trophy,
@@ -16,11 +16,12 @@ import {
   PiggyBank,
   X,
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { useState, useMemo } from 'react';
+
+import { transactionsApi } from '~/lib/api/transactions';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaceStore } from '~/stores/space';
-import { transactionsApi } from '~/lib/api/transactions';
-import type { Transaction } from '@dhanam/shared';
 
 interface Insight {
   id: string;

@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardContent, Button, Progress } from '@dhanam/ui';
 import { Check, ExternalLink, X } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 const DISMISS_KEY = 'dhanam_onboarding_dismissed';
 

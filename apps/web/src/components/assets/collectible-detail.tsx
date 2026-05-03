@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Package,
   RefreshCw,
@@ -11,13 +10,15 @@ import {
   AlertCircle,
   Calendar,
 } from 'lucide-react';
+import { useState } from 'react';
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { collectiblesApi, type CollectibleValuation } from '@/lib/api/collectibles';
+
 import { CollectibleLinkModal } from './collectible-link-modal';
 
 interface CollectibleMetadata {

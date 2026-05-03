@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 
 jest.mock('@dhanam/ui', () => ({
   Alert: ({ children }: any) => <div role="alert">{children}</div>,
@@ -100,7 +100,14 @@ describe('OnboardingFlow', () => {
   it('should redirect to dashboard when completed', () => {
     const mockPush = jest.fn();
     const useRouter = require('next/navigation').useRouter;
-    useRouter.mockReturnValue({ push: mockPush, replace: jest.fn(), back: jest.fn(), forward: jest.fn(), refresh: jest.fn(), prefetch: jest.fn() });
+    useRouter.mockReturnValue({
+      push: mockPush,
+      replace: jest.fn(),
+      back: jest.fn(),
+      forward: jest.fn(),
+      refresh: jest.fn(),
+      prefetch: jest.fn(),
+    });
 
     mockUseOnboarding.mockReturnValue({
       status: { completed: true, currentStep: 'completed' },

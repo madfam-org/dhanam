@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useTranslation } from '@dhanam/shared';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,15 +8,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Button,
 } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
 import { ChevronDown, Loader2 } from 'lucide-react';
-import { useAuth } from '~/lib/hooks/use-auth';
-import { authApi } from '~/lib/api/auth';
-import { useSpaceStore } from '~/stores/space';
-import { useTranslation } from '@dhanam/shared';
+import { useState } from 'react';
 
+import { authApi } from '~/lib/api/auth';
 import { useDemoNavigation } from '~/lib/contexts/demo-navigation-context';
+import { useAuth } from '~/lib/hooks/use-auth';
+import { useSpaceStore } from '~/stores/space';
 
 const PERSONAS = [
   { key: 'guest', emoji: '👋', nameKey: 'personaGuest' },

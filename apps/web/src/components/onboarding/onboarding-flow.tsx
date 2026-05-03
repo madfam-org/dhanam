@@ -1,20 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Alert, AlertDescription, Button } from '@dhanam/ui';
 import { useRouter } from 'next/navigation';
-import { useOnboarding } from './onboarding-provider';
+import { useEffect, useState } from 'react';
+
 import { OnboardingHeader } from './onboarding-header';
 import { OnboardingProgress } from './onboarding-progress';
-import { WelcomeStep } from './steps/welcome-step';
+import { useOnboarding } from './onboarding-provider';
+import { CompletionStep } from './steps/completion-step';
+import { ConnectAccountsStep } from './steps/connect-accounts-step';
 import { EmailVerificationStep } from './steps/email-verification-step';
+import { FeatureTourStep } from './steps/feature-tour-step';
+import { FirstBudgetStep } from './steps/first-budget-step';
 import { PreferencesStep } from './steps/preferences-step';
 import { SpaceSetupStep } from './steps/space-setup-step';
-import { ConnectAccountsStep } from './steps/connect-accounts-step';
-import { FirstBudgetStep } from './steps/first-budget-step';
-import { FeatureTourStep } from './steps/feature-tour-step';
-import { CompletionStep } from './steps/completion-step';
-import { Alert, AlertDescription } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
+import { WelcomeStep } from './steps/welcome-step';
 
 export function OnboardingFlow() {
   const router = useRouter();

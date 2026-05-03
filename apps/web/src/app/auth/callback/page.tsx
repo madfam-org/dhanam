@@ -1,11 +1,10 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 import { useTranslation } from '@dhanam/shared';
-// Dynamic import to avoid SSR crash (useJanua requires JanuaProvider)
 import { useAuth as useJanuaAuth } from '@janua/react-sdk'; // OK: this page only renders client-side via Suspense
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
+// Dynamic import to avoid SSR crash (useJanua requires JanuaProvider)
 
 /**
  * Loading spinner shown while the SDK processes the PKCE callback.

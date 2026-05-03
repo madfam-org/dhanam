@@ -1,4 +1,3 @@
-import { apiClient } from './client';
 import {
   NetWorthResponse,
   CashflowForecast,
@@ -10,8 +9,11 @@ import {
   Transaction,
   Budget,
 } from '@dhanam/shared';
+
 import type { Goal } from '@/hooks/useGoals';
+
 import type { BudgetSummary } from './budgets';
+import { apiClient } from './client';
 
 export interface NetWorthHistoryPoint {
   date: string;

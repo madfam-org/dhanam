@@ -3,8 +3,8 @@
 import { useTranslation } from '@dhanam/shared';
 import type { Currency } from '@dhanam/shared';
 
-import { formatCurrency, cn } from '@/lib/utils';
 import type { CalendarDay } from '@/lib/api/analytics';
+import { formatCurrency, cn } from '@/lib/utils';
 
 interface CalendarDayCellProps {
   dayNum: number;

@@ -2,8 +2,8 @@
 
 import { Lock, TrendingUp, Coins } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface SandOverviewProps {
   sandStaked: number;

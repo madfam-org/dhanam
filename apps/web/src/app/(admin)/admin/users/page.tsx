@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { adminApi, type UserDetails } from '~/lib/api/admin';
+import { Card, Input, Button, Badge, Skeleton } from '@dhanam/ui';
 import { Search, ChevronLeft, ChevronRight, User, Shield, Mail } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { UserDetailsModal } from '~/components/admin/user-details-modal';
+import { adminApi, type UserDetails } from '~/lib/api/admin';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<UserDetails[]>([]);

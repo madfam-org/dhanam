@@ -1,12 +1,10 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
-import { RefreshCw, CheckCircle, XCircle, Clock, Wifi, WifiOff, AlertCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@dhanam/ui';
+import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
+import { RefreshCw, CheckCircle, XCircle, Clock, Wifi, WifiOff, AlertCircle } from 'lucide-react';
 
 interface SyncStatusProps {
   spaceId: string;

@@ -1,8 +1,9 @@
 'use client';
 
-import { useAuth } from '@/lib/hooks/use-auth';
 import { Button } from '@dhanam/ui';
 import { useRouter } from 'next/navigation';
+
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export function OnboardingHeader() {
   const { user, logout } = useAuth();

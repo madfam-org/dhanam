@@ -1,5 +1,6 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
+
 import { DemoNavigationProvider, useDemoNavigation } from './demo-navigation-context';
 
 const mockUsePathname = jest.fn();
@@ -30,7 +31,7 @@ describe('DemoNavigationContext', () => {
       render(
         <DemoNavigationProvider>
           <TestConsumer />
-        </DemoNavigationProvider>,
+        </DemoNavigationProvider>
       );
       expect(screen.getByTestId('isDemoMode').textContent).toBe('true');
     });
@@ -39,7 +40,7 @@ describe('DemoNavigationContext', () => {
       render(
         <DemoNavigationProvider>
           <TestConsumer />
-        </DemoNavigationProvider>,
+        </DemoNavigationProvider>
       );
       expect(screen.getByTestId('demoHref').textContent).toBe('/demo/dashboard');
     });
@@ -48,7 +49,7 @@ describe('DemoNavigationContext', () => {
       render(
         <DemoNavigationProvider>
           <TestConsumer />
-        </DemoNavigationProvider>,
+        </DemoNavigationProvider>
       );
       expect(screen.getByTestId('stripDemoPrefix').textContent).toBe('/accounts');
     });
@@ -57,7 +58,7 @@ describe('DemoNavigationContext', () => {
       render(
         <DemoNavigationProvider>
           <TestConsumer />
-        </DemoNavigationProvider>,
+        </DemoNavigationProvider>
       );
       expect(screen.getByTestId('stripRoot').textContent).toBe('/');
     });
@@ -72,7 +73,7 @@ describe('DemoNavigationContext', () => {
       render(
         <DemoNavigationProvider>
           <TestConsumer />
-        </DemoNavigationProvider>,
+        </DemoNavigationProvider>
       );
       expect(screen.getByTestId('isDemoMode').textContent).toBe('false');
     });
@@ -81,7 +82,7 @@ describe('DemoNavigationContext', () => {
       render(
         <DemoNavigationProvider>
           <TestConsumer />
-        </DemoNavigationProvider>,
+        </DemoNavigationProvider>
       );
       expect(screen.getByTestId('demoHref').textContent).toBe('/dashboard');
     });

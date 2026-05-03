@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import {
   Home,
   MapPin,
@@ -14,11 +13,12 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
+import { useState } from 'react';
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { realEstateApi, type PropertyValuationSummary } from '@/lib/api/real-estate';
 

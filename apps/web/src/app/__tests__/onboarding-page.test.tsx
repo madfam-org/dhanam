@@ -1,13 +1,18 @@
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 
-jest.mock('@dhanam/ui', () =>
-  new Proxy({}, {
-    get: (_, prop) => {
-      if (prop === '__esModule') return false;
-      return ({ children, ...props }: any) => <div {...props}>{children}</div>;
-    },
-  }),
+jest.mock(
+  '@dhanam/ui',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, prop) => {
+          if (prop === '__esModule') return false;
+          return ({ children, ...props }: any) => <div {...props}>{children}</div>;
+        },
+      }
+    )
 );
 
 jest.mock('@dhanam/shared', () => ({

@@ -1,5 +1,6 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
+
 import { LegalPageLayout } from './legal-page-layout';
 
 jest.mock('@dhanam/shared', () => ({
@@ -43,7 +44,9 @@ describe('LegalPageLayout', () => {
 
   it('should render the intro text', () => {
     render(<LegalPageLayout {...defaultProps} />);
-    expect(screen.getByText('This policy describes how we collect and use data.')).toBeInTheDocument();
+    expect(
+      screen.getByText('This policy describes how we collect and use data.')
+    ).toBeInTheDocument();
   });
 
   it('should render table of contents with section links', () => {

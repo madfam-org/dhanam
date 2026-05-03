@@ -1,15 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader } from '@dhanam/ui';
-import { Calendar } from 'lucide-react';
 import { useTranslation } from '@dhanam/shared';
 import type { Currency } from '@dhanam/shared';
+import { Card, CardContent, CardHeader } from '@dhanam/ui';
+import { useQuery } from '@tanstack/react-query';
+import { Calendar } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
-import { useSpaceStore } from '@/stores/space';
-import { analyticsApi, type CalendarDay } from '@/lib/api/analytics';
-import { useIsMobile } from '@/hooks/use-mobile';
 import {
   CalendarGrid,
   CalendarSkeleton,
@@ -18,6 +15,9 @@ import {
   MonthNavigator,
   MonthlySummary,
 } from '@/components/calendar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { analyticsApi, type CalendarDay } from '@/lib/api/analytics';
+import { useSpaceStore } from '@/stores/space';
 
 export default function CalendarPage() {
   const { t } = useTranslation('transactions');

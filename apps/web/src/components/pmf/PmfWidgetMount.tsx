@@ -40,8 +40,9 @@
  * tezca PR #39 (apps/web/components/pmf/PmfWidgetMount.tsx).
  */
 
-import { useEffect, useState, type ComponentType } from 'react';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState, type ComponentType } from 'react';
+
 import { useAuth } from '~/lib/hooks/use-auth';
 
 /**

@@ -1,5 +1,6 @@
-import { apiClient } from './client';
 import { Account, Provider, AccountType, Currency } from '@dhanam/shared';
+
+import { apiClient } from './client';
 
 export interface ConnectAccountDto {
   provider: Exclude<Provider, 'manual'>;

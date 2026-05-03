@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
+import { Suspense, useEffect } from 'react';
 
 /**
  * PostHog Analytics Provider for Next.js App Router

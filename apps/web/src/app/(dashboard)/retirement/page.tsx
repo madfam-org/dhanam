@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslation } from '@dhanam/shared';
+import { Info } from 'lucide-react';
+import { useState } from 'react';
+
 import { RetirementCalculatorForm } from '@/components/simulations/RetirementCalculatorForm';
 import { RetirementResults } from '@/components/simulations/RetirementResults';
 import { SimulationChart } from '@/components/simulations/SimulationChart';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { RetirementSimulationResult } from '@/hooks/useSimulations';
 import { PremiumGate } from '~/components/billing/PremiumGate';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
 
 export default function RetirementPage() {
   const { t } = useTranslation('projections');

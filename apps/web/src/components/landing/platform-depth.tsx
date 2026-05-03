@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslation, I18nContext } from '@dhanam/shared';
-import { useContext } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useState, useContext } from 'react';
 
 const sections = ['defi', 'collectibles', 'scenarios'] as const;
 

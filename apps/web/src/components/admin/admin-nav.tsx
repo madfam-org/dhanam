@@ -1,8 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { cn } from '~/lib/utils';
 import {
   LayoutDashboard,
   Users,
@@ -17,6 +14,10 @@ import {
   Receipt,
   ShieldCheck,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { cn } from '~/lib/utils';
 
 interface NavItem {
   name: string;

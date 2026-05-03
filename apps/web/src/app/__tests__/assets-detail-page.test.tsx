@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 
 const mockPush = jest.fn();
 const mockParams = { id: 'asset-123' };
@@ -18,7 +18,11 @@ jest.mock('next/link', () => {
 });
 
 jest.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: any) => <div data-testid="card" {...props}>{children}</div>,
+  Card: ({ children, ...props }: any) => (
+    <div data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
   CardContent: ({ children }: any) => <div>{children}</div>,
   CardDescription: ({ children }: any) => <p>{children}</p>,
   CardHeader: ({ children }: any) => <div>{children}</div>,
@@ -60,16 +64,20 @@ jest.mock('@/components/ui/alert-dialog', () => ({
   AlertDialogTitle: ({ children }: any) => <h3>{children}</h3>,
 }));
 
-jest.mock('lucide-react', () =>
-  new Proxy(
-    {},
-    {
-      get: (_, prop) => {
-        if (prop === '__esModule') return true;
-        return (props: any) => <span data-testid={`icon-${String(prop).toLowerCase()}`} {...props} />;
-      },
-    },
-  ),
+jest.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, prop) => {
+          if (prop === '__esModule') return true;
+          return (props: any) => (
+            <span data-testid={`icon-${String(prop).toLowerCase()}`} {...props} />
+          );
+        },
+      }
+    )
 );
 
 jest.mock('date-fns', () => ({

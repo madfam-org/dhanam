@@ -1,9 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { onboardingApi } from '@/lib/api/onboarding';
+
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { onboardingApi } from '@/lib/api/onboarding';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export interface OnboardingStep {
   id: string;

@@ -1,10 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useOnboarding } from '../onboarding-provider';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
 import {
   PiggyBankIcon,
   PlusIcon,
@@ -14,6 +10,10 @@ import {
   AlertTriangleIcon,
   BarChart3Icon,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { useOnboarding } from '../onboarding-provider';
 
 export function FirstBudgetStep() {
   const router = useRouter();

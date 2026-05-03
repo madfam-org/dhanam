@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useTranslation } from '@dhanam/shared';
+import { Dialog, DialogContent } from '@dhanam/ui';
 import {
   Search,
   Loader2,
@@ -20,13 +20,13 @@ import {
   Leaf,
   Gamepad2,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@dhanam/ui';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/client';
 import { transactionsApi } from '@/lib/api/transactions';
-import { useTranslation } from '@dhanam/shared';
 
 interface SearchResult {
   answer?: string;
@@ -338,7 +338,6 @@ export function SearchCommand({ spaceId }: SearchCommandProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="flex h-12 w-full bg-transparent py-3 px-3 text-sm outline-none placeholder:text-muted-foreground"
-              // eslint-disable-next-line jsx-a11y/no-autofocus -- Reason: Search command palette should auto-focus input when opened for keyboard-first UX
               autoFocus
             />
             {isSearching && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}

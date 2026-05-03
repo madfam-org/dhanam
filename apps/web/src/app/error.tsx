@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect } from 'react';
 
 const defaultMsg = {
@@ -61,12 +62,12 @@ export default function Error({
           >
             {m.retry}
           </button>
-          <a
+          <Link
             href="/"
             className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             {m.home}
-          </a>
+          </Link>
         </div>
       </div>
     </div>

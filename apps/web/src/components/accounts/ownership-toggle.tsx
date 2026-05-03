@@ -1,9 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { Users, User, Heart } from 'lucide-react';
-
-import { cn } from '@/lib/utils';
 import {
   Card,
   CardContent,
@@ -15,6 +11,10 @@ import {
   TabsTrigger,
   TabsContent,
 } from '@dhanam/ui';
+import { Users, User, Heart } from 'lucide-react';
+import { useState } from 'react';
+
+import { cn } from '@/lib/utils';
 
 export type OwnershipFilter = 'yours' | 'mine' | 'ours';
 

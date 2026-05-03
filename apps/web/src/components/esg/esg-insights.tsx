@@ -1,9 +1,10 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Lightbulb, TrendingUp, TrendingDown, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Lightbulb, TrendingUp, TrendingDown, AlertCircle, CheckCircle2, Info } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { PortfolioEsgAnalysis, EsgTrends } from '@/hooks/useEsg';
 
 interface EsgInsightsProps {

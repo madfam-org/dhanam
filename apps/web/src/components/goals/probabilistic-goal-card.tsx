@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
 import { Target, TrendingUp, TrendingDown, Loader2, RefreshCw, Calendar } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { useGoals, type Goal, type GoalProbabilityResult } from '@/hooks/useGoals';
+
 import { HelpTooltip } from '../demo/help-tooltip';
 
 interface ProbabilisticGoalCardProps {

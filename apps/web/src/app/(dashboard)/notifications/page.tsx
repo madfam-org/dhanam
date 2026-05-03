@@ -1,9 +1,9 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button, Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger } from '@dhanam/ui';
-import { Bell, Check, AlertTriangle, Lightbulb, Trophy, Info, Clock } from 'lucide-react';
 import { useTranslation } from '@dhanam/shared';
+import { Button, Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger } from '@dhanam/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Bell, Check, AlertTriangle, Lightbulb, Trophy, Info, Clock } from 'lucide-react';
 
 interface Notification {
   id: string;

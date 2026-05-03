@@ -1,9 +1,9 @@
 'use client';
 
-import { useTheme } from 'next-themes';
+import { useTranslation } from '@dhanam/shared';
 import { Button } from '@dhanam/ui';
 import { Moon, Sun } from 'lucide-react';
-import { useTranslation } from '@dhanam/shared';
+import { useTheme } from 'next-themes';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();

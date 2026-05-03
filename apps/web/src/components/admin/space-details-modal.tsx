@@ -1,11 +1,9 @@
 'use client';
 
-import { Dialog } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Card } from '@dhanam/ui';
-import { Separator } from '@dhanam/ui';
-import type { SpaceInfo } from '~/lib/api/admin';
+import { Dialog, Badge, Card, Separator } from '@dhanam/ui';
 import { Building2, Users, CreditCard, Receipt } from 'lucide-react';
+
+import type { SpaceInfo } from '~/lib/api/admin';
 
 interface SpaceDetailsModalProps {
   space: SpaceInfo;

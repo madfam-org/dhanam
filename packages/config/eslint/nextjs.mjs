@@ -99,6 +99,12 @@ const config = [
         { max: 800, skipBlankLines: true, skipComments: true },
       ],
 
+      // TypeScript's parser handles undefined-name detection more
+      // accurately than ESLint's plain `no-undef` (it knows about
+      // ambient types like `React.ReactNode`, `JSX`, etc). Per the
+      // @typescript-eslint guide we turn the base rule off for TS files.
+      'no-undef': 'off',
+
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [

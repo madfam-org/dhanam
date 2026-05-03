@@ -1,5 +1,5 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 
 // Mock @dhanam/ui with Proxy
 jest.mock(
@@ -58,9 +58,9 @@ jest.mock('@/lib/utils', () => ({
 
 jest.mock('@/lib/api/zero-based', () => ({}));
 
-import { ReadyToAssignBanner } from '../ready-to-assign-banner';
 import { CategoryRow } from '../category-row';
 import { MonthSelector } from '../month-selector';
+import { ReadyToAssignBanner } from '../ready-to-assign-banner';
 
 describe('ReadyToAssignBanner', () => {
   const defaultProps = {

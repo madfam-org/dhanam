@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/hooks/use-auth';
+import { useEffect } from 'react';
+
 import { OnboardingProvider } from '@/components/onboarding/onboarding-provider';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 interface OnboardingLayoutProps {
   children: React.ReactNode;
