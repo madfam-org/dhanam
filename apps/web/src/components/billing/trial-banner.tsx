@@ -1,11 +1,11 @@
 'use client';
 
+import { Alert, AlertDescription, Button } from '@dhanam/ui';
 import { useQuery } from '@tanstack/react-query';
-import { Alert, AlertDescription } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
 import { Clock, CreditCard, Sparkles } from 'lucide-react';
-import { billingApi } from '~/lib/api/billing';
 import { useRouter } from 'next/navigation';
+
+import { billingApi } from '~/lib/api/billing';
 
 export function TrialBanner() {
   const router = useRouter();

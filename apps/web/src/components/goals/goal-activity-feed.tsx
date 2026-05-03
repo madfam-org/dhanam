@@ -1,9 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { formatDistanceToNow } from 'date-fns';
 import {
   TrendingUp,
   TrendingDown,
@@ -16,8 +13,12 @@ import {
   CheckCircle2,
   Loader2,
 } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useGoals, type GoalActivity } from '@/hooks/useGoals';
-import { formatDistanceToNow } from 'date-fns';
 
 interface GoalActivityFeedProps {
   goalId: string;

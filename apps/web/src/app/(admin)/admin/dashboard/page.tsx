@@ -1,10 +1,10 @@
 'use client';
 
-import { Card } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { useAdmin } from '~/contexts/AdminContext';
-import { StatsCard } from '~/components/admin/stats-card';
+import { Card, Skeleton } from '@dhanam/ui';
 import { Users, Building2, CreditCard, Receipt, TrendingUp, Shield } from 'lucide-react';
+
+import { StatsCard } from '~/components/admin/stats-card';
+import { useAdmin } from '~/contexts/AdminContext';
 
 export default function AdminDashboard() {
   const { systemStats, isLoading } = useAdmin();

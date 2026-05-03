@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useRef, useMemo, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
+import { Transaction, useTranslation } from '@dhanam/shared';
 import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -13,17 +15,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@dhanam/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dhanam/ui';
-import { Badge } from '@/components/ui/badge';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import {
   Plus,
   MoreVertical,
@@ -34,21 +39,23 @@ import {
   ChevronRight,
   Sparkles,
 } from 'lucide-react';
-import { useSpaceStore } from '@/stores/space';
-import { transactionsApi } from '@/lib/api/transactions';
-import { accountsApi } from '@/lib/api/accounts';
-import { categoriesApi } from '@/lib/api/categories';
-import { Transaction, useTranslation } from '@dhanam/shared';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import { toast } from 'sonner';
+
+import { CategoryCorrectionDialog } from '@/components/transactions/category-correction-dialog';
 import { MerchantIcon } from '@/components/transactions/merchant-icon';
+import { TransactionDetailSheet } from '@/components/transactions/transaction-detail-sheet';
 import {
   TransactionFilters,
   EMPTY_FILTERS,
   type TransactionFilterValues,
 } from '@/components/transactions/transaction-filters';
-import { CategoryCorrectionDialog } from '@/components/transactions/category-correction-dialog';
-import { TransactionDetailSheet } from '@/components/transactions/transaction-detail-sheet';
+import { Badge } from '@/components/ui/badge';
+import { accountsApi } from '@/lib/api/accounts';
+import { categoriesApi } from '@/lib/api/categories';
+import { transactionsApi } from '@/lib/api/transactions';
+import { formatCurrency, formatDate } from '@/lib/utils';
+import { useSpaceStore } from '@/stores/space';
 
 const ITEMS_PER_PAGE = 25;
 const TRANSACTION_ROW_HEIGHT = 80;
@@ -419,7 +426,7 @@ export default function TransactionsPage() {
                   const transaction = transactionsData?.data?.[virtualItem.index];
                   if (!transaction) return null;
                   const account = accounts?.find((a) => a.id === transaction.accountId);
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- merchant field exists in DB but not in shared Transaction type
+
                   const merchant: string | null =
                     (transaction as any).merchant ??
                     (transaction.metadata as Record<string, string> | undefined)?.merchant ??

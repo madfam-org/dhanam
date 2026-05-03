@@ -1,9 +1,11 @@
 'use client';
 
+import { Target, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Target, CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { type Goal } from '@/hooks/useGoals';
+
 import { HelpTooltip } from '../demo/help-tooltip';
 
 interface GoalHealthScoreProps {

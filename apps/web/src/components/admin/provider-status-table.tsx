@@ -1,7 +1,7 @@
 'use client';
 
-import { Card } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
+import { Card, Badge } from '@dhanam/ui';
+
 import type { ProviderHealth } from '~/lib/api/admin';
 
 interface ProviderStatusTableProps {

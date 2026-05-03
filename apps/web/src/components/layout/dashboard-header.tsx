@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@dhanam/ui';
+import { useTranslation } from '@dhanam/shared';
+import type { Space } from '@dhanam/shared';
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -10,26 +11,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@dhanam/ui';
+import { useAuth as useJanuaAuth } from '@janua/react-sdk';
 import { Settings, LogOut, ChevronDown, Shield } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+
+import { PersonaSwitcher } from '~/components/demo/persona-switcher';
+import { MobileSidebar } from '~/components/layout/mobile-sidebar';
+import { NotificationDropdown } from '~/components/layout/notification-dropdown';
+import { LocaleSwitcher } from '~/components/locale-switcher/LocaleSwitcher';
+import { SearchCommand } from '~/components/search/search-command';
+import { ThemeToggle } from '~/components/theme-toggle';
+import { useDemoNavigation } from '~/lib/contexts/demo-navigation-context';
+import { useAuth } from '~/lib/hooks/use-auth';
+import { useSpaces } from '~/lib/hooks/use-spaces';
+import { useSpaceStore } from '~/stores/space';
 
 const UserButton = dynamic(() => import('@janua/react-sdk').then((mod) => mod.UserButton), {
   ssr: false,
 });
-import { useAuth as useJanuaAuth } from '@janua/react-sdk';
-import { useAuth } from '~/lib/hooks/use-auth';
-import { useSpaces } from '~/lib/hooks/use-spaces';
-import { useSpaceStore } from '~/stores/space';
-import { useTranslation } from '@dhanam/shared';
-
-import { useDemoNavigation } from '~/lib/contexts/demo-navigation-context';
-import { PersonaSwitcher } from '~/components/demo/persona-switcher';
-import { MobileSidebar } from '~/components/layout/mobile-sidebar';
-import { NotificationDropdown } from '~/components/layout/notification-dropdown';
-import { SearchCommand } from '~/components/search/search-command';
-import { ThemeToggle } from '~/components/theme-toggle';
-import { LocaleSwitcher } from '~/components/locale-switcher/LocaleSwitcher';
-import type { Space } from '@dhanam/shared';
 
 export function DashboardHeader() {
   const { user, logout } = useAuth();

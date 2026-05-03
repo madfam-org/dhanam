@@ -1,7 +1,9 @@
 'use client';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
+
 import { esgApi } from '@/lib/api/esg';
+
 import { EsgScore, PortfolioEsgAnalysis, AssetComparison, EsgTrends } from './useEsg';
 
 // Query key factory for consistent key management

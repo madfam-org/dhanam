@@ -1,6 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+
 import { DashboardHeader } from './dashboard-header';
 
 // Mock @dhanam/shared (useTranslation with 'dashboard' namespace)

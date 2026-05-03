@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Dialog,
   DialogContent,
@@ -9,17 +7,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  Button,
+  Checkbox,
+  Label,
+  Badge,
 } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Checkbox } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Sparkles, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useSpaceStore } from '@/stores/space';
+import { useState } from 'react';
+
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { categoriesApi } from '@/lib/api/categories';
 import { mlApi } from '@/lib/api/ml';
+import { cn } from '@/lib/utils';
+import { useSpaceStore } from '@/stores/space';
 
 interface CategoryCorrectionDialogProps {
   open: boolean;

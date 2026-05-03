@@ -1,17 +1,27 @@
 'use client';
 
-import { useState, Component, type ReactNode } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useTranslation } from '@dhanam/shared';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Alert,
+  AlertDescription,
+  Button,
+  Separator,
+} from '@dhanam/ui';
 import { useMutation } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Alert, AlertDescription, Button, Separator } from '@dhanam/ui';
-import { useAuth } from '~/lib/hooks/use-auth';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, Component, type ReactNode } from 'react';
+
+import { LocaleSwitcher } from '~/components/locale-switcher';
 import { authApi } from '~/lib/api/auth';
 import { ApiError } from '~/lib/api/client';
-import { useTranslation } from '@dhanam/shared';
-import { LocaleSwitcher } from '~/components/locale-switcher';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 const SignIn = dynamic(() => import('@janua/react-sdk').then((mod) => mod.SignIn), {
   ssr: false,

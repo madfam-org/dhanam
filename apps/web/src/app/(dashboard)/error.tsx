@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent } from '@dhanam/ui';
+import { Button, Card, CardContent } from '@dhanam/ui';
 import { AlertTriangle, RotateCcw, Home } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function DashboardError({
   error,

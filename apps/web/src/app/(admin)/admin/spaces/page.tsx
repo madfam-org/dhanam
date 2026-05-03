@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { adminApi, type SpaceInfo } from '~/lib/api/admin';
-import { SpaceDetailsModal } from '~/components/admin/space-details-modal';
+import { Card, Input, Button, Badge, Skeleton } from '@dhanam/ui';
 import { Search, ChevronLeft, ChevronRight, Building2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
+import { SpaceDetailsModal } from '~/components/admin/space-details-modal';
+import { adminApi, type SpaceInfo } from '~/lib/api/admin';
 
 export default function SpacesPage() {
   const [spaces, setSpaces] = useState<SpaceInfo[]>([]);

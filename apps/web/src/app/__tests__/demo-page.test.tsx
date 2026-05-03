@@ -1,20 +1,22 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 
-jest.mock('@dhanam/ui', () =>
-  new Proxy(
-    {},
-    {
-      get: (_, prop) => {
-        if (prop === '__esModule') return true;
-        return ({ children, ...props }: any) => (
-          <div data-testid={String(prop).toLowerCase()} {...props}>
-            {children}
-          </div>
-        );
-      },
-    },
-  ),
+jest.mock(
+  '@dhanam/ui',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, prop) => {
+          if (prop === '__esModule') return true;
+          return ({ children, ...props }: any) => (
+            <div data-testid={String(prop).toLowerCase()} {...props}>
+              {children}
+            </div>
+          );
+        },
+      }
+    )
 );
 
 jest.mock('@dhanam/shared', () => ({
@@ -27,16 +29,18 @@ jest.mock('@dhanam/shared', () => ({
   }),
 }));
 
-jest.mock('lucide-react', () =>
-  new Proxy(
-    {},
-    {
-      get: (_, prop) => {
-        if (prop === '__esModule') return true;
-        return (props: any) => <span data-testid={`icon-${String(prop)}`} {...props} />;
-      },
-    },
-  ),
+jest.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, prop) => {
+          if (prop === '__esModule') return true;
+          return (props: any) => <span data-testid={`icon-${String(prop)}`} {...props} />;
+        },
+      }
+    )
 );
 
 jest.mock('@tanstack/react-query', () => ({
@@ -55,7 +59,7 @@ jest.mock('~/stores/space', () => ({
         setCurrentSpace: jest.fn(),
         setSpaces: jest.fn(),
       }),
-    },
+    }
   ),
 }));
 
@@ -86,7 +90,11 @@ jest.mock('@/hooks/useAnalytics', () => ({
 
 // Local UI mocks for demo page which uses @/components/ui/*
 jest.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: any) => <div data-testid="card" {...props}>{children}</div>,
+  Card: ({ children, ...props }: any) => (
+    <div data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
   CardContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   CardDescription: ({ children, ...props }: any) => <p {...props}>{children}</p>,
   CardHeader: ({ children, ...props }: any) => <div {...props}>{children}</div>,

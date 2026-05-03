@@ -1,10 +1,11 @@
 'use client';
 
-import { create } from 'zustand';
-import posthog from 'posthog-js';
 import type { AuthTokens, UserProfile, Locale } from '@dhanam/shared';
-import { apiClient } from '../api/client';
+import posthog from 'posthog-js';
+import { create } from 'zustand';
+
 import { authApi } from '../api/auth';
+import { apiClient } from '../api/client';
 
 const JANUA_API_URL = process.env.NEXT_PUBLIC_JANUA_API_URL || 'https://auth.madfam.io';
 

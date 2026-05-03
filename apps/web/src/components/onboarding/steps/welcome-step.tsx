@@ -1,10 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { useOnboarding } from '../onboarding-provider';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent } from '@dhanam/ui';
+import { Button, Card, CardContent } from '@dhanam/ui';
 import {
   TrendingUpIcon,
   ShieldIcon,
@@ -12,6 +8,11 @@ import {
   SmartphoneIcon,
   ArrowRightIcon,
 } from 'lucide-react';
+import { useState } from 'react';
+
+import { useAuth } from '@/lib/hooks/use-auth';
+
+import { useOnboarding } from '../onboarding-provider';
 
 const features = [
   {

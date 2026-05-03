@@ -1,7 +1,7 @@
 'use client';
 
-import { use } from 'react';
 import { I18nProvider, type Locale } from '@dhanam/shared';
+import { use } from 'react';
 
 export default function LocaleLayout({
   children,

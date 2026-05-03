@@ -1,9 +1,11 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { DemoModeBanner } from './demo-mode-banner';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useRouter } from 'next/navigation';
+import React from 'react';
+
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAuth } from '@/lib/hooks/use-auth';
+
+import { DemoModeBanner } from './demo-mode-banner';
 
 // Mock @dhanam/shared (useTranslation with 'common' namespace)
 jest.mock('@dhanam/shared', () => {
@@ -184,9 +186,12 @@ describe('DemoModeBanner', () => {
     const dismissButton = screen.getByRole('button', { name: /Dismiss banner/i });
     fireEvent.click(dismissButton);
 
-    expect(mockAnalytics.track).toHaveBeenCalledWith('demo_banner_dismissed', expect.objectContaining({
-      timeRemaining: expect.stringMatching(/\d+[hm]\s+\d+[ms]/),
-    }));
+    expect(mockAnalytics.track).toHaveBeenCalledWith(
+      'demo_banner_dismissed',
+      expect.objectContaining({
+        timeRemaining: expect.stringMatching(/\d+[hm]\s+\d+[ms]/),
+      })
+    );
   });
 
   it('should initialize session start time in localStorage on first render', () => {

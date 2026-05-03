@@ -1,11 +1,12 @@
 'use client';
 
+import { Gauge, TrendingUp, Target, LineChart, Briefcase, Activity } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useAuth } from '~/lib/hooks/use-auth';
-import { billingApi, UsageMetrics } from '~/lib/api/billing';
+
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Gauge, TrendingUp, Target, LineChart, Briefcase, Activity } from 'lucide-react';
+import { billingApi, UsageMetrics } from '~/lib/api/billing';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 type MetricType =
   | 'esg_calculation'

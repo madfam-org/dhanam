@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, Button } from '@dhanam/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
+
 import { useAnalytics } from '@/hooks/useAnalytics';
 
 export default function BillingSuccessPage() {

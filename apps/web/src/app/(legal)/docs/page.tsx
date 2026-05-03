@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
-import { Button } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
+import { Button } from '@dhanam/ui';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 export default function DocsPage() {
   const { t } = useTranslation('legal');

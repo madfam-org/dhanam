@@ -1,20 +1,21 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from '@dhanam/shared';
 import { useRouter } from 'next/navigation';
-import { DashboardNav } from '~/components/layout/dashboard-nav';
-import { DashboardHeader } from '~/components/layout/dashboard-header';
-import { DemoModeBanner } from '~/components/demo/demo-mode-banner';
+import { useCallback, useEffect, useState } from 'react';
+
 import { SubscriptionBanner } from '~/components/billing/SubscriptionBanner';
+import { DemoModeBanner } from '~/components/demo/demo-mode-banner';
 import { DemoTour } from '~/components/demo/demo-tour';
 import { KeyboardShortcuts } from '~/components/keyboard-shortcuts';
-import { PageTransition } from '~/components/motion/page-transition';
+import { DashboardHeader } from '~/components/layout/dashboard-header';
+import { DashboardNav } from '~/components/layout/dashboard-nav';
 import { MobileNav } from '~/components/layout/mobile-nav';
+import { PageTransition } from '~/components/motion/page-transition';
+import { authApi } from '~/lib/api/auth';
 import { DemoNavigationProvider } from '~/lib/contexts/demo-navigation-context';
-import { useTranslation } from '@dhanam/shared';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaces } from '~/lib/hooks/use-spaces';
-import { authApi } from '~/lib/api/auth';
 
 /**
  * Loading skeleton shown during SSR and initial client hydration.

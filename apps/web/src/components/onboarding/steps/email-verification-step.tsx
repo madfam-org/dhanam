@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { useOnboarding } from '../onboarding-provider';
-import { onboardingApi } from '@/lib/api/onboarding';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent } from '@dhanam/ui';
-import { Alert, AlertDescription } from '@dhanam/ui';
+import { Button, Card, CardContent, Alert, AlertDescription } from '@dhanam/ui';
 import { MailIcon, CheckCircleIcon, RefreshCwIcon } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
+import { onboardingApi } from '@/lib/api/onboarding';
+import { useAuth } from '@/lib/hooks/use-auth';
+
+import { useOnboarding } from '../onboarding-provider';
 
 export function EmailVerificationStep() {
   const { user } = useAuth();

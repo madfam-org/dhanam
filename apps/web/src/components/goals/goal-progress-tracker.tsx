@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@dhanam/ui';
 import {
   Loader2,
@@ -13,6 +12,8 @@ import {
   RefreshCw,
   CheckCircle,
 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { GoalProgress, ordersApi } from '../../lib/api/orders';
 
 interface GoalProgressTrackerProps {

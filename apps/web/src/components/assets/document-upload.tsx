@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
 import { Upload, X, FileText, AlertCircle, Check } from 'lucide-react';
+import { useState, useCallback, useRef } from 'react';
 
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -12,9 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { cn } from '@/lib/utils';
 import { documentsApi, type DocumentMetadata, type DocumentConfig } from '@/lib/api/documents';
+import { cn } from '@/lib/utils';
 
 interface DocumentUploadProps {
   spaceId: string;

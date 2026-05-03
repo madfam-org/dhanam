@@ -1,7 +1,9 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { useAuth } from '@/lib/hooks/use-auth';
+
 import {
   Goal,
   GoalProgress,

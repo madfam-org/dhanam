@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
+import { createContext, useContext, useMemo } from 'react';
 
 interface DemoNavigationContextValue {
   isDemoMode: boolean;

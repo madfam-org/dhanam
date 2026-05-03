@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Button } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
+import { Button } from '@dhanam/ui';
+import { useEffect, useState } from 'react';
+
 import { optInPostHog, optOutPostHog } from '~/lib/posthog';
 
 function getCookie(name: string): string | undefined {

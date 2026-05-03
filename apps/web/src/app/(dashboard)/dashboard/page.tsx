@@ -1,21 +1,21 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Progress } from '@dhanam/ui';
-import { useAuth } from '~/lib/hooks/use-auth';
-import { useSpaces } from '~/lib/hooks/use-spaces';
-import { useSpaceStore } from '~/stores/space';
-import { analyticsApi } from '~/lib/api/analytics';
-import { authApi } from '~/lib/api/auth';
-import { CategorySummary } from '~/lib/api/budgets';
-import { analyticsKeys } from '~/lib/query-keys';
-import { formatCurrency } from '~/lib/utils';
+/* eslint-disable max-lines -- Dashboard composes 30+ analytics + goal +
+   onboarding sub-components into one route page; legitimate splitting
+   blocked on the larger dashboard refactor tracked separately. */
+
 import { useTranslation } from '@dhanam/shared';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Progress,
+  Skeleton,
+} from '@dhanam/ui';
+import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp,
   TrendingDown,
@@ -30,23 +30,33 @@ import {
   AlertCircle,
   RefreshCw,
 } from 'lucide-react';
-import { useAnalytics } from '~/hooks/useAnalytics';
-import { SyncStatus } from '@/components/sync/sync-status';
-import { HelpTooltip } from '@/components/demo/help-tooltip';
-import { AnalyticsEmptyState } from '@/components/demo/analytics-empty-state';
-import { ProbabilisticGoalCard } from '@/components/goals/probabilistic-goal-card';
-import { GoalHealthScore } from '@/components/goals/goal-health-score';
-import { GoalProbabilityTimeline } from '@/components/goals/goal-probability-timeline';
-import { PremiumGate } from '@/components/billing/PremiumGate';
-import { DemoTour } from '@/components/demo/demo-tour';
-import { SavingsStreak } from '@/components/insights/savings-streak';
-import { InsightCards } from '@/components/insights/insight-cards';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+
+import { PremiumGate } from '@/components/billing/PremiumGate';
 import { InsightsCard } from '@/components/dashboard/insights-card';
 import { WeeklySummary } from '@/components/dashboard/weekly-summary';
+import { AnalyticsEmptyState } from '@/components/demo/analytics-empty-state';
+import { DemoTour } from '@/components/demo/demo-tour';
+import { HelpTooltip } from '@/components/demo/help-tooltip';
+import { GoalHealthScore } from '@/components/goals/goal-health-score';
+import { GoalProbabilityTimeline } from '@/components/goals/goal-probability-timeline';
+import { ProbabilisticGoalCard } from '@/components/goals/probabilistic-goal-card';
+import { InsightCards } from '@/components/insights/insight-cards';
+import { SavingsStreak } from '@/components/insights/savings-streak';
+import { SyncStatus } from '@/components/sync/sync-status';
 import { OnboardingWizard } from '~/components/onboarding/onboarding-wizard';
+import { useAnalytics } from '~/hooks/useAnalytics';
+import { analyticsApi } from '~/lib/api/analytics';
+import { authApi } from '~/lib/api/auth';
+import { CategorySummary } from '~/lib/api/budgets';
 import { fireStreakCelebration } from '~/lib/celebrations';
-import { formatDate } from '~/lib/utils';
+import { useAuth } from '~/lib/hooks/use-auth';
+import { useSpaces } from '~/lib/hooks/use-spaces';
+import { analyticsKeys } from '~/lib/query-keys';
+import { formatCurrency, formatDate } from '~/lib/utils';
+import { useSpaceStore } from '~/stores/space';
 
 export default function DashboardPage() {
   const router = useRouter();

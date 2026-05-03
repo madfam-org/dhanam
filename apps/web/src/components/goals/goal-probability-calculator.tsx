@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Target, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+
 import { SimulationChart } from '@/components/simulations/SimulationChart';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { useGoals, type GoalProbabilityResult } from '@/hooks/useGoals';
 
 interface GoalProbabilityCalculatorProps {

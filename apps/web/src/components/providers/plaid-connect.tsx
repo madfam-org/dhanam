@@ -1,13 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Loader2, Shield, CreditCard, Building2 } from 'lucide-react';
-import { toast } from 'sonner';
 import { useTranslation } from '@dhanam/shared';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@dhanam/ui';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2, Shield, CreditCard, Building2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
+
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { plaidApi } from '@/lib/api/plaid';
 

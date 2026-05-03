@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Currency, useTranslation } from '@dhanam/shared';
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,11 @@ import {
   Input,
   Label,
 } from '@dhanam/ui';
-import { Currency, useTranslation } from '@dhanam/shared';
 import { Target, Calendar, Percent, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-import { formatCurrency, getCurrencySymbol, cn } from '@/lib/utils';
 import { SetCategoryGoalDto, CategoryAllocationStatus } from '@/lib/api/zero-based';
+import { formatCurrency, getCurrencySymbol, cn } from '@/lib/utils';
 
 interface GoalEditorProps {
   open: boolean;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Currency, useTranslation } from '@dhanam/shared';
 import {
   Dialog,
   DialogContent,
@@ -17,11 +17,11 @@ import {
   SelectContent,
   SelectItem,
 } from '@dhanam/ui';
-import { Currency, useTranslation } from '@dhanam/shared';
 import { Wallet, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-import { formatCurrency, getCurrencySymbol } from '@/lib/utils';
 import { CategoryAllocationStatus } from '@/lib/api/zero-based';
+import { formatCurrency, getCurrencySymbol } from '@/lib/utils';
 
 interface AllocateModalProps {
   open: boolean;

@@ -1,20 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Alert, AlertDescription } from '@dhanam/ui';
-import { Plus, Loader2, Settings, TestTube, CheckCircle, XCircle, ArrowUpDown } from 'lucide-react';
-import { toast } from 'sonner';
-import { rulesApi, CreateRuleDto, TestRuleDto } from '@/lib/api/rules';
-import { categoriesApi } from '@/lib/api/categories';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useTranslation } from '@dhanam/shared';
+import {
+  Card,
+  CardContent,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Badge,
+  Alert,
+  AlertDescription,
+} from '@dhanam/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus, Loader2, Settings, TestTube, CheckCircle, XCircle, ArrowUpDown } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { categoriesApi } from '@/lib/api/categories';
+import { rulesApi, CreateRuleDto, TestRuleDto } from '@/lib/api/rules';
 
 interface RuleManagerProps {
   open: boolean;

@@ -1,18 +1,30 @@
 'use client';
 
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+  Alert,
+  AlertDescription,
+} from '@dhanam/ui';
+import { SettingsIcon, GlobeIcon, DollarSignIcon, BellIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { useOnboarding } from '../onboarding-provider';
+
 import { onboardingApi } from '@/lib/api/onboarding';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dhanam/ui';
-import { Switch } from '@dhanam/ui';
-import { Alert, AlertDescription } from '@dhanam/ui';
-import { SettingsIcon, GlobeIcon, DollarSignIcon, BellIcon } from 'lucide-react';
+import { useAuth } from '@/lib/hooks/use-auth';
 import { useGeoDefaults } from '@/lib/hooks/use-geo-defaults';
+
+import { useOnboarding } from '../onboarding-provider';
 
 interface PreferencesFormData {
   locale: string;

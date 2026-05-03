@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import { getGeoDefaults, type GeoDefaults } from '@dhanam/shared';
+import { useMemo } from 'react';
 
 function getGeoCookie(): string | null {
   if (typeof document === 'undefined') return null;

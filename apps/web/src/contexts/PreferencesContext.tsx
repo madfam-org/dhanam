@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+
 import { useAuth } from '@/lib/hooks/use-auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4010/v1';

@@ -1,8 +1,16 @@
 'use client';
 
+import { useTranslation } from '@dhanam/shared';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+  Skeleton,
+} from '@dhanam/ui';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, Button } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
 import {
   TrendingUp,
   TrendingDown,
@@ -15,18 +23,18 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useSpaceStore } from '@/stores/space';
-import { analyticsApi } from '@/lib/api/analytics';
-import { formatCurrency, formatDateShort } from '@/lib/utils';
+
 import {
   NetWorthChart,
   IncomeExpenseChart,
   SpendingCategoryChart,
   PortfolioChart,
 } from '@/components/analytics';
-import { ScheduleReportModal } from '@/components/reports/schedule-report-modal';
 import { MlInsightsDashboard } from '@/components/ml/ml-insights-dashboard';
-import { useTranslation } from '@dhanam/shared';
+import { ScheduleReportModal } from '@/components/reports/schedule-report-modal';
+import { analyticsApi } from '@/lib/api/analytics';
+import { formatCurrency, formatDateShort } from '@/lib/utils';
+import { useSpaceStore } from '@/stores/space';
 
 export default function AnalyticsPage() {
   const { currentSpace } = useSpaceStore();

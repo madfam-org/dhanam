@@ -1,10 +1,7 @@
 'use client';
 
-import { useContext } from 'react';
 import { I18nContext, useTranslation } from '@dhanam/shared';
 import type { Locale } from '@dhanam/shared';
-import { usePostHog } from '~/providers/PostHogProvider';
-import { Globe } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +9,10 @@ import {
   DropdownMenuTrigger,
   Button,
 } from '@dhanam/ui';
+import { Globe } from 'lucide-react';
+import { useContext } from 'react';
+
+import { usePostHog } from '~/providers/PostHogProvider';
 
 const locales: Array<{ code: Locale; name: string; flag: string }> = [
   { code: 'es', name: 'Español', flag: '🇲🇽' },

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback, useEffect, type ComponentType } from 'react';
-import { useAuth } from '~/lib/hooks/use-auth';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@dhanam/ui';
+import { useState, useCallback, useEffect, type ComponentType } from 'react';
+
+import { useAuth } from '~/lib/hooks/use-auth';
 
 interface MFAGateProps {
   /** Content that requires MFA verification to access */

@@ -1,5 +1,8 @@
 'use client';
 
+import type { Currency } from '@dhanam/shared';
+import { useTranslation } from '@dhanam/shared';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
 import { useMemo } from 'react';
 import {
   BarChart,
@@ -11,10 +14,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
+
 import { formatCurrency } from '@/lib/utils';
-import type { Currency } from '@dhanam/shared';
-import { useTranslation } from '@dhanam/shared';
 
 interface IncomeExpenseDataPoint {
   month: string;

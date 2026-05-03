@@ -1,5 +1,5 @@
-import confetti from 'canvas-confetti';
 import { CELEBRATION_COLORS } from '@dhanam/shared';
+import confetti from 'canvas-confetti';
 
 export function fireConfetti() {
   confetti({

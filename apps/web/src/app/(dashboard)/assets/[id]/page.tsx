@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
+import { useTranslation } from '@dhanam/shared';
+import { formatDistanceToNow } from 'date-fns';
 import {
   Building2,
   Car,
@@ -17,19 +16,13 @@ import {
   Trash2,
   Loader2,
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
+import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { DocumentList } from '@/components/assets/document-list';
+import { DocumentUpload } from '@/components/assets/document-upload';
+import { ManualAssetForm, type ManualAssetData } from '@/components/assets/manual-asset-form';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,13 +33,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { ManualAssetForm, type ManualAssetData } from '@/components/assets/manual-asset-form';
-import { DocumentUpload } from '@/components/assets/document-upload';
-import { DocumentList } from '@/components/assets/document-list';
-import { documentsApi, type DocumentMetadata, type DocumentConfig } from '@/lib/api/documents';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { apiClient } from '@/lib/api/client';
+import { documentsApi, type DocumentMetadata, type DocumentConfig } from '@/lib/api/documents';
 import { useSpaceStore } from '@/stores/space';
-import { useTranslation } from '@dhanam/shared';
 
 interface ManualAsset {
   id: string;

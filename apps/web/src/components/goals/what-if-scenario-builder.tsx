@@ -1,18 +1,20 @@
 'use client';
 
+import { Loader2, Lightbulb, TrendingUp, TrendingDown, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Lightbulb, TrendingUp, TrendingDown, RotateCcw } from 'lucide-react';
 import {
   useGoals,
   type Goal,
   type WhatIfScenario,
   type GoalProbabilityResult,
 } from '@/hooks/useGoals';
+
 import { HelpTooltip } from '../demo/help-tooltip';
 
 interface WhatIfScenarioBuilderProps {

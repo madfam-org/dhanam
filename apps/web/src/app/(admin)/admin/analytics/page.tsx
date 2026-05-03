@@ -1,10 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card } from '@dhanam/ui';
-import { Progress } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { adminApi, type OnboardingFunnel } from '~/lib/api/admin';
+import { Card, Progress, Skeleton } from '@dhanam/ui';
 import {
   Users,
   UserCheck,
@@ -15,6 +11,9 @@ import {
   TrendingDown,
   Clock,
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+import { adminApi, type OnboardingFunnel } from '~/lib/api/admin';
 
 export default function AnalyticsPage(): JSX.Element {
   const [funnel, setFunnel] = useState<OnboardingFunnel | null>(null);

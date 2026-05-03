@@ -1,12 +1,11 @@
 'use client';
 
+import { Card, Button, Badge } from '@dhanam/ui';
+import { RefreshCw, Trash2, ListChecks } from 'lucide-react';
 import { useState } from 'react';
-import { Card } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
+
 import type { QueueInfo } from '~/lib/api/admin';
 import { adminApi } from '~/lib/api/admin';
-import { RefreshCw, Trash2, ListChecks } from 'lucide-react';
 
 interface QueueCardProps {
   queue: QueueInfo;

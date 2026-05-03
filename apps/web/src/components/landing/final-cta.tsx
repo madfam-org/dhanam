@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
+import { Button } from '@dhanam/ui';
 import { ArrowRight } from 'lucide-react';
 
 interface FinalCtaProps {

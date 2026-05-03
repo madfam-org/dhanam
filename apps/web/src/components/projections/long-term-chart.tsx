@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslation } from '@dhanam/shared';
 import {
   Area,
   AreaChart,
@@ -13,7 +14,6 @@ import {
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { YearlySnapshot } from '@/lib/api/projections';
-import { useTranslation } from '@dhanam/shared';
 
 interface LongTermChartProps {
   snapshots: YearlySnapshot[];

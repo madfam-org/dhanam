@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useOnboarding } from '../onboarding-provider';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
 import { BuildingIcon, UserIcon, CheckIcon } from 'lucide-react';
+import { useState } from 'react';
+
+import { useOnboarding } from '../onboarding-provider';
 
 export function SpaceSetupStep() {
   const { updateStep } = useOnboarding();

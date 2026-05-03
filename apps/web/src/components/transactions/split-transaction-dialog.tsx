@@ -1,8 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Trash2, UserPlus } from 'lucide-react';
-
 import {
   Button,
   Dialog,
@@ -21,6 +18,8 @@ import {
   SelectValue,
   Separator,
 } from '@dhanam/ui';
+import { Plus, Trash2, UserPlus } from 'lucide-react';
+import { useState } from 'react';
 
 interface SplitItem {
   userId: string;

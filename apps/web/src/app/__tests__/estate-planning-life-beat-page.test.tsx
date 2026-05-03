@@ -1,9 +1,13 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 
 // This page uses @/components/ui/* (local shadcn), not @dhanam/ui
 jest.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: any) => <div data-testid="card" {...props}>{children}</div>,
+  Card: ({ children, ...props }: any) => (
+    <div data-testid="card" {...props}>
+      {children}
+    </div>
+  ),
   CardContent: ({ children }: any) => <div>{children}</div>,
   CardDescription: ({ children }: any) => <p>{children}</p>,
   CardHeader: ({ children }: any) => <div>{children}</div>,
@@ -66,16 +70,20 @@ jest.mock('@/components/ui/checkbox', () => ({
   Checkbox: ({ ...props }: any) => <input type="checkbox" data-testid="checkbox" {...props} />,
 }));
 
-jest.mock('lucide-react', () =>
-  new Proxy(
-    {},
-    {
-      get: (_, prop) => {
-        if (prop === '__esModule') return true;
-        return (props: any) => <span data-testid={`icon-${String(prop).toLowerCase()}`} {...props} />;
-      },
-    },
-  ),
+jest.mock(
+  'lucide-react',
+  () =>
+    new Proxy(
+      {},
+      {
+        get: (_, prop) => {
+          if (prop === '__esModule') return true;
+          return (props: any) => (
+            <span data-testid={`icon-${String(prop).toLowerCase()}`} {...props} />
+          );
+        },
+      }
+    )
 );
 
 jest.mock('@dhanam/shared', () => ({

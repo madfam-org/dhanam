@@ -1,9 +1,9 @@
 'use client';
 
-import { Card } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import type { DeploymentStatus as DeploymentStatusType } from '~/lib/api/admin';
+import { Card, Badge } from '@dhanam/ui';
 import { Server, GitBranch, Clock, Cpu } from 'lucide-react';
+
+import type { DeploymentStatus as DeploymentStatusType } from '~/lib/api/admin';
 
 interface DeploymentStatusProps {
   status: DeploymentStatusType;

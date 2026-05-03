@@ -1,10 +1,11 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle2, AlertCircle, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, AlertCircle, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import type { RetirementSimulationResult } from '@/hooks/useSimulations';
 
 interface RetirementResultsProps {

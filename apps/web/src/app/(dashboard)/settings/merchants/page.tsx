@@ -1,26 +1,31 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  Input,
+  Label,
 } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Checkbox } from '@dhanam/ui';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Store, Search, Pencil, Merge } from 'lucide-react';
-import { useSpaceStore } from '@/stores/space';
+import { useState, useMemo } from 'react';
+import { toast } from 'sonner';
+
 import { transactionsApi, MerchantInfo } from '@/lib/api/transactions';
 import { formatDate } from '@/lib/utils';
-import { toast } from 'sonner';
+import { useSpaceStore } from '@/stores/space';
 
 export default function MerchantsSettingsPage() {
   const { currentSpace } = useSpaceStore();

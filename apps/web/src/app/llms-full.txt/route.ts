@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+
+import { NextResponse } from 'next/server';
 
 let cachedContent: string | null = null;
 

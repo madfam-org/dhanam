@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
+import { Button } from '@dhanam/ui';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 function resolveLocale(): string {

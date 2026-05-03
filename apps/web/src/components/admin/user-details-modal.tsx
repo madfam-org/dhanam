@@ -1,12 +1,10 @@
 'use client';
 
-import { Dialog } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Card } from '@dhanam/ui';
-import { Separator } from '@dhanam/ui';
-import type { UserDetails } from '~/lib/api/admin';
-import { User, Mail, Shield, Globe, Clock, Building2, CreditCard, Receipt } from 'lucide-react';
 import { useTranslation } from '@dhanam/shared';
+import { Dialog, Badge, Card, Separator } from '@dhanam/ui';
+import { User, Mail, Shield, Globe, Clock, Building2, CreditCard, Receipt } from 'lucide-react';
+
+import type { UserDetails } from '~/lib/api/admin';
 
 interface UserDetailsModalProps {
   user: UserDetails;

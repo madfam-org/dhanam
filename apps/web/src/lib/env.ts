@@ -100,7 +100,6 @@ export function getEnv(): Env {
   // partially via getEnvUnsafe() at use sites, so type narrowing still works.
   // Use only as a break-glass — log loudly so it's visible in incident review.
   if (process.env.SKIP_ENV_VALIDATION === '1') {
-    // eslint-disable-next-line no-console
     console.warn(
       '[dhanam-web] SKIP_ENV_VALIDATION=1 — Zod env schema bypassed. ' +
         'This is a break-glass for prod incidents only; remove it once recovered.'
@@ -121,7 +120,6 @@ export function getEnv(): Env {
 
   // Warn (but don't fail) on missing observability — see superRefine note above.
   if (cachedEnv.NODE_ENV === 'production' && !cachedEnv.NEXT_PUBLIC_POSTHOG_KEY) {
-    // eslint-disable-next-line no-console
     console.warn(
       '[dhanam-web] NEXT_PUBLIC_POSTHOG_KEY not set in production — observability disabled. ' +
         'Set it in dhanam-secrets to re-enable PostHog tracking.'

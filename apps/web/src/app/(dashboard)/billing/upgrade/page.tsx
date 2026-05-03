@@ -1,15 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from '@dhanam/ui';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
 import { CheckCircle2, Loader2, ArrowLeft, Zap, Crown, Sparkles, Star } from 'lucide-react';
-import { billingApi } from '~/lib/api/billing';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
+
 import { useAnalytics } from '~/hooks/useAnalytics';
+import { billingApi } from '~/lib/api/billing';
 
 function formatPrice(amount: number, currency: string): string {
   try {

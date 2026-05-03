@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/hooks/use-auth';
+import { useTranslation } from '@dhanam/shared';
 import { Button } from '@dhanam/ui';
 import { X, Clock, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { useTranslation } from '@dhanam/shared';
+import { useAuth } from '@/lib/hooks/use-auth';
+
 import { PersonaSwitcher } from './persona-switcher';
 
 export function DemoModeBanner() {

@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
 import { Flame, Target, Leaf } from 'lucide-react';
-import { useAuth } from '~/lib/hooks/use-auth';
-import { fireStreakCelebration } from '~/lib/celebrations';
+import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+
+import { fireStreakCelebration } from '~/lib/celebrations';
+import { useAuth } from '~/lib/hooks/use-auth';
 
 interface Badge {
   label: string;

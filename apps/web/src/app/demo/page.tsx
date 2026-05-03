@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ArrowRight, CheckCircle2, Sparkles, Loader2 } from 'lucide-react';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '~/lib/hooks/use-auth';
+import { ArrowRight, CheckCircle2, Sparkles, Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAnalytics } from '@/hooks/useAnalytics';
 import { authApi } from '~/lib/api/auth';
+import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaceStore } from '~/stores/space';
 
 const PERSONAS = [

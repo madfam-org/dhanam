@@ -1,15 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Card } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Switch } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { useAdmin } from '~/contexts/AdminContext';
+import { Card, Button, Switch, Badge, Input, Label, Skeleton } from '@dhanam/ui';
 import { Flag, Users, Percent, Edit2, Save, X } from 'lucide-react';
+import { useState } from 'react';
+
+import { useAdmin } from '~/contexts/AdminContext';
 import type { FeatureFlag } from '~/lib/api/admin';
 
 export default function FeatureFlagsPage() {

@@ -1,9 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useOnboarding } from '../onboarding-provider';
-import { Button } from '@dhanam/ui';
-import { Card, CardContent } from '@dhanam/ui';
+import { Button, Card, CardContent } from '@dhanam/ui';
 import {
   PlayCircleIcon,
   ChevronLeftIcon,
@@ -11,6 +8,9 @@ import {
   CheckCircleIcon,
   SkipForwardIcon,
 } from 'lucide-react';
+import { useState } from 'react';
+
+import { useOnboarding } from '../onboarding-provider';
 
 const features = [
   {

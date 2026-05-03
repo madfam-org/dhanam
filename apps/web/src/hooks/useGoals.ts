@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { useAuth } from '@/lib/hooks/use-auth';
 
 export interface Goal {

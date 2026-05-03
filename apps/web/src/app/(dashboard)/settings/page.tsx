@@ -1,14 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useTranslation } from '@dhanam/shared';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Button,
+  Switch,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Separator,
+  Badge,
+} from '@dhanam/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Switch } from '@dhanam/ui';
-import { Label } from '@dhanam/ui';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@dhanam/ui';
-import { Separator } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
 import {
   Loader2,
   Bell,
@@ -22,12 +32,13 @@ import {
   CreditCard,
   ExternalLink,
 } from 'lucide-react';
-import { preferencesApi, UserPreferences } from '@/lib/api/preferences';
-import { billingApi } from '@/lib/api/billing';
-import { UsageOverview } from '~/components/billing/UsageIndicator';
-import { PremiumUpsell } from '~/components/billing/PremiumUpsell';
-import { useTranslation } from '@dhanam/shared';
+import { useState } from 'react';
 import { toast } from 'sonner';
+
+import { billingApi } from '@/lib/api/billing';
+import { preferencesApi, UserPreferences } from '@/lib/api/preferences';
+import { PremiumUpsell } from '~/components/billing/PremiumUpsell';
+import { UsageOverview } from '~/components/billing/UsageIndicator';
 
 export default function SettingsPage() {
   const { t } = useTranslation('settings');

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import { Plus, Trash2, Calculator, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import type { WhatIfScenario, ProjectionResult } from '@/lib/api/projections';
 
 interface WhatIfPanelProps {

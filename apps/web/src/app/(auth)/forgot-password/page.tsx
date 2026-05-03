@@ -1,10 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@dhanam/ui';
-import { Button, Input, Label } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  Label,
+} from '@dhanam/ui';
+import Link from 'next/link';
+import { useState } from 'react';
+
 import { LocaleSwitcher } from '~/components/locale-switcher';
 
 const JANUA_URL = process.env.NEXT_PUBLIC_JANUA_API_URL || 'https://auth.madfam.io';

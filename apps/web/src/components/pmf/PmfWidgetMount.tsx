@@ -40,8 +40,9 @@
  * tezca PR #39 (apps/web/components/pmf/PmfWidgetMount.tsx).
  */
 
-import { useEffect, useState, type ComponentType } from 'react';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState, type ComponentType } from 'react';
+
 import { useAuth } from '~/lib/hooks/use-auth';
 
 /**
@@ -57,7 +58,7 @@ function isFlagEnabled(): boolean {
 }
 
 function getTulanaApiUrl(): string {
-  return process.env.NEXT_PUBLIC_TULANA_API_URL || 'https://api.tulana.madfam.io';
+  return process.env.NEXT_PUBLIC_TULANA_API_URL || 'https://tulana-api.madfam.io';
 }
 
 /**

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+
 import { esgApi } from '@/lib/api/esg';
 
 export interface EsgScore {

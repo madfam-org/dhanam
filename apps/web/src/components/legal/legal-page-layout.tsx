@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from '@dhanam/shared';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 interface LegalSection {
   title: string;

@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from '@dhanam/shared';
 import type { Currency } from '@dhanam/shared';
+import { useMemo, useCallback, useRef } from 'react';
 
 import type { CalendarDay } from '@/lib/api/analytics';
+
 import { CalendarDayCell } from './calendar-day-cell';
 
 function resolveLocale(): string {
@@ -85,7 +86,7 @@ export function CalendarGrid({
   // Keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, dayNum: number) => {
-      let newDay = dayNum;
+      let newDay: number;
       switch (e.key) {
         case 'ArrowLeft':
           newDay = dayNum - 1;

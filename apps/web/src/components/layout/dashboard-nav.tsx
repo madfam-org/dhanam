@@ -1,12 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { cn } from '@dhanam/ui';
 import { useTranslation } from '@dhanam/shared';
-
-import { useDemoNavigation } from '~/lib/contexts/demo-navigation-context';
+import { cn } from '@dhanam/ui';
 import {
   LayoutDashboard,
   Wallet,
@@ -28,6 +23,11 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+
+import { useDemoNavigation } from '~/lib/contexts/demo-navigation-context';
 
 interface NavChild {
   key: string;

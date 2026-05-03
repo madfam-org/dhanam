@@ -1,5 +1,3 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
 import {
   ArrowRight,
   CheckCircle2,
@@ -11,6 +9,8 @@ import {
   Receipt,
   Building2,
 } from 'lucide-react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'For platforms — One billing API. Stripe + SPEI + OXXO + Conekta. | Dhanam',

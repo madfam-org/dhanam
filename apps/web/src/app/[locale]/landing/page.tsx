@@ -1,24 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { useAuth } from '@/lib/hooks/use-auth';
-import { Button } from '@dhanam/ui';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useTranslation } from '@dhanam/shared';
+import { Button } from '@dhanam/ui';
 import { Globe, Menu, X } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Hero } from '@/components/landing/hero';
-import { PersonaCards } from '@/components/landing/persona-cards';
-import { ProblemSolution } from '@/components/landing/problem-solution';
-import { HowItWorks } from '@/components/landing/how-it-works';
-import { SecurityTrust } from '@/components/landing/security-trust';
 import { FeaturesGrid } from '@/components/landing/features-grid';
-import { PlatformDepth } from '@/components/landing/platform-depth';
-import { SocialProof } from '@/components/landing/social-proof';
-import { Pricing } from '@/components/landing/pricing';
 import { FinalCta } from '@/components/landing/final-cta';
 import { Footer } from '@/components/landing/footer';
+import { Hero } from '@/components/landing/hero';
+import { HowItWorks } from '@/components/landing/how-it-works';
+import { PersonaCards } from '@/components/landing/persona-cards';
+import { PlatformDepth } from '@/components/landing/platform-depth';
+import { Pricing } from '@/components/landing/pricing';
+import { ProblemSolution } from '@/components/landing/problem-solution';
+import { SecurityTrust } from '@/components/landing/security-trust';
+import { SocialProof } from '@/components/landing/social-proof';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export default function LocaleLandingPage() {
   const params = useParams<{ locale: string }>();
@@ -78,7 +78,7 @@ export default function LocaleLandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
       {/* SEO hreflang tags */}
-      {/* eslint-disable-next-line @next/next/no-head-element -- Reason: hreflang and og:locale meta tags needed in client page where Next.js metadata API is unavailable */}
+      {}
       <head>
         <link rel="alternate" hrefLang="es" href="https://dhan.am/es" />
         <link rel="alternate" hrefLang="en" href="https://dhan.am/en" />

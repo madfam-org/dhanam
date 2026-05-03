@@ -1,17 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Alert, AlertDescription } from '@dhanam/ui';
-import { Loader2, Shield, Smartphone, AlertTriangle, Copy, Check } from 'lucide-react';
-import { toast } from 'sonner';
 import { useTranslation } from '@dhanam/shared';
-import { authApi } from '~/lib/api/auth';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  Button,
+  Input,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Alert,
+  AlertDescription,
+} from '@dhanam/ui';
+import { useMutation } from '@tanstack/react-query';
+import { Loader2, Shield, Smartphone, AlertTriangle, Copy, Check } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import { authApi } from '~/lib/api/auth';
 
 interface TotpSetupProps {
   open: boolean;

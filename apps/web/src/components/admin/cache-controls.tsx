@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Card } from '@dhanam/ui';
-import { Input } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { adminApi } from '~/lib/api/admin';
+import { Card, Input, Button } from '@dhanam/ui';
 import { Trash2 } from 'lucide-react';
+import { useState } from 'react';
+
+import { adminApi } from '~/lib/api/admin';
 
 export function CacheControls() {
   const [pattern, setPattern] = useState('');

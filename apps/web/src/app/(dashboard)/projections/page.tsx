@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from '@dhanam/shared';
 import {
   TrendingUp,
@@ -11,18 +10,18 @@ import {
   Shield,
   Loader2,
 } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
 
-import { PremiumGate } from '~/components/billing/PremiumGate';
+import { LifeEventTimeline } from '@/components/projections/life-event-timeline';
+import { LongTermChart, IncomeExpenseChart } from '@/components/projections/long-term-chart';
+import { WhatIfPanel } from '@/components/projections/what-if-panel';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LongTermChart, IncomeExpenseChart } from '@/components/projections/long-term-chart';
-import { LifeEventTimeline } from '@/components/projections/life-event-timeline';
-import { WhatIfPanel } from '@/components/projections/what-if-panel';
 import {
   projectionsApi,
   type ProjectionResult,
@@ -31,6 +30,7 @@ import {
   type LifeEvent,
 } from '@/lib/api/projections';
 import { useSpaceStore } from '@/stores/space';
+import { PremiumGate } from '~/components/billing/PremiumGate';
 
 function formatCurrency(value: number, currency = 'USD'): string {
   return new Intl.NumberFormat('en-US', {

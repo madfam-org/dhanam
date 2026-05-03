@@ -1,14 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useTranslation } from '@dhanam/shared';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersApi, type LifeBeatStatus } from '@/lib/api/users';
-import { estatePlanningApi, type Executor } from '@/lib/api/estate-planning';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
+import {
+  HeartPulse,
+  Plus,
+  UserCheck,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  Shield,
+  Mail,
+  Trash2,
+} from 'lucide-react';
+import { useState } from 'react';
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -27,20 +39,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  HeartPulse,
-  Plus,
-  UserCheck,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  Loader2,
-  Shield,
-  Mail,
-  Trash2,
-} from 'lucide-react';
-import { useTranslation } from '@dhanam/shared';
+import { Switch } from '@/components/ui/switch';
+import { estatePlanningApi, type Executor } from '@/lib/api/estate-planning';
+import { usersApi, type LifeBeatStatus } from '@/lib/api/users';
 
 export default function LifeBeatPage() {
   const { t } = useTranslation('estatePlanning');

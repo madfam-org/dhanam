@@ -2,8 +2,8 @@
 
 import { Layers, Coins, LandPlot, Image as ImageIcon } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface PlatformSummary {
   platform: string;

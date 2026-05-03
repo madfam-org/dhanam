@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card } from '@dhanam/ui';
-import { Badge } from '@dhanam/ui';
-import { Button } from '@dhanam/ui';
-import { Skeleton } from '@dhanam/ui';
-import { adminApi, type BillingEvent } from '~/lib/api/admin';
+import { Card, Badge, Button, Skeleton } from '@dhanam/ui';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
+import { adminApi, type BillingEvent } from '~/lib/api/admin';
 
 export default function BillingEventsPage() {
   const [events, setEvents] = useState<BillingEvent[]>([]);
