@@ -290,6 +290,29 @@ spec:
                   key: FEDERATION_API_TOKEN
 
             # =================================================================
+            # Analytics + KYC flow + Checkout host allowlist
+            # Reconciled into dhanam-secrets 2026-05-04 (previously kubectl-edit
+            # inline-patched on the live deployment, which blocked ArgoCD sync
+            # for 25+ days). See:
+            # internal-devops/runbooks/2026-05-04-dhanam-argocd-sync-incident.md
+            # =================================================================
+            - name: POSTHOG_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-secrets
+                  key: POSTHOG_API_KEY
+            - name: METAMAP_FLOW_ID
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-secrets
+                  key: METAMAP_FLOW_ID
+            - name: CHECKOUT_ALLOWED_HOSTS
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-secrets
+                  key: CHECKOUT_ALLOWED_HOSTS
+
+            # =================================================================
             # Email / SMTP
             # =================================================================
             - name: SMTP_HOST
