@@ -88,6 +88,14 @@ spec:
               value: "production"
             - name: PORT
               value: "4300"
+            # Required by post-2026-04-30 ConfigModule validator
+            # (newer images refuse startup with "Config validation
+            # error: WEB_URL is required"). Old running image
+            # sha256:99f148de predates this validator; once that
+            # image rolls forward to a fixed BillingModule build,
+            # this var becomes load-bearing.
+            - name: WEB_URL
+              value: "https://app.dhan.am"
 
             # =================================================================
             # Janua OIDC (Galaxy Ecosystem Authentication)
