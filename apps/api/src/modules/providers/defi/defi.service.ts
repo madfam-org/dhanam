@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { SpacesService } from '../../spaces/spaces.service';
@@ -33,6 +33,7 @@ export class DeFiService {
 
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => SpacesService))
     private readonly spacesService: SpacesService,
     private readonly zapperService: ZapperService
   ) {}
