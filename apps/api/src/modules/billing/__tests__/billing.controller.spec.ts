@@ -4,10 +4,15 @@ import { ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import Stripe from 'stripe';
 
+import { JwtAuthGuard } from '../../../core/auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../../core/auth/guards/roles.guard';
+import { ThrottleAuthGuard } from '../../../core/security/guards/throttle-auth.guard';
 import { BillingController } from '../billing.controller';
 import { BillingService } from '../billing.service';
 import { JanuaBillingService } from '../janua-billing.service';
+import { CancellationService } from '../services/cancellation.service';
 import { PricingEngineService } from '../services/pricing-engine.service';
+import { RevenueMetricsService } from '../services/revenue-metrics.service';
 import { TrialService } from '../services/trial.service';
 import { StripeService } from '../stripe.service';
 
@@ -104,8 +109,33 @@ describe('BillingController', () => {
             getEffectiveTier: jest.fn(),
           },
         },
+        {
+          provide: CancellationService,
+          useValue: {
+            startCancelIntent: jest.fn(),
+            confirmCancellation: jest.fn(),
+            pauseSubscription: jest.fn(),
+            applySaveDiscount: jest.fn(),
+          },
+        },
+        {
+          provide: RevenueMetricsService,
+          useValue: {
+            getRevenueMetrics: jest.fn(),
+          },
+        },
       ],
-    }).compile();
+    })
+      // Auth + throttle guards have their own dedicated specs; here we
+      // override them so the controller→service wiring tests don't pull
+      // in PrismaService / Reflector dependencies.
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(ThrottleAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<BillingController>(BillingController);
     billingService = module.get(BillingService) as jest.Mocked<BillingService>;
@@ -546,7 +576,7 @@ describe('BillingController', () => {
       );
     });
 
-    it('should acknowledge receipt even when webhook processing fails', async () => {
+    it('should re-throw when webhook handler fails so Stripe retries (fail-closed)', async () => {
       const mockEvent = {
         id: 'evt_test123',
         type: 'customer.subscription.created',
@@ -555,13 +585,17 @@ describe('BillingController', () => {
 
       const mockRequest = createMockRequest(mockEvent);
       const signature = 'valid_signature';
+      const handlerError = new Error('Database error');
 
       stripeService.constructWebhookEvent.mockReturnValue(mockEvent);
-      billingService.handleSubscriptionCreated.mockRejectedValue(new Error('Database error'));
+      billingService.handleSubscriptionCreated.mockRejectedValue(handlerError);
 
-      const result = await controller.handleWebhook(mockRequest as any, signature);
-
-      expect(result).toEqual({ received: true });
+      // Previously this swallowed the error and 200-ACK'd, defeating Stripe
+      // retries. Idempotency in webhook-processor.service.ts (BillingEvent
+      // stripeEventId unique constraint) prevents double-application on retry.
+      await expect(controller.handleWebhook(mockRequest as any, signature)).rejects.toThrow(
+        handlerError
+      );
     });
 
     it('should handle checkout.session.completed webhook', async () => {
