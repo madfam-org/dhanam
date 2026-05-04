@@ -28,8 +28,14 @@ import { QueueService } from './queue.service';
     ScheduleModule.forRoot(),
     PrismaModule,
     CryptoModule,
-    CategoriesModule,
-    SpacesModule,
+    // forwardRef on the SpacesModule edge breaks the cycle:
+    // JobsModule → SpacesModule → BillingModule → MonitoringModule → JobsModule.
+    // CategoriesModule transitively imports SpacesModule (also via forwardRef
+    // per #415), but JobsModule imports CategoriesModule directly — so wrap
+    // both edges that lead to SpacesModule for safety. Existing forwardRefs
+    // on AnalyticsModule + MlModule were anticipated; SpacesModule wasn't.
+    forwardRef(() => CategoriesModule),
+    forwardRef(() => SpacesModule),
     EsgModule,
     ProvidersModule,
     forwardRef(() => AnalyticsModule),
