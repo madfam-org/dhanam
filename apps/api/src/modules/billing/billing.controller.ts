@@ -363,8 +363,12 @@ export class BillingController {
           this.logger.log(`Unhandled event type: ${event.type}`);
       }
     } catch (error) {
-      // Log the error but acknowledge receipt to prevent Stripe retries
+      // Fail closed: re-throw so NestJS converts to a 5xx and Stripe retries
+      // via its standard retry ladder (24 hours, 3 days, ...).
+      // Idempotency in webhook-processor.service.ts (BillingEvent.stripeEventId
+      // unique constraint) prevents double-application on retry.
       this.logger.error(`Error processing webhook event ${event.type}`, error.stack);
+      throw error;
     }
 
     return { received: true };
