@@ -8,15 +8,26 @@ import Stripe from 'stripe';
 @Injectable()
 export class ReconciliationJob {
   private readonly logger = new Logger(ReconciliationJob.name);
-  private readonly stripe: Stripe;
+  private stripeClient: Stripe | null = null;
 
   constructor(
     private prisma: PrismaService,
     private config: ConfigService
-  ) {
-    this.stripe = new Stripe(this.config.get('STRIPE_SECRET_KEY') ?? '', {
-      apiVersion: '2026-02-25.clover',
-    });
+  ) {}
+
+  // Lazy Stripe init: Stripe v20.4.1 throws "Neither apiKey nor
+  // config.authenticator provided" when constructed with an empty
+  // string. Production deployments without STRIPE_SECRET_KEY (e.g.
+  // FEATURE_STRIPE_MXN_LIVE=false) crashloop the entire API on
+  // module instantiation. Lazy init defers the constructor call to
+  // the cron tick, where we can also no-op gracefully when key is
+  // absent.
+  private get stripe(): Stripe | null {
+    if (this.stripeClient) return this.stripeClient;
+    const key = this.config.get<string>('STRIPE_SECRET_KEY');
+    if (!key) return null;
+    this.stripeClient = new Stripe(key, { apiVersion: '2026-02-25.clover' });
+    return this.stripeClient;
   }
 
   /**
@@ -28,6 +39,11 @@ export class ReconciliationJob {
    */
   @Cron('0 3 * * *', { name: 'billing-reconciliation' })
   async reconcile(): Promise<void> {
+    const stripe = this.stripe;
+    if (!stripe) {
+      this.logger.warn('Skipping billing reconciliation — STRIPE_SECRET_KEY not configured');
+      return;
+    }
     this.logger.log('Starting nightly billing reconciliation');
 
     const subscribedUsers = await this.prisma.user.findMany({
@@ -49,7 +65,7 @@ export class ReconciliationJob {
 
     for (const user of subscribedUsers) {
       try {
-        const subscriptions = await this.stripe.subscriptions.list({
+        const subscriptions = await stripe.subscriptions.list({
           customer: user.stripeCustomerId!,
           status: 'active',
           limit: 1,
