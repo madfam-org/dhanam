@@ -2,8 +2,10 @@ export const landing = {
   hero: {
     badge: 'Family Office Autônomo para Todos',
     title: 'Toda a Sua Vida Financeira. Uma Plataforma.',
-    subtitle: 'Bancos, cripto, DeFi, imóveis, colecionáveis — rastreados por IA, projetados com Monte Carlo, protegidos com criptografia bancária.',
-    subDescription: 'As ferramentas que consultores financeiros cobram milhares — automatizadas e disponíveis para todos.',
+    subtitle:
+      'Bancos, cripto, DeFi, imóveis, colecionáveis — rastreados com IA, projetados com Monte Carlo, protegidos com criptografia forte.',
+    subDescription:
+      'Ferramentas no estilo de gestão patrimonial, automatizadas e disponíveis para famílias.',
     cta: 'Testar Demo ao Vivo',
     ctaSecondary: 'Criar Conta Grátis',
     demoNote: 'Acesso imediato • Sem cadastro • Explore todas as funcionalidades por 1 hora',
@@ -31,7 +33,7 @@ export const landing = {
     diego: {
       archetype: 'Nativo Web3 / DeFi',
       pain: 'Posições DeFi invisíveis para o seu banco',
-      superpower: '7 redes, pontuações ESG, execução de trades — tudo aqui.',
+      superpower: '7 redes, rastreamento on-chain, pontuações ESG — tudo aqui.',
       cta: 'Explorar como Diego',
     },
     patricia: {
@@ -46,71 +48,87 @@ export const landing = {
     subtitle: 'Ferramentas profissionais para pessoas e negócios',
     feature1: {
       title: 'Banco Multi-Provedor',
-      description: 'Belvo (México), Plaid (EUA), MX, Finicity — conecte todas as suas contas automaticamente.',
+      description:
+        'Belvo (México), Plaid (EUA), MX, Finicity — conecte todas as suas contas automaticamente.',
     },
     feature2: {
       title: 'DeFi e Web3',
-      description: 'Integração Zapper em 7 redes — Ethereum, Polygon, Arbitrum e mais. Além de Bitso e rastreamento on-chain.',
+      description:
+        'Integração Zapper em 7 redes — Ethereum, Polygon, Arbitrum e mais. Além de Bitso e rastreamento on-chain.',
     },
     feature3: {
       title: 'Imóveis e Colecionáveis',
-      description: 'Avaliações Zillow Zestimate para propriedades. Tênis, relógios, arte, vinho, moedas e cards.',
+      description:
+        'Avaliações Zillow Zestimate para propriedades. Tênis, relógios, arte, vinho, moedas e cards.',
     },
     feature4: {
       title: 'Gaming e Metaverso',
-      description: 'Portfolio de 7 plataformas — rastreie ativos in-game, recompensas de staking e NFTs.',
+      description:
+        'Portfolio de 7 plataformas — rastreie ativos in-game, recompensas de staking e NFTs.',
     },
     feature5: {
       title: 'Categorização Inteligente',
-      description: 'Auto-categorização com ML que melhora com suas correções através de um ciclo de aprendizado.',
+      description:
+        'Auto-categorização com ML que melhora com suas correções através de um ciclo de aprendizado.',
     },
     feature6: {
       title: 'Planejamento Patrimonial e Life Beat',
-      description: 'Testamentos digitais com interruptor de segurança — acesso de executores e ativado automaticamente.',
+      description:
+        'Testamentos digitais com interruptor de segurança — acesso de executores e ativado automaticamente.',
     },
     feature7: {
       title: 'Busca IA (⌘K)',
-      description: "Pergunte 'para onde foi meu dinheiro do café?' e obtenha respostas instantâneas em todas as suas contas.",
+      description:
+        "Pergunte 'para onde foi meu dinheiro do café?' e obtenha respostas instantâneas em todas as suas contas.",
     },
     feature8: {
       title: 'Orçamento Base Zero',
-      description: 'Dê um trabalho a cada real com limites por categoria, regras automatizadas e rastreamento de sobras.',
+      description:
+        'Dê um trabalho a cada real com limites por categoria, regras automatizadas e rastreamento de sobras.',
     },
     feature9: {
       title: 'Previsão de Fluxo de Caixa de 60 Dias',
-      description: 'A IA detecta padrões recorrentes e projeta seu runway com granularidade semanal.',
+      description:
+        'A IA detecta padrões recorrentes e projeta seu runway com granularidade semanal.',
     },
     feature10: {
       title: 'Gestão do Lar',
-      description: 'Espaços com vários membros com visões Seu / Meu / Nosso para casais e famílias.',
+      description:
+        'Espaços com vários membros com visões Seu / Meu / Nosso para casais e famílias.',
     },
     feature11: {
       title: 'Cofre de Documentos',
-      description: 'Armazenamento criptografado para escrituras, testamentos, apólices e documentação de ativos.',
+      description:
+        'Armazenamento criptografado para escrituras, testamentos, apólices e documentação de ativos.',
     },
     feature12: {
       title: 'Sistema de Conquistas',
-      description: 'Acompanhe sua jornada de educação financeira com marcos, sequências e badges de progresso.',
+      description:
+        'Acompanhe sua jornada de educação financeira com marcos, sequências e badges de progresso.',
     },
   },
   securityTrust: {
-    title: 'Segurança Bancária. Sem Compromissos.',
-    subtitle: 'Seus dados financeiros merecem os mais altos padrões de proteção',
+    title: 'Segurança que Podemos Sustentar.',
+    subtitle: 'Seus dados financeiros merecem proteção por design — é isto que de fato fazemos.',
     encryption: {
       title: 'Criptografia de Ponta a Ponta',
-      description: 'AES-256-GCM para tokens de provedores, Argon2id para senhas, TLS 1.3 em trânsito.',
+      description:
+        'AES-256-GCM para tokens de provedores, Argon2id para senhas, TLS 1.3 em trânsito.',
     },
     authentication: {
       title: 'Autenticação Robusta',
-      description: 'JWT de curta duração (15 min) com tokens de atualização rotativos. Autenticação TOTP de dois fatores opcional.',
+      description:
+        'JWT de curta duração (15 min) com tokens de atualização rotativos. Autenticação TOTP de dois fatores opcional.',
     },
     readOnly: {
       title: 'Acesso Somente Leitura',
-      description: 'Nunca armazenamos senhas bancárias. Todas as conexões são somente leitura e revogáveis a qualquer momento.',
+      description:
+        'Nunca armazenamos senhas bancárias. Todas as conexões são somente leitura e revogáveis a qualquer momento.',
     },
     auditTrail: {
       title: 'Auditoria Completa',
-      description: 'Cada operação sensível fica registrada. A personificação de admin requer auditoria e consentimento.',
+      description:
+        'Cada operação sensível fica registrada. A personificação de admin requer auditoria e consentimento.',
     },
   },
   platformDepth: {
@@ -243,21 +261,43 @@ export const landing = {
   howItWorks: {
     title: 'Como Funciona',
     subtitle: 'De contas conectadas a decisões com confiança em cinco passos',
-    step1: { title: 'Conecte', description: 'Vincule contas bancárias, carteiras crypto, ou adicione ativos manuais como imóveis e colecionáveis.' },
-    step2: { title: 'Automatize', description: 'A IA categoriza transações, detecta padrões recorrentes e gera sua previsão de fluxo de caixa de 60 dias.' },
-    step3: { title: 'Simule', description: 'Execute 10.000 iterações Monte Carlo sobre suas metas e teste-as contra 12 cenários históricos.' },
-    step4: { title: 'Planeje', description: 'Veja a probabilidade de alcançar cada meta e obtenha passos acionáveis para melhorar suas chances.' },
-    step5: { title: 'Execute', description: 'Acompanhe seu progresso com orçamentos, alertas e marcos. Ajuste quando a vida mudar.' },
+    step1: {
+      title: 'Conecte',
+      description:
+        'Vincule contas bancárias, carteiras crypto, ou adicione ativos manuais como imóveis e colecionáveis.',
+    },
+    step2: {
+      title: 'Automatize',
+      description:
+        'A IA categoriza transações, detecta padrões recorrentes e gera sua previsão de fluxo de caixa de 60 dias.',
+    },
+    step3: {
+      title: 'Simule',
+      description:
+        'Execute 10.000 iterações Monte Carlo sobre suas metas e teste-as contra 12 cenários históricos.',
+    },
+    step4: {
+      title: 'Planeje',
+      description:
+        'Veja a probabilidade de alcançar cada meta e obtenha passos acionáveis para melhorar suas chances.',
+    },
+    step5: {
+      title: 'Execute',
+      description:
+        'Acompanhe seu progresso com orçamentos, alertas e marcos. Ajuste quando a vida mudar.',
+    },
   },
   trustSignals: {
     title: 'Integrado com as Plataformas que Você Confia',
     partners: ['Belvo', 'Plaid', 'Bitso', 'Zapper', 'Zillow', 'Banxico'],
     openSource: 'Metodologia ESG de Código Aberto',
-    openSourceDescription: 'Nossa pontuação ESG é transparente e auditável. Veja a metodologia no GitHub.',
+    openSourceDescription:
+      'Nossa pontuação ESG é transparente e auditável. Veja a metodologia no GitHub.',
   },
   cta: {
     title: 'Sua Vida Financeira, Unificada.',
-    subtitle: 'Seja você a Maria gerenciando 5 contas ou o Diego rastreando 7 redes DeFi — comece em 30 segundos.',
+    subtitle:
+      'Seja você a Maria gerenciando 5 contas ou o Diego rastreando 7 redes DeFi — comece em 30 segundos.',
     button: 'Criar Conta Grátis',
     buttonSecondary: 'Testar Demo ao Vivo',
   },

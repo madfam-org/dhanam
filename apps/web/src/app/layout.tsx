@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    siteName: 'Dhanam by MADFAM',
+    siteName: 'Dhanam by Innovaciones MADFAM',
     title: 'Dhanam - Budget & Wealth Tracker',
     description:
       'Track budgets, wealth, DeFi portfolios, and ESG scores — personal and business finance in one place.',
