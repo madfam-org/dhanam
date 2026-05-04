@@ -132,6 +132,76 @@ spec:
                 secretKeyRef:
                   name: dhanam-billing-secrets
                   key: STRIPE_MX_WEBHOOK_SECRET
+            # Legacy Stripe webhook secret read by billing.controller.ts
+            # (handleWebhook). Optional so missing-secret doesn't crash startup;
+            # the controller self-gates on absence.
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-billing-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+                  optional: true
+            # Business gate: when "false", livemode Stripe events are 200-ACK'd
+            # with a warning per stripe-mx-spei-relay guardrails (CLAUDE.md).
+            # Operator flips to "true" only after a successful test SPEI →
+            # Karafiel CFDI emit roundtrip on live keys.
+            - name: FEATURE_STRIPE_MXN_LIVE
+              value: "false"
+
+            # =================================================================
+            # Billing - Conekta (LATAM card + SPEI direct gateway)
+            # =================================================================
+            # Sits alongside Stripe MX. Distinct from the Janua-routed Conekta
+            # path (JanuaBillingService). All optional so Conekta can be
+            # provisioned independently of Stripe rollout.
+            - name: CONEKTA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-billing-secrets
+                  key: CONEKTA_PRIVATE_KEY
+                  optional: true
+            - name: CONEKTA_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-billing-secrets
+                  key: CONEKTA_PUBLIC_KEY
+                  optional: true
+            - name: CONEKTA_WEBHOOK_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-billing-secrets
+                  key: CONEKTA_WEBHOOK_SIGNING_KEY
+                  optional: true
+
+            # =================================================================
+            # Credit metering / billing-event ingest HMAC
+            # =================================================================
+            - name: BILLING_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-billing-secrets
+                  key: BILLING_WEBHOOK_SECRET
+                  optional: true
+
+            # =================================================================
+            # Ecosystem fan-out (Karafiel CFDI + PhyneCRM engagement events)
+            # =================================================================
+            - name: PRODUCT_WEBHOOK_URLS
+              value: "karafiel:https://api.karafiel.mx/api/v1/webhooks/dhanam,phynecrm:https://crm.madfam.io/api/v1/engagements/events"
+            - name: PHYNECRM_API_URL
+              value: "https://crm.madfam.io"
+            - name: PHYNE_ENGAGEMENT_EVENTS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-billing-secrets
+                  key: PHYNE_ENGAGEMENT_EVENTS_SECRET
+                  optional: true
+            - name: MADFAM_EVENTS_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-billing-secrets
+                  key: MADFAM_EVENTS_WEBHOOK_SECRET
+                  optional: true
 
             # =================================================================
             # Billing - Paddle (Global Market)
