@@ -64,7 +64,7 @@
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "7.3.0",
     "@sentry/node": "^10.38.0",
-    "@sentry/profiling-node": "^10.38.0",
+    "@sentry/profiling-node": "^10.51.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/belvo": "^0.16.2",
     "@types/bull": "^4.10.4",
