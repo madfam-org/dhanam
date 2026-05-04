@@ -59,7 +59,7 @@
     "@sentry/nextjs": "^10.50.0"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.0",
+    "@axe-core/playwright": "^4.11.3",
     "@dhanam/config": "workspace:*",
     "@tailwindcss/postcss": "^4.2.3",
     "@testing-library/jest-dom": "^6.9.1",
