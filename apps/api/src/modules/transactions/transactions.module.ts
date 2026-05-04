@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 
 import { PrismaModule } from '../../core/prisma/prisma.module';
 import { SpacesModule } from '../spaces/spaces.module';
@@ -6,8 +6,9 @@ import { SpacesModule } from '../spaces/spaces.module';
 import { TransactionsController } from './transactions.controller';
 import { TransactionsService } from './transactions.service';
 
+// forwardRef per cascade #414-#435.
 @Module({
-  imports: [PrismaModule, SpacesModule],
+  imports: [PrismaModule, forwardRef(() => SpacesModule)],
   controllers: [TransactionsController],
   providers: [TransactionsService],
   exports: [TransactionsService],
