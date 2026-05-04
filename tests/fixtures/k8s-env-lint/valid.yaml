@@ -1,0 +1,83 @@
+# Fixture: valid.yaml — every env entry uses either `value` OR `valueFrom`,
+# never both. lint-k8s-env.py must pass this file with zero violations.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valid-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: valid-app
+  template:
+    metadata:
+      labels:
+        app: valid-app
+    spec:
+      containers:
+        - name: app
+          image: example/app:latest
+          env:
+            # Plain literal value
+            - name: NODE_ENV
+              value: "production"
+            # Secret reference
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DATABASE_URL
+            # Optional secret reference
+            - name: OPTIONAL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: OPTIONAL_TOKEN
+                  optional: true
+            # Empty-string literal value (allowed when `valueFrom` is absent)
+            - name: FEATURE_FLAG
+              value: ""
+            # ConfigMap reference
+            - name: CONFIG_VALUE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: CONFIG_VALUE
+      initContainers:
+        - name: migrate
+          image: example/app:latest
+          command: ["./migrate"]
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DATABASE_URL
+
+---
+# Companion CronJob — exercises the nested pod spec path
+# (spec.jobTemplate.spec.template.spec).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: valid-cron
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cron
+              image: example/cron:latest
+              env:
+                - name: SCHEDULE_TAG
+                  value: "hourly"
+                - name: API_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: cron-secrets
+                      key: API_TOKEN
+          restartPolicy: OnFailure

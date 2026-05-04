@@ -1,0 +1,59 @@
+# Fixture: invalid.yaml — env entries with BOTH `value` and `valueFrom`. This
+# is the bug pattern that broke dhanam-api ArgoCD sync on 2026-05-04.
+# lint-k8s-env.py must report two violations on this file:
+#   - METAMAP_CLIENT_ID  in container "api"   (Deployment)
+#   - LEGACY_FLAG        in container "cron"  (CronJob)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: invalid-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: invalid-app
+  template:
+    metadata:
+      labels:
+        app: invalid-app
+    spec:
+      containers:
+        - name: api
+          image: example/app:latest
+          env:
+            - name: NODE_ENV
+              value: "production"
+            # BUG: both `value` and `valueFrom` set.
+            - name: METAMAP_CLIENT_ID
+              value: "some-plaintext-leaked-into-source"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: METAMAP_CLIENT_ID
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: invalid-cron
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cron
+              image: example/cron:latest
+              env:
+                # BUG: empty-string value paired with valueFrom is also
+                # ambiguous and rejected.
+                - name: LEGACY_FLAG
+                  value: ""
+                  valueFrom:
+                    secretKeyRef:
+                      name: cron-secrets
+                      key: LEGACY_FLAG
+          restartPolicy: OnFailure

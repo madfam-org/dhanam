@@ -15,6 +15,33 @@ env:
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
 
 jobs:
+  k8s-env-lint:
+    name: K8s Env-Var Conflict Linter
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    # Refs: 2026-05-04 dhanam-api ArgoCD sync regression — env entries with
+    # both `value` and `valueFrom` are ambiguous and ArgoCD treats them as
+    # drift. This job catches the bug pattern in source manifests so it can't
+    # land via a misapplied kustomize patch or hand-edit again.
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install PyYAML
+        run: pip install --quiet "pyyaml>=6.0"
+
+      - name: Lint K8s manifests for value/valueFrom conflicts
+        run: python3 scripts/lint-k8s-env.py infra/k8s
+
+      - name: Run linter unit tests
+        run: python3 -m unittest discover -s tests/fixtures/k8s-env-lint -p 'test_*.py' -v
+
   validate:
     name: Validate Lockfile
     runs-on: ubuntu-latest
