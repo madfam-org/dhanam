@@ -15,7 +15,7 @@
  * =============================================================================
  */
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AuditModule } from '../../core/audit/audit.module';
@@ -78,7 +78,13 @@ import { UsageAlertsService } from './services/usage-alerts.service';
     ConfigModule,
     PrismaModule,
     AuditModule,
-    EmailModule,
+    // forwardRef breaks the indirect circular dep:
+    //   BillingModule → EmailModule → AnalyticsModule (@Global)
+    //     → SpacesModule → BillingModule
+    // EmailService is consumed only at provider level (UsageAlertsService),
+    // so deferring the module-graph edge is safe. Added 2026-05-04 to fix
+    // the prod CrashLoopBackOff that pinned us to sha256:99f148de (#413).
+    forwardRef(() => EmailModule),
     // MonitoringModule provides the 'SentryService' string token used
     // by WebhookDlqService for per-failure structured Sentry events.
     MonitoringModule,
