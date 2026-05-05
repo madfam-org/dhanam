@@ -41,7 +41,7 @@ const nextConfig = {
               "img-src 'self' data: https:",
               "font-src 'self' data:",
               `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am'} ${process.env.NEXT_PUBLIC_OIDC_ISSUER || 'https://auth.madfam.io'} https://*.ingest.sentry.io`,
-              "frame-ancestors 'none'",
+              "frame-ancestors 'self' https://selva.town https://*.selva.town https://*.madfam.io",
               "base-uri 'self'",
               "form-action 'self'",
             ].join('; '),

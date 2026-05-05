@@ -76,7 +76,12 @@ async function bootstrap() {
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", 'data:', 'https:'],
-        frameAncestors: ["'none'"],
+        frameAncestors: [
+          "'self'",
+          'https://selva.town',
+          'https://*.selva.town',
+          'https://*.madfam.io',
+        ],
         baseUri: ["'self'"],
         formAction: ["'self'"],
         reportUri: ['/v1/csp-reports'],
@@ -108,7 +113,7 @@ async function bootstrap() {
   await app.register(fastifyMultipart as any, {
     limits: {
       fileSize: 25 * 1024 * 1024, // 25MB max per file
-      files: 1,                   // one file per request
+      files: 1, // one file per request
     },
   });
 

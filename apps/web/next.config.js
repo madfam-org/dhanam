@@ -105,7 +105,7 @@ const nextConfig = {
                   return 'https://api.dhan.am';
                 }
               })()} https://analytics.madfam.io ${process.env.NEXT_PUBLIC_OIDC_ISSUER || 'https://auth.madfam.io'} https://challenges.cloudflare.com https://cloudflareinsights.com https://*.ingest.sentry.io`,
-              "frame-ancestors 'none'",
+              "frame-ancestors 'self' https://selva.town https://*.selva.town https://*.madfam.io",
               "base-uri 'self'",
               "form-action 'self'",
             ].join('; '),
