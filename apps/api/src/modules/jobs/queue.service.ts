@@ -1,9 +1,10 @@
-import { InfrastructureException } from '@core/exceptions/domain-exceptions';
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Sentry from '@sentry/node';
 import { Queue, Worker, Job, QueueEvents } from 'bullmq';
 import { Redis } from 'ioredis';
+
+import { InfrastructureException } from '@core/exceptions/domain-exceptions';
 
 export interface JobData {
   type: string;
@@ -70,12 +71,23 @@ export interface EmailJobData {
   };
 }
 
+export interface ReferralRewardJobData {
+  type: 'referral-reward-apply';
+  payload: {
+    rewardId: string;
+    recipientUserId: string;
+    rewardType: string;
+    referralId: string;
+  };
+}
+
 export type QueueJobData =
   | SyncTransactionsJobData
   | CategorizeTransactionsJobData
   | ESGUpdateJobData
   | ValuationSnapshotJobData
-  | EmailJobData;
+  | EmailJobData
+  | ReferralRewardJobData;
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
@@ -164,6 +176,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       'valuation-snapshots',
       'email-notifications',
       'system-maintenance',
+      'referral-rewards',
     ];
 
     // Initialize dead letter queue first
@@ -183,10 +196,15 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
           removeOnComplete: 100,
           removeOnFail: 50,
           attempts: maxAttempts,
-          backoff: {
-            type: 'exponential',
-            delay: this.getBackoffDelayForQueue(queueName),
-          },
+          backoff:
+            queueName === 'referral-rewards'
+              ? // Custom backoff resolved on the worker via `referral-reward-backoff`
+                // strategy (60s / 5m / 30m). See registerWorker().
+                { type: 'referral-reward-backoff' }
+              : {
+                  type: 'exponential',
+                  delay: this.getBackoffDelayForQueue(queueName),
+                },
         },
       });
 
@@ -255,7 +273,37 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     if (highPriorityQueues.includes(queueName)) {
       return 4;
     }
+    if (queueName === 'referral-rewards') {
+      // Initial try + 3 retries (1m / 5m / 30m). Total: 4 BullMQ
+      // attempts. Tied to the `referral-reward-backoff` worker strategy.
+      return 4;
+    }
     return 3; // Default
+  }
+
+  /**
+   * Custom backoff schedule for the referral-rewards queue.
+   *
+   * Per BullMQ source (`bullmq/classes/job.js`), the strategy is called with
+   * `attemptsMade + 1` after a failure — i.e. the 1-indexed number of the
+   * upcoming retry. With `attempts: 4` (initial + 3 retries) the audit's
+   * requested 1m / 5m / 30m schedule maps to:
+   *   - 2 (before retry #2): wait 1 minute
+   *   - 3 (before retry #3): wait 5 minutes
+   *   - 4 (before retry #4): wait 30 minutes
+   *
+   * After the final failure the job exits to BullMQ's `failed` set, where
+   * `handlePotentialDLQJob()` moves it to the dead letter queue.
+   *
+   * Exported as a static helper so the worker registration in
+   * `registerWorker()` and unit tests can both reference the same
+   * authoritative schedule.
+   */
+  static referralRewardBackoff(upcomingAttempt: number): number {
+    const minute = 60_000;
+    if (upcomingAttempt <= 2) return 1 * minute;
+    if (upcomingAttempt === 3) return 5 * minute;
+    return 30 * minute;
   }
 
   /**
@@ -433,6 +481,30 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  /**
+   * Enqueue a referral reward application job.
+   *
+   * Idempotency: jobId is the reward id, so a second webhook delivering the
+   * same reward (or a retry from PhyneCRM) cannot create a duplicate job
+   * — BullMQ silently no-ops the second `add()`.
+   *
+   * Retry policy is queue-level (3 attempts, 1m / 5m / 30m custom backoff).
+   * Final failures fall through to QueueService's existing dead letter
+   * queue handling.
+   */
+  async addReferralRewardJob(
+    data: ReferralRewardJobData['payload'],
+    priority: number = 60
+  ): Promise<Job | null> {
+    const queue = this.getQueueOrSkip('referral-rewards');
+    if (!queue) return null;
+
+    return queue.add('referral-reward-apply', data, {
+      priority,
+      jobId: data.rewardId,
+    });
+  }
+
   // Recurring job scheduling
   async scheduleRecurringJob(
     queueName: string,
@@ -523,13 +595,24 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   }
 
   registerWorker(queueName: string, processor: (job: Job) => Promise<any>): Worker {
-    const worker = new Worker(queueName, processor, {
+    const workerOptions: ConstructorParameters<typeof Worker>[2] = {
       connection: this.redis,
       concurrency: this.configService.get(
         `QUEUE_${queueName.toUpperCase().replace('-', '_')}_CONCURRENCY`,
         5
       ),
-    });
+    };
+
+    // Register custom backoff strategies. BullMQ resolves
+    // `backoff.type === 'referral-reward-backoff'` against this map at
+    // failure time on the worker side.
+    if (queueName === 'referral-rewards') {
+      workerOptions.settings = {
+        backoffStrategy: (attemptsMade: number) => QueueService.referralRewardBackoff(attemptsMade),
+      };
+    }
+
+    const worker = new Worker(queueName, processor, workerOptions);
 
     worker.on('completed', (job) => {
       this.logger.log(`Worker completed job ${job.id} in queue ${queueName}`);

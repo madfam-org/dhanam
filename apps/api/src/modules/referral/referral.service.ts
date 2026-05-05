@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { QueueService } from '../jobs/queue.service';
 
 import { AmbassadorService } from './ambassador.service';
 import { ReferralConversionDataDto } from './dto/referral-event.dto';
@@ -28,7 +29,13 @@ export class ReferralService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly ambassadorService: AmbassadorService
+    private readonly ambassadorService: AmbassadorService,
+    // forwardRef matches the ReferralModule → JobsModule edge that is
+    // already wrapped to break the Spaces → Billing → Monitoring → Jobs
+    // → Referral cycle. QueueService itself has no dependency back into
+    // ReferralModule.
+    @Inject(forwardRef(() => QueueService))
+    private readonly queueService: QueueService
   ) {}
 
   /**
@@ -72,39 +79,92 @@ export class ReferralService {
       return { rewards_created: 0, ambassador_tier: profile.tier };
     }
 
-    // Create rewards in a transaction
-    const rewards = await this.prisma.referralReward.createMany({
-      data: [
-        {
-          referralId,
-          recipientUserId: referrer_user_id,
-          rewardType: 'subscription_extension',
-          amount: 1,
-          description: 'Referral reward: 1 free month for successful referral',
-          metadata: { source_product, target_product },
-        },
-        {
-          referralId,
-          recipientUserId: referrer_user_id,
-          rewardType: 'credit_grant',
-          amount: 50,
-          description: 'Referral bonus: 50 credits for referrer',
-          metadata: { source_product, target_product },
-        },
-        {
-          referralId,
-          recipientUserId: referred_user_id,
-          rewardType: 'credit_grant',
-          amount: 50,
-          description: 'Welcome bonus: 50 credits for being referred',
-          metadata: { source_product, target_product },
-        },
-      ],
-    });
+    // Create rewards atomically. We use individual `create` calls inside
+    // a transaction (rather than `createMany`) because `createMany` does
+    // not return generated ids — and we need them to drive the BullMQ
+    // enqueue with a stable jobId for idempotency.
+    const rewardSpecs: Array<{
+      recipientUserId: string;
+      rewardType: 'subscription_extension' | 'credit_grant';
+      amount: number;
+      description: string;
+    }> = [
+      {
+        recipientUserId: referrer_user_id,
+        rewardType: 'subscription_extension',
+        amount: 1,
+        description: 'Referral reward: 1 free month for successful referral',
+      },
+      {
+        recipientUserId: referrer_user_id,
+        rewardType: 'credit_grant',
+        amount: 50,
+        description: 'Referral bonus: 50 credits for referrer',
+      },
+      {
+        recipientUserId: referred_user_id,
+        rewardType: 'credit_grant',
+        amount: 50,
+        description: 'Welcome bonus: 50 credits for being referred',
+      },
+    ];
+
+    const createdRewards = await this.prisma.$transaction(
+      rewardSpecs.map((spec) =>
+        this.prisma.referralReward.create({
+          data: {
+            referralId,
+            recipientUserId: spec.recipientUserId,
+            rewardType: spec.rewardType,
+            amount: spec.amount,
+            description: spec.description,
+            metadata: { source_product, target_product },
+          },
+          select: {
+            id: true,
+            recipientUserId: true,
+            rewardType: true,
+          },
+        })
+      )
+    );
 
     this.logger.log(
-      `Created ${rewards.count} rewards for conversion: code=${referral_code} referrer=${referrer_user_id} referred=${referred_user_id}`
+      `Created ${createdRewards.length} rewards for conversion: code=${referral_code} referrer=${referrer_user_id} referred=${referred_user_id}`
     );
+
+    // Auto-enqueue an apply job per reward. JobId = reward.id makes the
+    // enqueue idempotent: a duplicate webhook (PhyneCRM retry, manual
+    // replay) cannot create a duplicate job, and the worker also short-
+    // circuits if reward.applied is already true.
+    //
+    // Failures here are logged but never thrown — the reward rows are
+    // already in the DB, and the existing 15-min cron sweep
+    // (ReferralRewardJob) will pick them up as a safety net.
+    for (const reward of createdRewards) {
+      try {
+        const job = await this.queueService.addReferralRewardJob({
+          rewardId: reward.id,
+          recipientUserId: reward.recipientUserId,
+          rewardType: reward.rewardType,
+          referralId,
+        });
+
+        if (job) {
+          this.logger.debug(`Enqueued reward apply job for ${reward.id} (${reward.rewardType})`);
+        } else {
+          this.logger.warn(
+            `Reward ${reward.id} created but enqueue returned null (queue not ready). Cron sweep will pick it up.`
+          );
+        }
+      } catch (enqueueError) {
+        const err = enqueueError instanceof Error ? enqueueError : new Error(String(enqueueError));
+        this.logger.error(
+          `Reward ${reward.id} created but enqueue failed: ${err.message}. Cron sweep will pick it up.`,
+          err.stack
+        );
+      }
+    }
 
     // Recalculate ambassador tier
     const tierResult = await this.ambassadorService.recalculateTier(referrer_user_id);
@@ -116,7 +176,7 @@ export class ReferralService {
     }
 
     return {
-      rewards_created: rewards.count,
+      rewards_created: createdRewards.length,
       ambassador_tier: tierResult.newTier,
     };
   }

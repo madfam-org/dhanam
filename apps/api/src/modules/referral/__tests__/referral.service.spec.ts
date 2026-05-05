@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
+import { QueueService } from '../../jobs/queue.service';
 import { AmbassadorService } from '../ambassador.service';
 import { ReferralService } from '../referral.service';
 
@@ -8,6 +9,7 @@ describe('ReferralService', () => {
   let service: ReferralService;
   let prisma: jest.Mocked<PrismaService>;
   let ambassadorService: jest.Mocked<AmbassadorService>;
+  let queueService: jest.Mocked<QueueService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,8 +21,13 @@ describe('ReferralService', () => {
             referralReward: {
               findMany: jest.fn(),
               findFirst: jest.fn(),
-              createMany: jest.fn(),
+              create: jest.fn(),
             },
+            // $transaction(array) returns the resolved values of each
+            // promise in order — mock by awaiting the input.
+            $transaction: jest
+              .fn()
+              .mockImplementation((ops: Promise<unknown>[]) => Promise.all(ops)),
           },
         },
         {
@@ -30,14 +37,22 @@ describe('ReferralService', () => {
             recalculateTier: jest.fn(),
           },
         },
+        {
+          provide: QueueService,
+          useValue: {
+            addReferralRewardJob: jest.fn().mockResolvedValue({ id: 'job-stub' }),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<ReferralService>(ReferralService);
     prisma = module.get(PrismaService) as jest.Mocked<PrismaService>;
     ambassadorService = module.get(AmbassadorService) as jest.Mocked<AmbassadorService>;
+    queueService = module.get(QueueService) as jest.Mocked<QueueService>;
 
     jest.clearAllMocks();
+    queueService.addReferralRewardJob.mockResolvedValue({ id: 'job-stub' } as any);
   });
 
   it('should be defined', () => {
@@ -57,9 +72,26 @@ describe('ReferralService', () => {
       revenue_cents: 1199,
     };
 
+    /**
+     * Stub `prisma.referralReward.create` so each call resolves to a row
+     * matching the input plus a synthetic id. The test then asserts on
+     * call args via the standard jest mock instance.
+     */
+    function mockCreateRewardsWithIds(): void {
+      let counter = 0;
+      (prisma.referralReward.create as jest.Mock).mockImplementation((args: any) => {
+        counter += 1;
+        return Promise.resolve({
+          id: `reward-${counter}`,
+          recipientUserId: args.data.recipientUserId,
+          rewardType: args.data.rewardType,
+        });
+      });
+    }
+
     it('should create 3 rewards and recalculate tier', async () => {
       prisma.referralReward.findFirst.mockResolvedValue(null);
-      prisma.referralReward.createMany.mockResolvedValue({ count: 3 });
+      mockCreateRewardsWithIds();
       ambassadorService.recalculateTier.mockResolvedValue({
         previousTier: 'none',
         newTier: 'bronze',
@@ -71,8 +103,12 @@ describe('ReferralService', () => {
       expect(result.rewards_created).toBe(3);
       expect(result.ambassador_tier).toBe('bronze');
 
-      expect(prisma.referralReward.createMany).toHaveBeenCalledWith({
-        data: expect.arrayContaining([
+      expect(prisma.referralReward.create).toHaveBeenCalledTimes(3);
+      const createCalls = (prisma.referralReward.create as jest.Mock).mock.calls.map(
+        (c: any[]) => c[0]
+      );
+      expect(createCalls.map((c: any) => c.data)).toEqual(
+        expect.arrayContaining([
           expect.objectContaining({
             referralId: 'KRF-ABCD1234',
             recipientUserId: 'referrer-1',
@@ -91,8 +127,8 @@ describe('ReferralService', () => {
             rewardType: 'credit_grant',
             amount: 50,
           }),
-        ]),
-      });
+        ])
+      );
 
       expect(ambassadorService.recalculateTier).toHaveBeenCalledWith('referrer-1');
     });
@@ -123,13 +159,15 @@ describe('ReferralService', () => {
 
       expect(result.rewards_created).toBe(0);
       expect(result.ambassador_tier).toBe('silver');
-      expect(prisma.referralReward.createMany).not.toHaveBeenCalled();
+      expect(prisma.referralReward.create).not.toHaveBeenCalled();
       expect(ambassadorService.recalculateTier).not.toHaveBeenCalled();
+      // Idempotency: a duplicate webhook MUST NOT enqueue any apply jobs.
+      expect(queueService.addReferralRewardJob).not.toHaveBeenCalled();
     });
 
     it('should include source and target product in reward metadata', async () => {
       prisma.referralReward.findFirst.mockResolvedValue(null);
-      prisma.referralReward.createMany.mockResolvedValue({ count: 3 });
+      mockCreateRewardsWithIds();
       ambassadorService.recalculateTier.mockResolvedValue({
         previousTier: 'bronze',
         newTier: 'bronze',
@@ -138,13 +176,89 @@ describe('ReferralService', () => {
 
       await service.handleConversionWebhook(conversionData);
 
-      const createManyCall = prisma.referralReward.createMany.mock.calls[0][0];
-      for (const reward of (createManyCall as any).data) {
-        expect(reward.metadata).toEqual({
+      const createCalls = (prisma.referralReward.create as jest.Mock).mock.calls.map(
+        (c: any[]) => c[0]
+      );
+      for (const call of createCalls) {
+        expect(call.data.metadata).toEqual({
           source_product: 'karafiel',
           target_product: 'dhanam',
         });
       }
+    });
+
+    // ─── Auto-enqueue contract ────────────────────────────────────────
+
+    it('should enqueue one BullMQ job per created reward', async () => {
+      prisma.referralReward.findFirst.mockResolvedValue(null);
+      mockCreateRewardsWithIds();
+      ambassadorService.recalculateTier.mockResolvedValue({
+        previousTier: 'none',
+        newTier: 'bronze',
+        promoted: true,
+      });
+
+      await service.handleConversionWebhook(conversionData);
+
+      expect(queueService.addReferralRewardJob).toHaveBeenCalledTimes(3);
+      const enqueueCalls = queueService.addReferralRewardJob.mock.calls.map((c) => c[0]);
+      expect(enqueueCalls).toEqual(
+        expect.arrayContaining([
+          {
+            rewardId: 'reward-1',
+            recipientUserId: 'referrer-1',
+            rewardType: 'subscription_extension',
+            referralId: 'KRF-ABCD1234',
+          },
+          {
+            rewardId: 'reward-2',
+            recipientUserId: 'referrer-1',
+            rewardType: 'credit_grant',
+            referralId: 'KRF-ABCD1234',
+          },
+          {
+            rewardId: 'reward-3',
+            recipientUserId: 'referred-1',
+            rewardType: 'credit_grant',
+            referralId: 'KRF-ABCD1234',
+          },
+        ])
+      );
+    });
+
+    it('should not throw when the queue is unreachable — cron sweep is the safety net', async () => {
+      prisma.referralReward.findFirst.mockResolvedValue(null);
+      mockCreateRewardsWithIds();
+      ambassadorService.recalculateTier.mockResolvedValue({
+        previousTier: 'none',
+        newTier: 'bronze',
+        promoted: true,
+      });
+      queueService.addReferralRewardJob.mockRejectedValue(new Error('redis unreachable'));
+
+      const result = await service.handleConversionWebhook(conversionData);
+
+      // Reward rows still created + tier still recalculated. The cron
+      // sweep (ReferralRewardJob) will pick up the unapplied rewards.
+      expect(result.rewards_created).toBe(3);
+      expect(result.ambassador_tier).toBe('bronze');
+      expect(ambassadorService.recalculateTier).toHaveBeenCalledWith('referrer-1');
+    });
+
+    it('should treat a null queue response as a benign skip (test/no-redis env)', async () => {
+      prisma.referralReward.findFirst.mockResolvedValue(null);
+      mockCreateRewardsWithIds();
+      ambassadorService.recalculateTier.mockResolvedValue({
+        previousTier: 'none',
+        newTier: 'bronze',
+        promoted: false,
+      });
+      queueService.addReferralRewardJob.mockResolvedValue(null);
+
+      const result = await service.handleConversionWebhook(conversionData);
+
+      expect(result.rewards_created).toBe(3);
+      expect(queueService.addReferralRewardJob).toHaveBeenCalledTimes(3);
     });
   });
 
