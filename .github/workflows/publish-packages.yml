@@ -119,6 +119,17 @@ jobs:
           echo "--- .npmrc (token redacted) ---"
           sed 's/_authToken=.*/_authToken=<REDACTED>/' .npmrc
           echo "-------------------------------"
+          echo "--- Token diagnostics ---"
+          echo "TOKEN_LEN=${#NPM_MADFAM_TOKEN}"
+          # Direct HTTP whoami via curl (bypasses npm CLI config) — proves
+          # whether the token itself works against the registry vs. an
+          # npm-side config issue.
+          HTTP_CODE=$(curl -sw '%{http_code}' -o /tmp/whoami_resp \
+            -H "Authorization: Bearer ${NPM_MADFAM_TOKEN}" \
+            https://npm.madfam.io/-/whoami) || true
+          echo "curl /-/whoami → HTTP ${HTTP_CODE}"
+          echo "body: $(cat /tmp/whoami_resp 2>/dev/null | head -c 200)"
+          echo "-------------------------------"
           if WHO=$(npm whoami --registry=https://npm.madfam.io/ 2>&1); then
             echo "authenticated as: ${WHO}"
           else
