@@ -107,15 +107,18 @@ jobs:
             echo "::error::NPM_MADFAM_TOKEN is empty — org secret not exposed to this job"
             exit 1
           fi
-          # printf, not heredoc: GitHub Actions YAML `|` block keeps every
-          # line indented, including the heredoc terminator, which leaves
-          # the heredoc unterminated and writes an empty file.
-          {
-            printf '%s\n' '@dhanam:registry=https://npm.madfam.io/'
-            printf '%s\n' '@madfam:registry=https://npm.madfam.io/'
-            printf '//npm.madfam.io/:_authToken=%s\n' "${NPM_MADFAM_TOKEN}"
-          } > ~/.npmrc
-          chmod 600 ~/.npmrc
+          # Append auth token to the REPO-LEVEL ./.npmrc (already has the
+          # @dhanam/@madfam/@janua/@cotiza/@fortuna scope mappings + the
+          # commented `# //npm.madfam.io/:_authToken=...` placeholder).
+          # Writing to ~/.npmrc didn't help on self-hosted ARC runners
+          # because pnpm prefers project-local config; whoami still got
+          # ENEEDAUTH.
+          printf '\n//npm.madfam.io/:_authToken=%s\n' "${NPM_MADFAM_TOKEN}" >> .npmrc
+          chmod 600 .npmrc
+          # Sanity check (token-redacted)
+          echo "--- .npmrc (token redacted) ---"
+          sed 's/_authToken=.*/_authToken=<REDACTED>/' .npmrc
+          echo "-------------------------------"
           if WHO=$(npm whoami --registry=https://npm.madfam.io/ 2>&1); then
             echo "authenticated as: ${WHO}"
           else
