@@ -107,11 +107,14 @@ jobs:
             echo "::error::NPM_MADFAM_TOKEN is empty — org secret not exposed to this job"
             exit 1
           fi
-          cat > ~/.npmrc <<EOF
-          @dhanam:registry=https://npm.madfam.io/
-          @madfam:registry=https://npm.madfam.io/
-          //npm.madfam.io/:_authToken=${NPM_MADFAM_TOKEN}
-          EOF
+          # printf, not heredoc: GitHub Actions YAML `|` block keeps every
+          # line indented, including the heredoc terminator, which leaves
+          # the heredoc unterminated and writes an empty file.
+          {
+            printf '%s\n' '@dhanam:registry=https://npm.madfam.io/'
+            printf '%s\n' '@madfam:registry=https://npm.madfam.io/'
+            printf '//npm.madfam.io/:_authToken=%s\n' "${NPM_MADFAM_TOKEN}"
+          } > ~/.npmrc
           chmod 600 ~/.npmrc
           if WHO=$(npm whoami --registry=https://npm.madfam.io/ 2>&1); then
             echo "authenticated as: ${WHO}"
