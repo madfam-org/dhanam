@@ -1,3 +1,4 @@
+import { EcosystemBanner } from '@dhanam/ui';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
@@ -90,6 +91,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={inter.className}>
         <Providers>{children}</Providers>
         <Toaster theme="system" position="top-right" richColors />
+        {/*
+          Ecosystem banner mounts at the very bottom of <body>, OUTSIDE the
+          providers tree on purpose: it is a global, non-localized,
+          non-authenticated chrome element. Sticky-bottom, dismissible,
+          versioned via packages/ui/src/components/ecosystem-banner/.
+        */}
+        <EcosystemBanner />
       </body>
     </html>
   );

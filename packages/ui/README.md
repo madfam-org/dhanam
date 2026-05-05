@@ -14,30 +14,31 @@ The MADFAM UI system follows these principles:
 
 ## Components (24)
 
-| Component | Description | Radix Base |
-|-----------|-------------|------------|
-| Alert | Feedback messages | - |
-| AlertDialog | Confirmation dialogs | ✓ |
-| Badge | Status indicators | - |
-| Button | Interactive buttons | Slot |
-| Card | Content containers | - |
-| Checkbox | Toggle inputs | ✓ |
-| Dialog | Modal windows | ✓ |
-| DropdownMenu | Action menus | ✓ |
-| Input | Text inputs | - |
-| Label | Form labels | ✓ |
-| Popover | Floating content | ✓ |
-| Progress | Progress indicators | ✓ |
-| Select | Selection inputs | ✓ |
-| Separator | Visual dividers | ✓ |
-| Skeleton | Loading placeholders | - |
-| Slider | Range inputs | ✓ |
-| Switch | Toggle switches | ✓ |
-| Tabs | Tabbed interfaces | ✓ |
-| Textarea | Multi-line inputs | - |
-| Toast | Notifications | ✓ |
-| Toaster | Toast container | ✓ |
-| Tooltip | Hover information | ✓ |
+| Component       | Description                                        | Radix Base |
+| --------------- | -------------------------------------------------- | ---------- |
+| Alert           | Feedback messages                                  | -          |
+| AlertDialog     | Confirmation dialogs                               | ✓          |
+| Badge           | Status indicators                                  | -          |
+| Button          | Interactive buttons                                | Slot       |
+| Card            | Content containers                                 | -          |
+| Checkbox        | Toggle inputs                                      | ✓          |
+| Dialog          | Modal windows                                      | ✓          |
+| DropdownMenu    | Action menus                                       | ✓          |
+| EcosystemBanner | Cross-platform ticker (sticky bottom, dismissible) | -          |
+| Input           | Text inputs                                        | -          |
+| Label           | Form labels                                        | ✓          |
+| Popover         | Floating content                                   | ✓          |
+| Progress        | Progress indicators                                | ✓          |
+| Select          | Selection inputs                                   | ✓          |
+| Separator       | Visual dividers                                    | ✓          |
+| Skeleton        | Loading placeholders                               | -          |
+| Slider          | Range inputs                                       | ✓          |
+| Switch          | Toggle switches                                    | ✓          |
+| Tabs            | Tabbed interfaces                                  | ✓          |
+| Textarea        | Multi-line inputs                                  | -          |
+| Toast           | Notifications                                      | ✓          |
+| Toaster         | Toast container                                    | ✓          |
+| Tooltip         | Hover information                                  | ✓          |
 
 ## Golden Ratio Tokens
 
@@ -61,9 +62,7 @@ phi-2xl: 4.236rem (~68px)  ← φ³
 // In your component
 <div className="p-phi-lg m-phi-md rounded-phi">
   <h1 className="text-phi-2xl">Golden Title</h1>
-  <p className="text-phi-base leading-phi">
-    Harmonious content
-  </p>
+  <p className="text-phi-base leading-phi">Harmonious content</p>
 </div>
 ```
 
@@ -78,6 +77,7 @@ mkdir -p packages/ui/src/{components,tokens,hooks,lib}
 ### 2. Copy the foundation files
 
 From `@dhanam/ui`, copy:
+
 - `src/lib/utils.ts` - The `cn()` utility
 - `src/tokens/` - Golden ratio tokens
 - `src/hooks/use-toast.ts` - Toast hook (if using toasts)
@@ -98,10 +98,7 @@ import { madfamPreset } from './packages/ui/src/tokens/tailwind-preset';
 
 export default {
   presets: [madfamPreset],
-  content: [
-    './src/**/*.{ts,tsx}',
-    './packages/ui/src/**/*.{ts,tsx}',
-  ],
+  content: ['./src/**/*.{ts,tsx}', './packages/ui/src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       // App-specific overrides here
@@ -149,13 +146,13 @@ const buttonVariants = cva(
 
 Each MADFAM app has its own visual identity while sharing the golden ratio foundation:
 
-| App | Primary Color | Aesthetic |
-|-----|---------------|-----------|
-| Dhanam | Green (#22c55e) | Finance, trust, growth |
-| Fortuna | Purple (#8b5cf6) | Insight, intelligence |
-| sim4d | Blue (#3b82f6) | Technical, precise |
-| Forj | Orange (#f97316) | Marketplace, energy |
-| Janua | Slate (#64748b) | Security, neutral |
+| App     | Primary Color    | Aesthetic              |
+| ------- | ---------------- | ---------------------- |
+| Dhanam  | Green (#22c55e)  | Finance, trust, growth |
+| Fortuna | Purple (#8b5cf6) | Insight, intelligence  |
+| sim4d   | Blue (#3b82f6)   | Technical, precise     |
+| Forj    | Orange (#f97316) | Marketplace, energy    |
+| Janua   | Slate (#64748b)  | Security, neutral      |
 
 ## File Structure
 
@@ -204,4 +201,26 @@ pnpm typecheck
 
 ---
 
-*Part of the MADFAM Solarpunk Foundry - From Bits to Atoms*
+## Ecosystem Banner — copy-paste path for sibling landings
+
+`<EcosystemBanner />` is the shared cross-product ticker that lives at the bottom of every MADFAM landing (dhan.am, karafiel.mx, selva.town, cotiza.studio, …). Until `npm.madfam.io` re-publishes `@dhanam/ui`, sibling landings adopt it by **copying the directory**:
+
+```bash
+# from another madfam-org repo (e.g. karafiel, cotiza, forj):
+mkdir -p packages/ui/src/components/ecosystem-banner
+cp -R \
+  ../dhanam/packages/ui/src/components/ecosystem-banner/* \
+  packages/ui/src/components/ecosystem-banner/
+# then export from your local barrel
+echo "export * from './components/ecosystem-banner';" \
+  >> packages/ui/src/index.ts
+# mount once in your root layout, after the body's main content
+```
+
+**Source-of-truth platform list**: `packages/ui/src/components/ecosystem-banner/platforms.ts`. Edit `DEFAULT_ECOSYSTEM_PLATFORMS` to add/remove a platform; bump `BANNER_VERSION` in `ecosystem-banner.tsx` to force previously-dismissed users to see the new lineup.
+
+**Drift policy**: when `@madfam/ecosystem-banner` lands on `npm.madfam.io`, swap the copy for a dependency. Until then, the platforms list should be re-synced from dhanam's copy on each landing's release cadence.
+
+---
+
+_Part of the MADFAM Solarpunk Foundry - From Bits to Atoms_
