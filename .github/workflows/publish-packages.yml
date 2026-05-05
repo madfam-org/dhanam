@@ -97,8 +97,28 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts --filter '${{ needs.resolve.outputs.package_name }}...'
 
       - name: Authenticate to npm.madfam.io
+        # OVERWRITE not append — self-hosted ARC runners can persist a
+        # stale ~/.npmrc between jobs; npm reads the first matching
+        # _authToken= line, so append would silently use the cached
+        # token. Plus a whoami pre-flight catches secret-rotation drift
+        # before the publish step rather than during it.
         run: |
-          echo "//npm.madfam.io/:_authToken=${NPM_MADFAM_TOKEN}" >> ~/.npmrc
+          if [ -z "${NPM_MADFAM_TOKEN}" ]; then
+            echo "::error::NPM_MADFAM_TOKEN is empty — org secret not exposed to this job"
+            exit 1
+          fi
+          cat > ~/.npmrc <<EOF
+          @dhanam:registry=https://npm.madfam.io/
+          @madfam:registry=https://npm.madfam.io/
+          //npm.madfam.io/:_authToken=${NPM_MADFAM_TOKEN}
+          EOF
+          chmod 600 ~/.npmrc
+          if WHO=$(npm whoami --registry=https://npm.madfam.io/ 2>&1); then
+            echo "authenticated as: ${WHO}"
+          else
+            echo "::error::npm whoami failed against npm.madfam.io: ${WHO}"
+            exit 1
+          fi
         env:
           NPM_MADFAM_TOKEN: ${{ secrets.NPM_MADFAM_TOKEN }}
 
