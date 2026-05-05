@@ -16,20 +16,30 @@
  * - ReferralRewardJob: Processes pending rewards every 15 minutes
  * =============================================================================
  */
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { BillingModule } from '../billing/billing.module';
+import { JobsModule } from '../jobs/jobs.module';
 
 import { AmbassadorService } from './ambassador.service';
 import { ReferralHmacGuard } from './guards/referral-hmac.guard';
 import { ReferralRewardJob } from './jobs/referral-reward.job';
+import { ReferralRewardProcessor } from './jobs/referral-reward.processor';
 import { ReferralRewardService } from './referral-reward.service';
 import { ReferralController } from './referral.controller';
 import { ReferralService } from './referral.service';
 
 @Module({
-  imports: [ConfigModule, BillingModule],
+  imports: [
+    ConfigModule,
+    BillingModule,
+    // forwardRef on JobsModule because JobsModule pulls in a long
+    // dependency chain (Spaces → Billing → Monitoring → Jobs) and we
+    // only need QueueService here. Mirrors the same pattern used by
+    // MonitoringModule per the comment in monitoring.module.ts.
+    forwardRef(() => JobsModule),
+  ],
   controllers: [ReferralController],
   providers: [
     // Core services
@@ -39,6 +49,7 @@ import { ReferralService } from './referral.service';
 
     // Jobs
     ReferralRewardJob,
+    ReferralRewardProcessor,
 
     // Guards
     ReferralHmacGuard,
