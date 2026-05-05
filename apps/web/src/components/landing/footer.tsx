@@ -25,7 +25,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Innovaciones MADFAM
+              Innovaciones MADFAM S.A.S. de C.V.
             </a>
             .
           </p>

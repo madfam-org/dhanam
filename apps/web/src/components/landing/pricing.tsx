@@ -29,7 +29,9 @@ export function Pricing({ onSignUpClick }: PricingProps) {
   const [pricing, setPricing] = useState<PricingResponse | null>(null);
 
   useEffect(() => {
-    // Try to detect country from cookie or default to US
+    // Try to detect country from cookie or default to MX (LATAM-first; MXN is the
+    // canonical anchoring currency per
+    // internal-devops/decisions/2026-04-25-tulana-ecosystem-pricing.md).
     const geoCookie = document.cookie
       .split('; ')
       .find((c) => c.startsWith('dhanam_geo='))
@@ -39,38 +41,41 @@ export function Pricing({ onSignUpClick }: PricingProps) {
       .getPricing(geoCookie || undefined)
       .then(setPricing)
       .catch(() => {
-        // Fallback: use static defaults
+        // Fallback: use the static Tulana v0.1 tiers below
       });
   }, []);
 
-  // Fallback static pricing if API not available
+  // Fallback static pricing — anchored to the Tulana v0.1 recommended Consumer
+  // tiers (MXN/mo): Free $0 / Copilot Pro 199 / Family Plus 499. Source of
+  // truth: internal-devops/decisions/2026-04-25-tulana-ecosystem-pricing.md.
+  // Confidence is low and pricing is subject to validation with real users.
   const tiers = pricing?.tiers || [
     {
-      id: 'essentials',
-      name: 'Essentials',
-      monthlyPrice: 4.99,
+      id: 'free',
+      name: 'Free',
+      monthlyPrice: 0,
       promoPrice: null,
-      currency: 'USD',
+      currency: 'MXN',
       features: [],
     },
     {
-      id: 'pro',
-      name: 'Pro',
-      monthlyPrice: 11.99,
+      id: 'copilot_pro',
+      name: 'Copilot Pro',
+      monthlyPrice: 199,
       promoPrice: null,
-      currency: 'USD',
+      currency: 'MXN',
       features: [],
     },
     {
-      id: 'premium',
-      name: 'Premium',
-      monthlyPrice: 19.99,
+      id: 'family_plus',
+      name: 'Family Plus',
+      monthlyPrice: 499,
       promoPrice: null,
-      currency: 'USD',
+      currency: 'MXN',
       features: [],
     },
   ];
-  const trial = pricing?.trial || { daysWithoutCC: 3, daysWithCC: 21, promoMonths: 3 };
+  const trial = pricing?.trial || { daysWithoutCC: 14, daysWithCC: 30, promoMonths: 3 };
   const hasPromo = tiers.some((t) => t.promoPrice !== null);
 
   return (
@@ -88,12 +93,20 @@ export function Pricing({ onSignUpClick }: PricingProps) {
               </span>
             </div>
           )}
+          <p className="mt-3 text-xs text-muted-foreground max-w-xl mx-auto">
+            Indicative pricing in MXN per month, anchored to the Tulana v0.1 ecosystem
+            recommendation and subject to validation with real users.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {tiers.map((tier) => {
-            const isPro = tier.id === 'pro';
-            const isPremium = tier.id === 'premium';
+            // Highlight the recommended consumer tier (Copilot Pro). The legacy
+            // 'pro' id stays supported for back-compat with API responses.
+            const isPro = tier.id === 'copilot_pro' || tier.id === 'pro';
+            // 'family_plus' is the highest consumer tier; 'premium' kept for back-compat.
+            const isPremium = tier.id === 'family_plus' || tier.id === 'premium';
+            const isFree = tier.monthlyPrice === 0 || tier.id === 'free';
 
             return (
               <div
@@ -110,7 +123,7 @@ export function Pricing({ onSignUpClick }: PricingProps) {
                 {isPremium && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
                     <Star className="h-3 w-3" />
-                    Premium
+                    {t('pricing.bestValue')}
                   </div>
                 )}
                 <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
@@ -152,7 +165,7 @@ export function Pricing({ onSignUpClick }: PricingProps) {
                   variant="default"
                   onClick={() => onSignUpClick(tier.id)}
                 >
-                  Start {trial.daysWithoutCC}-Day Free Trial
+                  {isFree ? 'Get Started' : `Start ${trial.daysWithoutCC}-Day Trial`}
                 </Button>
                 <p className="text-xs text-center text-muted-foreground mt-2">
                   {t('pricing.cancelAnytime')}
@@ -165,10 +178,18 @@ export function Pricing({ onSignUpClick }: PricingProps) {
         <p className="text-center text-sm text-muted-foreground mt-6">
           {t('pricing.selfHosted').split('Community')[0]}
           <a
-            href="https://github.com/aldoruizluna/Dhanam"
+            href="https://github.com/madfam-org/dhanam"
             className="text-primary hover:underline font-medium"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             Community edition
+          </a>
+        </p>
+        <p className="text-center text-xs text-muted-foreground mt-2">
+          Building on the MADFAM ecosystem and need billing-as-a-service?{' '}
+          <a href="/for-platforms" className="text-primary hover:underline font-medium">
+            See Dhanam for platforms.
           </a>
         </p>
       </div>
