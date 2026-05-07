@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 
 interface DemoNavigationContextValue {
@@ -15,7 +16,7 @@ const DemoNavigationContext = createContext<DemoNavigationContextValue>({
   stripDemoPrefix: (path) => path,
 });
 
-export function DemoNavigationProvider({ children }: { children: React.ReactNode }) {
+export function DemoNavigationProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   const value = useMemo(() => {

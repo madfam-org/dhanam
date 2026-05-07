@@ -1,0 +1,41 @@
+{{> header subject="Investor report ready"}}
+
+<h2 style="margin: 0 0 20px; color: #0f766e; font-size: 24px;">Investor report packet is ready</h2>
+
+<p style="margin: 0 0 16px;">Hi,</p>
+
+<p style="margin: 0 0 20px;">
+  {{senderName}} shared a Dhanam investor report packet for <strong>{{spaceName}}</strong>.
+</p>
+
+<div style="margin: 28px 0; padding: 20px; background-color: #f0fdfa; border: 1px solid #99f6e4; border-radius: 8px;">
+  <h3 style="margin: 0 0 12px; color: #115e59; font-size: 18px;">Report details</h3>
+  <table style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 8px 0; color: #475569;">Report</td>
+      <td style="padding: 8px 0; text-align: right; font-weight: 600;">{{reportName}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; color: #475569;">Period</td>
+      <td style="padding: 8px 0; text-align: right; font-weight: 600;">{{startDate}} - {{endDate}}</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; color: #475569;">Access expires</td>
+      <td style="padding: 8px 0; text-align: right; font-weight: 600;">{{expiresAt}}</td>
+    </tr>
+  </table>
+</div>
+
+{{#if message}}
+<div style="margin: 24px 0; padding: 16px; background-color: #f8fafc; border-left: 4px solid #0f766e;">
+  <p style="margin: 0; color: #334155;">{{message}}</p>
+</div>
+{{/if}}
+
+{{> button text="Open investor report" url=publicUrl}}
+
+<p style="margin: 28px 0 0; color: #64748b; font-size: 13px;">
+  This secure link is access-limited and audited by Dhanam. If you were not expecting this report, contact {{senderEmail}}.
+</p>
+
+{{> footer}}

@@ -1,6 +1,7 @@
 'use client';
 
 import { Share2, Loader2, CheckCircle } from 'lucide-react';
+import type { ChangeEvent, ReactElement } from 'react';
 import { useState } from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -29,7 +30,7 @@ import { useGoals, type Goal } from '@/hooks/useGoals';
 interface ShareGoalDialogProps {
   goal: Goal;
   onShared?: () => void;
-  trigger?: React.ReactNode;
+  trigger?: ReactElement;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -127,7 +128,7 @@ export function ShareGoalDialog({
                 type="email"
                 placeholder="partner@example.com"
                 value={formData.shareWithEmail}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setFormData({
                     ...formData,
                     shareWithEmail: e.target.value,
@@ -171,7 +172,7 @@ export function ShareGoalDialog({
                 id="message"
                 placeholder="Let's work together on our retirement savings!"
                 value={formData.message}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                   setFormData({ ...formData, message: e.target.value })
                 }
                 rows={3}

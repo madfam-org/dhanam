@@ -81,6 +81,27 @@ export interface SharedReport extends SavedReport {
   sharedBy: { id: string; name: string; email: string };
 }
 
+export interface InvestorReportPacketRequest {
+  spaceId: string;
+  startDate: string;
+  endDate: string;
+  recipients: string[];
+  name?: string;
+  message?: string;
+  expiresInHours?: number;
+}
+
+export interface InvestorReportPacketResponse {
+  reportId: string;
+  generatedReportId: string;
+  shareTokenId: string;
+  reportName: string;
+  publicUrl: string;
+  ownerDownloadUrl: string;
+  expiresAt: string;
+  recipientsQueued: number;
+}
+
 export const reportsApi = {
   // ── Existing ────────────────────────────────────────
 
@@ -279,6 +300,14 @@ export const reportsApi = {
 
   revokeShareLink: async (tokenId: string): Promise<void> => {
     return apiClient.delete(`/reports/share-links/${tokenId}`);
+  },
+
+  // ── Investor Packets ───────────────────────────────
+
+  createInvestorPacket: async (
+    data: InvestorReportPacketRequest
+  ): Promise<InvestorReportPacketResponse> => {
+    return apiClient.post<InvestorReportPacketResponse>('/reports/investor-packets', data);
   },
 
   // ── Public Access ──────────────────────────────────

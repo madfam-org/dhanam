@@ -22,6 +22,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronRight,
+  Archive,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -74,6 +75,7 @@ const navigation: NavItem[] = [
   { key: 'retirement', href: '/retirement', icon: Target },
   { key: 'scenarios', href: '/scenarios', icon: AlertTriangle },
   { key: 'reports', href: '/reports', icon: FileText },
+  { key: 'statements', href: '/statements', icon: Archive },
   { key: 'billing', href: '/billing', icon: CreditCard },
   { key: 'settings', href: '/settings', icon: Settings },
 ];

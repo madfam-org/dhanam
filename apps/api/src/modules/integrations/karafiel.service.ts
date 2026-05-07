@@ -30,6 +30,26 @@ export interface ExtractedTransactionData {
   lineItems?: Array<{ description: string; quantity?: number; unitPrice?: number; total: number }>;
   /** CFDI UUID if this was a CFDI invoice */
   cfdiUuid?: string;
+  /** High-level document class for downstream review queues */
+  documentType?: 'receipt' | 'invoice' | 'bank_statement' | 'account_statement' | 'other';
+  /** Statement period start, when available */
+  statementPeriodStart?: string;
+  /** Statement period end, when available */
+  statementPeriodEnd?: string;
+  /** Masked account identifier, when available */
+  accountLast4?: string;
+  /** Statement opening balance */
+  openingBalance?: number;
+  /** Statement closing balance */
+  closingBalance?: number;
+  /** Extracted statement transaction rows, when available */
+  transactions?: Array<{
+    date: string;
+    description: string;
+    amount: number;
+    balance?: number;
+    currency?: string;
+  }>;
   /** Confidence score 0-1 from the extraction engine */
   confidence: number;
 }
@@ -123,10 +143,7 @@ export class KarafielService {
     }
   }
 
-  private mockReceipt(
-    digest: string,
-    prefix = 'MOCK'
-  ): KarafielRegistrationResult {
+  private mockReceipt(digest: string, prefix = 'MOCK'): KarafielRegistrationResult {
     return {
       karafielId: `${prefix}-${digest.slice(0, 16).toUpperCase()}`,
       sealedAt: new Date().toISOString(),

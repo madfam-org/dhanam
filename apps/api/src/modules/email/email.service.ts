@@ -85,6 +85,7 @@ export class EmailService {
       'sync-failed',
       'weekly-summary',
       'monthly-report',
+      'investor-report',
       'onboarding-complete',
       'email-verification',
       'drip-day-1-connect',

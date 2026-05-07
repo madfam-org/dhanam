@@ -9,6 +9,7 @@ import { AnalyticsModule } from '@modules/analytics/analytics.module';
 import { EmailController } from './email.controller';
 import { EmailProcessor } from './email.processor';
 import { EmailService } from './email.service';
+import { InvestorReportsController } from './investor-reports.controller';
 import { JanuaEmailService } from './janua-email.service';
 import { DripCampaignTask } from './tasks/drip-campaign.task';
 import { MonthlyReportTask } from './tasks/monthly-report.task';
@@ -36,7 +37,7 @@ import { WeeklySummaryTask } from './tasks/weekly-summary.task';
       },
     }),
   ],
-  controllers: [EmailController],
+  controllers: [EmailController, InvestorReportsController],
   providers: [
     EmailService,
     JanuaEmailService,

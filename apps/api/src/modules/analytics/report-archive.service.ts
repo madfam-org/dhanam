@@ -105,16 +105,14 @@ export class ReportArchiveService {
         );
     }
 
-    // Upload to R2
     const timestamp = Date.now();
     const ext = FORMAT_EXTENSION[format] || 'pdf';
-    const r2Key = `spaces/${savedReport.spaceId}/reports/${savedReportId}/${timestamp}.${ext}`;
     const contentType = FORMAT_CONTENT_TYPE[format] || 'application/pdf';
     const filename = `${savedReport.name}-${timestamp}.${ext}`;
 
-    await this.r2StorageService.uploadFile(
+    const uploaded = await this.r2StorageService.uploadFile(
       savedReport.spaceId,
-      randomBytes(8).toString('hex'),
+      `reports/${savedReportId}/${randomBytes(8).toString('hex')}`,
       buffer,
       filename,
       contentType,
@@ -130,7 +128,7 @@ export class ReportArchiveService {
         format,
         startDate,
         endDate,
-        r2Key,
+        r2Key: uploaded.key,
         fileSize: buffer.length,
       },
     });
@@ -156,7 +154,7 @@ export class ReportArchiveService {
     this.logger.log(`Generated report ${generatedReport.id} for saved report ${savedReportId}`);
 
     // Return download URL
-    const downloadUrl = await this.r2StorageService.getPresignedDownloadUrl(r2Key, 3600);
+    const downloadUrl = await this.r2StorageService.getPresignedDownloadUrl(uploaded.key, 3600);
 
     return { generatedReport, downloadUrl };
   }

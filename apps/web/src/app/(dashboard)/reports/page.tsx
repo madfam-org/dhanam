@@ -34,6 +34,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { ReportHistoryPanel } from '@/components/reports/report-history-panel';
+import { InvestorReportPanel } from '@/components/reports/investor-report-panel';
 import { SavedReportCard } from '@/components/reports/saved-report-card';
 import { ShareLinkPanel } from '@/components/reports/share-link-panel';
 import { ShareManagementPanel } from '@/components/reports/share-management-panel';
@@ -310,6 +311,8 @@ export default function ReportsPage() {
         <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
         <p className="text-muted-foreground">{t('description')}</p>
       </div>
+
+      <InvestorReportPanel spaceId={currentSpace.id} startDate={startDate} endDate={endDate} />
 
       {/* Quick Export */}
       <Card>

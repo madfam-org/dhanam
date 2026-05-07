@@ -2,6 +2,7 @@
 
 import { useTranslation } from '@dhanam/shared';
 import { useRouter } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { SubscriptionBanner } from '~/components/billing/SubscriptionBanner';
@@ -61,7 +62,7 @@ function isDemoModeCookie(): boolean {
   return document.cookie.includes('demo-mode=true');
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: ReactNode }) {
   const { isAuthenticated, _hasHydrated, user, refreshUser, setAuth } = useAuth();
   const router = useRouter();
   // Trigger spaces fetch early so child pages have data before rendering.

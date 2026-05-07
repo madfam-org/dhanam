@@ -1,6 +1,7 @@
 'use client';
 
 import { Share2, Loader2, CheckCircle } from 'lucide-react';
+import type { ChangeEvent, ReactElement } from 'react';
 import { useState } from 'react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -29,7 +30,7 @@ import { reportsApi, type SavedReport } from '@/lib/api/reports';
 interface ShareReportDialogProps {
   report: SavedReport;
   onShared?: () => void;
-  trigger?: React.ReactNode;
+  trigger?: ReactElement;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -123,7 +124,7 @@ export function ShareReportDialog({
                 type="email"
                 placeholder="colleague@example.com"
                 value={formData.shareWithEmail}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setFormData({ ...formData, shareWithEmail: e.target.value })
                 }
               />
@@ -158,7 +159,7 @@ export function ShareReportDialog({
                 id="message"
                 placeholder="Check out this financial report!"
                 value={formData.message}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                   setFormData({ ...formData, message: e.target.value })
                 }
                 rows={3}

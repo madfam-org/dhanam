@@ -1,6 +1,7 @@
 'use client';
 
 import { Gauge, TrendingUp, Target, LineChart, Briefcase, Activity } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -16,10 +17,7 @@ type MetricType =
   | 'portfolio_rebalance'
   | 'api_request';
 
-const METRIC_CONFIG: Record<
-  MetricType,
-  { label: string; shortLabel: string; icon: React.ReactNode }
-> = {
+const METRIC_CONFIG: Record<MetricType, { label: string; shortLabel: string; icon: ReactNode }> = {
   esg_calculation: {
     label: 'ESG Calculations',
     shortLabel: 'ESG',

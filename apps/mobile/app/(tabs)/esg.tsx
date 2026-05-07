@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
-import { LineChart, BarChart } from 'react-native-chart-kit';
 
 import { ErrorState } from '@/components/ErrorState';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { useSpaces } from '@/hooks/useSpaces';
+import { BarChart, LineChart } from '@/lib/chart-kit-compat';
 import {
   Ionicons,
   View,

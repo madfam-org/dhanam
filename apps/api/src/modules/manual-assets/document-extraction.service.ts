@@ -20,9 +20,17 @@ Return a JSON object with these fields (omit fields you cannot confidently extra
   "description": "Short description or concept",
   "lineItems": [{ "description": string, "quantity": number, "unitPrice": number, "total": number }],
   "cfdiUuid": "UUID of CFDI folio fiscal if present",
+  "documentType": "receipt | invoice | bank_statement | account_statement | other",
+  "statementPeriodStart": "YYYY-MM-DD if this is a statement",
+  "statementPeriodEnd": "YYYY-MM-DD if this is a statement",
+  "accountLast4": "last four account digits if visible",
+  "openingBalance": number,
+  "closingBalance": number,
+  "transactions": [{ "date": "YYYY-MM-DD", "description": string, "amount": number, "balance": number, "currency": "MXN" }],
   "confidence": number between 0.0 and 1.0
 }
 
+For bank statements, prefer preserving the statement-level summary and transaction rows over forcing the whole document into a single merchant transaction.
 Be strict: if you cannot read the document or the document is not a financial transaction, set confidence below 0.4.`;
 
 const CONFIDENCE_THRESHOLD = 0.5;
@@ -46,8 +54,7 @@ export class DocumentExtractionService {
     const apiKey = this.config.get<string>('OPENAI_API_KEY');
     this.openai = apiKey ? new OpenAI({ apiKey }) : null;
     // Selva is the MADFAM inference router — OpenAI-compatible /v1 endpoint
-    this.selvaBaseUrl =
-      this.config.get<string>('SELVA_API_URL') || 'https://selva.madfam.io/v1';
+    this.selvaBaseUrl = this.config.get<string>('SELVA_API_URL') || 'https://selva.madfam.io/v1';
   }
 
   /**
@@ -73,7 +80,9 @@ export class DocumentExtractionService {
           `Native confidence too low (${nativeResult.confidence}) — escalating to Selva`
         );
       } catch (err) {
-        this.logger.warn(`Native extraction failed: ${(err as Error).message} — escalating to Selva`);
+        this.logger.warn(
+          `Native extraction failed: ${(err as Error).message} — escalating to Selva`
+        );
       }
     } else {
       this.logger.warn('OPENAI_API_KEY not set — escalating directly to Selva');
@@ -95,11 +104,15 @@ export class DocumentExtractionService {
   ): Promise<ExtractedTransactionData> {
     const base64 = buffer.toString('base64');
     const dataUrl = `data:${mimeType};base64,${base64}`;
+    const textPreview = mimeType === 'text/csv' ? buffer.toString('utf-8').slice(0, 60_000) : '';
 
     // For PDFs, send the filename as context since OpenAI vision doesn't
     // natively render multi-page PDFs — we rely on the first-page rendering
     // if the client converts it, or use text for single-page PDFs.
     const isImage = mimeType.startsWith('image/');
+    const documentContext = textPreview
+      ? `Filename: ${filename}. CSV/text statement content:\n${textPreview}`
+      : `Filename: ${filename}. This is a ${mimeType} document. Extract all financial transaction metadata you can from the available document context, and set confidence appropriately if you cannot read the content.`;
 
     const messages: OpenAI.ChatCompletionMessageParam[] = [
       { role: 'system', content: NATIVE_EXTRACTION_SYSTEM_PROMPT },
@@ -116,7 +129,7 @@ export class DocumentExtractionService {
                 text: `Filename: ${filename}. Extract all financial transaction metadata from this document.`,
               },
             ]
-          : `Filename: ${filename}. This is a PDF document (base64 omitted for PDFs). Extract all financial transaction metadata you can from the filename and context, and set confidence appropriately if you cannot read the PDF content.`,
+          : documentContext,
       },
     ];
 
@@ -142,6 +155,13 @@ export class DocumentExtractionService {
       description: parsed.description,
       lineItems: parsed.lineItems,
       cfdiUuid: parsed.cfdiUuid,
+      documentType: parsed.documentType,
+      statementPeriodStart: parsed.statementPeriodStart,
+      statementPeriodEnd: parsed.statementPeriodEnd,
+      accountLast4: parsed.accountLast4,
+      openingBalance: parsed.openingBalance,
+      closingBalance: parsed.closingBalance,
+      transactions: parsed.transactions,
       confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.3,
     };
   }
@@ -164,6 +184,8 @@ export class DocumentExtractionService {
     const base64 = buffer.toString('base64');
     const isImage = mimeType.startsWith('image/');
     const dataUrl = `data:${mimeType};base64,${base64}`;
+    const textPreview = mimeType === 'text/csv' ? buffer.toString('utf-8').slice(0, 60_000) : '';
+    const encodedPreview = base64.slice(0, 16_000);
 
     const body = {
       model: 'auto', // Selva picks the best model
@@ -179,7 +201,9 @@ export class DocumentExtractionService {
                   text: `Filename: ${filename}. This is a complex financial document that requires deep analysis. Extract all transaction metadata.`,
                 },
               ]
-            : `Filename: ${filename}. Deep-analyze this financial document (content: base64 length ${base64.length}) and extract all transaction metadata. Set confidence accurately.`,
+            : textPreview
+              ? `Filename: ${filename}. Deep-analyze this CSV/text financial statement and extract all transaction metadata:\n${textPreview}`
+              : `Filename: ${filename}. Deep-analyze this ${mimeType} financial document. Base64 prefix (${encodedPreview.length}/${base64.length} chars): ${encodedPreview}. Extract all transaction metadata and set confidence accurately.`,
         },
       ],
       response_format: { type: 'json_object' },
@@ -215,6 +239,13 @@ export class DocumentExtractionService {
         description: parsed.description,
         lineItems: parsed.lineItems,
         cfdiUuid: parsed.cfdiUuid,
+        documentType: parsed.documentType,
+        statementPeriodStart: parsed.statementPeriodStart,
+        statementPeriodEnd: parsed.statementPeriodEnd,
+        accountLast4: parsed.accountLast4,
+        openingBalance: parsed.openingBalance,
+        closingBalance: parsed.closingBalance,
+        transactions: parsed.transactions,
         confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.6,
       };
     } catch (err) {

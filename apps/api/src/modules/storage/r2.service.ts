@@ -25,11 +25,11 @@ import { v4 as uuidv4 } from 'uuid';
 const getSignedUrl: (
   client: unknown,
   command: unknown,
-  options?: { expiresIn?: number },
+  options?: { expiresIn?: number }
 ) => Promise<string> = _getSignedUrl as unknown as (
   client: unknown,
   command: unknown,
-  options?: { expiresIn?: number },
+  options?: { expiresIn?: number }
 ) => Promise<string>;
 
 export interface UploadedDocument {
@@ -55,7 +55,7 @@ export class R2StorageService {
   private readonly bucket: string;
   private readonly publicUrl: string;
 
-  private static readonly MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  private static readonly MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
   private static readonly ALLOWED_MIME_TYPES = new Set([
     'image/png',
     'image/jpeg',

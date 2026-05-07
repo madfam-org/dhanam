@@ -1,7 +1,6 @@
 import { Account, Transaction } from '@dhanam/shared';
 import { useQuery } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
-import { LineChart } from 'react-native-chart-kit';
 
 import { AccountCard } from '@/components/AccountCard';
 import { ErrorState } from '@/components/ErrorState';
@@ -20,6 +19,7 @@ import {
   FAB,
   Button,
 } from '@/lib/react-native-compat';
+import { LineChart } from '@/lib/chart-kit-compat';
 import { apiClient } from '@/services/api';
 import { styles } from '@/styles/dashboard';
 import { theme } from '@/theme';

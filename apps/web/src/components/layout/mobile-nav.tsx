@@ -16,6 +16,7 @@ import {
   ScrollText,
   Gamepad2,
   CreditCard,
+  Archive,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -36,6 +37,7 @@ const moreNav = [
   { label: 'ESG Insights', href: '/esg', icon: Leaf },
   { label: 'Gaming', href: '/gaming', icon: Gamepad2 },
   { label: 'Reports', href: '/reports', icon: FileText },
+  { label: 'Statements', href: '/statements', icon: Archive },
   { label: 'Billing', href: '/billing', icon: CreditCard },
   { label: 'Settings', href: '/settings', icon: Settings },
 ] as const;

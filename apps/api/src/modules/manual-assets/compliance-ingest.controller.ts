@@ -32,6 +32,9 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/png',
   'image/webp',
   'image/gif',
+  'text/csv',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ]);
 
 interface JwtUser {
@@ -81,9 +84,19 @@ export class ComplianceIngestController {
     schema: {
       type: 'object',
       properties: {
-        file: { type: 'string', format: 'binary', description: 'PDF or image of financial document' },
-        spaceId: { type: 'string', description: 'Target space ID (optional — defaults to user primary space)' },
-        category: { type: 'string', description: 'Document category (invoice, receipt, statement, etc.)' },
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'PDF or image of financial document',
+        },
+        spaceId: {
+          type: 'string',
+          description: 'Target space ID (optional — defaults to user primary space)',
+        },
+        category: {
+          type: 'string',
+          description: 'Document category (invoice, receipt, statement, etc.)',
+        },
       },
       required: ['file'],
     },
@@ -100,6 +113,14 @@ export class ComplianceIngestController {
       merchant: string;
       confidence: number;
     };
+    statementSummary?: {
+      periodStart?: string;
+      periodEnd?: string;
+      accountLast4?: string;
+      openingBalance?: number;
+      closingBalance?: number;
+      transactionCount: number;
+    };
   }> {
     // --- 1. Parse multipart upload ---
     const data = await req.file();
@@ -112,7 +133,7 @@ export class ComplianceIngestController {
 
     if (!ALLOWED_MIME_TYPES.has(mimeType)) {
       throw new BadRequestException(
-        `Unsupported file type: ${mimeType}. Allowed: PDF, JPEG, PNG, WEBP, GIF`
+        `Unsupported file type: ${mimeType}. Allowed: PDF, JPEG, PNG, WEBP, GIF, CSV, XLS, XLSX`
       );
     }
 
@@ -188,6 +209,18 @@ export class ComplianceIngestController {
 
     this.logger.log(`ComplianceRecord created: ${record.id} (karafielId=${record.karafielId})`);
 
+    const statementSummary =
+      category === 'statement' || transactionData.documentType === 'bank_statement'
+        ? {
+            periodStart: transactionData.statementPeriodStart,
+            periodEnd: transactionData.statementPeriodEnd,
+            accountLast4: transactionData.accountLast4,
+            openingBalance: transactionData.openingBalance,
+            closingBalance: transactionData.closingBalance,
+            transactionCount: transactionData.transactions?.length ?? 0,
+          }
+        : undefined;
+
     return {
       complianceRecordId: record.id,
       karafielId: karafielResult.karafielId,
@@ -200,6 +233,7 @@ export class ComplianceIngestController {
         merchant: transactionData.merchant,
         confidence: transactionData.confidence,
       },
+      statementSummary,
     };
   }
 

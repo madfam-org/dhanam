@@ -13,6 +13,7 @@ export type EmailTemplate =
   | 'sync-failed'
   | 'weekly-summary'
   | 'monthly-report'
+  | 'investor-report'
   | 'drip-day-1-connect'
   | 'drip-day-3-budget'
   | 'drip-day-7-summary'

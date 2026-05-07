@@ -16,6 +16,7 @@ export const dashboard = {
     assets: 'Ativos',
     goals: 'Metas',
     reports: 'Relatórios',
+    statements: 'Extratos',
     defi: 'DeFi',
     collectibles: 'Colecionáveis',
     realEstate: 'Imóveis',
