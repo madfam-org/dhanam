@@ -33,8 +33,8 @@ import {
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { ReportHistoryPanel } from '@/components/reports/report-history-panel';
 import { InvestorReportPanel } from '@/components/reports/investor-report-panel';
+import { ReportHistoryPanel } from '@/components/reports/report-history-panel';
 import { SavedReportCard } from '@/components/reports/saved-report-card';
 import { ShareLinkPanel } from '@/components/reports/share-link-panel';
 import { ShareManagementPanel } from '@/components/reports/share-management-panel';
