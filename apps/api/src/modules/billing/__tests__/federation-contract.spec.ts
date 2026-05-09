@@ -1,5 +1,5 @@
 /**
- * Dhanam-side contract test for the PhyneCRM federation integration.
+ * Dhanam-side contract test for the PhyndCRM federation integration.
  *
  * Validates that the CustomerFederationService response shape matches the
  * shared DhanamRawCustomer JSON Schema contract. Uses Zod for runtime
@@ -11,8 +11,8 @@
  * - The CustomerFederationService mapping logic changed the output shape
  * - The contract schema was updated without updating this producer
  *
- * Shared schema: phyne-crm/packages/federation/src/providers/dhanam/__tests__/dhanam-customer-contract.schema.json
- * Counterpart:   phyne-crm/packages/federation/src/providers/dhanam/__tests__/contract.test.ts
+ * Shared schema: phynd-crm/packages/federation/src/providers/dhanam/__tests__/dhanam-customer-contract.schema.json
+ * Counterpart:   phynd-crm/packages/federation/src/providers/dhanam/__tests__/contract.test.ts
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -43,22 +43,22 @@ interface JsonSchema extends JsonSchemaProperty {
   description?: string;
 }
 
-// The schema lives in the PhyneCRM repo. For local development with the
-// monorepo sibling layout (labspace/dhanam + labspace/phyne-crm), we
+// The schema lives in the PhyndCRM repo. For local development with the
+// monorepo sibling layout (labspace/dhanam + labspace/phynd-crm), we
 // resolve it relative to __dirname.
 //
 // Path: __tests__ -> billing -> modules -> src -> api -> apps -> dhanam -> labspace
-//       then: phyne-crm/packages/federation/src/providers/dhanam/__tests__/
+//       then: phynd-crm/packages/federation/src/providers/dhanam/__tests__/
 const schemaPath = resolve(
   __dirname,
-  '../../../../../../../phyne-crm/packages/federation/src/providers/dhanam/__tests__/dhanam-customer-contract.schema.json'
+  '../../../../../../../phynd-crm/packages/federation/src/providers/dhanam/__tests__/dhanam-customer-contract.schema.json'
 );
 
 let contractSchema: JsonSchema;
 try {
   contractSchema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
 } catch {
-  // Fallback: if the PhyneCRM repo is not present (e.g., isolated CI),
+  // Fallback: if the PhyndCRM repo is not present (e.g., isolated CI),
   // embed the schema fields we validate against. This ensures the test
   // still catches regressions in the Dhanam response shape.
   contractSchema = null as unknown as JsonSchema;

@@ -15,7 +15,7 @@ import { ConfigService } from '@nestjs/config';
  * =============================================================================
  * Validates Bearer tokens for service-to-service federation calls.
  *
- * PhyneCRM (and other MADFAM ecosystem services) authenticate to the
+ * PhyndCRM (and other MADFAM ecosystem services) authenticate to the
  * customer federation endpoint using a shared secret token configured
  * via the FEDERATION_API_TOKEN environment variable.
  *

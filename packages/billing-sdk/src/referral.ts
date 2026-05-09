@@ -26,7 +26,7 @@ export interface ReferralClientConfig {
  * Authenticates via JWT.
  *
  * Funnel operations (code generation, validation, application, stats) have
- * moved to PhyneCRM. This client retains only reward and ambassador queries.
+ * moved to PhyndCRM. This client retains only reward and ambassador queries.
  *
  * @example
  * ```ts

@@ -1,16 +1,16 @@
 /**
- * PhyneCRM engagement event notifier — outbound from Dhanam.
+ * PhyndCRM engagement event notifier — outbound from Dhanam.
  *
  * When a Stripe MX payment envelope carries ecosystem metadata tying it
- * to a PhyneCRM engagement, fire a `dhanam:payment.succeeded` (or
- * failed/refunded) event to PhyneCRM's unified webhook so the client
- * portal timeline updates live. Fire-and-forget — PhyneCRM being
+ * to a PhyndCRM engagement, fire a `dhanam:payment.succeeded` (or
+ * failed/refunded) event to PhyndCRM's unified webhook so the client
+ * portal timeline updates live. Fire-and-forget — PhyndCRM being
  * offline must never break the Stripe → Dhanam → Karafiel path.
  *
  * Design contract:
  * - Only fires when `envelope.data.ecosystem.engagement_id` is present.
  *   Standalone Dhanam-subscription payments (no engagement) are silent.
- * - Idempotent on PhyneCRM's side via a stable `dedup_key`:
+ * - Idempotent on PhyndCRM's side via a stable `dedup_key`:
  *   `dhanam:<type>:<payment_id>`. A retry of the same envelope is a
  *   no-op there.
  * - HMAC-SHA256 body signature via `PHYNE_ENGAGEMENT_EVENTS_SECRET`
@@ -53,7 +53,7 @@ export class PhyneCrmEngagementNotifierService {
   }
 
   /**
-   * Emit a PhyneCRM engagement event for this envelope, if it carries
+   * Emit a PhyndCRM engagement event for this envelope, if it carries
    * an engagement_id. Returns nothing — call-sites should `void` the
    * promise to make fire-and-forget explicit.
    */
@@ -66,7 +66,7 @@ export class PhyneCrmEngagementNotifierService {
     }
     if (!this.apiUrl || !this.secret) {
       this.logger.warn(
-        'PhyneCRM notify skipped — PHYNECRM_API_URL or PHYNE_ENGAGEMENT_EVENTS_SECRET not configured'
+        'PhyndCRM notify skipped — PHYNECRM_API_URL or PHYNE_ENGAGEMENT_EVENTS_SECRET not configured'
       );
       return;
     }
@@ -91,13 +91,13 @@ export class PhyneCrmEngagementNotifierService {
       if (!res.ok) {
         const text = await res.text().catch(() => '');
         this.logger.warn(
-          `PhyneCRM engagement notify returned ${res.status} for engagement=${engagementId} event=${payload.event_type}: ${text.slice(0, 200)}`
+          `PhyndCRM engagement notify returned ${res.status} for engagement=${engagementId} event=${payload.event_type}: ${text.slice(0, 200)}`
         );
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.logger.warn(
-        `PhyneCRM engagement notify failed for engagement=${engagementId} event=${payload.event_type}: ${message}`
+        `PhyndCRM engagement notify failed for engagement=${engagementId} event=${payload.event_type}: ${message}`
       );
     } finally {
       clearTimeout(timer);
@@ -118,7 +118,7 @@ export class PhyneCrmEngagementNotifierService {
       status: type === 'payment.failed' ? 'failed' : 'completed',
       message: human,
       timestamp,
-      // Stable per-payment dedup_key — PhyneCRM's `recordEvent`
+      // Stable per-payment dedup_key — PhyndCRM's `recordEvent`
       // short-circuits on the second delivery of the same key.
       dedup_key: `dhanam:${type}:${data.payment_id}`,
       metadata: {

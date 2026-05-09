@@ -192,10 +192,10 @@ spec:
                   optional: true
 
             # =================================================================
-            # Ecosystem fan-out (Karafiel CFDI + PhyneCRM engagement events)
+            # Ecosystem fan-out (Karafiel CFDI + PhyndCRM engagement events)
             # =================================================================
             - name: PRODUCT_WEBHOOK_URLS
-              value: "karafiel:https://api.karafiel.mx/api/v1/webhooks/dhanam,phynecrm:https://crm.madfam.io/api/v1/engagements/events"
+              value: "karafiel:https://api.karafiel.mx/api/v1/webhooks/dhanam,phyndcrm:https://crm.madfam.io/api/v1/engagements/events"
             - name: PHYNECRM_API_URL
               value: "https://crm.madfam.io"
             - name: PHYNE_ENGAGEMENT_EVENTS_SECRET

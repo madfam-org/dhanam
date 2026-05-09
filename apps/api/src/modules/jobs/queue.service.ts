@@ -485,7 +485,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
    * Enqueue a referral reward application job.
    *
    * Idempotency: jobId is the reward id, so a second webhook delivering the
-   * same reward (or a retry from PhyneCRM) cannot create a duplicate job
+   * same reward (or a retry from PhyndCRM) cannot create a duplicate job
    * — BullMQ silently no-ops the second `add()`.
    *
    * Retry policy is queue-level (3 attempts, 1m / 5m / 30m custom backoff).

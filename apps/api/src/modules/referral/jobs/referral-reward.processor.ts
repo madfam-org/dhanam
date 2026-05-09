@@ -22,7 +22,7 @@ import { ReferralRewardService } from '../referral-reward.service';
  *
  * Enqueue site: `ReferralService.handleConversionWebhook()` after the
  * reward rows are committed. JobId is the reward id, so duplicate
- * webhooks (PhyneCRM retry, manual replay) are silently de-duplicated by
+ * webhooks (PhyndCRM retry, manual replay) are silently de-duplicated by
  * BullMQ.
  *
  * Retry policy lives on the queue (`attempts: 4`, custom backoff

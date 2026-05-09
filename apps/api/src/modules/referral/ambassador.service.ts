@@ -89,7 +89,7 @@ export class AmbassadorService {
    * Derives conversion count from subscription_extension rewards (one per conversion).
    * Also updates aggregate stats (lifetimeCreditsEarned, lifetimeMonthsEarned).
    *
-   * Note: With funnel tracking moved to PhyneCRM, we derive conversion counts
+   * Note: With funnel tracking moved to PhyndCRM, we derive conversion counts
    * from ReferralReward records rather than Referral records.
    */
   async recalculateTier(userId: string): Promise<{

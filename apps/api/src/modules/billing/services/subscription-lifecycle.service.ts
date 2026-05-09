@@ -395,7 +395,7 @@ export class SubscriptionLifecycleService {
   }
 
   /**
-   * Create a checkout session on behalf of a federated service (e.g., PhyneCRM).
+   * Create a checkout session on behalf of a federated service (e.g., PhyndCRM).
    */
   async createFederatedCheckout(
     userId: string,
@@ -629,9 +629,10 @@ export class SubscriptionLifecycleService {
       ok = response.ok;
       if (!ok) {
         try {
-          errorMessage = `consumer responded ${response.status}: ${(
-            await response.text()
-          ).slice(0, 500)}`;
+          errorMessage = `consumer responded ${response.status}: ${(await response.text()).slice(
+            0,
+            500
+          )}`;
         } catch {
           errorMessage = `consumer responded ${response.status}`;
         }

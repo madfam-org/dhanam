@@ -10,11 +10,11 @@ import { ReferralConversionDataDto } from './dto/referral-event.dto';
  * =============================================================================
  * Referral Service (Rewards-Only)
  * =============================================================================
- * Handles reward creation from PhyneCRM conversion webhooks and
+ * Handles reward creation from PhyndCRM conversion webhooks and
  * reward history queries.
  *
  * Funnel tracking (code generation, validation, application, lifecycle
- * events, stats) has moved to PhyneCRM. Dhanam retains only:
+ * events, stats) has moved to PhyndCRM. Dhanam retains only:
  * - Reward creation on conversion
  * - Reward history retrieval
  * - Ambassador tier recalculation (delegated to AmbassadorService)
@@ -39,7 +39,7 @@ export class ReferralService {
   ) {}
 
   /**
-   * Handle a `referral.converted` webhook from PhyneCRM.
+   * Handle a `referral.converted` webhook from PhyndCRM.
    *
    * Creates ReferralReward rows:
    * - Referrer: 1 month subscription extension
@@ -49,7 +49,7 @@ export class ReferralService {
    * Then recalculates the referrer's ambassador tier.
    *
    * The `referralId` stored in each reward is a cross-service reference
-   * to the PhyneCRM referral record, not a local FK.
+   * to the PhyndCRM referral record, not a local FK.
    */
   async handleConversionWebhook(data: ReferralConversionDataDto): Promise<{
     rewards_created: number;
@@ -59,7 +59,7 @@ export class ReferralService {
       data;
 
     // Use the referral code as the cross-service reference ID.
-    // PhyneCRM owns the referral record; we just store its code for traceability.
+    // PhyndCRM owns the referral record; we just store its code for traceability.
     const referralId = referral_code;
 
     // Check for duplicate: avoid double-rewarding the same conversion
@@ -134,7 +134,7 @@ export class ReferralService {
     );
 
     // Auto-enqueue an apply job per reward. JobId = reward.id makes the
-    // enqueue idempotent: a duplicate webhook (PhyneCRM retry, manual
+    // enqueue idempotent: a duplicate webhook (PhyndCRM retry, manual
     // replay) cannot create a duplicate job, and the worker also short-
     // circuits if reward.applied is already true.
     //

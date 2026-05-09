@@ -44,7 +44,7 @@ export class ReferralConversionDataDto {
 }
 
 /**
- * Payload for the `referral.converted` webhook from PhyneCRM.
+ * Payload for the `referral.converted` webhook from PhyndCRM.
  * Received via HMAC-authenticated POST /v1/referral/reward.
  */
 export class ReferralConversionWebhookDto {

@@ -1,6 +1,6 @@
 /**
  * PhyneCrmEngagementNotifierService — fire-and-forget emission to
- * PhyneCRM's engagement events webhook. Tests cover:
+ * PhyndCRM's engagement events webhook. Tests cover:
  *   - skipped when envelope has no engagement_id
  *   - skipped when secret or URL unset
  *   - HMAC signature matches body
@@ -12,11 +12,11 @@ import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { createHmac } from 'crypto';
 
-import { PhyneCrmEngagementNotifierService } from '../services/phynecrm-engagement-notifier.service';
+import { PhyneCrmEngagementNotifierService } from '../services/phyndcrm-engagement-notifier.service';
 import type { DhanamPaymentEnvelope } from '../services/stripe-mx-spei-relay.service';
 
-const SECRET = 'phyne-events-secret';
-const URL = 'https://phyne-crm.madfam.io';
+const SECRET = 'phynd-events-secret';
+const URL = 'https://phynd-crm.madfam.io';
 
 function mkConfig(overrides: Record<string, unknown> = {}) {
   const values: Record<string, unknown> = {
@@ -45,7 +45,9 @@ function mkEnvelope(
       amount: '199.00',
       amount_minor: 19900,
       currency: 'MXN',
-      ...(ecosystem && { ecosystem: ecosystem as NonNullable<DhanamPaymentEnvelope['data']['ecosystem']> }),
+      ...(ecosystem && {
+        ecosystem: ecosystem as NonNullable<DhanamPaymentEnvelope['data']['ecosystem']>,
+      }),
     },
     ...partial,
   };
@@ -132,22 +134,20 @@ describe('PhyneCrmEngagementNotifierService', () => {
 
   it('flips status to "failed" for payment.failed', async () => {
     await svc.notify(
-      mkEnvelope(
-        {
-          type: 'payment.failed',
-          data: {
-            customer_id: 'u',
-            subscription_id: '',
-            payment_id: 'pi_x',
-            amount: '50.00',
-            amount_minor: 5000,
-            currency: 'MXN',
-            failure_reason: 'card_declined',
-            failure_code: 'generic_decline',
-            ecosystem: { engagement_id: 'eng_1' },
-          },
-        }
-      )
+      mkEnvelope({
+        type: 'payment.failed',
+        data: {
+          customer_id: 'u',
+          subscription_id: '',
+          payment_id: 'pi_x',
+          amount: '50.00',
+          amount_minor: 5000,
+          currency: 'MXN',
+          failure_reason: 'card_declined',
+          failure_code: 'generic_decline',
+          ecosystem: { engagement_id: 'eng_1' },
+        },
+      })
     );
     const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
     expect(body.event_type).toBe('payment.failed');
@@ -158,14 +158,17 @@ describe('PhyneCrmEngagementNotifierService', () => {
 
   it('passes through cotiza + milestone metadata into the payload', async () => {
     await svc.notify(
-      mkEnvelope({}, {
-        engagement_id: 'eng_1',
-        cotiza_quote_id: 'q_1',
-        cotiza_quote_item_id: 'qi_1',
-        milestone_id: 'm_1',
-        order_id: 'ord_1',
-        source: 'cotiza',
-      })
+      mkEnvelope(
+        {},
+        {
+          engagement_id: 'eng_1',
+          cotiza_quote_id: 'q_1',
+          cotiza_quote_item_id: 'qi_1',
+          milestone_id: 'm_1',
+          order_id: 'ord_1',
+          source: 'cotiza',
+        }
+      )
     );
     const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
     expect(body.metadata.cotiza_quote_id).toBe('q_1');
@@ -177,9 +180,7 @@ describe('PhyneCrmEngagementNotifierService', () => {
 
   it('swallows fetch rejections without throwing', async () => {
     fetchSpy.mockRejectedValueOnce(new Error('ECONNREFUSED'));
-    await expect(
-      svc.notify(mkEnvelope({}, { engagement_id: 'eng_1' }))
-    ).resolves.toBeUndefined();
+    await expect(svc.notify(mkEnvelope({}, { engagement_id: 'eng_1' }))).resolves.toBeUndefined();
   });
 
   it('tolerates non-2xx responses without throwing', async () => {
@@ -188,9 +189,7 @@ describe('PhyneCrmEngagementNotifierService', () => {
       status: 502,
       text: async () => 'upstream down',
     } as unknown as Response);
-    await expect(
-      svc.notify(mkEnvelope({}, { engagement_id: 'eng_1' }))
-    ).resolves.toBeUndefined();
+    await expect(svc.notify(mkEnvelope({}, { engagement_id: 'eng_1' }))).resolves.toBeUndefined();
   });
 
   it('strips trailing slash from PHYNECRM_API_URL', async () => {

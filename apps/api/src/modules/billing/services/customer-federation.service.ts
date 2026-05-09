@@ -5,9 +5,9 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
  * =============================================================================
  * Customer Federation Service
  * =============================================================================
- * Assembles customer billing data for the PhyneCRM federation layer.
+ * Assembles customer billing data for the PhyndCRM federation layer.
  *
- * PhyneCRM federates data from MADFAM ecosystem services via its
+ * PhyndCRM federates data from MADFAM ecosystem services via its
  * DhanamProvider, which expects a DhanamRawCustomer shape containing:
  * - Subscription status (plan + status)
  * - Account balance (amount + currency)
@@ -15,11 +15,11 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
  * - Payment methods (provider info derived from user billing config)
  *
  * The externalId parameter maps to the Dhanam user's `id` field,
- * which PhyneCRM stores as an external reference.
+ * which PhyndCRM stores as an external reference.
  * =============================================================================
  */
 
-/** Matches PhyneCRM's DhanamRawCustomer interface */
+/** Matches PhyndCRM's DhanamRawCustomer interface */
 export interface FederatedCustomerResponse {
   id: string;
   subscription: {
@@ -205,7 +205,7 @@ export class CustomerFederationService {
   }): FederatedCustomerResponse['payment_methods'] {
     // Dhanam does not store raw card details (PCI compliance).
     // We expose the billing provider configuration as a payment method
-    // reference so PhyneCRM can display which provider is active.
+    // reference so PhyndCRM can display which provider is active.
     const methods: FederatedCustomerResponse['payment_methods'] = [];
 
     if (user.stripeCustomerId) {

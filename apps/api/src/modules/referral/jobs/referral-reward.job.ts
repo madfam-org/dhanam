@@ -12,7 +12,7 @@ import { ReferralRewardService } from '../referral-reward.service';
  * Processes unapplied referral rewards every 15 minutes.
  *
  * Reward rows are created by ReferralService.handleConversionWebhook() when
- * PhyneCRM sends a referral.converted event. This job picks up any rewards
+ * PhyndCRM sends a referral.converted event. This job picks up any rewards
  * that have not yet been applied (subscription extension or credit grant)
  * and executes them.
  *

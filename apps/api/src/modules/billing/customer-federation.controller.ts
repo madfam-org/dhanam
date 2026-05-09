@@ -34,12 +34,12 @@ import {
  * =============================================================================
  * Customer Federation Controller
  * =============================================================================
- * Provides a read-only federation endpoint for PhyneCRM's DhanamProvider.
+ * Provides a read-only federation endpoint for PhyndCRM's DhanamProvider.
  *
- * PhyneCRM federates billing data from Dhanam without duplicating it.
+ * PhyndCRM federates billing data from Dhanam without duplicating it.
  * This endpoint returns customer subscription status, balance, recent
  * invoices, and payment method references in the DhanamRawCustomer
- * shape defined in @phyne/federation.
+ * shape defined in @phynd/federation.
  *
  * Authentication: Bearer token (FEDERATION_API_TOKEN shared secret).
  * Rate limit: 60 requests per minute per IP.
@@ -64,7 +64,7 @@ export class CustomerFederationController {
    * Fetch customer billing data by external ID.
    *
    * Returns subscription status, account balance, recent invoices,
-   * and payment method references for the PhyneCRM federation layer.
+   * and payment method references for the PhyndCRM federation layer.
    */
   @Get(':externalId')
   @HttpCode(HttpStatus.OK)
@@ -72,11 +72,11 @@ export class CustomerFederationController {
     summary: 'Get customer billing data for federation (service-to-service)',
     description:
       'Returns customer subscription, balance, invoices, and payment methods ' +
-      'in the DhanamRawCustomer format consumed by PhyneCRM federation.',
+      'in the DhanamRawCustomer format consumed by PhyndCRM federation.',
   })
   @ApiParam({
     name: 'externalId',
-    description: 'Dhanam user ID (stored as external reference in PhyneCRM)',
+    description: 'Dhanam user ID (stored as external reference in PhyndCRM)',
     type: String,
   })
   @ApiOkResponse({
@@ -96,7 +96,7 @@ export class CustomerFederationController {
   /**
    * Create a checkout session for a customer via federation.
    *
-   * Returns a checkout URL that PhyneCRM can redirect the customer to.
+   * Returns a checkout URL that PhyndCRM can redirect the customer to.
    */
   @Post(':externalId/checkout')
   @HttpCode(HttpStatus.CREATED)
@@ -104,7 +104,7 @@ export class CustomerFederationController {
     summary: 'Create checkout session for federation customer',
     description:
       'Creates a Dhanam checkout session and returns the URL. ' +
-      'PhyneCRM uses this to trigger subscription upgrades for contacts.',
+      'PhyndCRM uses this to trigger subscription upgrades for contacts.',
   })
   @ApiParam({
     name: 'externalId',

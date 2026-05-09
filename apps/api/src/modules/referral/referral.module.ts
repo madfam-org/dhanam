@@ -5,10 +5,10 @@
  * Provides reward application and ambassador tier management for the
  * MADFAM ecosystem referral system.
  *
- * Funnel tracking (referral codes, lifecycle) has moved to PhyneCRM.
+ * Funnel tracking (referral codes, lifecycle) has moved to PhyndCRM.
  *
  * ## Features
- * - Reward creation from PhyneCRM conversion webhooks
+ * - Reward creation from PhyndCRM conversion webhooks
  * - Reward application (subscription extensions, credit grants)
  * - Ambassador tier system (none -> bronze -> silver -> gold -> platinum)
  *

@@ -5,7 +5,7 @@ export { DhanamClient } from './client';
 export { DhanamUsageClient } from './usage';
 export type { UsageClientConfig } from './usage';
 
-// Referral client (rewards-only; funnel tracking moved to PhyneCRM)
+// Referral client (rewards-only; funnel tracking moved to PhyndCRM)
 export { DhanamReferralClient } from './referral';
 export type { ReferralClientConfig } from './referral';
 

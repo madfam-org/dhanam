@@ -6,7 +6,7 @@
  * Bridges Stripe Mexico payment events (SPEI via `customer_balance`, card
  * MXN charges, refunds) into Dhanam's canonical outbound webhook envelope
  * so downstream consumers in the MADFAM ecosystem (Karafiel CFDI bridge,
- * PhyneCRM, analytics) receive a single, product-agnostic payment shape.
+ * PhyndCRM, analytics) receive a single, product-agnostic payment shape.
  *
  * On-wire envelope (MUST match Karafiel's `DhanamPaymentDataSerializer`
  * at `karafiel/apps/api/integrations/webhook_schemas.py`):
@@ -87,7 +87,7 @@ import type Stripe from 'stripe';
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 
-import { PhyneCrmEngagementNotifierService } from './phynecrm-engagement-notifier.service';
+import { PhyneCrmEngagementNotifierService } from './phyndcrm-engagement-notifier.service';
 import { WebhookDlqService } from './webhook-dlq.service';
 
 /** Outbound Dhanam envelope for payment.* events. */
@@ -134,7 +134,7 @@ export interface DhanamPaymentEnvelope {
  * standalone Dhanam subscription payment so the envelope stays lean.
  *
  * Keys recognized (all optional, all string):
- *   engagement_id             PhyneCRM engagement aggregate ID
+ *   engagement_id             PhyndCRM engagement aggregate ID
  *   cotiza_quote_id           Cotiza quote ID (the parent quote)
  *   cotiza_quote_item_id      Cotiza quote-item ID (for per-milestone charges)
  *   milestone_id              The milestone inside services-mode details
@@ -183,7 +183,7 @@ export class StripeMxSpeiRelayService {
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly audit: AuditService,
-    private readonly phynecrmNotifier: PhyneCrmEngagementNotifierService,
+    private readonly phyndcrmNotifier: PhyneCrmEngagementNotifierService,
     private readonly dlq: WebhookDlqService
   ) {}
 
@@ -517,11 +517,11 @@ export class StripeMxSpeiRelayService {
    * retry ladder to re-deliver to us if we returned non-200.
    */
   private async dispatch(envelope: DhanamPaymentEnvelope): Promise<void> {
-    // Fire the PhyneCRM engagement event first (fire-and-forget). It's
+    // Fire the PhyndCRM engagement event first (fire-and-forget). It's
     // schema-incompatible with the `PRODUCT_WEBHOOK_URLS` canonical
-    // envelope so we can't add PhyneCRM as another target in that list
+    // envelope so we can't add PhyndCRM as another target in that list
     // — it has its own transformer + endpoint.
-    void this.phynecrmNotifier.notify(envelope);
+    void this.phyndcrmNotifier.notify(envelope);
 
     const targets = this.listRelayTargets();
     if (targets.length === 0) {

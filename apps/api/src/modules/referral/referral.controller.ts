@@ -33,11 +33,11 @@ import { ReferralService } from './referral.service';
  * =============================================================================
  * Endpoints for referral reward management and ambassador tiers.
  *
- * Funnel tracking (codes, lifecycle) has moved to PhyneCRM.
+ * Funnel tracking (codes, lifecycle) has moved to PhyndCRM.
  * Dhanam retains only reward application and ambassador tier management.
  *
  * ## Authentication Modes
- * - **HMAC**: Receive `referral.converted` webhook from PhyneCRM
+ * - **HMAC**: Receive `referral.converted` webhook from PhyndCRM
  * - **JWT**: User-facing queries (reward history, ambassador profile)
  *
  * All paths are prefixed with `/v1/referral` by the global route prefix.
@@ -56,8 +56,8 @@ export class ReferralController {
   // ─── HMAC-Protected Endpoint (Service-to-Service) ────────────────────
 
   /**
-   * Receive a referral conversion webhook from PhyneCRM.
-   * Authenticated via HMAC-SHA256 signature in X-PhyneCRM-Signature
+   * Receive a referral conversion webhook from PhyndCRM.
+   * Authenticated via HMAC-SHA256 signature in X-PhyndCRM-Signature
    * or X-Referral-Signature header.
    *
    * Creates reward rows (1 month extension for referrer + 50 credits each)
@@ -67,14 +67,14 @@ export class ReferralController {
   @UseGuards(ReferralHmacGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Receive referral conversion webhook from PhyneCRM (HMAC-signed)',
+    summary: 'Receive referral conversion webhook from PhyndCRM (HMAC-signed)',
     description:
-      'Processes a referral.converted event from PhyneCRM. ' +
+      'Processes a referral.converted event from PhyndCRM. ' +
       'Creates rewards and recalculates ambassador tier. ' +
-      'Authenticated via HMAC-SHA256 signature in X-PhyneCRM-Signature or X-Referral-Signature header.',
+      'Authenticated via HMAC-SHA256 signature in X-PhyndCRM-Signature or X-Referral-Signature header.',
   })
   @ApiHeader({
-    name: 'X-PhyneCRM-Signature',
+    name: 'X-PhyndCRM-Signature',
     description: 'HMAC-SHA256 hex signature of request body',
   })
   @ApiCreatedResponse({ description: 'Rewards created and tier recalculated' })

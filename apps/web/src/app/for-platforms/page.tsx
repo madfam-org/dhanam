@@ -83,7 +83,7 @@ const ECOSYSTEM = [
     who: 'Tezca',
     uses: 'Receives subscription.activated/upgraded webhooks → updates API key tier',
   },
-  { who: 'PhyneCRM', uses: 'Receives engagement-tagged payment events for client timeline' },
+  { who: 'PhyndCRM', uses: 'Receives engagement-tagged payment events for client timeline' },
 ];
 
 export default function ForPlatformsPage() {

@@ -8,7 +8,7 @@ import { RedisService } from '../../core/redis/redis.service';
  * Cross-service event publisher using Redis Streams.
  *
  * Publishes billing lifecycle events to `madfam:billing-events` stream
- * for consumption by PhyneCRM, AutoSwarm, and Tezca.
+ * for consumption by PhyndCRM, AutoSwarm, and Tezca.
  *
  * Fire-and-forget — publishing failures are logged but never thrown,
  * so they cannot block the billing flow.

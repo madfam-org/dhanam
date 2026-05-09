@@ -4,7 +4,7 @@ import type Stripe from 'stripe';
 
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
-import { PhyneCrmEngagementNotifierService } from '../services/phynecrm-engagement-notifier.service';
+import { PhyneCrmEngagementNotifierService } from '../services/phyndcrm-engagement-notifier.service';
 import { StripeMxSpeiRelayService } from '../services/stripe-mx-spei-relay.service';
 import { WebhookDlqService } from '../services/webhook-dlq.service';
 

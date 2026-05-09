@@ -39,7 +39,7 @@ Dhanam is the ecosystem's billing backbone: 6 payment gateways (Stripe, Mercado 
 ### Downstream consumers (this repo is consumed by)
 
 - every ecosystem repo with paid tiers (webhooks route to downstream services)
-- tezca, avala, forgesight, cotiza, karafiel, phyne-crm — all receive billing webhooks for tier up/downgrades
+- tezca, avala, forgesight, cotiza, karafiel, phynd-crm — all receive billing webhooks for tier up/downgrades
 
 ### Key environment variables
 
@@ -69,7 +69,7 @@ below is embedded here so this document stands alone.
 | **Cotiza**      | `madfam-org/digifab-quoting`  | MADFAM's quoting engine (fabrication + services)                                                   |
 | **Forgesight**  | `madfam-org/forgesight`       | Digital fabrication industry intelligence (pricing/vendor feed to Cotiza)                          |
 | **Pravara MES** | `madfam-org/pravara-mes`      | Fabrication-node routing and dispatch (physical jobs)                                              |
-| **PhyneCRM**    | `madfam-org/phyne-crm`        | Client-facing deliverables portal (single pane of glass per engagement)                            |
+| **PhyndCRM**    | `madfam-org/phynd-crm`        | Client-facing deliverables portal (single pane of glass per engagement)                            |
 | **Fortuna**     | `madfam-org/fortuna`          | Problem intelligence / zeitgeist analysis                                                          |
 | **Avala**       | `madfam-org/avala`            | Learning verification platform                                                                     |
 

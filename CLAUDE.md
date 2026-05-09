@@ -134,7 +134,7 @@ billing/
 │  ├─ payment-router.service.ts    # Hybrid routing (Stripe MX + Paddle)
 │  ├─ stripe-mx.service.ts         # Stripe Mexico (MXN, OXXO, SPEI)
 │  ├─ paddle.service.ts            # Paddle MoR (global tax compliance)
-│  ├─ customer-federation.service.ts # PhyneCRM federation
+│  ├─ customer-federation.service.ts # PhyndCRM federation
 │  ├─ price-resolver.service.ts    # Price ID resolution
 │  ├─ pricing-engine.service.ts    # Dynamic pricing logic
 │  └─ trial.service.ts             # Trial lifecycle management
@@ -490,13 +490,13 @@ for the transform implementation and
 for the 22-test suite covering signature, transforms, idempotency,
 currency guard, and feature-flag gate.
 
-### PhyneCRM engagement event relay (T1.3)
+### PhyndCRM engagement event relay (T1.3)
 
 When a Stripe MX envelope carries ecosystem correlation keys (set by
 Cotiza's `DhanamMilestoneService` when a services-mode quote with
 billableType=MILESTONE transitions to ORDERED — see the `extractEcosystemMetadata()` helper in `stripe-mx-spei-relay.service.ts`),
 `PhyneCrmEngagementNotifierService` fires an outbound
-`dhanam:payment.succeeded` (or `failed` / `refunded`) event to PhyneCRM's
+`dhanam:payment.succeeded` (or `failed` / `refunded`) event to PhyndCRM's
 unified engagement-events webhook so the client portal timeline updates
 live. Sits alongside the Karafiel CFDI notifier and the product-webhook
 relay as a peer on the Stripe MX → ecosystem fan-out.
@@ -508,21 +508,21 @@ relay as a peer on the Stripe MX → ecosystem fan-out.
 | Target       | `POST <PHYNECRM_API_URL>/api/v1/engagements/events`                                                                    |
 | Auth         | HMAC-SHA256 body signature in `x-webhook-signature` header (secret `PHYNE_ENGAGEMENT_EVENTS_SECRET`)                   |
 | Trigger      | Only fires when `envelope.data.ecosystem.engagement_id` is present (standalone Dhanam subs are silent)                 |
-| Idempotency  | PhyneCRM side dedups on `dedup_key = dhanam:<type>:<payment_id>`                                                       |
+| Idempotency  | PhyndCRM side dedups on `dedup_key = dhanam:<type>:<payment_id>`                                                       |
 | Failure mode | Fire-and-forget — errors logged, never thrown; Stripe retry ladder still re-delivers to Dhanam if the envelope matters |
 
-**Keys mapped into `payload.metadata`** (match PhyneCRM's receiver + Cotiza's producer contract exactly — snake_case throughout):
+**Keys mapped into `payload.metadata`** (match PhyndCRM's receiver + Cotiza's producer contract exactly — snake_case throughout):
 `payment_id`, `subscription_id`, `amount`, `amount_minor`, `currency`, `customer_id`, `failure_reason`, `failure_code`, `refunded_payment_id`, `original_payment_id`, `cotiza_quote_id`, `cotiza_quote_item_id`, `milestone_id`, `order_id`, `source_product`.
 
 **Env vars:**
 
 | Variable                         | Required             | Description                                                                                                                                                                     |
 | -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `PHYNECRM_API_URL`               | Yes for relay        | Base URL; trailing slashes stripped. E.g. `https://phyne-crm.madfam.io`                                                                                                         |
-| `PHYNE_ENGAGEMENT_EVENTS_SECRET` | Yes for relay        | Shared secret — same value as PhyneCRM's `PHYNE_ENGAGEMENT_EVENTS_SECRET` and Cotiza's `PHYNECRM_ENGAGEMENT_SECRET` (all three names refer to the same ecosystem-wide HMAC key) |
+| `PHYNECRM_API_URL`               | Yes for relay        | Base URL; trailing slashes stripped. E.g. `https://phynd-crm.madfam.io`                                                                                                         |
+| `PHYNE_ENGAGEMENT_EVENTS_SECRET` | Yes for relay        | Shared secret — same value as PhyndCRM's `PHYNE_ENGAGEMENT_EVENTS_SECRET` and Cotiza's `PHYNECRM_ENGAGEMENT_SECRET` (all three names refer to the same ecosystem-wide HMAC key) |
 | `PHYNECRM_WEBHOOK_TIMEOUT`       | No (default 10000ms) | `fetch` timeout for the notify call                                                                                                                                             |
 
-Files: `apps/api/src/modules/billing/services/phynecrm-engagement-notifier.service.ts` + `apps/api/src/modules/billing/__tests__/phynecrm-engagement-notifier.service.spec.ts` (13 tests covering skip-paths, HMAC, dedup_key stability, success/failed/refunded translation, non-throwing error handling, trailing-slash URL hygiene + `extractEcosystemMetadata` empty-string skip).
+Files: `apps/api/src/modules/billing/services/phyndcrm-engagement-notifier.service.ts` + `apps/api/src/modules/billing/__tests__/phyndcrm-engagement-notifier.service.spec.ts` (13 tests covering skip-paths, HMAC, dedup_key stability, success/failed/refunded translation, non-throwing error handling, trailing-slash URL hygiene + `extractEcosystemMetadata` empty-string skip).
 
 ## Conekta direct gateway (Wave A pre-flight)
 

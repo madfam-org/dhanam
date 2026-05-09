@@ -321,7 +321,7 @@ export interface DhanamClientConfig {
 }
 
 // ────────────────────────────────────────────────
-// Referral Reward Types (funnel types moved to PhyneCRM)
+// Referral Reward Types (funnel types moved to PhyndCRM)
 // ────────────────────────────────────────────────
 
 /** A reward earned through referrals */

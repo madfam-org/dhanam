@@ -45,7 +45,7 @@ import { SubscriptionLifecycleJob } from './jobs/subscription-lifecycle.job';
 import { SyntheticRevenueProbeJob } from './jobs/synthetic-revenue-probe.job';
 import { WebhookDlqRetryJob } from './jobs/webhook-dlq-retry.job';
 import { MadfamEventsController } from './madfam-events.controller';
-// Federation (PhyneCRM integration)
+// Federation (PhyndCRM integration)
 import { CancellationService } from './services/cancellation.service';
 import { ConektaService } from './services/conekta.service';
 import { CustomerFederationService } from './services/customer-federation.service';
@@ -56,7 +56,7 @@ import { PriceResolverService } from './services/price-resolver.service';
 import { PricingEngineService } from './services/pricing-engine.service';
 import { ProductCatalogService } from './services/product-catalog.service';
 import { RevenueMetricsService } from './services/revenue-metrics.service';
-import { PhyneCrmEngagementNotifierService } from './services/phynecrm-engagement-notifier.service';
+import { PhyneCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
 import { StripeMxSpeiRelayService } from './services/stripe-mx-spei-relay.service';
 import { StripeMxService } from './services/stripe-mx.service';
 import { SyntheticRevenueProbeService } from './services/synthetic-revenue-probe.service';
@@ -160,7 +160,7 @@ import { UsageAlertsService } from './services/usage-alerts.service';
     // Janua-routed Conekta path in JanuaBillingService)
     ConektaService,
 
-    // Federation (PhyneCRM)
+    // Federation (PhyndCRM)
     CustomerFederationService,
     FederationAuthGuard,
 
