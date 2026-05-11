@@ -49,6 +49,6 @@
     "subscriptions"
   ],
   "dependencies": {
-    "next": "15.5.11"
+    "next": "16.2.6"
   }
 }
