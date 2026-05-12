@@ -196,13 +196,13 @@ spec:
             # =================================================================
             - name: PRODUCT_WEBHOOK_URLS
               value: "karafiel:https://api.karafiel.mx/api/v1/webhooks/dhanam,phyndcrm:https://crm.madfam.io/api/v1/engagements/events"
-            - name: PHYNECRM_API_URL
+            - name: PHYNDCRM_API_URL
               value: "https://crm.madfam.io"
-            - name: PHYNE_ENGAGEMENT_EVENTS_SECRET
+            - name: PHYND_ENGAGEMENT_EVENTS_SECRET
               valueFrom:
                 secretKeyRef:
                   name: dhanam-billing-secrets
-                  key: PHYNE_ENGAGEMENT_EVENTS_SECRET
+                  key: PHYND_ENGAGEMENT_EVENTS_SECRET
                   optional: true
             - name: MADFAM_EVENTS_WEBHOOK_SECRET
               valueFrom:

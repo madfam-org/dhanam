@@ -56,7 +56,7 @@ import { PriceResolverService } from './services/price-resolver.service';
 import { PricingEngineService } from './services/pricing-engine.service';
 import { ProductCatalogService } from './services/product-catalog.service';
 import { RevenueMetricsService } from './services/revenue-metrics.service';
-import { PhyneCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
+import { PhyndCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
 import { StripeMxSpeiRelayService } from './services/stripe-mx-spei-relay.service';
 import { StripeMxService } from './services/stripe-mx.service';
 import { SyntheticRevenueProbeService } from './services/synthetic-revenue-probe.service';
@@ -154,7 +154,7 @@ import { UsageAlertsService } from './services/usage-alerts.service';
     PaymentRouterService,
     StripeMxService,
     StripeMxSpeiRelayService,
-    PhyneCrmEngagementNotifierService,
+    PhyndCrmEngagementNotifierService,
     PaddleService,
     // Conekta direct gateway (Wave A — alongside Stripe MX, distinct from
     // Janua-routed Conekta path in JanuaBillingService)

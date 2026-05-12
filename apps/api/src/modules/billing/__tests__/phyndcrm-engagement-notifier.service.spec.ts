@@ -1,5 +1,5 @@
 /**
- * PhyneCrmEngagementNotifierService — fire-and-forget emission to
+ * PhyndCrmEngagementNotifierService — fire-and-forget emission to
  * PhyndCRM's engagement events webhook. Tests cover:
  *   - skipped when envelope has no engagement_id
  *   - skipped when secret or URL unset
@@ -12,7 +12,7 @@ import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { createHmac } from 'crypto';
 
-import { PhyneCrmEngagementNotifierService } from '../services/phyndcrm-engagement-notifier.service';
+import { PhyndCrmEngagementNotifierService } from '../services/phyndcrm-engagement-notifier.service';
 import type { DhanamPaymentEnvelope } from '../services/stripe-mx-spei-relay.service';
 
 const SECRET = 'phynd-events-secret';
@@ -20,9 +20,9 @@ const URL = 'https://phynd-crm.madfam.io';
 
 function mkConfig(overrides: Record<string, unknown> = {}) {
   const values: Record<string, unknown> = {
-    PHYNECRM_API_URL: URL,
-    PHYNE_ENGAGEMENT_EVENTS_SECRET: SECRET,
-    PHYNECRM_WEBHOOK_TIMEOUT: 5000,
+    PHYNDCRM_API_URL: URL,
+    PHYND_ENGAGEMENT_EVENTS_SECRET: SECRET,
+    PHYNDCRM_WEBHOOK_TIMEOUT: 5000,
     ...overrides,
   };
   return {
@@ -53,18 +53,18 @@ function mkEnvelope(
   };
 }
 
-describe('PhyneCrmEngagementNotifierService', () => {
-  let svc: PhyneCrmEngagementNotifierService;
+describe('PhyndCrmEngagementNotifierService', () => {
+  let svc: PhyndCrmEngagementNotifierService;
   let fetchSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        PhyneCrmEngagementNotifierService,
+        PhyndCrmEngagementNotifierService,
         { provide: ConfigService, useValue: mkConfig() },
       ],
     }).compile();
-    svc = module.get(PhyneCrmEngagementNotifierService);
+    svc = module.get(PhyndCrmEngagementNotifierService);
 
     fetchSpy = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
@@ -85,14 +85,14 @@ describe('PhyneCrmEngagementNotifierService', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
-  it('skips when PHYNECRM_API_URL is unset', async () => {
+  it('skips when PHYNDCRM_API_URL is unset', async () => {
     const module = await Test.createTestingModule({
       providers: [
-        PhyneCrmEngagementNotifierService,
-        { provide: ConfigService, useValue: mkConfig({ PHYNECRM_API_URL: '' }) },
+        PhyndCrmEngagementNotifierService,
+        { provide: ConfigService, useValue: mkConfig({ PHYNDCRM_API_URL: '' }) },
       ],
     }).compile();
-    const svc2 = module.get(PhyneCrmEngagementNotifierService);
+    const svc2 = module.get(PhyndCrmEngagementNotifierService);
     await svc2.notify(mkEnvelope({}, { engagement_id: 'eng_1' }));
     expect(fetchSpy).not.toHaveBeenCalled();
   });
@@ -100,11 +100,11 @@ describe('PhyneCrmEngagementNotifierService', () => {
   it('skips when the shared secret is unset', async () => {
     const module = await Test.createTestingModule({
       providers: [
-        PhyneCrmEngagementNotifierService,
-        { provide: ConfigService, useValue: mkConfig({ PHYNE_ENGAGEMENT_EVENTS_SECRET: '' }) },
+        PhyndCrmEngagementNotifierService,
+        { provide: ConfigService, useValue: mkConfig({ PHYND_ENGAGEMENT_EVENTS_SECRET: '' }) },
       ],
     }).compile();
-    const svc2 = module.get(PhyneCrmEngagementNotifierService);
+    const svc2 = module.get(PhyndCrmEngagementNotifierService);
     await svc2.notify(mkEnvelope({}, { engagement_id: 'eng_1' }));
     expect(fetchSpy).not.toHaveBeenCalled();
   });
@@ -192,14 +192,14 @@ describe('PhyneCrmEngagementNotifierService', () => {
     await expect(svc.notify(mkEnvelope({}, { engagement_id: 'eng_1' }))).resolves.toBeUndefined();
   });
 
-  it('strips trailing slash from PHYNECRM_API_URL', async () => {
+  it('strips trailing slash from PHYNDCRM_API_URL', async () => {
     const module = await Test.createTestingModule({
       providers: [
-        PhyneCrmEngagementNotifierService,
-        { provide: ConfigService, useValue: mkConfig({ PHYNECRM_API_URL: `${URL}///` }) },
+        PhyndCrmEngagementNotifierService,
+        { provide: ConfigService, useValue: mkConfig({ PHYNDCRM_API_URL: `${URL}///` }) },
       ],
     }).compile();
-    const svc2 = module.get(PhyneCrmEngagementNotifierService);
+    const svc2 = module.get(PhyndCrmEngagementNotifierService);
     await svc2.notify(mkEnvelope({}, { engagement_id: 'eng_1' }));
     const [urlArg] = fetchSpy.mock.calls[0] as [string, RequestInit];
     expect(urlArg).toBe(`${URL}/api/v1/engagements/events`);

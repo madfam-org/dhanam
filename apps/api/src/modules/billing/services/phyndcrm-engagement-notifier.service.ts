@@ -13,13 +13,13 @@
  * - Idempotent on PhyndCRM's side via a stable `dedup_key`:
  *   `dhanam:<type>:<payment_id>`. A retry of the same envelope is a
  *   no-op there.
- * - HMAC-SHA256 body signature via `PHYNE_ENGAGEMENT_EVENTS_SECRET`
+ * - HMAC-SHA256 body signature via `PHYND_ENGAGEMENT_EVENTS_SECRET`
  *   (same ecosystem-shared secret that Cotiza + Pravara use for the
  *   same endpoint).
  * - Errors logged, never thrown. Stripe's retry ladder still re-delivers
  *   to Dhanam if this ever matters.
  *
- * Endpoint: `POST <PHYNECRM_API_URL>/api/v1/engagements/events`
+ * Endpoint: `POST <PHYNDCRM_API_URL>/api/v1/engagements/events`
  */
 import { createHmac } from 'crypto';
 
@@ -28,7 +28,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { DhanamPaymentEnvelope } from './stripe-mx-spei-relay.service';
 
-export interface PhyneCrmEngagementEventPayload {
+export interface PhyndCrmEngagementEventPayload {
   engagement_id: string;
   source: 'dhanam';
   event_type: 'payment.succeeded' | 'payment.failed' | 'payment.refunded';
@@ -40,16 +40,16 @@ export interface PhyneCrmEngagementEventPayload {
 }
 
 @Injectable()
-export class PhyneCrmEngagementNotifierService {
-  private readonly logger = new Logger(PhyneCrmEngagementNotifierService.name);
+export class PhyndCrmEngagementNotifierService {
+  private readonly logger = new Logger(PhyndCrmEngagementNotifierService.name);
   private readonly apiUrl: string;
   private readonly secret: string;
   private readonly timeoutMs: number;
 
   constructor(private readonly config: ConfigService) {
-    this.apiUrl = this.config.get<string>('PHYNECRM_API_URL', '');
-    this.secret = this.config.get<string>('PHYNE_ENGAGEMENT_EVENTS_SECRET', '');
-    this.timeoutMs = this.config.get<number>('PHYNECRM_WEBHOOK_TIMEOUT', 10_000);
+    this.apiUrl = this.config.get<string>('PHYNDCRM_API_URL', '');
+    this.secret = this.config.get<string>('PHYND_ENGAGEMENT_EVENTS_SECRET', '');
+    this.timeoutMs = this.config.get<number>('PHYNDCRM_WEBHOOK_TIMEOUT', 10_000);
   }
 
   /**
@@ -66,7 +66,7 @@ export class PhyneCrmEngagementNotifierService {
     }
     if (!this.apiUrl || !this.secret) {
       this.logger.warn(
-        'PhyndCRM notify skipped — PHYNECRM_API_URL or PHYNE_ENGAGEMENT_EVENTS_SECRET not configured'
+        'PhyndCRM notify skipped — PHYNDCRM_API_URL or PHYND_ENGAGEMENT_EVENTS_SECRET not configured'
       );
       return;
     }
@@ -107,7 +107,7 @@ export class PhyneCrmEngagementNotifierService {
   private buildPayload(
     envelope: DhanamPaymentEnvelope,
     engagementId: string
-  ): PhyneCrmEngagementEventPayload {
+  ): PhyndCrmEngagementEventPayload {
     const { type, data, id: envelopeId, timestamp } = envelope;
     const eco = data.ecosystem ?? {};
     const human = describeEvent(envelope);

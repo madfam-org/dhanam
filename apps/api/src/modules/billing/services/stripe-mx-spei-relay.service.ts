@@ -87,7 +87,7 @@ import type Stripe from 'stripe';
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 
-import { PhyneCrmEngagementNotifierService } from './phyndcrm-engagement-notifier.service';
+import { PhyndCrmEngagementNotifierService } from './phyndcrm-engagement-notifier.service';
 import { WebhookDlqService } from './webhook-dlq.service';
 
 /** Outbound Dhanam envelope for payment.* events. */
@@ -183,7 +183,7 @@ export class StripeMxSpeiRelayService {
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly audit: AuditService,
-    private readonly phyndcrmNotifier: PhyneCrmEngagementNotifierService,
+    private readonly phyndcrmNotifier: PhyndCrmEngagementNotifierService,
     private readonly dlq: WebhookDlqService
   ) {}
 

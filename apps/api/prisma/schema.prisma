@@ -2510,7 +2510,7 @@ enum AmbassadorTier {
 
 model ReferralReward {
   id              String     @id @default(uuid())
-  referralId      String     @map("referral_id") // Cross-service reference to PhyneCRM referral ID
+  referralId      String     @map("referral_id") // Cross-service reference to PhyndCRM referral ID
   recipientUserId String     @map("recipient_user_id")
   rewardType      RewardType @map("reward_type")
   amount          Int // months for subscription_extension, credits for credit_grant, basis points for tier_discount
