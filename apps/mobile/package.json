@@ -33,7 +33,7 @@
     "axios": ">=1.13.5",
     "expo": "~54.0.33",
     "expo-auth-session": "~55.0.14",
-    "expo-camera": "~15.0.10",
+    "expo-camera": "~55.0.18",
     "expo-constants": "~17.0.8",
     "expo-crypto": "~13.0.2",
     "expo-device": "~8.0.10",
