@@ -56,6 +56,22 @@ spec:
       ports:
         - port: 4300
           protocol: TCP
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: converge-dash
+          podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - converge-api
+                  - converge-worker
+      ports:
+        - port: 80
+          protocol: TCP
+        - port: 4300
+          protocol: TCP
 
 ---
 # --- API Egress: DNS, postgres, redis, HTTPS ---

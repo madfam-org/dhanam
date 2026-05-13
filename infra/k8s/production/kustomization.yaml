@@ -6,6 +6,7 @@ resources:
 - api-deployment.yaml
 - admin-deployment.yaml
 - web-deployment.yaml
+- external-secret.yaml
 - network-policies.yaml
 - pdb.yaml
 

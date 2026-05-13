@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
+import type { ComponentType } from 'react';
 
 import { cn } from '../lib/utils';
 import { Button } from './button';
@@ -75,13 +76,14 @@ export interface EmptyStateProps {
  * ```
  */
 function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
-  const ActionIcon = action?.icon;
+  const DisplayIcon = Icon as ComponentType<{ className?: string }>;
+  const ActionIcon = action?.icon as ComponentType<{ className?: string }> | undefined;
 
   return (
     <Card className={cn('border-dashed', className)}>
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
         <div className="rounded-full bg-muted p-4 mb-4">
-          <Icon className="h-8 w-8 text-muted-foreground" />
+          <DisplayIcon className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="font-semibold text-lg mb-2">{title}</h3>
         {description && (
