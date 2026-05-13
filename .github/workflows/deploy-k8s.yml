@@ -1,5 +1,8 @@
 name: Deploy API to K8s (GHCR)
 
+# MADFAM-ENCLII-FIRST-WORKFLOW-EXCEPTION v1: workflow_dispatch raw K8s path is break-glass only.
+# Routine production deployment must use Enclii web, API, CLI, or GitOps digest promotion.
+
 # Auto-deploy: push to main builds + commits digest → ArgoCD syncs
 # Manual: workflow_dispatch for force-deploy
 

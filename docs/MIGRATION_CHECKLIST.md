@@ -1,5 +1,12 @@
 # Dhanam Migration Checklist
 
+> [!IMPORTANT]
+> MADFAM-ENCLII-FIRST-LEGACY-RAW v1: This document contains legacy raw infrastructure command examples.
+> Routine production operations must use Enclii web, API, or CLI. Treat raw
+> `kubectl`, `helm`, SSH, provider CLI/API, `docker exec`, and direct container
+> access as platform bootstrap or documented break-glass only, and record any
+> missing Enclii adapter gap.
+
 > **Mission**: Migrate Dhanam to Galaxy Ecosystem with Janua OIDC + Hybrid Billing
 > **Target**: Enclii K8s Cluster | **Status**: Ready for Deployment
 
@@ -100,6 +107,7 @@
   - ENCRYPTION_KEY: `_______________`
 
 - [ ] **Generate NextAuth Secret**
+
   ```bash
   openssl rand -base64 32
   ```
@@ -384,9 +392,9 @@ Configure alerts for:
 
 **Approved for Production:** [ ]
 
-**Deployment Lead:** ******\_\_\_******
+**Deployment Lead:** **\*\***\_\_\_**\*\***
 
-**Date:** ******\_\_\_******
+**Date:** **\*\***\_\_\_**\*\***
 
 ---
 

@@ -1,5 +1,8 @@
 name: Deploy via Enclii (K8s)
 
+# MADFAM-ENCLII-FIRST-WORKFLOW-EXCEPTION v1: manual emergency path only until this workflow uses Enclii ops/providers end to end.
+# Routine production deployment must use Enclii web, API, CLI, or GitOps digest promotion.
+
 # Manual deployment workflow for dhanam-web via Enclii.
 # Auto-deploy is handled by deploy-web-k8s.yml (push → build → digest commit → ArgoCD sync).
 # Use this workflow only for manual/emergency deployments.

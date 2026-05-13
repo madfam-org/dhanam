@@ -1,5 +1,12 @@
 # Dhanam Reset Command Documentation
 
+> [!IMPORTANT]
+> MADFAM-ENCLII-FIRST-LEGACY-RAW v1: This document contains legacy raw infrastructure command examples.
+> Routine production operations must use Enclii web, API, or CLI. Treat raw
+> `kubectl`, `helm`, SSH, provider CLI/API, `docker exec`, and direct container
+> access as platform bootstrap or documented break-glass only, and record any
+> missing Enclii adapter gap.
+
 ## Overview
 
 The `./dhanam reset` command provides a comprehensive cleanup and recovery system with multiple reset levels to handle different scenarios.
@@ -7,6 +14,7 @@ The `./dhanam reset` command provides a comprehensive cleanup and recovery syste
 ## Features
 
 ### Interactive Reset Menu
+
 When running `./dhanam reset` without options, you'll see:
 
 1. **Current Status Display**
@@ -23,9 +31,11 @@ When running `./dhanam reset` without options, you'll see:
 ## Reset Levels
 
 ### 1️⃣ Soft Reset
+
 **Purpose**: Quick cleanup while preserving data
 
 **What it does:**
+
 - ✅ Stops application servers
 - ✅ Kills orphaned Node processes
 - ✅ Clears application logs
@@ -33,12 +43,14 @@ When running `./dhanam reset` without options, you'll see:
 - ✅ Cleans temporary build artifacts
 
 **What it preserves:**
+
 - ✓ Database data
 - ✓ Docker volumes
 - ✓ Dependencies (node_modules)
 - ✓ Environment configurations
 
 **Use when:**
+
 - Application is misbehaving
 - Need to clear logs and caches
 - Want to restart cleanly without data loss
@@ -48,10 +60,12 @@ When running `./dhanam reset` without options, you'll see:
 # Select option 1
 ```
 
-### 2️⃣ Hard Reset  
+### 2️⃣ Hard Reset
+
 **Purpose**: Fresh start with clean data
 
 **What it does:**
+
 - ✅ Everything from Soft Reset
 - ✅ Stops Docker containers
 - ✅ Removes all Docker volumes
@@ -61,11 +75,13 @@ When running `./dhanam reset` without options, you'll see:
 - ✅ Removes environment files
 
 **What it preserves:**
+
 - ✓ Dependencies (node_modules)
 - ✓ Package lock files
 - ✓ Docker images
 
 **Use when:**
+
 - Need completely fresh data
 - Database is corrupted
 - Want to test initial setup flow
@@ -77,9 +93,11 @@ When running `./dhanam reset` without options, you'll see:
 ```
 
 ### 3️⃣ Nuclear Reset
+
 **Purpose**: Complete platform cleanup
 
 **What it does:**
+
 - ✅ Everything from Hard Reset
 - ✅ Removes ALL Docker containers
 - ✅ Removes Docker images
@@ -89,9 +107,11 @@ When running `./dhanam reset` without options, you'll see:
 - ✅ Clears all caches
 
 **What it preserves:**
+
 - ✓ Source code only
 
 **Use when:**
+
 - Switching Node/pnpm versions
 - Resolving dependency conflicts
 - Need absolute clean slate
@@ -106,9 +126,11 @@ When running `./dhanam reset` without options, you'll see:
 ```
 
 ### 4️⃣ Fix Database
+
 **Purpose**: Resolve database permission issues
 
 **What it does:**
+
 - ✅ Ensures PostgreSQL container is running
 - ✅ Drops and recreates database
 - ✅ Sets proper ownership and permissions
@@ -117,6 +139,7 @@ When running `./dhanam reset` without options, you'll see:
 - ✅ Attempts schema push
 
 **Use when:**
+
 - Getting Prisma P1010 errors
 - Database permission denied
 - Cannot connect to database
@@ -136,6 +159,7 @@ For automated environments, use the `--quick` flag:
 ```
 
 **What it does:**
+
 - No confirmation required
 - Stops Docker services with volume removal
 - Removes build artifacts
@@ -143,6 +167,7 @@ For automated environments, use the `--quick` flag:
 - Returns immediately
 
 **Perfect for:**
+
 - CI/CD pipelines
 - Automated testing
 - Build scripts
@@ -151,6 +176,7 @@ For automated environments, use the `--quick` flag:
 ## Usage Examples
 
 ### Typical Development Workflow
+
 ```bash
 # After encountering issues
 ./dhanam reset        # Choose option 1 (Soft)
@@ -158,29 +184,33 @@ For automated environments, use the `--quick` flag:
 ```
 
 ### Fresh Demo Environment
+
 ```bash
 ./dhanam reset        # Choose option 2 (Hard)
 ./dhanam up          # Creates fresh demo data
 ```
 
 ### Complete Reinstall
+
 ```bash
 ./dhanam reset        # Choose option 3 (Nuclear)
 ./dhanam up          # Rebuilds everything
 ```
 
 ### Database Issues
+
 ```bash
 ./dhanam reset        # Choose option 4 (Fix DB)
 ./dhanam up          # Start with fixed database
 ```
 
 ### CI/CD Pipeline
+
 ```yaml
 # GitHub Actions example
 - name: Clean environment
   run: ./dhanam reset --quick
-  
+
 - name: Start platform
   run: ./dhanam up
 ```
@@ -188,12 +218,15 @@ For automated environments, use the `--quick` flag:
 ## Troubleshooting
 
 ### Reset Didn't Work?
+
 1. Check for running processes:
+
    ```bash
    ps aux | grep -E "node|docker"
    ```
 
 2. Manually stop Docker:
+
    ```bash
    docker ps -a | grep dhanam | awk '{print $1}' | xargs docker stop
    docker ps -a | grep dhanam | awk '{print $1}' | xargs docker rm
@@ -205,13 +238,17 @@ For automated environments, use the `--quick` flag:
    ```
 
 ### Permission Denied
+
 If you get permission errors:
+
 ```bash
 sudo ./dhanam reset  # Use with caution
 ```
 
 ### Database Still Failing
+
 After Fix Database option:
+
 ```bash
 # Check PostgreSQL logs
 docker logs dhanam-postgres --tail 50
@@ -225,16 +262,19 @@ docker exec dhanam-postgres psql -U dhanam -d dhanam -c "SELECT 1;"
 If platform won't start after reset:
 
 1. **Soft Reset First**
+
    ```bash
    ./dhanam reset  # Try option 1
    ```
 
 2. **Then Hard Reset**
+
    ```bash
    ./dhanam reset  # Try option 2
    ```
 
 3. **Fix Database**
+
    ```bash
    ./dhanam reset  # Try option 4
    ```
@@ -246,19 +286,19 @@ If platform won't start after reset:
 
 ## What Gets Reset
 
-| Component | Soft | Hard | Nuclear | Fix DB |
-|-----------|------|------|---------|--------|
-| App Servers | ✓ | ✓ | ✓ | - |
-| Logs | ✓ | ✓ | ✓ | - |
-| Cache | ✓ | ✓ | ✓ | - |
-| Docker Containers | - | ✓ | ✓ | - |
-| Database Data | - | ✓ | ✓ | ✓ |
-| Docker Volumes | - | ✓ | ✓ | - |
-| Docker Images | - | - | ✓ | - |
-| node_modules | - | - | ✓ | - |
-| Lock Files | - | - | ✓ | - |
-| Environment Files | - | ✓ | ✓ | - |
-| Database Permissions | - | - | - | ✓ |
+| Component            | Soft | Hard | Nuclear | Fix DB |
+| -------------------- | ---- | ---- | ------- | ------ |
+| App Servers          | ✓    | ✓    | ✓       | -      |
+| Logs                 | ✓    | ✓    | ✓       | -      |
+| Cache                | ✓    | ✓    | ✓       | -      |
+| Docker Containers    | -    | ✓    | ✓       | -      |
+| Database Data        | -    | ✓    | ✓       | ✓      |
+| Docker Volumes       | -    | ✓    | ✓       | -      |
+| Docker Images        | -    | -    | ✓       | -      |
+| node_modules         | -    | -    | ✓       | -      |
+| Lock Files           | -    | -    | ✓       | -      |
+| Environment Files    | -    | ✓    | ✓       | -      |
+| Database Permissions | -    | -    | -       | ✓      |
 
 ## Best Practices
 

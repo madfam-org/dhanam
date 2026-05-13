@@ -1,70 +1,16 @@
-# Dhanam Ledger
+# Dhanam
 
-> Comprehensive budget and wealth tracking application with ESG crypto insights, targeting LATAM-first users with multilingual support (English/Spanish).
+Compact LLM context index for this repository.
 
-- Production URLs: app.dhan.am (web), api.dhan.am (API), admin.dhan.am (admin)
-- Part of the MADFAM ecosystem — uses Janua for auth (OIDC SSO) and Enclii for deployment (bare metal K8s)
-- Stack: Next.js 15/16, React Native + Expo, NestJS (Fastify), PostgreSQL (Prisma), Redis (BullMQ)
-- Monorepo: Turborepo + pnpm — 4 apps, 6 packages
-- API: 32 fully implemented modules with Swagger docs
-- Test coverage: 95%+ API, 80%+ frontend, with Playwright E2E and contract tests
-- License: AGPL-3.0
+## Read first
 
-## Getting Started
+- `AGENTS.md` — canonical agent operating instructions.
+- `README.md` — human/product overview when present.
+- `ECOSYSTEM.md` — MADFAM ecosystem and Enclii deployment context when present.
+- `llms-full.txt` — full context map and durable operating contract.
 
-- [Development Guide](https://github.com/madfam-org/dhanam/blob/main/docs/DEVELOPMENT.md): Local development setup, prerequisites, environment variables, and scripts
-- [README](https://github.com/madfam-org/dhanam/blob/main/README.md): Project overview, quick start, and available scripts
-- [Contributing Guide](https://github.com/madfam-org/dhanam/blob/main/CONTRIBUTING.md): Branching strategy, commit conventions, and PR process
+## Production operations
 
-## Architecture
-
-- [Architecture Overview](https://github.com/madfam-org/dhanam/blob/main/docs/architecture/ARCHITECTURE.md): System design, high-level architecture diagram, tech stack details
-- [Software Specification](https://github.com/madfam-org/dhanam/blob/main/docs/architecture/SOFTWARE_SPEC.md): Technical specifications and data architecture
-- [Infrastructure Guide](https://github.com/madfam-org/dhanam/blob/main/docs/INFRASTRUCTURE.md): Cloud services, Docker, and Kubernetes setup
-- [System Context](https://github.com/madfam-org/dhanam/blob/main/SYSTEM_CONTEXT.md): MADFAM ecosystem integration, K8s resources, and troubleshooting
-
-## API Reference
-
-- [API Documentation](https://github.com/madfam-org/dhanam/blob/main/docs/API.md): Full REST API reference with request/response examples
-- [OpenAPI Specification](https://github.com/madfam-org/dhanam/blob/main/API_SPECIFICATION.yaml): Machine-readable OpenAPI spec
-- [Swagger UI](https://api.dhan.am/docs): Interactive API explorer (production)
-
-## Architecture Decision Records
-
-- [ADR-001: NestJS with Fastify](https://github.com/madfam-org/dhanam/blob/main/docs/adr/001-nestjs-fastify.md): Chose Fastify over Express for 5x faster JSON serialization
-- [ADR-002: Prisma ORM](https://github.com/madfam-org/dhanam/blob/main/docs/adr/002-prisma-orm.md): Schema-first ORM with type-safe client and Decimal precision for financial data
-- [ADR-003: Multi-Provider Strategy](https://github.com/madfam-org/dhanam/blob/main/docs/adr/003-multi-provider-strategy.md): Provider orchestration with failover for Belvo, Plaid, Bitso, Zapper, Zillow
-- [ADR-004: Janua Auth Integration](https://github.com/madfam-org/dhanam/blob/main/docs/adr/004-janua-auth-integration.md): MADFAM SSO via OIDC with TOTP 2FA and token rotation
-- [ADR-005: Enclii Deployment](https://github.com/madfam-org/dhanam/blob/main/docs/adr/005-enclii-deployment.md): Auto-deploy to bare metal K8s with zero-downtime rolling updates
-
-## Deployment
-
-- [Deployment Guide](https://github.com/madfam-org/dhanam/blob/main/docs/DEPLOYMENT.md): Production deployment via Enclii, fallback options, and infrastructure details
-- [Launch Operations Runbook](https://github.com/madfam-org/dhanam/blob/main/docs/LAUNCH_OPERATIONS.md): Complete production launch checklist — legal, accounts, infra, app stores, go-to-market
-- [Enclii Configuration](https://github.com/madfam-org/dhanam/blob/main/.enclii.yml): Service definition, domains, autoscaling, SLOs
-
-## Security
-
-- [Security Policy](https://github.com/madfam-org/dhanam/blob/main/SECURITY.md): Vulnerability reporting, response timeline, security features, and audit history
-- [Tech Debt Log](https://github.com/madfam-org/dhanam/blob/main/TECH_DEBT.md): Open technical debt items with severity tracking
-
-## Agent & LLM Context
-
-- [CLAUDE.md](https://github.com/madfam-org/dhanam/blob/main/CLAUDE.md): Agent guidance for Claude Code — critical ecosystem dependencies, implementation guidelines, testing strategy
-- [Agent Manifest](https://github.com/madfam-org/dhanam/blob/main/tools/agent-manifest.json): Machine-readable project metadata — domains, ports, K8s resources, build/test commands
-- [llms-full.txt](https://github.com/madfam-org/dhanam/blob/main/llms-full.txt): Expanded version of this file with inlined documentation content
-
-## Optional
-
-- [Changelog](https://github.com/madfam-org/dhanam/blob/main/CHANGELOG.md): Version history and release notes
-- [Documentation Index](https://github.com/madfam-org/dhanam/blob/main/docs/INDEX.md): Complete docs table of contents with all modules
-- [Mobile App Guide](https://github.com/madfam-org/dhanam/blob/main/docs/MOBILE.md): React Native + Expo development
-- [Admin Dashboard](https://github.com/madfam-org/dhanam/blob/main/docs/ADMIN_DASHBOARD.md): Admin features and user management
-- [CI/CD Guide](https://github.com/madfam-org/dhanam/blob/main/docs/guides/CICD_IMPLEMENTATION_SUMMARY.md): GitHub Actions workflows and quality gates
-- [Test Coverage Guide](https://github.com/madfam-org/dhanam/blob/main/apps/api/TEST_COVERAGE_GUIDE.md): Testing strategy and infrastructure
-- [Implementation Summary](https://github.com/madfam-org/dhanam/blob/main/docs/IMPLEMENTATION_SUMMARY.md): Feature implementation details
-- [Implementation Roadmap](https://github.com/madfam-org/dhanam/blob/main/docs/guides/IMPLEMENTATION_ROADMAP.md): Project roadmap and phases
-- [Phase 2 Summary](https://github.com/madfam-org/dhanam/blob/main/docs/PHASE2-SUMMARY.md): Phase 2 completion report
-- [Phase 3 Plan](https://github.com/madfam-org/dhanam/blob/main/docs/PHASE3-PLAN.md): Upcoming features
-- [Sentry Setup](https://github.com/madfam-org/dhanam/blob/main/docs/SENTRY_SETUP.md): Error tracking configuration
-- [ESG Package](https://github.com/aldoruizluna/Dhanam): Dhanam ESG scoring package for crypto assets
+Routine production operations are Enclii-first. Use Enclii web, API, or CLI
+before raw infrastructure tools. Direct `kubectl`, `helm`, SSH, provider CLIs,
+`docker exec`, or direct container access is bootstrap/break-glass only.

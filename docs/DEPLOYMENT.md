@@ -1,5 +1,12 @@
 # Dhanam Ledger Deployment Guide
 
+> [!IMPORTANT]
+> MADFAM-ENCLII-FIRST-LEGACY-RAW v1: This document contains legacy raw infrastructure command examples.
+> Routine production operations must use Enclii web, API, or CLI. Treat raw
+> `kubectl`, `helm`, SSH, provider CLI/API, `docker exec`, and direct container
+> access as platform bootstrap or documented break-glass only, and record any
+> missing Enclii adapter gap.
+
 > **Last Updated**: 2026-03-03
 
 ## Overview
@@ -8,12 +15,12 @@ Dhanam deploys to bare-metal Kubernetes via **Enclii** (MADFAM's PaaS). The prim
 
 ### Production URLs
 
-| Service | URL |
-|---------|-----|
-| Web Dashboard | `https://app.dhan.am` |
-| Admin Dashboard | `https://admin.dhanam.com` |
-| API Backend | `https://api.dhan.am` |
-| Auth (Janua SSO) | `https://auth.madfam.io` |
+| Service          | URL                        |
+| ---------------- | -------------------------- |
+| Web Dashboard    | `https://app.dhan.am`      |
+| Admin Dashboard  | `https://admin.dhanam.com` |
+| API Backend      | `https://api.dhan.am`      |
+| Auth (Janua SSO) | `https://auth.madfam.io`   |
 
 ### Infrastructure
 
@@ -64,13 +71,13 @@ kubectl -n dhanam set image deployment/dhanam-web \
 
 ### GitHub Actions Workflows
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `ci.yml` | All PRs | Lint, test, typecheck |
-| `deploy-enclii.yml` | Manual dispatch | Fallback Enclii deploy |
-| `deploy-staging.yml` | Push to main | Auto-deploy staging (1 replica, `:main` tags) |
-| `deploy-web-k8s.yml` | Manual dispatch | Web-only K8s deploy |
-| `publish-packages.yml` | Tag / manual | npm publish to npm.madfam.io |
+| Workflow               | Trigger         | Purpose                                       |
+| ---------------------- | --------------- | --------------------------------------------- |
+| `ci.yml`               | All PRs         | Lint, test, typecheck                         |
+| `deploy-enclii.yml`    | Manual dispatch | Fallback Enclii deploy                        |
+| `deploy-staging.yml`   | Push to main    | Auto-deploy staging (1 replica, `:main` tags) |
+| `deploy-web-k8s.yml`   | Manual dispatch | Web-only K8s deploy                           |
+| `publish-packages.yml` | Tag / manual    | npm publish to npm.madfam.io                  |
 
 ---
 
@@ -142,10 +149,10 @@ In CI/production, the `pnpm db:migrate:deploy` script handles this.
 
 The secrets template is at `infra/k8s/production/secrets-template.yaml`. Two Secret resources:
 
-| Secret | Contents |
-|--------|----------|
-| `dhanam-secrets` | `DATABASE_URL`, `REDIS_URL`, `ENCRYPTION_KEY`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, provider keys |
-| `dhanam-billing-secrets` | `STRIPE_MX_*`, `PADDLE_*` |
+| Secret                   | Contents                                                                                                                                                    |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dhanam-secrets`         | `DATABASE_URL`, `REDIS_URL`, `ENCRYPTION_KEY`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, provider keys |
+| `dhanam-billing-secrets` | `STRIPE_MX_*`, `PADDLE_*`                                                                                                                                   |
 
 ```bash
 # Create from template
@@ -174,12 +181,12 @@ kubectl -n dhanam create secret docker-registry ghcr-credentials \
 
 All monitoring manifests live in `infra/k8s/monitoring/`.
 
-| Component | Description |
-|-----------|-------------|
-| **Prometheus** | ServiceMonitor scrapes `/metrics` on port 4300 |
-| **PrometheusRule** | Alert rules CRD (error rate, latency, queue depth) |
-| **Alertmanager** | Critical alerts (1h repeat), warnings (12h repeat); Slack/PagerDuty receivers |
-| **Grafana** | Auto-provisioned dashboards: request rate, error rate, p95 latency, auth failures, queue depth, DB/Redis health, pod restarts |
+| Component          | Description                                                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Prometheus**     | ServiceMonitor scrapes `/metrics` on port 4300                                                                                |
+| **PrometheusRule** | Alert rules CRD (error rate, latency, queue depth)                                                                            |
+| **Alertmanager**   | Critical alerts (1h repeat), warnings (12h repeat); Slack/PagerDuty receivers                                                 |
+| **Grafana**        | Auto-provisioned dashboards: request rate, error rate, p95 latency, auth failures, queue depth, DB/Redis health, pod restarts |
 
 ### Staging
 
@@ -235,11 +242,11 @@ eas build --platform android --profile production
 
 ## Health Checks
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /health` | Basic liveness check |
-| `GET /health/database` | PostgreSQL connectivity and connection count |
-| `GET /health/providers` | Status of Plaid, Belvo, Bitso integrations |
+| Endpoint                | Description                                  |
+| ----------------------- | -------------------------------------------- |
+| `GET /health`           | Basic liveness check                         |
+| `GET /health/database`  | PostgreSQL connectivity and connection count |
+| `GET /health/providers` | Status of Plaid, Belvo, Bitso integrations   |
 
 ---
 

@@ -1,5 +1,12 @@
 # Dhanam Ledger -- Launch Operations Runbook
 
+> [!IMPORTANT]
+> MADFAM-ENCLII-FIRST-LEGACY-RAW v1: This document contains legacy raw infrastructure command examples.
+> Routine production operations must use Enclii web, API, or CLI. Treat raw
+> `kubectl`, `helm`, SSH, provider CLI/API, `docker exec`, and direct container
+> access as platform bootstrap or documented break-glass only, and record any
+> missing Enclii adapter gap.
+
 This runbook covers every step required to take Dhanam from development to production launch. It is organized by dependency chain so that long-lead items start first and shorter tasks fill in around them.
 
 **Production URLs:**
