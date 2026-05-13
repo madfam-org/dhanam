@@ -55,7 +55,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^4.3.6",
-    "zustand": "^5.0.11",
+    "zustand": "^5.0.13",
     "@sentry/nextjs": "^10.50.0"
   },
   "devDependencies": {
