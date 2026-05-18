@@ -493,7 +493,7 @@ Mexico's Ley para Regular las Instituciones de Tecnologia Financiera (Ley Fintec
 - [ ] Copy the `SENTRY_DSN` from each project's settings (Client Keys page).
 - [ ] Optionally configure source maps upload via Sentry CLI in the CI pipeline.
 
-**K8s secret keys:** `dhanam-secrets` -- `sentry-dsn` (shared or per-app, depending on desired separation).
+**K8s secret keys:** `dhanam-secrets` -- `SENTRY_DSN` (shared or per-app, depending on desired separation).
 
 ### 5.13 Email (Resend or SMTP)
 
