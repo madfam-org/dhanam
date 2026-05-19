@@ -4,9 +4,9 @@
 apiVersion: enclii.dev/v1
 kind: Service
 metadata:
-  name: dhanam
-  project: madfam-platform
-  description: Community wealth management with AI-powered insights
+  name: dhanam-web
+  project: dhanam
+  description: Dhanam web app and public landing surface
 
 # RFC 0001 promotion policy — Dhanam is Pattern B (manual gate) because it
 # is the billing boundary for the MADFAM ecosystem. A wrong promote is
@@ -28,6 +28,7 @@ spec:
     args:
       NEXT_PUBLIC_API_URL: https://api.dhan.am/v1
       NEXT_PUBLIC_BASE_URL: https://app.dhan.am
+      NEXT_PUBLIC_ADMIN_URL: https://admin.dhan.am
       NEXT_PUBLIC_OIDC_ISSUER: https://auth.madfam.io
       NEXT_PUBLIC_OIDC_CLIENT_ID: jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t
       NEXT_PUBLIC_JANUA_API_URL: https://auth.madfam.io
@@ -75,6 +76,8 @@ spec:
       value: https://api.dhan.am/v1
     - name: NEXT_PUBLIC_BASE_URL
       value: https://app.dhan.am
+    - name: NEXT_PUBLIC_ADMIN_URL
+      value: https://admin.dhan.am
 
     - name: DATABASE_URL
       valueFrom:

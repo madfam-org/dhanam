@@ -1,0 +1,83 @@
+apiVersion: enclii.dev/v1
+kind: Service
+metadata:
+  name: dhanam-web
+  project: dhanam
+  description: Dhanam web app and public landing surface
+spec:
+  build:
+    type: dockerfile
+    dockerfile: apps/web/Dockerfile
+    context: .
+    args:
+      NEXT_PUBLIC_API_URL: https://api.dhan.am/v1
+      NEXT_PUBLIC_BASE_URL: https://app.dhan.am
+      NEXT_PUBLIC_ADMIN_URL: https://admin.dhan.am
+      NEXT_PUBLIC_OIDC_ISSUER: https://auth.madfam.io
+      NEXT_PUBLIC_OIDC_CLIENT_ID: jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t
+      NEXT_PUBLIC_JANUA_API_URL: https://auth.madfam.io
+      NEXT_PUBLIC_AUTH_MODE: janua
+    source:
+      git:
+        repository: https://github.com/madfam-org/dhanam
+        branch: main
+        autoDeploy: true
+
+  runtime:
+    port: 4200
+    replicas: 2
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+    healthCheck: /api/health
+    readinessProbe:
+      path: /api/health
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+    livenessProbe:
+      path: /api/health
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: PORT
+      value: "4200"
+    - name: NEXT_PUBLIC_API_URL
+      value: https://api.dhan.am/v1
+    - name: NEXT_PUBLIC_BASE_URL
+      value: https://app.dhan.am
+    - name: NEXT_PUBLIC_ADMIN_URL
+      value: https://admin.dhan.am
+    - name: NEXT_PUBLIC_AUTH_MODE
+      value: janua
+    - name: NEXT_PUBLIC_JANUA_API_URL
+      value: https://api.janua.dev
+    - name: NEXT_PUBLIC_OIDC_ISSUER
+      value: https://auth.madfam.io
+    - name: NEXT_PUBLIC_OIDC_CLIENT_ID
+      value: jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t
+
+  domains:
+    - domain: app.dhan.am
+      tls: true
+      tlsIssuer: cloudflare
+      primary: true
+    - domain: dhan.am
+      tls: true
+      tlsIssuer: cloudflare
+    - domain: www.dhan.am
+      tls: true
+      tlsIssuer: cloudflare
+      redirectTo: dhan.am

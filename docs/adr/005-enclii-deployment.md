@@ -42,7 +42,8 @@ Use **Enclii** (MADFAM's internal deployment platform) for all production deploy
    - Better latency for LATAM users (Mexico-based infrastructure)
 
 3. **Developer Experience**
-   - Simple `.enclii.yml` configuration
+   - Explicit service specs in `infra/enclii/services/`
+   - Compatibility `.enclii.yml` for the web service
    - GitHub integration for auto-deploy
    - Preview environments for PRs
    - Built-in secrets management
@@ -90,50 +91,19 @@ GitHub Main Branch
 
 ### Configuration
 
-```yaml
-# .enclii.yml
-name: dhanam
-region: mx-central
+Service-level Enclii specs live in `infra/enclii/services/`:
 
-services:
-  api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-    replicas:
-      min: 3
-      max: 10
-    resources:
-      cpu: 500m
-      memory: 512Mi
-    healthcheck:
-      path: /health
-      interval: 10s
-    env_from:
-      - secret: dhanam-api-secrets
-    domains:
-      - api.dhan.am
+- `dhanam-web.yaml` builds `apps/web/Dockerfile` and serves `app.dhan.am`, `dhan.am`, and `www.dhan.am`.
+- `dhanam-api.yaml` builds `apps/api/Dockerfile` and serves `api.dhan.am`.
+- `dhanam-admin.yaml` builds `apps/admin/Dockerfile` and serves `admin.dhan.am`.
 
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    replicas:
-      min: 2
-      max: 8
-    resources:
-      cpu: 250m
-      memory: 256Mi
-    domains:
-      - app.dhan.am
+The root `.enclii.yml` is retained as the compatibility entrypoint for Enclii's single-file deploy flow and mirrors `dhanam-web.yaml`. The root `enclii.yaml` is the domain/status manifest, not a service reconciliation input.
 
-  admin:
-    build:
-      context: .
-      dockerfile: apps/admin/Dockerfile
-    replicas: 1
-    domains:
-      - admin.dhan.am
+Use Enclii-first service reconciliation when metadata drifts:
+
+```bash
+enclii services-sync --dir infra/enclii/services --project dhanam --reconcile-existing --dry-run
+enclii services-sync --dir infra/enclii/services --project dhanam --reconcile-existing
 ```
 
 ### Deployment Flow
@@ -232,3 +202,4 @@ this.logger.log({
 - [Enclii Documentation](https://docs.enclii.com) (internal)
 - [Kubernetes Deployment Best Practices](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 - `.enclii.yml` in project root
+- `infra/enclii/services/`

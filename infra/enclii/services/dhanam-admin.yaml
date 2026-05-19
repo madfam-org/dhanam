@@ -1,0 +1,54 @@
+apiVersion: enclii.dev/v1
+kind: Service
+metadata:
+  name: dhanam-admin
+  project: dhanam
+  description: Dhanam standalone SRE and finance operations console
+spec:
+  build:
+    type: dockerfile
+    dockerfile: apps/admin/Dockerfile
+    context: .
+    source:
+      git:
+        repository: https://github.com/madfam-org/dhanam
+        branch: main
+        autoDeploy: true
+
+  runtime:
+    port: 3400
+    replicas: 1
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+    healthCheck: /api/health
+    readinessProbe:
+      path: /api/health
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+    livenessProbe:
+      path: /api/health
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: PORT
+      value: "3400"
+
+  domains:
+    - domain: admin.dhan.am
+      tls: true
+      tlsIssuer: cloudflare
+      primary: true

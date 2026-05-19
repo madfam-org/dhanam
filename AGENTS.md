@@ -88,7 +88,8 @@ Dhanam uses **Janua** (MADFAM's own SSO platform) for ALL authentication.
 
 Dhanam uses **Enclii** (MADFAM's own deployment platform) for ALL production deployments.
 
-- **Config file**: `.enclii.yml` (project root)
+- **Web compatibility config**: `.enclii.yml` (project root, mirrors `dhanam-web`)
+- **Service specs**: `infra/enclii/services/` (canonical Enclii service reconciliation source for `dhanam-web`, `dhanam-api`, and `dhanam-admin`)
 - **Domain manifest**: `enclii.yaml` (project root) — declares domains for auto-provisioning
 - **Auto-deploy**: Enabled on `main` branch
 - **Flow**: Push to main → Enclii detects → Builds → Deploys to bare metal K8s
@@ -96,6 +97,8 @@ Dhanam uses **Enclii** (MADFAM's own deployment platform) for ALL production dep
 - Only dhanam-web domains listed (dhan.am, www, app); api/admin domains managed via static tunnel config
 
 **To deploy**: Simply push to main. Enclii handles everything automatically.
+
+**To repair Enclii service metadata drift**: use `enclii services-sync --dir infra/enclii/services --project dhanam --reconcile-existing`. Do not sync from the repository root; `enclii.yaml` is the domain/status manifest and is consumed separately by the platform.
 
 **GitHub Actions Workflows** (`.github/workflows/`):
 

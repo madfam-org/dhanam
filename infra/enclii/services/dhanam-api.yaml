@@ -1,0 +1,54 @@
+apiVersion: enclii.dev/v1
+kind: Service
+metadata:
+  name: dhanam-api
+  project: dhanam
+  description: Dhanam NestJS API and billing ledger boundary
+spec:
+  build:
+    type: dockerfile
+    dockerfile: apps/api/Dockerfile
+    context: .
+    source:
+      git:
+        repository: https://github.com/madfam-org/dhanam
+        branch: main
+        autoDeploy: true
+
+  runtime:
+    port: 4300
+    replicas: 2
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "512Mi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+    healthCheck: /v1/monitoring/health
+    readinessProbe:
+      path: /v1/monitoring/health
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+    livenessProbe:
+      path: /v1/monitoring/health
+      initialDelaySeconds: 45
+      periodSeconds: 20
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: PORT
+      value: "4300"
+
+  domains:
+    - domain: api.dhan.am
+      tls: true
+      tlsIssuer: cloudflare
+      primary: true
