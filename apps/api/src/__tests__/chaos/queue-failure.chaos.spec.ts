@@ -39,15 +39,26 @@ describe('Queue Failure Chaos Tests', () => {
     expect(health.checks.queues.error).toContain('BullMQ connection failed');
   });
 
-  it('failed jobs in queue → queue health is down', async () => {
+  it('failed jobs retained in queue history → queue health is degraded', async () => {
     mockQueueService.getAllQueueStats.mockResolvedValue([
       { name: 'sync', active: 2, waiting: 50, completed: 100, failed: 5 },
       { name: 'email', active: 0, waiting: 0, completed: 50, failed: 0 },
     ]);
 
     const health = await service.getHealthStatus();
-    expect(health.checks.queues.status).toBe('down');
+    expect(health.checks.queues.status).toBe('degraded');
     expect(health.checks.queues.details.failedJobs).toBe(5);
+    expect(health.checks.queues.details.failedQueues).toEqual([{ name: 'sync', failed: 5 }]);
+  });
+
+  it('queue backpressure → queue health is down', async () => {
+    mockQueueService.getAllQueueStats.mockResolvedValue([
+      { name: 'sync', active: 2, waiting: 1001, completed: 100, failed: 0 },
+    ]);
+
+    const health = await service.getHealthStatus();
+    expect(health.checks.queues.status).toBe('down');
+    expect(health.checks.queues.details.backpressure).toBe(true);
   });
 
   it('empty queues are healthy', async () => {

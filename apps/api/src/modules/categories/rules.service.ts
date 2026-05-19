@@ -27,12 +27,25 @@ export interface RuleCondition {
     | 'equals'
     | 'startsWith'
     | 'endsWith'
+    | 'regex'
     | 'greaterThan'
     | 'lessThan'
     | 'between';
   value: string | number;
   valueEnd?: number; // For 'between' operator
   caseInsensitive?: boolean;
+}
+
+interface LegacyRuleCondition {
+  field?: RuleCondition['field'];
+  operator?: RuleCondition['operator'];
+  value?: string | number;
+  valueEnd?: number;
+  caseInsensitive?: boolean;
+  type?: string;
+  descriptionPattern?: string;
+  merchantPattern?: string;
+  accountPattern?: string;
 }
 
 @Injectable()
@@ -205,7 +218,12 @@ export class RulesService {
   }
 
   private evaluateRule(rule: CategoryRule, transaction: Transaction): boolean {
-    return rule.conditions.every((condition) => this.evaluateCondition(condition, transaction));
+    const conditions = this.normalizeRuleConditions(rule.conditions);
+
+    return (
+      conditions.length > 0 &&
+      conditions.every((condition) => this.evaluateCondition(condition, transaction))
+    );
   }
 
   private evaluateCondition(condition: RuleCondition, transaction: Transaction): boolean {
@@ -257,6 +275,12 @@ export class RulesService {
           return field.startsWith(value);
         case 'endsWith':
           return field.endsWith(value);
+        case 'regex':
+          try {
+            return new RegExp(conditionValue, caseInsensitive ? 'i' : undefined).test(fieldValue);
+          } catch {
+            return false;
+          }
         default:
           return false;
       }
@@ -296,10 +320,61 @@ export class RulesService {
       categoryId: rule.categoryId,
       name: rule.name,
       priority: rule.priority,
-      conditions: rule.conditions as RuleCondition[],
+      conditions: this.normalizeRuleConditions(rule.conditions),
       actions,
       enabled: rule.enabled,
     };
+  }
+
+  private normalizeRuleConditions(rawConditions: unknown): RuleCondition[] {
+    if (Array.isArray(rawConditions)) {
+      return rawConditions
+        .map((condition) => this.normalizeRuleCondition(condition))
+        .filter((condition): condition is RuleCondition => condition !== null);
+    }
+
+    const condition = this.normalizeRuleCondition(rawConditions);
+    return condition ? [condition] : [];
+  }
+
+  private normalizeRuleCondition(rawCondition: unknown): RuleCondition | null {
+    if (!rawCondition || typeof rawCondition !== 'object') {
+      return null;
+    }
+
+    const condition = rawCondition as LegacyRuleCondition;
+    if (condition.field && condition.operator && condition.value !== undefined) {
+      return {
+        field: condition.field,
+        operator: condition.operator,
+        value: condition.value,
+        ...(condition.valueEnd !== undefined && { valueEnd: condition.valueEnd }),
+        ...(condition.caseInsensitive !== undefined && {
+          caseInsensitive: condition.caseInsensitive,
+        }),
+      };
+    }
+
+    if (condition.type === 'regex') {
+      const pattern =
+        condition.descriptionPattern || condition.merchantPattern || condition.accountPattern;
+      if (!pattern) {
+        return null;
+      }
+
+      return {
+        field: condition.descriptionPattern
+          ? 'description'
+          : condition.merchantPattern
+            ? 'merchant'
+            : 'account',
+        operator: 'regex',
+        value: pattern,
+        caseInsensitive: true,
+      };
+    }
+
+    return null;
   }
 
   // Predefined common rules for quick setup

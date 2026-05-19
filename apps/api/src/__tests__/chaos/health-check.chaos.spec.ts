@@ -53,6 +53,41 @@ describe('Health Check Chaos Tests', () => {
     expect(health.checks.redis.status).toBe('up');
   });
 
+  it('optional Banxico check is skipped when no token is configured', async () => {
+    const health = await service.getHealthStatus();
+
+    expect(health.checks.external.status).toBe('up');
+    expect(health.checks.external.details?.services).toEqual([
+      {
+        name: 'Banxico',
+        status: 'unconfigured',
+        optional: true,
+      },
+    ]);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('configured Banxico failures are reported as external down', async () => {
+    mockConfig.get.mockImplementation((key: string, defaultValue?: string) => {
+      if (key === 'REDIS_URL') return 'redis://localhost:6379';
+      if (key === 'BANXICO_API_TOKEN') return 'test-token';
+      if (key === 'NODE_ENV') return 'test';
+      return defaultValue;
+    });
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 503 });
+
+    const health = await service.getHealthStatus();
+
+    expect(health.checks.external.status).toBe('down');
+    expect(health.checks.external.details?.services).toEqual([
+      {
+        name: 'Banxico',
+        status: 'down',
+        statusCode: 503,
+      },
+    ]);
+  });
+
   it('database down → degrades overall', async () => {
     mockPrisma.$queryRaw.mockRejectedValue(new Error('Connection refused'));
 
@@ -95,12 +130,26 @@ describe('Health Check Chaos Tests', () => {
     expect(readiness.reason).toContain('shutting down');
   });
 
-  it('queue has failed jobs → queue check is down', async () => {
+  it('queue has retained failed jobs → queue check is degraded', async () => {
     mockQueueService.getAllQueueStats.mockResolvedValue([
       { name: 'sync', active: 0, waiting: 0, completed: 10, failed: 3 },
     ]);
 
     const health = await service.getHealthStatus();
+    expect(health.status).toBe('degraded');
+    expect(health.checks.queues.status).toBe('degraded');
+    expect(health.checks.queues.details?.failedJobs).toBe(3);
+    expect(health.checks.queues.details?.failedQueues).toEqual([{ name: 'sync', failed: 3 }]);
+  });
+
+  it('queue backpressure → queue check is down', async () => {
+    mockQueueService.getAllQueueStats.mockResolvedValue([
+      { name: 'sync', active: 0, waiting: 1001, completed: 10, failed: 0 },
+    ]);
+
+    const health = await service.getHealthStatus();
+    expect(health.status).toBe('degraded');
     expect(health.checks.queues.status).toBe('down');
+    expect(health.checks.queues.details?.backpressure).toBe(true);
   });
 });

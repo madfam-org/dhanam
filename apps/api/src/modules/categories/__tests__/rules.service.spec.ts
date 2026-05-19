@@ -574,6 +574,60 @@ describe('RulesService - Business Logic Tests', () => {
     });
   });
 
+  describe('Legacy Condition Shapes', () => {
+    it('should normalize a single legacy condition object before evaluating', () => {
+      const rule = {
+        id: 'rule-1',
+        categoryId: 'cat-1',
+        name: 'Legacy Merchant',
+        priority: 100,
+        enabled: true,
+        conditions: {
+          field: 'merchant',
+          operator: 'equals',
+          value: 'Whole Foods',
+        },
+      };
+
+      const result = (service as any).evaluateRule(rule, mockTransaction);
+
+      expect(result).toBe(true);
+    });
+
+    it('should support legacy regex pattern conditions', () => {
+      const rule = {
+        id: 'rule-1',
+        categoryId: 'cat-1',
+        name: 'Cloud Software',
+        priority: 100,
+        enabled: true,
+        conditions: {
+          type: 'regex',
+          descriptionPattern: 'whole\\s+foods|aws|slack',
+        },
+      };
+
+      const result = (service as any).evaluateRule(rule, mockTransaction);
+
+      expect(result).toBe(true);
+    });
+
+    it('should not match malformed legacy conditions', () => {
+      const rule = {
+        id: 'rule-1',
+        categoryId: 'cat-1',
+        name: 'Malformed Legacy Rule',
+        priority: 100,
+        enabled: true,
+        conditions: { type: 'regex' },
+      };
+
+      const result = (service as any).evaluateRule(rule, mockTransaction);
+
+      expect(result).toBe(false);
+    });
+  });
+
   describe('Account Field Matching', () => {
     it('should match transactions from specific account', () => {
       // Arrange

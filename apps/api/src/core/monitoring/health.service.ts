@@ -32,7 +32,7 @@ export interface BasicHealthStatus {
 }
 
 export interface HealthCheck {
-  status: 'up' | 'down';
+  status: 'up' | 'down' | 'degraded';
   responseTime?: number;
   error?: string;
   details?: Record<string, unknown>;
@@ -266,13 +266,16 @@ export class HealthService {
     try {
       const queueStats = await this.queueService.getAllQueueStats();
 
-      const hasFailedQueues = queueStats.some((queue: QueueStat) => queue.failed > 0);
+      const failedJobs = queueStats.reduce((sum: number, q: QueueStat) => sum + q.failed, 0);
+      const failedQueues = queueStats
+        .filter((queue: QueueStat) => queue.failed > 0)
+        .map((queue: QueueStat) => ({ name: queue.name, failed: queue.failed }));
       const BACKPRESSURE_THRESHOLD = 1000;
       const hasBackpressure = queueStats.some(
         (queue: QueueStat) => queue.waiting > BACKPRESSURE_THRESHOLD
       );
 
-      const status = hasFailedQueues || hasBackpressure ? 'down' : 'up';
+      const status = hasBackpressure ? 'down' : failedJobs > 0 ? 'degraded' : 'up';
 
       return {
         status,
@@ -283,7 +286,8 @@ export class HealthService {
             (sum: number, q: QueueStat) => sum + q.active + q.waiting + q.completed,
             0
           ),
-          failedJobs: queueStats.reduce((sum: number, q: QueueStat) => sum + q.failed, 0),
+          failedJobs,
+          failedQueues,
           waitingJobs: queueStats.reduce((sum: number, q: QueueStat) => sum + q.waiting, 0),
           backpressure: hasBackpressure,
         },
@@ -300,10 +304,35 @@ export class HealthService {
   private async checkExternalServices(): Promise<HealthCheck> {
     const start = Date.now();
     const checks = [];
+    const banxicoToken =
+      this.configService.get<string>('BANXICO_API_TOKEN', '') ||
+      this.configService.get<string>('BANXICO_SIE_TOKEN', '');
 
-    // Check if external API endpoints are accessible
+    if (!banxicoToken) {
+      return {
+        status: 'up',
+        responseTime: Date.now() - start,
+        details: {
+          services: [
+            {
+              name: 'Banxico',
+              status: 'unconfigured',
+              optional: true,
+            },
+          ],
+        },
+      };
+    }
+
+    // Check the same Banxico SIE surface used by the FX providers. The old
+    // unauthenticated /doc probe returns 404 and creates a false outage.
     const endpoints = [
-      { name: 'Banxico', url: 'https://www.banxico.org.mx/SieAPIRest/service/v1/doc' },
+      {
+        name: 'Banxico',
+        url: `https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/oportuno?token=${encodeURIComponent(
+          banxicoToken
+        )}`,
+      },
     ];
 
     for (const endpoint of endpoints) {
@@ -313,7 +342,7 @@ export class HealthService {
 
         const response = await fetch(endpoint.url, {
           signal: controller.signal,
-          method: 'HEAD',
+          headers: { Accept: 'application/json' },
         });
 
         clearTimeout(timeoutId);
@@ -342,12 +371,14 @@ export class HealthService {
   }
 
   private determineOverallStatus(checks: HealthCheck[]): 'healthy' | 'degraded' | 'unhealthy' {
-    const upCount = checks.filter((check) => check.status === 'up').length;
+    const downCount = checks.filter((check) => check.status === 'down').length;
+    const degradedCount = checks.filter((check) => check.status === 'degraded').length;
     const totalChecks = checks.length;
+    const nonDownCount = totalChecks - downCount;
 
-    if (upCount === totalChecks) {
+    if (downCount === 0 && degradedCount === 0) {
       return 'healthy';
-    } else if (upCount >= totalChecks * 0.7) {
+    } else if (downCount === 0 || nonDownCount >= totalChecks * 0.7) {
       return 'degraded';
     } else {
       return 'unhealthy';
