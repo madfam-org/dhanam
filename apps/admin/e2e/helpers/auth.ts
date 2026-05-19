@@ -80,6 +80,12 @@ async function installApiBackedAdminSession(
 export async function adminLogin(page: Page): Promise<void> {
   const email = process.env.E2E_ADMIN_EMAIL || 'admin@dhanam.demo';
   const password = process.env.E2E_ADMIN_PASSWORD || 'AdminPassword123!';
+  const useApiAuth = process.env.E2E_ADMIN_USE_API_AUTH === 'true';
+
+  if (process.env.CI && !useApiAuth) {
+    await installSyntheticAdminSession(page, email);
+    return;
+  }
 
   try {
     const response = await page.request.post(`${API_BASE}/auth/login`, {

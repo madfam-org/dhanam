@@ -1021,6 +1021,7 @@ jobs:
         run: pnpm exec playwright test --project=chromium
         env:
           E2E_BASE_URL: http://localhost:3400
+          E2E_API_URL: http://localhost:4010/v1
           CI: true
 
       - name: Upload Playwright admin report

@@ -133,6 +133,10 @@ The admin app includes a fully typed API client (`src/lib/api/admin.ts`) with 31
 
 All requests include the auth token from the Zustand store and target the API at `NEXT_PUBLIC_API_URL`.
 
+## Playwright E2E
+
+Admin Playwright tests use a synthetic admin session in CI by default and mock admin API reads at the browser-context layer. Set `E2E_ADMIN_USE_API_AUTH=true` only when a test environment has a seeded admin user and intentionally needs the real login path.
+
 ## Security
 
 - **Cross-subdomain auth**: Cookie-based with `Domain=.dhan.am`
