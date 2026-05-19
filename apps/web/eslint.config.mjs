@@ -14,6 +14,14 @@ const __dirname = dirname(__filename);
 export default [
   ...nextjs,
 
+  {
+    settings: {
+      next: {
+        rootDir: __dirname,
+      },
+    },
+  },
+
   // NOTE: type-aware lint via `projectService: true` was removed because
   // it forced the TS compiler to re-load the full program for each file
   // (~18s per file × thousands of files = the lint hook hung indefinitely).

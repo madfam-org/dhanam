@@ -20,8 +20,21 @@ import { AuthService } from '../auth.service';
 import { SessionService } from '../session.service';
 import { TotpService } from '../totp.service';
 
+const mockRedisClient = {
+  get: jest.fn(),
+  incr: jest.fn(),
+  expire: jest.fn(),
+  del: jest.fn(),
+  set: jest.fn(),
+  quit: jest.fn(),
+  disconnect: jest.fn(),
+};
+
+jest.mock('ioredis', () => jest.fn(() => mockRedisClient));
+
 describe('AuthService', () => {
   let service: AuthService;
+  let module: TestingModule;
   let prisma: jest.Mocked<PrismaService>;
   let jwtService: jest.Mocked<JwtService>;
   let sessionService: jest.Mocked<SessionService>;
@@ -110,14 +123,14 @@ describe('AuthService', () => {
       text: jest.fn().mockResolvedValue(''),
     });
 
-    // Mock Redis constructor - AuthService creates Redis in constructor
-    jest.spyOn(require('ioredis').prototype, 'get').mockResolvedValue(null);
-    jest.spyOn(require('ioredis').prototype, 'incr').mockResolvedValue(1);
-    jest.spyOn(require('ioredis').prototype, 'expire').mockResolvedValue(1);
-    jest.spyOn(require('ioredis').prototype, 'del').mockResolvedValue(1);
-    jest.spyOn(require('ioredis').prototype, 'set').mockResolvedValue('OK');
+    mockRedisClient.get.mockResolvedValue(null);
+    mockRedisClient.incr.mockResolvedValue(1);
+    mockRedisClient.expire.mockResolvedValue(1);
+    mockRedisClient.del.mockResolvedValue(1);
+    mockRedisClient.set.mockResolvedValue('OK');
+    mockRedisClient.quit.mockResolvedValue('OK');
 
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: PrismaService, useValue: mockPrisma },
@@ -140,7 +153,8 @@ describe('AuthService', () => {
     logger = module.get(LoggerService);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await module.close();
     jest.clearAllMocks();
   });
 
@@ -356,9 +370,8 @@ describe('AuthService', () => {
 
     it('should reject login when account is locked', async () => {
       // Override the redis.get mock to return 'locked' for the lockout key check
-      const redisSpy = require('ioredis').prototype.get;
-      redisSpy.mockReset();
-      redisSpy.mockResolvedValue('locked');
+      mockRedisClient.get.mockReset();
+      mockRedisClient.get.mockResolvedValue('locked');
 
       await expect(service.login(loginDto)).rejects.toThrow('Account temporarily locked');
     });
@@ -367,13 +380,12 @@ describe('AuthService', () => {
       // User not found → triggers recordFailedLogin
       prisma.user.findUnique.mockResolvedValue(null);
       // Override redis.incr to return MAX_LOGIN_ATTEMPTS (5)
-      const incrSpy = require('ioredis').prototype.incr;
-      incrSpy.mockReset();
-      incrSpy.mockResolvedValue(5);
+      mockRedisClient.incr.mockReset();
+      mockRedisClient.incr.mockResolvedValue(5);
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
       // Verify lockout was set via redis.set
-      expect(require('ioredis').prototype.set).toHaveBeenCalledWith(
+      expect(mockRedisClient.set).toHaveBeenCalledWith(
         `lockout:${loginDto.email}`,
         'locked',
         'EX',
@@ -657,10 +669,13 @@ describe('AuthService', () => {
 
       // Service returns user object without passwordHash
       expect(result).toBeDefined();
-      expect(result!.id).toBe(mockUser.id);
-      expect(result!.email).toBe(mockUser.email);
-      expect(result!.totpSecret).toBeNull();
-      expect(result!.isActive).toBe(true);
+      if (!result) {
+        throw new Error('Expected validateUser to return a user');
+      }
+      expect(result.id).toBe(mockUser.id);
+      expect(result.email).toBe(mockUser.email);
+      expect(result.totpSecret).toBeNull();
+      expect(result.isActive).toBe(true);
       expect((result as any).passwordHash).toBeUndefined();
       expect(result.passwordHash).toBeUndefined();
     });

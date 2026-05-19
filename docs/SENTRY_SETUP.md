@@ -28,6 +28,7 @@ SENTRY_ENVIRONMENT=production     # development, staging, or production
 **Error Tracking:**
 
 - All 5xx errors automatically captured
+- Next.js web/admin request errors captured through `onRequestError`
 - Full stack traces
 - Request context (URL, method, headers)
 - User context (ID, email) when authenticated
@@ -64,6 +65,21 @@ Automatically removes:
 - `password` query parameters
 
 ## Usage in Code
+
+### Next.js Apps
+
+The web and admin apps use Sentry's Next.js 15 instrumentation convention:
+
+- `src/instrumentation.ts` registers server and edge Sentry config and exports
+  `onRequestError`.
+- `src/instrumentation-client.ts` initializes browser-side Sentry and exports
+  `onRouterTransitionStart` for navigation instrumentation.
+- `sentry.server.config.ts` and `sentry.edge.config.ts` initialize server and
+  edge runtimes.
+
+Do not restore legacy `sentry.client.config.ts`; it triggers a Sentry 10
+migration warning and can leave nested React Server Component request errors
+uncaptured.
 
 ```typescript
 import { SentryService } from '@core/monitoring/sentry.service';

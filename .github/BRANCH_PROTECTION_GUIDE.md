@@ -62,8 +62,14 @@ main
 - [x] `lint` (ESLint from lint.yml)
 - [x] `type-check` (TypeScript from lint.yml)
 - [x] `prettier` (Format check from lint.yml)
+- [x] `check-migrations` (Prisma migration drift validation)
 
 _Note: Status checks will appear in the list after they run at least once._
+
+Local pre-push hooks run `pnpm format:check`, `pnpm typecheck`, `pnpm lint`,
+`pnpm test`, `pnpm build`, and Prisma schema validation. The live migration
+status check only runs locally when `DATABASE_URL` is explicitly supplied; the
+required database-backed drift gate is the `check-migrations` workflow above.
 
 #### ✅ Require conversation resolution before merging
 

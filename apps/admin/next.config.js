@@ -4,6 +4,11 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+  eslint: {
+    // ESLint is enforced by the repo lint gates; keep production builds
+    // focused on compile/type correctness and avoid Next's legacy ESLint probe.
+    ignoreDuringBuilds: true,
+  },
   transpilePackages: ['@dhanam/shared', '@dhanam/ui', '@janua/ui', '@janua/react-sdk'],
 
   env: {
@@ -56,5 +61,7 @@ module.exports = withSentryConfig(nextConfig, {
   silent: true,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
-  disableSourceMapUpload: !process.env.SENTRY_AUTH_TOKEN,
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
 });

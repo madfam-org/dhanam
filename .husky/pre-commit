@@ -1,5 +1,8 @@
 # Quick Jest module resolution check (runs in <2s)
 echo "Checking Jest module resolution..."
+HOOK_DATABASE_URL="${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dhanam_hook?schema=public}"
+export DATABASE_URL="$HOOK_DATABASE_URL"
+
 cd apps/api
 if ! pnpm jest --passWithNoTests --testPathPatterns="nonexistent" 2>&1 | head -5 | grep -q "No tests found"; then
   # Check for module resolution errors
@@ -26,34 +29,22 @@ pnpm lint-staged || {
 # Run TypeScript type checking on affected packages
 # This catches type errors before they reach CI
 echo "Running TypeScript type check..."
-if [ -z "$DATABASE_URL" ]; then
-  echo "⚠️  DATABASE_URL not set — skipping API typecheck (run pnpm dev:infra first)"
-  pnpm turbo typecheck --filter='!@dhanam/api' || {
-    echo "❌ TypeScript errors found."
-    exit 1
-  }
-else
-  pnpm typecheck || {
-    echo "❌ TypeScript errors found. Please fix them before committing."
-    exit 1
-  }
-fi
+pnpm typecheck || {
+  echo "❌ TypeScript errors found. Please fix them before committing."
+  exit 1
+}
 
 # Run tests on changed API files to catch failures before CI
 if git diff --cached --name-only | grep -q "apps/api/"; then
-  if [ -z "$DATABASE_URL" ]; then
-    echo "⚠️  DATABASE_URL not set — skipping API tests (run pnpm dev:infra first)"
-  else
-    echo "🧪 Running tests on affected API files..."
-    cd apps/api
-    # Run jest with bail flag to stop on first failure, --passWithNoTests for files without tests
-    if ! pnpm jest --bail --passWithNoTests --findRelatedTests $(git diff --cached --name-only | grep "apps/api/" | sed 's|apps/api/||g' | tr '\n' ' ') 2>/dev/null; then
-      echo "❌ Test failures detected. Please fix them before committing."
-      exit 1
-    fi
-    cd - > /dev/null
-    echo "✅ API tests passed"
+  echo "🧪 Running tests on affected API files..."
+  cd apps/api
+  # Run jest with bail flag to stop on first failure, --passWithNoTests for files without tests
+  if ! pnpm jest --bail --passWithNoTests --findRelatedTests $(git diff --cached --name-only | grep "apps/api/" | sed 's|apps/api/||g' | tr '\n' ' ') 2>/dev/null; then
+    echo "❌ Test failures detected. Please fix them before committing."
+    exit 1
   fi
+  cd - > /dev/null
+  echo "✅ API tests passed"
 fi
 
 # Check for schema drift if Prisma files changed

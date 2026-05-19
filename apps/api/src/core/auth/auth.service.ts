@@ -15,6 +15,7 @@ import {
   ConflictException,
   Inject,
   forwardRef,
+  OnModuleDestroy,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
@@ -37,7 +38,7 @@ export interface JwtPayload {
 }
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleDestroy {
   private redis: Redis;
 
   constructor(
@@ -52,6 +53,15 @@ export class AuthService {
     private securityConfig: SecurityConfigService
   ) {
     this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    try {
+      await this.redis.quit();
+    } catch {
+      this.logger.warn?.('Redis quit failed during AuthService teardown; disconnecting socket');
+      this.redis.disconnect();
+    }
   }
 
   /**

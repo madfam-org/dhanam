@@ -19,7 +19,7 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
+      "outputs": [],
       "env": ["NODE_ENV"]
     },
     "typecheck": {

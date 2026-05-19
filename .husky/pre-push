@@ -1,32 +1,37 @@
 echo "Running pre-push checks..."
 
+ORIGINAL_DATABASE_URL="${DATABASE_URL:-}"
+HOOK_DATABASE_URL="${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dhanam_hook?schema=public}"
+export DATABASE_URL="$HOOK_DATABASE_URL"
+
+# Verify formatting before spending time on heavier gates.
+pnpm format:check || {
+  echo "❌ Format check failed. Push aborted."
+  exit 1
+}
+
 # Full type check
-if [ -z "$DATABASE_URL" ]; then
-  echo "⚠️  DATABASE_URL not set — skipping API typecheck (run pnpm dev:infra first)"
-  pnpm turbo typecheck --filter='!@dhanam/api' || {
-    echo "❌ Type check failed. Push aborted."
-    exit 1
-  }
-else
-  pnpm typecheck || {
-    echo "❌ Type check failed. Push aborted."
-    exit 1
-  }
-fi
+pnpm typecheck || {
+  echo "❌ Type check failed. Push aborted."
+  exit 1
+}
 
 # Run lint across entire codebase
-if [ -z "$DATABASE_URL" ]; then
-  echo "⚠️  DATABASE_URL not set — skipping API lint (run pnpm dev:infra first)"
-  pnpm turbo lint --filter='!@dhanam/api' || {
-    echo "❌ Lint check failed. Push aborted."
-    exit 1
-  }
-else
-  pnpm lint || {
-    echo "❌ Lint check failed. Push aborted."
-    exit 1
-  }
-fi
+pnpm lint || {
+  echo "❌ Lint check failed. Push aborted."
+  exit 1
+}
+
+# Run the unit test suite before accepting a push.
+pnpm test || {
+  echo "❌ Test suite failed. Push aborted."
+  exit 1
+}
+
+pnpm build || {
+  echo "❌ Build failed. Push aborted."
+  exit 1
+}
 
 # Check if schema.prisma was modified without a migration
 if git diff origin/main --name-only 2>/dev/null | grep -q "prisma/schema.prisma"; then
@@ -39,10 +44,21 @@ if git diff origin/main --name-only 2>/dev/null | grep -q "prisma/schema.prisma"
   fi
 fi
 
-# Check for uncommitted schema drift
-cd apps/api
-if pnpm prisma migrate status 2>&1 | grep -q "have not yet been applied"; then
-  echo "⚠️  Warning: Pending migrations detected"
+# Validate Prisma schema deterministically. Live migration status requires a
+# reachable database, so only run it when the caller has explicitly supplied
+# DATABASE_URL instead of the hook's dummy URL.
+pnpm --filter @dhanam/api exec prisma validate || {
+  echo "❌ Prisma schema validation failed. Push aborted."
+  exit 1
+}
+
+if [ -n "$ORIGINAL_DATABASE_URL" ]; then
+  pnpm --filter @dhanam/api exec prisma migrate status || {
+    echo "❌ Prisma migration status failed. Push aborted."
+    exit 1
+  }
+else
+  echo "ℹ️  DATABASE_URL not supplied; live migration status is covered by CI check-migrations."
 fi
 
 echo "✅ Pre-push checks passed"

@@ -48,6 +48,27 @@ Error: Failed to fetch the engine file at https://binaries.prisma.sh/...
 
 ## Running Tests Locally
 
+### Stability Gates
+
+The default unit test suite must exit cleanly without Jest `forceExit`.
+Chaos tests are intentionally excluded from the default API Jest config and
+run through the dedicated chaos command:
+
+```bash
+pnpm --filter @dhanam/api test
+pnpm --filter @dhanam/api test:chaos
+```
+
+Git hooks use a deterministic dummy `DATABASE_URL` for static API checks so
+API typecheck, lint, and unit tests do not silently skip when local Postgres is
+not exported in the shell. Live migration status still requires an explicit
+`DATABASE_URL`; CI's migration workflow remains the required database-backed
+drift check.
+
+Root `pnpm test` intentionally does not cache coverage artifacts in Turborepo;
+coverage-producing commands such as `pnpm --filter @dhanam/api test:cov` remain
+the source for coverage reports.
+
 ### Prerequisites
 
 1. **Install Dependencies:**

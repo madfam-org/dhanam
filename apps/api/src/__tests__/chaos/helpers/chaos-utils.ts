@@ -45,7 +45,8 @@ export function createPrismaError(
 export function createSlowOperation<T>(delayMs: number, result?: T): () => Promise<T> {
   return () =>
     new Promise((resolve) => {
-      setTimeout(() => resolve(result as T), delayMs);
+      const timeout = setTimeout(() => resolve(result as T), delayMs);
+      timeout.unref?.();
     });
 }
 

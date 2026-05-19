@@ -2,11 +2,25 @@
 // apps/admin — flat config (matches legacy .eslintrc.json — next/core-web-vitals only)
 // =============================================================================
 
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import nextjs from '@dhanam/config/eslint/nextjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   ...nextjs,
+
+  {
+    settings: {
+      next: {
+        rootDir: __dirname,
+      },
+    },
+  },
 
   // Local overrides matching the legacy .eslintrc.json
   {
