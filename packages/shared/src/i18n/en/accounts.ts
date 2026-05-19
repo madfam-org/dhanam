@@ -207,7 +207,8 @@ export const accounts = {
     // Belvo
     belvo: {
       title: 'Connect Mexican Bank Account',
-      description: 'Securely connect your Mexican bank account using Belvo. Your credentials are encrypted and used only to fetch your financial data.',
+      description:
+        'Securely connect your Mexican bank account using Belvo. Your credentials are encrypted and used only to fetch your financial data.',
       securityTitle: 'Bank-Level Security',
       securityEncryption: '256-bit AES encryption for credentials',
       securityReadOnly: 'Read-only access to your accounts',
@@ -219,7 +220,8 @@ export const accounts = {
       usernamePlaceholder: 'Your online banking username',
       passwordLabel: 'Password',
       passwordPlaceholder: 'Your online banking password',
-      readOnlyNotice: "We'll only access your account balances and transaction history. No transfers or payments can be made through this connection.",
+      readOnlyNotice:
+        "We'll only access your account balances and transaction history. No transfers or payments can be made through this connection.",
       connecting: 'Connecting...',
       connectButton: 'Connect Bank Account',
       privacyConsent: "By connecting, you agree to Belvo's",
@@ -233,7 +235,8 @@ export const accounts = {
     // Plaid
     plaid: {
       title: 'Connect US Bank Account',
-      description: 'Securely connect your US bank account using Plaid. Your login credentials are encrypted and never stored on our servers.',
+      description:
+        'Securely connect your US bank account using Plaid. Your login credentials are encrypted and never stored on our servers.',
       securityTitle: 'Bank-Level Security',
       securityEncryption: '256-bit SSL encryption',
       securityReadOnly: 'Read-only access to your accounts',
@@ -254,9 +257,11 @@ export const accounts = {
     // Bitso
     bitso: {
       title: 'Connect Bitso Crypto Account',
-      description: 'Connect your Bitso account to automatically track your cryptocurrency portfolio',
+      description:
+        'Connect your Bitso account to automatically track your cryptocurrency portfolio',
       securityNotice: 'Your API credentials are encrypted and secure.',
-      securityDetail: 'We use bank-level encryption and never store your credentials in plain text.',
+      securityDetail:
+        'We use bank-level encryption and never store your credentials in plain text.',
       howToGetCredentials: 'How to get your Bitso API credentials',
       step1Title: 'Log in to Bitso',
       step1Description: 'and log in to your account',
@@ -266,7 +271,8 @@ export const accounts = {
       step3Description: 'Enable View permission only (read-only access)',
       step4Title: 'Copy Your Credentials',
       step4Description: "Copy your API Key and Secret (you'll only see the secret once!)",
-      permissionsWarning: 'Only enable "View" permissions. Never give trading permissions to third-party applications.',
+      permissionsWarning:
+        'Only enable "View" permissions. Never give trading permissions to third-party applications.',
       supportedCryptos: 'Supported Cryptocurrencies',
       haveCredentials: 'I Have My API Credentials',
       cancel: 'Cancel',
@@ -275,7 +281,8 @@ export const accounts = {
       apiSecretLabel: 'API Secret',
       apiSecretPlaceholder: 'Your Bitso API Secret',
       enableAutoSync: 'Enable automatic portfolio sync',
-      encryptionNotice: 'Your credentials will be encrypted with AES-256 encryption before being stored.',
+      encryptionNotice:
+        'Your credentials will be encrypted with AES-256 encryption before being stored.',
       connecting: 'Connecting...',
       connectButton: 'Connect Bitso Account',
       back: 'Back',

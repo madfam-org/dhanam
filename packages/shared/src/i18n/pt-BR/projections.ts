@@ -46,13 +46,15 @@ export const projections = {
     adjustSavings: 'Ajustar poupança',
     pageDescription: 'Use simulação Monte Carlo para planejar uma aposentadoria segura',
     howItWorks: 'Como funciona',
-    howItWorksBody: 'Esta calculadora executa 10.000 simulações do seu futuro financeiro usando métodos Monte Carlo. Ela modela duas fases: acumulação (poupando até a aposentadoria) e distribuição (gastando durante a aposentadoria). Os resultados mostram a probabilidade do seu dinheiro durar toda a sua expectativa de vida.',
+    howItWorksBody:
+      'Esta calculadora executa 10.000 simulações do seu futuro financeiro usando métodos Monte Carlo. Ela modela duas fases: acumulação (poupando até a aposentadoria) e distribuição (gastando durante a aposentadoria). Os resultados mostram a probabilidade do seu dinheiro durar toda a sua expectativa de vida.',
     tabs: {
       summary: 'Resumo',
       projections: 'Projeções',
     },
     portfolioProjections: 'Projeções de Portfólio de Aposentadoria',
-    twoPhaseSimulation: 'Simulação de duas fases: acumulação até a aposentadoria, depois distribuição',
+    twoPhaseSimulation:
+      'Simulação de duas fases: acumulação até a aposentadoria, depois distribuição',
     finalBalance: 'Saldo Final',
     median: 'Mediana',
     worst10: 'Pior 10%',
@@ -60,14 +62,18 @@ export const projections = {
     '10thPercentile': 'Percentil 10',
     '90thPercentile': 'Percentil 90',
     noProjectionYet: 'Sem projeção de aposentadoria ainda',
-    enterDetailsPrompt: 'Insira seus dados no formulário e clique em "Calcular Plano de Aposentadoria" para ver sua linha do tempo projetada',
+    enterDetailsPrompt:
+      'Insira seus dados no formulário e clique em "Calcular Plano de Aposentadoria" para ver sua linha do tempo projetada',
     understandingResults: 'Entendendo Seus Resultados',
     successRate: 'Taxa de Sucesso',
-    successRateDescription: 'A probabilidade de suas economias de aposentadoria durarem toda a sua expectativa de vida. 75% ou mais é geralmente considerado bom.',
+    successRateDescription:
+      'A probabilidade de suas economias de aposentadoria durarem toda a sua expectativa de vida. 75% ou mais é geralmente considerado bom.',
     percentiles: 'Percentis',
-    percentilesDescription: 'O percentil 10 mostra o resultado do "pior 10%", enquanto o 90 mostra o "melhor 10%". A mediana (percentil 50) é o resultado mais provável.',
+    percentilesDescription:
+      'O percentil 10 mostra o resultado do "pior 10%", enquanto o 90 mostra o "melhor 10%". A mediana (percentil 50) é o resultado mais provável.',
     safeWithdrawalRate: 'Taxa de Retirada Segura',
-    safeWithdrawalRateDescription: 'O valor mensal que você pode retirar com segurança durante sua aposentadoria com 75% de confiança de não ficar sem dinheiro.',
+    safeWithdrawalRateDescription:
+      'O valor mensal que você pode retirar com segurança durante sua aposentadoria com 75% de confiança de não ficar sem dinheiro.',
   },
   scenarios: {
     bestCase: 'Melhor cenário',
@@ -87,7 +93,8 @@ export const projections = {
       title: 'Análise de Cenários',
       description: 'Teste de estresse do seu portfólio contra eventos históricos do mercado',
       howItWorksTitle: 'Como Funciona a Análise de Cenários',
-      howItWorksDescription: 'Esta ferramenta compara a projeção base do seu portfólio com cenários históricos do mercado. Executa duas simulações: uma em condições normais e outra com o choque de mercado selecionado, e mostra o impacto no valor do seu portfólio.',
+      howItWorksDescription:
+        'Esta ferramenta compara a projeção base do seu portfólio com cenários históricos do mercado. Executa duas simulações: uma em condições normais e outra com o choque de mercado selecionado, e mostra o impacto no valor do seu portfólio.',
       portfolioConfiguration: 'Configuração do Portfólio',
       configureDescription: 'Defina os parâmetros base do seu portfólio',
       initialBalance: 'Saldo Inicial',
@@ -112,7 +119,8 @@ export const projections = {
       baselineProjectionDescription: 'Crescimento do portfólio em condições normais de mercado',
       projection: 'Projeção',
       noAnalysisYet: 'Sem análise de cenários ainda',
-      noAnalysisDescription: 'Configure os parâmetros do seu portfólio e selecione um cenário para testar seus investimentos contra eventos históricos do mercado.',
+      noAnalysisDescription:
+        'Configure os parâmetros do seu portfólio e selecione um cenário para testar seus investimentos contra eventos históricos do mercado.',
       getStarted: 'Começar',
       with: 'Com',
     },
@@ -181,7 +189,8 @@ export const projections = {
     includeLinkedAccounts: 'Incluir contas vinculadas',
     includeRecurringTransactions: 'Incluir transações recorrentes',
     noProjection: 'Sem Projeção Ainda',
-    noProjectionDescription: 'Configure seus ajustes e clique em "Gerar Projeção" para ver seu futuro financeiro',
+    noProjectionDescription:
+      'Configure seus ajustes e clique em "Gerar Projeção" para ver seu futuro financeiro',
     attentionRequired: 'Atenção Necessária',
   },
   summary: {

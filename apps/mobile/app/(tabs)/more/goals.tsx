@@ -139,9 +139,7 @@ export default function GoalsScreen() {
                     {/* Goal Header */}
                     <View style={styles.goalHeader}>
                       <View style={styles.goalInfo}>
-                        <View
-                          style={[styles.goalIcon, { backgroundColor: `${goalColor}20` }]}
-                        >
+                        <View style={[styles.goalIcon, { backgroundColor: `${goalColor}20` }]}>
                           <Ionicons
                             name={GOAL_ICONS[goal.type] || 'flag-outline'}
                             size={24}
@@ -162,13 +160,23 @@ export default function GoalsScreen() {
                         <Chip
                           mode="outlined"
                           textStyle={{
-                            color: goal.probability >= 70 ? '#4CAF50' : goal.probability >= 40 ? '#FF9800' : '#F44336',
+                            color:
+                              goal.probability >= 70
+                                ? '#4CAF50'
+                                : goal.probability >= 40
+                                  ? '#FF9800'
+                                  : '#F44336',
                             fontSize: 12,
                           }}
                           style={[
                             styles.probabilityChip,
                             {
-                              borderColor: goal.probability >= 70 ? '#4CAF50' : goal.probability >= 40 ? '#FF9800' : '#F44336',
+                              borderColor:
+                                goal.probability >= 70
+                                  ? '#4CAF50'
+                                  : goal.probability >= 40
+                                    ? '#FF9800'
+                                    : '#F44336',
                             },
                           ]}
                         >
@@ -254,9 +262,7 @@ export default function GoalsScreen() {
                   <Card.Content>
                     <View style={styles.goalHeader}>
                       <View style={styles.goalInfo}>
-                        <View
-                          style={[styles.goalIcon, { backgroundColor: '#E8F5E8' }]}
-                        >
+                        <View style={[styles.goalIcon, { backgroundColor: '#E8F5E8' }]}>
                           <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
                         </View>
                         <View style={styles.goalDetails}>

@@ -1,5 +1,3 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
-import { AuthenticatedRequest } from '@core/types/authenticated-request';
 import { Account, SyncAccountResponse } from '@dhanam/shared';
 import {
   Controller,
@@ -26,6 +24,9 @@ import {
   ApiBadRequestResponse,
   ApiParam,
 } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
+import { AuthenticatedRequest } from '@core/types/authenticated-request';
 
 import { RequireRole } from '../spaces/decorators/require-role.decorator';
 import { SpaceGuard } from '../spaces/guards/space.guard';

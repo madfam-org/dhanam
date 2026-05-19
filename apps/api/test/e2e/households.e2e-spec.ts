@@ -1,7 +1,7 @@
+import { JwtService } from '@nestjs/jwt';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 
 import { createE2EApp } from './helpers/e2e-app.helper';
 import { TestHelper } from './helpers/test.helper';

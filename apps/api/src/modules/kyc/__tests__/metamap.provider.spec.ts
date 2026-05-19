@@ -1,7 +1,7 @@
 import { createHmac } from 'crypto';
 
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { MetaMapProvider } from '../metamap.provider';
 

@@ -47,8 +47,9 @@ describe('DemoAuthService', () => {
     };
 
     // Mock DemoDataBuilder.prototype.buildPersona
-    (DemoDataBuilder as jest.MockedClass<typeof DemoDataBuilder>).prototype.buildPersona =
-      jest.fn().mockResolvedValue(mockUser);
+    (DemoDataBuilder as jest.MockedClass<typeof DemoDataBuilder>).prototype.buildPersona = jest
+      .fn()
+      .mockResolvedValue(mockUser);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -89,9 +90,7 @@ describe('DemoAuthService', () => {
       prismaError.code = 'P2021';
       prisma.user.findUnique.mockRejectedValue(prismaError);
 
-      await expect(service.loginAsPersona('guest')).rejects.toThrow(
-        ServiceUnavailableException
-      );
+      await expect(service.loginAsPersona('guest')).rejects.toThrow(ServiceUnavailableException);
       await expect(service.loginAsPersona('guest')).rejects.toThrow(
         'Demo mode is temporarily unavailable'
       );
@@ -102,9 +101,7 @@ describe('DemoAuthService', () => {
       prismaError.code = 'P2010';
       prisma.user.findUnique.mockRejectedValue(prismaError);
 
-      await expect(service.loginAsPersona('guest')).rejects.toThrow(
-        ServiceUnavailableException
-      );
+      await expect(service.loginAsPersona('guest')).rejects.toThrow(ServiceUnavailableException);
     });
 
     it('should re-throw non-Prisma errors', async () => {
@@ -132,9 +129,7 @@ describe('DemoAuthService', () => {
 
   describe('switchPersona', () => {
     it('should throw NotFoundException for unknown persona', async () => {
-      await expect(service.switchPersona('user-1', 'unknown')).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(service.switchPersona('user-1', 'unknown')).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ServiceUnavailableException on Prisma P2021 error', async () => {
@@ -163,13 +158,7 @@ describe('DemoAuthService', () => {
       const personas = service.getAvailablePersonas();
 
       expect(personas).toHaveLength(5);
-      expect(personas.map((p) => p.key)).toEqual([
-        'guest',
-        'maria',
-        'carlos',
-        'patricia',
-        'diego',
-      ]);
+      expect(personas.map((p) => p.key)).toEqual(['guest', 'maria', 'carlos', 'patricia', 'diego']);
     });
 
     it('should include required fields for each persona', () => {

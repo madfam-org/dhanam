@@ -1,4 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import {
   HttpException,
   HttpStatus,
@@ -10,11 +9,13 @@ import {
   InternalServerErrorException,
   ConflictException,
 } from '@nestjs/common';
-import { PrismaClientKnownRequestError } from '@db';
+import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { GlobalExceptionFilter, ErrorResponse } from '../global-exception.filter';
 import type { SentryService } from '@core/monitoring/sentry.service';
+import { PrismaClientKnownRequestError } from '@db';
+
+import { GlobalExceptionFilter, ErrorResponse } from '../global-exception.filter';
 
 describe('GlobalExceptionFilter', () => {
   let filter: GlobalExceptionFilter;
@@ -60,10 +61,7 @@ describe('GlobalExceptionFilter', () => {
     } as unknown as ArgumentsHost;
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        GlobalExceptionFilter,
-        { provide: 'SentryService', useValue: mockSentryService },
-      ],
+      providers: [GlobalExceptionFilter, { provide: 'SentryService', useValue: mockSentryService }],
     }).compile();
 
     filter = module.get<GlobalExceptionFilter>(GlobalExceptionFilter);

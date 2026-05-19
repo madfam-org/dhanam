@@ -13,17 +13,20 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 ### 1. CI/CD Security Enhancements (.github/workflows/ci.yml)
 
 **CodeQL Static Analysis**
+
 - Added CodeQL security scanning job for JavaScript/TypeScript
 - Automated SAST for every push and pull request
 - Results published to GitHub Security tab
 - Detects CWE vulnerabilities, SQL injection, XSS, etc.
 
 **Security Auditing**
+
 - Added `pnpm audit --audit-level=high` to test job
 - Scans for high/critical npm package vulnerabilities
 - Non-blocking (|| true) to allow CI continuation with warnings
 
 **Ephemeral Secrets**
+
 - Replaced hardcoded test JWT secrets with dynamic generation
 - Test environment: `openssl rand -hex 32` for each CI run
 - E2E environment: GitHub run_id based unique secrets
@@ -33,6 +36,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 ### 2. Docker Container Hardening
 
 **Dockerfile.api Changes**
+
 - Pinned base image: node:25-alpine → node:22-alpine (LTS)
 - Added curl package for health checks
 - Implemented HEALTHCHECK directive (30s interval, 5s timeout)
@@ -41,6 +45,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - dumb-init for proper signal handling
 
 **Dockerfile.web Changes**
+
 - Pinned base image: node:25-alpine → node:22-alpine (LTS)
 - Added curl package for health checks
 - Implemented HEALTHCHECK directive (30s interval, 5s timeout)
@@ -49,6 +54,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - dumb-init for proper signal handling
 
 **Security Benefits**
+
 - Container health monitoring for orchestration
 - Reduced attack surface (LTS, minimal packages)
 - Proper signal forwarding and zombie reaping
@@ -57,6 +63,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 ### 3. Database Backup & Recovery (infra/backup/)
 
 **backup.sh**
+
 - Automated PostgreSQL backup via pg_dump
 - Gzip compression for storage efficiency
 - Optional R2/S3 upload for offsite storage
@@ -66,6 +73,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - Executable permissions set
 
 **restore.sh**
+
 - Guided restore process with confirmation prompt
 - Automated decompression and restore via psql
 - Post-restore validation guidance
@@ -73,6 +81,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - Executable permissions set
 
 **SOC 2 Compliance**
+
 - Addresses CC6.1 (logical access controls - backup isolation)
 - Addresses CC7.2 (system operations - backup automation)
 - Addresses A1.2 (availability - disaster recovery capability)
@@ -82,6 +91,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 ### 4. Database Row-Level Security (infra/db/rls-policies.sql)
 
 **Tenant Isolation Policies**
+
 - RLS enabled on all space-scoped tables:
   - accounts, transactions, budgets, categories
   - transaction_rules, goals, manual_assets
@@ -91,6 +101,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - Defense-in-depth against application-level bugs
 
 **Implementation Requirements**
+
 - Apply after Prisma schema migrations
 - Requires database superuser or table owner
 - API middleware must set session variable per-request:
@@ -99,6 +110,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
   ```
 
 **SOC 2 Compliance**
+
 - Addresses CC6.1 (logical access controls - data segregation)
 - Addresses CC6.2 (prior to issuance - authorization)
 - Database-level enforcement of multi-tenant architecture
@@ -106,6 +118,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 ### 5. Tenant Isolation Testing (apps/api/test/integration/tenant-isolation.spec.ts)
 
 **Test Coverage**
+
 - User A cannot see User B spaces
 - User A cannot see User B accounts
 - User B cannot query User A space directly
@@ -113,6 +126,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - Cross-tenant transaction queries return empty
 
 **Test Methodology**
+
 - Integration test using Prisma Service
 - Creates two isolated users with spaces and accounts
 - Verifies query-level isolation at application layer
@@ -120,35 +134,39 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - Complements RLS policies with application-layer validation
 
 **SOC 2 Compliance**
+
 - Addresses CC7.1 (detection of system changes - continuous testing)
 - Provides evidence of logical access control effectiveness
 - Automated validation in CI pipeline
 
 ## SOC 2 Controls Addressed
 
-| Control | Description | Implementation |
-|---------|-------------|----------------|
-| CC6.1 | Logical and Physical Access Controls | RLS policies, ephemeral secrets, non-root containers |
-| CC6.2 | Prior to Issuance or Modification | RLS authorization at DB level |
-| CC7.1 | Detection of Changes | CodeQL SAST, tenant isolation tests |
-| CC7.2 | System Operations | Backup automation, health checks |
-| A1.2 | Availability - Disaster Recovery | Automated backups with 30-day retention |
+| Control | Description                          | Implementation                                       |
+| ------- | ------------------------------------ | ---------------------------------------------------- |
+| CC6.1   | Logical and Physical Access Controls | RLS policies, ephemeral secrets, non-root containers |
+| CC6.2   | Prior to Issuance or Modification    | RLS authorization at DB level                        |
+| CC7.1   | Detection of Changes                 | CodeQL SAST, tenant isolation tests                  |
+| CC7.2   | System Operations                    | Backup automation, health checks                     |
+| A1.2    | Availability - Disaster Recovery     | Automated backups with 30-day retention              |
 
 ## Deployment Checklist
 
 ### CI/CD Pipeline
+
 - [x] CodeQL workflow active on GitHub
 - [ ] Review initial CodeQL findings and remediate
 - [ ] Configure branch protection rules to require CodeQL pass
 - [ ] Set up Dependabot for dependency vulnerability alerts
 
 ### Docker Containers
+
 - [x] Dockerfiles updated with health checks
 - [ ] Update K8s deployment manifests to use health check endpoints
 - [ ] Test container health monitoring in staging
 - [ ] Configure liveness and readiness probes in production
 
 ### Database Backups
+
 - [x] Backup scripts created with proper permissions
 - [ ] Configure DATABASE_URL in backup environment
 - [ ] Set up K8s CronJob or cron schedule for daily backups
@@ -157,6 +175,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - [ ] Document backup retention and restore RTO/RPO
 
 ### Row-Level Security
+
 - [x] RLS policies SQL file created
 - [ ] Apply rls-policies.sql to production database (after migration)
 - [ ] Implement request middleware to set app.current_user_id
@@ -164,6 +183,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 - [ ] Verify no performance impact from RLS policies
 
 ### Tenant Isolation Testing
+
 - [x] Integration tests created
 - [ ] Add tenant-isolation tests to CI pipeline
 - [ ] Verify tests pass with RLS policies enabled
@@ -172,6 +192,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 ## Security Validation
 
 **Pre-Production Testing**
+
 1. Run CodeQL scan and resolve HIGH/CRITICAL findings
 2. Execute tenant isolation tests with RLS enabled
 3. Test backup/restore cycle with production-size dataset
@@ -179,6 +200,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 5. Load test RLS policies for performance impact
 
 **Production Deployment**
+
 1. Apply RLS policies during maintenance window
 2. Deploy updated containers with health checks
 3. Configure backup CronJob with alerting
@@ -186,6 +208,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 5. Verify tenant isolation via audit log sampling
 
 **Continuous Monitoring**
+
 - CodeQL runs on every PR (automated)
 - Backup success/failure alerts via monitoring
 - Container health status in K8s dashboard
@@ -194,19 +217,20 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 
 ## File Paths Summary
 
-| File | Purpose | Status |
-|------|---------|--------|
-| `.github/workflows/ci.yml` | CI/CD pipeline with security scanning | Modified |
-| `infra/docker/Dockerfile.api` | API container with health checks | Modified |
-| `infra/docker/Dockerfile.web` | Web container with health checks | Modified |
-| `infra/backup/backup.sh` | Automated database backup script | Created |
-| `infra/backup/restore.sh` | Guided database restore script | Created |
-| `infra/db/rls-policies.sql` | Row-level security policies | Created |
-| `apps/api/test/integration/tenant-isolation.spec.ts` | Tenant isolation tests | Created |
+| File                                                 | Purpose                               | Status   |
+| ---------------------------------------------------- | ------------------------------------- | -------- |
+| `.github/workflows/ci.yml`                           | CI/CD pipeline with security scanning | Modified |
+| `infra/docker/Dockerfile.api`                        | API container with health checks      | Modified |
+| `infra/docker/Dockerfile.web`                        | Web container with health checks      | Modified |
+| `infra/backup/backup.sh`                             | Automated database backup script      | Created  |
+| `infra/backup/restore.sh`                            | Guided database restore script        | Created  |
+| `infra/db/rls-policies.sql`                          | Row-level security policies           | Created  |
+| `apps/api/test/integration/tenant-isolation.spec.ts` | Tenant isolation tests                | Created  |
 
 ## Audit Evidence
 
 **SOC 2 Auditor Artifacts**
+
 1. CodeQL scan results from GitHub Security tab
 2. Backup logs with timestamps and file sizes
 3. Tenant isolation test results from CI
@@ -215,6 +239,7 @@ Successfully implemented comprehensive infrastructure security hardening for SOC
 6. Disaster recovery test documentation (quarterly)
 
 **Operational Metrics**
+
 - Backup success rate: Target 99.9%
 - Backup completion time: < 5 minutes
 - CodeQL findings: Target 0 HIGH/CRITICAL

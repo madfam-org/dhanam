@@ -9,44 +9,48 @@ Dhanam integrates with the Zapper API to provide comprehensive DeFi portfolio tr
 ## Supported Protocols
 
 ### Liquidity Protocols
-| Protocol | Networks | Position Types |
-|----------|----------|----------------|
-| Uniswap V2 | Ethereum, Polygon, Arbitrum | Liquidity pools |
+
+| Protocol   | Networks                                    | Position Types         |
+| ---------- | ------------------------------------------- | ---------------------- |
+| Uniswap V2 | Ethereum, Polygon, Arbitrum                 | Liquidity pools        |
 | Uniswap V3 | Ethereum, Polygon, Arbitrum, Optimism, Base | Concentrated liquidity |
-| SushiSwap | Ethereum, Polygon, Arbitrum | Liquidity pools, farms |
-| Curve | Ethereum, Polygon, Arbitrum | Stableswap pools |
-| Balancer | Ethereum, Polygon, Arbitrum | Weighted pools |
+| SushiSwap  | Ethereum, Polygon, Arbitrum                 | Liquidity pools, farms |
+| Curve      | Ethereum, Polygon, Arbitrum                 | Stableswap pools       |
+| Balancer   | Ethereum, Polygon, Arbitrum                 | Weighted pools         |
 
 ### Lending Protocols
-| Protocol | Networks | Position Types |
-|----------|----------|----------------|
-| Aave V2 | Ethereum, Polygon | Lending, borrowing |
-| Aave V3 | Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche | Lending, borrowing |
-| Compound | Ethereum | Lending, borrowing |
-| Maker | Ethereum | Vaults, DAI minting |
+
+| Protocol | Networks                                               | Position Types      |
+| -------- | ------------------------------------------------------ | ------------------- |
+| Aave V2  | Ethereum, Polygon                                      | Lending, borrowing  |
+| Aave V3  | Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche | Lending, borrowing  |
+| Compound | Ethereum                                               | Lending, borrowing  |
+| Maker    | Ethereum                                               | Vaults, DAI minting |
 
 ### Staking & Yield
-| Protocol | Networks | Position Types |
-|----------|----------|----------------|
-| Lido | Ethereum | stETH staking |
-| Yearn | Ethereum | Yield vaults |
-| Convex | Ethereum | Curve LP staking |
+
+| Protocol | Networks | Position Types   |
+| -------- | -------- | ---------------- |
+| Lido     | Ethereum | stETH staking    |
+| Yearn    | Ethereum | Yield vaults     |
+| Convex   | Ethereum | Curve LP staking |
 
 ## Supported Networks
 
-| Network | Chain ID | Native Token |
-|---------|----------|--------------|
-| Ethereum | 1 | ETH |
-| Polygon | 137 | MATIC |
-| Arbitrum | 42161 | ETH |
-| Optimism | 10 | ETH |
-| Base | 8453 | ETH |
-| Avalanche | 43114 | AVAX |
-| BSC | 56 | BNB |
+| Network   | Chain ID | Native Token |
+| --------- | -------- | ------------ |
+| Ethereum  | 1        | ETH          |
+| Polygon   | 137      | MATIC        |
+| Arbitrum  | 42161    | ETH          |
+| Optimism  | 10       | ETH          |
+| Base      | 8453     | ETH          |
+| Avalanche | 43114    | AVAX         |
+| BSC       | 56       | BNB          |
 
 ## Position Types
 
 ### Liquidity Pool
+
 Assets deposited into AMM pools to earn trading fees.
 
 ```typescript
@@ -63,6 +67,7 @@ interface LiquidityPoolPosition {
 ```
 
 ### Lending
+
 Assets supplied to lending protocols to earn interest.
 
 ```typescript
@@ -78,6 +83,7 @@ interface LendingPosition {
 ```
 
 ### Borrowing
+
 Assets borrowed from lending protocols (shown as liabilities).
 
 ```typescript
@@ -93,6 +99,7 @@ interface BorrowingPosition {
 ```
 
 ### Staking
+
 Assets staked to earn protocol rewards.
 
 ```typescript
@@ -108,6 +115,7 @@ interface StakingPosition {
 ```
 
 ### Farming
+
 LP tokens deposited in yield farms for additional rewards.
 
 ```typescript
@@ -122,6 +130,7 @@ interface FarmingPosition {
 ```
 
 ### Vault
+
 Assets deposited in auto-compounding yield strategies.
 
 ```typescript
@@ -145,12 +154,14 @@ GET /defi/positions?spaceId=space_123
 ```
 
 **Query Parameters:**
+
 - `spaceId` (required): Space identifier
 - `protocol`: Filter by protocol name
 - `network`: Filter by network
 - `type`: Filter by position type
 
 **Response:**
+
 ```json
 {
   "positions": [
@@ -222,6 +233,7 @@ Total Net Worth =
 ### Position Valuation
 
 All positions are valued in USD using real-time token prices from Zapper. Values are refreshed:
+
 - **On-demand**: When user requests sync
 - **Scheduled**: Every 4 hours via BullMQ job
 - **Webhook**: Real-time updates for significant price changes
@@ -242,16 +254,17 @@ DEFI_PRICE_CACHE_TTL_MINUTES=5
 
 ### Common Errors
 
-| Error Code | Description | Resolution |
-|------------|-------------|------------|
-| `INVALID_ADDRESS` | Wallet address format invalid | Use checksummed Ethereum address |
-| `UNSUPPORTED_NETWORK` | Network not supported | Use supported networks listed above |
-| `RATE_LIMIT_EXCEEDED` | Zapper API rate limit | Wait and retry, or upgrade API tier |
-| `POSITION_NOT_FOUND` | Position no longer exists | Position may have been closed |
+| Error Code            | Description                   | Resolution                          |
+| --------------------- | ----------------------------- | ----------------------------------- |
+| `INVALID_ADDRESS`     | Wallet address format invalid | Use checksummed Ethereum address    |
+| `UNSUPPORTED_NETWORK` | Network not supported         | Use supported networks listed above |
+| `RATE_LIMIT_EXCEEDED` | Zapper API rate limit         | Wait and retry, or upgrade API tier |
+| `POSITION_NOT_FOUND`  | Position no longer exists     | Position may have been closed       |
 
 ### Retry Strategy
 
 Failed syncs are retried with exponential backoff:
+
 - 1st retry: 1 minute
 - 2nd retry: 5 minutes
 - 3rd retry: 15 minutes
@@ -271,11 +284,7 @@ Failed syncs are retried with exponential backoff:
 ```tsx
 import { DefiPositionsWidget } from '@/components/defi/positions-widget';
 
-<DefiPositionsWidget
-  spaceId={spaceId}
-  showByProtocol={true}
-  showByNetwork={true}
-/>
+<DefiPositionsWidget spaceId={spaceId} showByProtocol={true} showByNetwork={true} />;
 ```
 
 ### Position Details Modal
@@ -283,10 +292,7 @@ import { DefiPositionsWidget } from '@/components/defi/positions-widget';
 ```tsx
 import { DefiPositionDetails } from '@/components/defi/position-details';
 
-<DefiPositionDetails
-  positionId={positionId}
-  showHistory={true}
-/>
+<DefiPositionDetails positionId={positionId} showHistory={true} />;
 ```
 
 ## Related Documentation

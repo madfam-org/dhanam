@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3040",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3040",
     "lint": "eslint ./src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "test": "jest",
@@ -61,6 +61,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@dhanam/config": "workspace:*",
+    "@playwright/test": "^1.52.0",
     "@tailwindcss/postcss": "^4.2.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",

@@ -12,10 +12,7 @@ module.exports = {
     // E2E tests excluded by default - require real infrastructure
     // Run with: pnpm test:e2e
   ],
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '<rootDir>/test/e2e/',
-  ],
+  testPathIgnorePatterns: ['/node_modules/', '<rootDir>/test/e2e/'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.module.ts',
@@ -114,9 +111,7 @@ module.exports = {
       statements: 95, // Target: raised from 83% baseline (Phase 6 coverage expansion)
     },
   },
-  transformIgnorePatterns: [
-    '/node_modules/(?!.*uuid)',
-  ],
+  transformIgnorePatterns: ['/node_modules/(?!.*uuid)'],
   moduleNameMapper: {
     '^@db/(.*)$': '<rootDir>/generated/prisma/$1',
     '^@db$': '<rootDir>/generated/prisma',

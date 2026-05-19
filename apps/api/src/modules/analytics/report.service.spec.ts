@@ -1,26 +1,33 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ReportService } from './report.service';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { AnalyticsService } from './analytics.service';
-import { Decimal } from '@db';
 import { EventEmitter } from 'events';
 
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { PrismaService } from '@core/prisma/prisma.service';
+import { Decimal } from '@db';
+
+import { AnalyticsService } from './analytics.service';
+import { ReportService } from './report.service';
+
 // Mock @dhanam/shared
-jest.mock('@dhanam/shared', () => ({
-  NetWorthResponse: {},
-  CashflowForecast: {},
-  SpendingByCategory: {},
-  IncomeVsExpenses: {},
-  AccountBalanceAnalytics: {},
-  PortfolioAllocation: {},
-  Currency: { USD: 'USD', EUR: 'EUR', MXN: 'MXN' },
-  ANALYTICS: {
-    HISTORY_DAYS: 90,
-    PDF_PAGE_BREAK_Y: 700,
-    SHARE_TOKEN_MAX_HOURS: 720,
-    AMOUNT_DISPLAY_MULTIPLIER: 10_000,
-  },
-}), { virtual: true });
+jest.mock(
+  '@dhanam/shared',
+  () => ({
+    NetWorthResponse: {},
+    CashflowForecast: {},
+    SpendingByCategory: {},
+    IncomeVsExpenses: {},
+    AccountBalanceAnalytics: {},
+    PortfolioAllocation: {},
+    Currency: { USD: 'USD', EUR: 'EUR', MXN: 'MXN' },
+    ANALYTICS: {
+      HISTORY_DAYS: 90,
+      PDF_PAGE_BREAK_Y: 700,
+      SHARE_TOKEN_MAX_HOURS: 720,
+      AMOUNT_DISPLAY_MULTIPLIER: 10_000,
+    },
+  }),
+  { virtual: true }
+);
 
 // Mock pdfkit
 jest.mock('pdfkit', () => {
@@ -243,9 +250,9 @@ describe('ReportService', () => {
     it('should throw error if space not found', async () => {
       mockPrismaService.space.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.generatePdfReport('nonexistent', startDate, endDate)
-      ).rejects.toThrow('Space not found');
+      await expect(service.generatePdfReport('nonexistent', startDate, endDate)).rejects.toThrow(
+        'Space not found'
+      );
     });
 
     it('should fetch transactions within date range', async () => {
@@ -510,17 +517,13 @@ describe('ReportService', () => {
         id: `budget-${i + 1}`,
         name: `Budget ${i + 1}`,
         spaceId: 'space-123',
-        categories: [
-          { id: `cat-${i}`, budgetedAmount: new Decimal(500) },
-        ],
+        categories: [{ id: `cat-${i}`, budgetedAmount: new Decimal(500) }],
       }));
 
       mockPrismaService.budget.findMany.mockResolvedValue(manyBudgets);
       mockPrismaService.transaction.findMany
         .mockResolvedValueOnce(mockTransactions)
-        .mockResolvedValue([
-          { id: 'txn-1', amount: new Decimal(-200) },
-        ]);
+        .mockResolvedValue([{ id: 'txn-1', amount: new Decimal(-200) }]);
 
       const result = await service.generatePdfReport('space-123', startDate, endDate);
 
@@ -724,9 +727,9 @@ describe('ReportService', () => {
     it('should throw error if space not found', async () => {
       mockPrismaService.space.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.generateExcelExport('nonexistent', startDate, endDate)
-      ).rejects.toThrow('Space not found');
+      await expect(service.generateExcelExport('nonexistent', startDate, endDate)).rejects.toThrow(
+        'Space not found'
+      );
     });
 
     it('should fetch space with user information', async () => {

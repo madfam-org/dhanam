@@ -73,7 +73,9 @@ export default function AddAccountScreen() {
           <Card.Content>
             {/* Name */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Account Name</Text>
+              <Text variant="titleMedium" style={styles.label}>
+                Account Name
+              </Text>
               <TextInput
                 mode="outlined"
                 placeholder="e.g., Chase Checking, Coinbase"
@@ -89,17 +91,17 @@ export default function AddAccountScreen() {
 
             {/* Type */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Account Type</Text>
-              <SegmentedButtons
-                value={type}
-                onValueChange={setType}
-                buttons={accountTypes}
-              />
+              <Text variant="titleMedium" style={styles.label}>
+                Account Type
+              </Text>
+              <SegmentedButtons value={type} onValueChange={setType} buttons={accountTypes} />
             </View>
 
             {/* Balance */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Current Balance</Text>
+              <Text variant="titleMedium" style={styles.label}>
+                Current Balance
+              </Text>
               <TextInput
                 mode="outlined"
                 placeholder="0.00"
@@ -114,7 +116,9 @@ export default function AddAccountScreen() {
 
             {/* Currency */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Currency</Text>
+              <Text variant="titleMedium" style={styles.label}>
+                Currency
+              </Text>
               <SegmentedButtons
                 value={currency}
                 onValueChange={setCurrency}
@@ -175,8 +179,13 @@ const styles = StyleSheet.create({
   errorContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 },
   errorText: { fontSize: 14, color: '#F44336' },
   infoBox: {
-    flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#f0f9ff',
-    borderRadius: 12, padding: 14, margin: 20, gap: 10,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#f0f9ff',
+    borderRadius: 12,
+    padding: 14,
+    margin: 20,
+    gap: 10,
   },
   infoText: { flex: 1, fontSize: 13, color: '#0c4a6e', lineHeight: 18 },
   actions: { flexDirection: 'row', padding: 20, gap: 12 },

@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { PrismaService } from '@core/prisma/prisma.service';
 
 import { ProviderSelectionService } from './provider-selection.service';
-import { PrismaService } from '@core/prisma/prisma.service';
 
 // Mock Prisma Provider enum
 jest.mock('@prisma/client', () => ({
@@ -75,17 +76,52 @@ describe('ProviderSelectionService', () => {
       // Plaid has best success rate
       mockPrisma.connectionAttempt.findMany
         .mockResolvedValueOnce([
-          { provider: 'plaid' as any, status: 'success', responseTimeMs: 1000, attemptedAt: new Date() },
-          { provider: 'plaid' as any, status: 'success', responseTimeMs: 1000, attemptedAt: new Date() },
-          { provider: 'plaid' as any, status: 'success', responseTimeMs: 1000, attemptedAt: new Date() },
+          {
+            provider: 'plaid' as any,
+            status: 'success',
+            responseTimeMs: 1000,
+            attemptedAt: new Date(),
+          },
+          {
+            provider: 'plaid' as any,
+            status: 'success',
+            responseTimeMs: 1000,
+            attemptedAt: new Date(),
+          },
+          {
+            provider: 'plaid' as any,
+            status: 'success',
+            responseTimeMs: 1000,
+            attemptedAt: new Date(),
+          },
         ])
         .mockResolvedValueOnce([
-          { provider: 'mx' as any, status: 'success', responseTimeMs: 1500, attemptedAt: new Date() },
-          { provider: 'mx' as any, status: 'failure', responseTimeMs: 2000, attemptedAt: new Date() },
+          {
+            provider: 'mx' as any,
+            status: 'success',
+            responseTimeMs: 1500,
+            attemptedAt: new Date(),
+          },
+          {
+            provider: 'mx' as any,
+            status: 'failure',
+            responseTimeMs: 2000,
+            attemptedAt: new Date(),
+          },
         ])
         .mockResolvedValueOnce([
-          { provider: 'finicity' as any, status: 'success', responseTimeMs: 1500, attemptedAt: new Date() },
-          { provider: 'finicity' as any, status: 'failure', responseTimeMs: 2000, attemptedAt: new Date() },
+          {
+            provider: 'finicity' as any,
+            status: 'success',
+            responseTimeMs: 1500,
+            attemptedAt: new Date(),
+          },
+          {
+            provider: 'finicity' as any,
+            status: 'failure',
+            responseTimeMs: 2000,
+            attemptedAt: new Date(),
+          },
         ]);
 
       const provider = await service.selectOptimalProvider('inst-123', 'US');
@@ -101,13 +137,38 @@ describe('ProviderSelectionService', () => {
       // Belvo has better success rate and cost
       mockPrisma.connectionAttempt.findMany
         .mockResolvedValueOnce([
-          { provider: 'belvo' as any, status: 'success', responseTimeMs: 1000, attemptedAt: new Date() },
-          { provider: 'belvo' as any, status: 'success', responseTimeMs: 1000, attemptedAt: new Date() },
-          { provider: 'belvo' as any, status: 'success', responseTimeMs: 1000, attemptedAt: new Date() },
+          {
+            provider: 'belvo' as any,
+            status: 'success',
+            responseTimeMs: 1000,
+            attemptedAt: new Date(),
+          },
+          {
+            provider: 'belvo' as any,
+            status: 'success',
+            responseTimeMs: 1000,
+            attemptedAt: new Date(),
+          },
+          {
+            provider: 'belvo' as any,
+            status: 'success',
+            responseTimeMs: 1000,
+            attemptedAt: new Date(),
+          },
         ])
         .mockResolvedValueOnce([
-          { provider: 'mx' as any, status: 'success', responseTimeMs: 1500, attemptedAt: new Date() },
-          { provider: 'mx' as any, status: 'failure', responseTimeMs: 2000, attemptedAt: new Date() },
+          {
+            provider: 'mx' as any,
+            status: 'success',
+            responseTimeMs: 1500,
+            attemptedAt: new Date(),
+          },
+          {
+            provider: 'mx' as any,
+            status: 'failure',
+            responseTimeMs: 2000,
+            attemptedAt: new Date(),
+          },
         ]);
 
       const provider = await service.selectOptimalProvider('inst-123', 'MX');
@@ -282,9 +343,7 @@ describe('ProviderSelectionService', () => {
       });
       mockPrisma.providerHealthStatus.findUnique.mockResolvedValue(null);
       // Empty arrays for both providers - no historical data
-      mockPrisma.connectionAttempt.findMany
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([]);
+      mockPrisma.connectionAttempt.findMany.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
       const provider = await service.selectOptimalProvider('inst-123', 'US');
 
@@ -307,7 +366,12 @@ describe('ProviderSelectionService', () => {
       });
       // Attempts with null response times
       mockPrisma.connectionAttempt.findMany.mockResolvedValue([
-        { provider: 'plaid' as any, status: 'success', responseTimeMs: null, attemptedAt: new Date() },
+        {
+          provider: 'plaid' as any,
+          status: 'success',
+          responseTimeMs: null,
+          attemptedAt: new Date(),
+        },
       ]);
 
       const provider = await service.selectOptimalProvider('inst-123', 'US');
@@ -327,7 +391,12 @@ describe('ProviderSelectionService', () => {
       mockPrisma.providerHealthStatus.findUnique.mockResolvedValue(null);
       // No attempt response times
       mockPrisma.connectionAttempt.findMany.mockResolvedValue([
-        { provider: 'plaid' as any, status: 'success', responseTimeMs: null, attemptedAt: new Date() },
+        {
+          provider: 'plaid' as any,
+          status: 'success',
+          responseTimeMs: null,
+          attemptedAt: new Date(),
+        },
       ]);
 
       const provider = await service.selectOptimalProvider('inst-123', 'US');
@@ -675,9 +744,7 @@ describe('ProviderSelectionService', () => {
 
       await service.updateSelectionModel('mx' as any, false, 5000);
 
-      expect(logSpy).toHaveBeenCalledWith(
-        expect.stringContaining('success=false')
-      );
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('success=false'));
     });
   });
 

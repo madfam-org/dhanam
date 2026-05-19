@@ -211,7 +211,7 @@ export class ScheduledReportProcessor implements OnModuleInit {
 
     this.logger.log(`Generating ${reportType} ${format} report for ${email}`);
 
-    let reportBuffer: Buffer | null = null;
+    let reportBuffer: Buffer;
     let contentType: string;
     let filename: string;
 

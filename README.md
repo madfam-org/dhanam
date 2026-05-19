@@ -48,11 +48,12 @@
 
 ## Production Status
 
-| Service       | Domain             | Status               |
-| ------------- | ------------------ | -------------------- |
-| Web Dashboard | `dhanam.com`       | ✅ Running on Enclii |
-| API Backend   | Internal           | ✅ Running on Enclii |
-| Admin Panel   | `admin.dhanam.com` | ✅ Running on Enclii |
+| Service      | Domain          | Status               |
+| ------------ | --------------- | -------------------- |
+| Web App      | `app.dhan.am`   | ✅ Running on Enclii |
+| Landing Page | `dhan.am`       | ✅ Running on Enclii |
+| API Backend  | `api.dhan.am`   | ✅ Running on Enclii |
+| Admin Panel  | `admin.dhan.am` | ✅ Running on Enclii |
 
 **Authentication**: Janua SSO via `@janua/react-sdk` (OIDC with PKCE, handled by SDK)
 
@@ -316,9 +317,9 @@ For detailed testing documentation, see:
 
 The application is deployed via **Enclii** to bare metal K8s (GitOps with ArgoCD):
 
-1. **Production**: Push to `main` → Enclii auto-deploys with pinned image digests
-2. **Staging**: Push to `main` → `deploy-staging.yml` applies `infra/k8s/staging/` (1 replica, `:main` tags)
-3. **Manual/Emergency**: Use `deploy-enclii.yml` or `deploy-k8s.yml` workflows
+1. **Staging**: Push to `main` → `deploy-staging.yml` patches digest-pinned staging images and ArgoCD reconciles.
+2. **Production**: `promote-to-prod.yml` manually promotes a soaked staging digest, or Enclii auto-deploys when configured.
+3. **Break glass**: `deploy-enclii.yml` / `deploy-{k8s,web-k8s,admin-k8s}.yml` are manual emergency paths only.
 
 ```bash
 # Build Docker images (for local testing)

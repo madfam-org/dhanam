@@ -23,15 +23,11 @@ export function createMoney(amount: number, currency: Currency): Money {
   return { amount, currency };
 }
 
-export function convertCurrency(
-  money: Money,
-  toCurrency: Currency,
-  exchangeRate: number
-): Money {
+export function convertCurrency(money: Money, toCurrency: Currency, exchangeRate: number): Money {
   if (money.currency === toCurrency) {
     return money;
   }
-  
+
   return {
     amount: money.amount * exchangeRate,
     currency: toCurrency,

@@ -3,6 +3,7 @@
 ## Test Files Created
 
 ### Core Authentication Tests
+
 1. **auth.service.spec.ts** (17 test cases)
    - Registration flow
    - Login with credentials + TOTP
@@ -22,6 +23,7 @@
    - Token hashing
 
 ### Security Services Tests
+
 4. **log-sanitizer.spec.ts** (25 test cases)
    - Sensitive data redaction
    - JWT pattern detection
@@ -35,6 +37,7 @@
    - Edge cases
 
 ## Total Test Coverage
+
 - **107 test cases** across 5 test suites
 - Core authentication: ~90% coverage
 - Security services: ~85% coverage
@@ -61,7 +64,9 @@ pnpm test:watch
 ```
 
 ## Expected Results
+
 All tests should pass with:
+
 - 0 failed tests
 - 107 passing tests
 - Coverage: ~35-40% overall, ~90% for core auth

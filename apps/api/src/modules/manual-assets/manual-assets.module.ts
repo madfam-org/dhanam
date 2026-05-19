@@ -1,20 +1,20 @@
-import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
 
 import { PrismaModule } from '../../core/prisma/prisma.module';
 import { CollectiblesValuationModule } from '../collectibles-valuation/collectibles-valuation.module';
+import { KarafielService } from '../integrations/karafiel.service';
 import { ZillowModule } from '../integrations/zillow/zillow.module';
 import { SpacesModule } from '../spaces/spaces.module';
 import { StorageModule } from '../storage/storage.module';
 
-import { DocumentService } from './document.service';
-import { DocumentExtractionService } from './document-extraction.service';
 import { ComplianceIngestController } from './compliance-ingest.controller';
+import { DocumentExtractionService } from './document-extraction.service';
+import { DocumentService } from './document.service';
 import { ManualAssetsController } from './manual-assets.controller';
 import { ManualAssetsService } from './manual-assets.service';
 import { PEAnalyticsService } from './pe-analytics.service';
 import { RealEstateValuationService } from './real-estate-valuation.service';
-import { KarafielService } from '../integrations/karafiel.service';
 
 @Module({
   imports: [

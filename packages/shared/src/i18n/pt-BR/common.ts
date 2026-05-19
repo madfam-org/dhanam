@@ -163,7 +163,8 @@ export const common = {
   demoExploringAs: 'Explorando como',
 
   personaGuest: 'Visão Rápida',
-  personaGuestDesc: 'Finanças pessoais básicas: conta, poupança, cartão de crédito, crypto e orçamento mensal.',
+  personaGuestDesc:
+    'Finanças pessoais básicas: conta, poupança, cartão de crédito, crypto e orçamento mensal.',
   personaGuestFeature1: 'Orçamento mensal',
   personaGuestFeature2: 'Visão multi-conta',
   personaGuestFeature3: 'Acompanhamento crypto',
@@ -177,21 +178,24 @@ export const common = {
 
   personaCarlos: 'Carlos Mendoza',
   personaCarlosArchetype: 'Dono de Negócio',
-  personaCarlosDesc: 'Espaços pessoal + negócio, ativos manuais, portfólio de investimentos e colecionáveis.',
+  personaCarlosDesc:
+    'Espaços pessoal + negócio, ativos manuais, portfólio de investimentos e colecionáveis.',
   personaCarlosFeature1: 'Espaços Seu / Meu / Nosso',
   personaCarlosFeature2: 'Orçamento empresarial',
   personaCarlosFeature3: 'Ativos manuais',
 
   personaPatricia: 'Patricia Ruiz',
   personaPatriciaArchetype: 'Alto Patrimônio',
-  personaPatriciaDesc: 'Portfólios de investimento, planejamento patrimonial, contas multi-moeda USD e orçamentos empresariais.',
+  personaPatriciaDesc:
+    'Portfólios de investimento, planejamento patrimonial, contas multi-moeda USD e orçamentos empresariais.',
   personaPatriciaFeature1: 'Planejamento patrimonial',
   personaPatriciaFeature2: 'Contas multi-moeda',
   personaPatriciaFeature3: 'Portfólios de investimento',
 
   personaDiego: 'Diego Navarro',
   personaDiegoArchetype: 'Web3 / DeFi Nativo',
-  personaDiegoDesc: 'Posições DeFi em 4 redes, wallets de gaming, NFTs, tokens de governança DAO e staking.',
+  personaDiegoDesc:
+    'Posições DeFi em 4 redes, wallets de gaming, NFTs, tokens de governança DAO e staking.',
   personaDiegoFeature1: 'DeFi multi-rede',
   personaDiegoFeature2: 'Wallets de gaming e NFTs',
   personaDiegoFeature3: 'Governança DAO',

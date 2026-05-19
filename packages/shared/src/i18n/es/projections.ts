@@ -46,7 +46,8 @@ export const projections = {
     adjustSavings: 'Ajustar ahorro',
     pageDescription: 'Usa simulación Monte Carlo para planear un retiro seguro',
     howItWorks: 'Cómo funciona',
-    howItWorksBody: 'Esta calculadora ejecuta 10,000 simulaciones de tu futuro financiero usando métodos Monte Carlo. Modela dos fases: acumulación (ahorrando hasta el retiro) y retiro (gastando durante el retiro). Los resultados muestran la probabilidad de que tu dinero dure toda tu esperanza de vida.',
+    howItWorksBody:
+      'Esta calculadora ejecuta 10,000 simulaciones de tu futuro financiero usando métodos Monte Carlo. Modela dos fases: acumulación (ahorrando hasta el retiro) y retiro (gastando durante el retiro). Los resultados muestran la probabilidad de que tu dinero dure toda tu esperanza de vida.',
     tabs: {
       summary: 'Resumen',
       projections: 'Proyecciones',
@@ -60,14 +61,18 @@ export const projections = {
     '10thPercentile': 'Percentil 10',
     '90thPercentile': 'Percentil 90',
     noProjectionYet: 'Sin proyección de retiro aún',
-    enterDetailsPrompt: 'Ingresa tus datos en el formulario y haz clic en "Calcular Plan de Retiro" para ver tu línea de tiempo proyectada',
+    enterDetailsPrompt:
+      'Ingresa tus datos en el formulario y haz clic en "Calcular Plan de Retiro" para ver tu línea de tiempo proyectada',
     understandingResults: 'Entendiendo Tus Resultados',
     successRate: 'Tasa de Éxito',
-    successRateDescription: 'La probabilidad de que tus ahorros de retiro duren toda tu esperanza de vida. 75% o más se considera generalmente bueno.',
+    successRateDescription:
+      'La probabilidad de que tus ahorros de retiro duren toda tu esperanza de vida. 75% o más se considera generalmente bueno.',
     percentiles: 'Percentiles',
-    percentilesDescription: 'El percentil 10 muestra el resultado del "peor 10%", mientras que el 90 muestra el "mejor 10%". La mediana (percentil 50) es el resultado más probable.',
+    percentilesDescription:
+      'El percentil 10 muestra el resultado del "peor 10%", mientras que el 90 muestra el "mejor 10%". La mediana (percentil 50) es el resultado más probable.',
     safeWithdrawalRate: 'Tasa de Retiro Segura',
-    safeWithdrawalRateDescription: 'El monto mensual que puedes retirar con seguridad durante tu retiro con 75% de confianza de no quedarte sin dinero.',
+    safeWithdrawalRateDescription:
+      'El monto mensual que puedes retirar con seguridad durante tu retiro con 75% de confianza de no quedarte sin dinero.',
   },
   scenarios: {
     bestCase: 'Mejor escenario',
@@ -87,7 +92,8 @@ export const projections = {
       title: 'Análisis de Escenarios',
       description: 'Prueba de estrés de tu portafolio contra eventos históricos del mercado',
       howItWorksTitle: 'Cómo Funciona el Análisis de Escenarios',
-      howItWorksDescription: 'Esta herramienta compara la proyección base de tu portafolio contra escenarios históricos del mercado. Ejecuta dos simulaciones: una en condiciones normales y otra con el shock de mercado seleccionado, y muestra el impacto en el valor de tu portafolio.',
+      howItWorksDescription:
+        'Esta herramienta compara la proyección base de tu portafolio contra escenarios históricos del mercado. Ejecuta dos simulaciones: una en condiciones normales y otra con el shock de mercado seleccionado, y muestra el impacto en el valor de tu portafolio.',
       portfolioConfiguration: 'Configuración del Portafolio',
       configureDescription: 'Establece los parámetros base de tu portafolio',
       initialBalance: 'Balance Inicial',
@@ -109,10 +115,12 @@ export const projections = {
       crisisDuration: 'Duración de Crisis:',
       months: 'meses',
       baselineProjection: 'Proyección Base',
-      baselineProjectionDescription: 'Crecimiento del portafolio en condiciones normales de mercado',
+      baselineProjectionDescription:
+        'Crecimiento del portafolio en condiciones normales de mercado',
       projection: 'Proyección',
       noAnalysisYet: 'Sin análisis de escenarios aún',
-      noAnalysisDescription: 'Configura los parámetros de tu portafolio y selecciona un escenario para probar tus inversiones contra eventos históricos del mercado.',
+      noAnalysisDescription:
+        'Configura los parámetros de tu portafolio y selecciona un escenario para probar tus inversiones contra eventos históricos del mercado.',
       getStarted: 'Comenzar',
       with: 'Con',
     },
@@ -181,7 +189,8 @@ export const projections = {
     includeLinkedAccounts: 'Incluir cuentas vinculadas',
     includeRecurringTransactions: 'Incluir transacciones recurrentes',
     noProjection: 'Sin Proyección Aún',
-    noProjectionDescription: 'Configura tus ajustes y haz clic en "Generar Proyección" para ver tu futuro financiero',
+    noProjectionDescription:
+      'Configura tus ajustes y haz clic en "Generar Proyección" para ver tu futuro financiero',
     attentionRequired: 'Atención Requerida',
   },
   summary: {

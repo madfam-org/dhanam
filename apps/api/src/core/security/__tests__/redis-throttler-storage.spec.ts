@@ -38,7 +38,7 @@ class RedisThrottlerStorage {
     ttl: number,
     limit: number,
     blockDuration: number,
-    _throttlerName: string,
+    _throttlerName: string
   ): Promise<{
     totalHits: number;
     timeToExpire: number;
@@ -84,7 +84,7 @@ describe('RedisThrottlerStorage', () => {
   describe('increment', () => {
     it('should execute MULTI with INCR and PTTL', async () => {
       mockMulti.exec.mockResolvedValue([
-        [null, 1],  // INCR result
+        [null, 1], // INCR result
         [null, 5000], // PTTL result
       ]);
 
@@ -187,9 +187,18 @@ describe('RedisThrottlerStorage', () => {
     it('should handle concurrent requests to the same key', async () => {
       // Simulate rapid sequential requests
       mockMulti.exec
-        .mockResolvedValueOnce([[null, 1], [null, -1]])
-        .mockResolvedValueOnce([[null, 2], [null, 59000]])
-        .mockResolvedValueOnce([[null, 3], [null, 58000]]);
+        .mockResolvedValueOnce([
+          [null, 1],
+          [null, -1],
+        ])
+        .mockResolvedValueOnce([
+          [null, 2],
+          [null, 59000],
+        ])
+        .mockResolvedValueOnce([
+          [null, 3],
+          [null, 58000],
+        ]);
 
       const results = await Promise.all([
         storage.increment('key', 60000, 10, 0, 'short'),

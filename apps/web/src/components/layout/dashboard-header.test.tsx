@@ -76,8 +76,12 @@ jest.mock('lucide-react', () => ({
 }));
 
 // Mock @janua/react-sdk
+const mockJanuaSignOut = jest.fn().mockResolvedValue(undefined);
 jest.mock('@janua/react-sdk', () => ({
   UserButton: () => <div data-testid="janua-user-button">User Button</div>,
+  useAuth: () => ({
+    signOut: mockJanuaSignOut,
+  }),
 }));
 
 // Mock hooks and stores
@@ -179,6 +183,7 @@ describe('DashboardHeader', () => {
     await user.click(logoutItem);
 
     expect(mockLogout).toHaveBeenCalled();
+    expect(mockJanuaSignOut).toHaveBeenCalled();
     // Wait for the async logout to complete and check redirect
     await new Promise((r) => setTimeout(r, 0));
     expect(mockPush).toHaveBeenCalledWith('/login');

@@ -14,7 +14,7 @@ export const options = {
 export function setup() {
   const auth = login(
     __ENV.TEST_EMAIL || 'loadtest@example.com',
-    __ENV.TEST_PASSWORD || 'LoadTest123!',
+    __ENV.TEST_PASSWORD || 'LoadTest123!'
   );
   return { token: auth?.accessToken };
 }

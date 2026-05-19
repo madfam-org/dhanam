@@ -149,9 +149,7 @@ export default function HouseholdsScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Header Info */}
         <Card style={styles.infoCard}>
@@ -202,12 +200,7 @@ export default function HouseholdsScreen() {
 
                 return (
                   <React.Fragment key={household.id}>
-                    <View
-                      style={[
-                        styles.householdRow,
-                        isSelected && styles.householdRowSelected,
-                      ]}
-                    >
+                    <View style={[styles.householdRow, isSelected && styles.householdRowSelected]}>
                       <Button
                         mode="text"
                         onPress={() => handleHouseholdPress(household)}
@@ -227,7 +220,10 @@ export default function HouseholdsScreen() {
                               {household.name}
                             </Text>
                             <View style={styles.householdMeta}>
-                              <Chip compact style={[styles.typeChip, { backgroundColor: colors.bg }]}>
+                              <Chip
+                                compact
+                                style={[styles.typeChip, { backgroundColor: colors.bg }]}
+                              >
                                 <Text style={[styles.typeChipText, { color: colors.text }]}>
                                   {typeInfo?.label || 'Family'}
                                 </Text>
@@ -312,7 +308,10 @@ export default function HouseholdsScreen() {
                       </Text>
                     </View>
                     <View style={styles.goalStat}>
-                      <Text variant="headlineMedium" style={[styles.goalStatValue, { color: '#4CAF50' }]}>
+                      <Text
+                        variant="headlineMedium"
+                        style={[styles.goalStatValue, { color: '#4CAF50' }]}
+                      >
                         {goalSummary.activeGoals}
                       </Text>
                       <Text variant="bodySmall" style={styles.goalStatLabel}>
@@ -320,7 +319,10 @@ export default function HouseholdsScreen() {
                       </Text>
                     </View>
                     <View style={styles.goalStat}>
-                      <Text variant="headlineMedium" style={[styles.goalStatValue, { color: '#2196F3' }]}>
+                      <Text
+                        variant="headlineMedium"
+                        style={[styles.goalStatValue, { color: '#2196F3' }]}
+                      >
                         {goalSummary.achievedGoals}
                       </Text>
                       <Text variant="bodySmall" style={styles.goalStatLabel}>
@@ -334,7 +336,10 @@ export default function HouseholdsScreen() {
                       Total Target Amount
                     </Text>
                     <Text variant="titleMedium" style={styles.targetValue}>
-                      {formatCurrency(goalSummary.totalTargetAmount, selectedHousehold.baseCurrency)}
+                      {formatCurrency(
+                        goalSummary.totalTargetAmount,
+                        selectedHousehold.baseCurrency
+                      )}
                     </Text>
                   </View>
                 </Card.Content>

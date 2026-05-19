@@ -8,12 +8,12 @@ The Manual Assets module enables users to track assets that cannot be automatica
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| `ManualAsset` | User-entered asset with type, value, and metadata |
-| `ManualAssetValuation` | Historical valuation entries for tracking value changes |
-| `PECashFlow` | Private equity cash flows (capital calls, distributions) |
-| `Document` | Attached documents stored in Cloudflare R2 |
+| Entity                 | Description                                              |
+| ---------------------- | -------------------------------------------------------- |
+| `ManualAsset`          | User-entered asset with type, value, and metadata        |
+| `ManualAssetValuation` | Historical valuation entries for tracking value changes  |
+| `PECashFlow`           | Private equity cash flows (capital calls, distributions) |
+| `Document`             | Attached documents stored in Cloudflare R2               |
 
 ### Asset Types
 
@@ -41,7 +41,7 @@ interface RealEstateMetadata {
   bathrooms?: number;
   yearBuilt?: number;
   lotSize?: number;
-  zpid?: string;           // Zillow Property ID
+  zpid?: string; // Zillow Property ID
   lastZillowSync?: string;
   zillowEnabled?: boolean;
 }
@@ -51,46 +51,46 @@ interface RealEstateMetadata {
 
 ### Core Asset Management
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/spaces/:spaceId/manual-assets` | JWT | List all manual assets |
-| `GET` | `/spaces/:spaceId/manual-assets/summary` | JWT | Get totals by asset type |
-| `GET` | `/spaces/:spaceId/manual-assets/:id` | JWT | Get single asset details |
-| `POST` | `/spaces/:spaceId/manual-assets` | JWT | Create new manual asset |
-| `PATCH` | `/spaces/:spaceId/manual-assets/:id` | JWT | Update asset |
-| `DELETE` | `/spaces/:spaceId/manual-assets/:id` | JWT | Delete asset (admin only) |
-| `POST` | `/spaces/:spaceId/manual-assets/:id/valuations` | JWT | Add valuation entry |
+| Method   | Endpoint                                        | Auth | Description               |
+| -------- | ----------------------------------------------- | ---- | ------------------------- |
+| `GET`    | `/spaces/:spaceId/manual-assets`                | JWT  | List all manual assets    |
+| `GET`    | `/spaces/:spaceId/manual-assets/summary`        | JWT  | Get totals by asset type  |
+| `GET`    | `/spaces/:spaceId/manual-assets/:id`            | JWT  | Get single asset details  |
+| `POST`   | `/spaces/:spaceId/manual-assets`                | JWT  | Create new manual asset   |
+| `PATCH`  | `/spaces/:spaceId/manual-assets/:id`            | JWT  | Update asset              |
+| `DELETE` | `/spaces/:spaceId/manual-assets/:id`            | JWT  | Delete asset (admin only) |
+| `POST`   | `/spaces/:spaceId/manual-assets/:id/valuations` | JWT  | Add valuation entry       |
 
 ### Private Equity Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/spaces/:spaceId/manual-assets/pe/portfolio` | JWT | Get PE portfolio summary |
-| `GET` | `/spaces/:spaceId/manual-assets/:id/performance` | JWT | Get IRR, TVPI, DPI metrics |
-| `GET` | `/spaces/:spaceId/manual-assets/:id/cash-flows` | JWT | List cash flows |
-| `POST` | `/spaces/:spaceId/manual-assets/:id/cash-flows` | JWT | Add cash flow |
-| `DELETE` | `/spaces/:spaceId/manual-assets/:id/cash-flows/:cashFlowId` | JWT | Delete cash flow |
+| Method   | Endpoint                                                    | Auth | Description                |
+| -------- | ----------------------------------------------------------- | ---- | -------------------------- |
+| `GET`    | `/spaces/:spaceId/manual-assets/pe/portfolio`               | JWT  | Get PE portfolio summary   |
+| `GET`    | `/spaces/:spaceId/manual-assets/:id/performance`            | JWT  | Get IRR, TVPI, DPI metrics |
+| `GET`    | `/spaces/:spaceId/manual-assets/:id/cash-flows`             | JWT  | List cash flows            |
+| `POST`   | `/spaces/:spaceId/manual-assets/:id/cash-flows`             | JWT  | Add cash flow              |
+| `DELETE` | `/spaces/:spaceId/manual-assets/:id/cash-flows/:cashFlowId` | JWT  | Delete cash flow           |
 
 ### Document Management
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/spaces/:spaceId/manual-assets/document-config` | JWT | Get upload configuration |
-| `GET` | `/spaces/:spaceId/manual-assets/:id/documents` | JWT | List asset documents |
-| `POST` | `/spaces/:spaceId/manual-assets/:id/documents/upload-url` | JWT | Get presigned upload URL |
-| `POST` | `/spaces/:spaceId/manual-assets/:id/documents/confirm` | JWT | Confirm upload completion |
-| `GET` | `/spaces/:spaceId/manual-assets/:id/documents/:key/download-url` | JWT | Get presigned download URL |
-| `DELETE` | `/spaces/:spaceId/manual-assets/:id/documents/:key` | JWT | Delete document |
+| Method   | Endpoint                                                         | Auth | Description                |
+| -------- | ---------------------------------------------------------------- | ---- | -------------------------- |
+| `GET`    | `/spaces/:spaceId/manual-assets/document-config`                 | JWT  | Get upload configuration   |
+| `GET`    | `/spaces/:spaceId/manual-assets/:id/documents`                   | JWT  | List asset documents       |
+| `POST`   | `/spaces/:spaceId/manual-assets/:id/documents/upload-url`        | JWT  | Get presigned upload URL   |
+| `POST`   | `/spaces/:spaceId/manual-assets/:id/documents/confirm`           | JWT  | Confirm upload completion  |
+| `GET`    | `/spaces/:spaceId/manual-assets/:id/documents/:key/download-url` | JWT  | Get presigned download URL |
+| `DELETE` | `/spaces/:spaceId/manual-assets/:id/documents/:key`              | JWT  | Delete document            |
 
 ### Zillow Integration
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/spaces/:spaceId/manual-assets/:id/zillow/link` | JWT | Link property to Zillow |
-| `POST` | `/spaces/:spaceId/manual-assets/:id/zillow/unlink` | JWT | Unlink from Zillow |
-| `POST` | `/spaces/:spaceId/manual-assets/:id/zillow/refresh` | JWT | Refresh Zestimate |
-| `GET` | `/spaces/:spaceId/manual-assets/:id/zillow/summary` | JWT | Get valuation summary |
-| `POST` | `/spaces/:spaceId/manual-assets/real-estate/refresh-all` | JWT | Refresh all properties |
+| Method | Endpoint                                                 | Auth | Description             |
+| ------ | -------------------------------------------------------- | ---- | ----------------------- |
+| `POST` | `/spaces/:spaceId/manual-assets/:id/zillow/link`         | JWT  | Link property to Zillow |
+| `POST` | `/spaces/:spaceId/manual-assets/:id/zillow/unlink`       | JWT  | Unlink from Zillow      |
+| `POST` | `/spaces/:spaceId/manual-assets/:id/zillow/refresh`      | JWT  | Refresh Zestimate       |
+| `GET`  | `/spaces/:spaceId/manual-assets/:id/zillow/summary`      | JWT  | Get valuation summary   |
+| `POST` | `/spaces/:spaceId/manual-assets/real-estate/refresh-all` | JWT  | Refresh all properties  |
 
 ### Example Requests
 
@@ -187,26 +187,26 @@ Cash Flows -> IRR Calculation (Newton-Raphson)
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `ZILLOW_API_KEY` | Zillow API key for property lookups | For real estate |
-| `R2_ACCOUNT_ID` | Cloudflare R2 account ID | For documents |
-| `R2_ACCESS_KEY_ID` | R2 access key | For documents |
-| `R2_SECRET_ACCESS_KEY` | R2 secret key | For documents |
-| `R2_BUCKET_NAME` | R2 bucket name | For documents |
+| Variable               | Description                         | Required        |
+| ---------------------- | ----------------------------------- | --------------- |
+| `ZILLOW_API_KEY`       | Zillow API key for property lookups | For real estate |
+| `R2_ACCOUNT_ID`        | Cloudflare R2 account ID            | For documents   |
+| `R2_ACCESS_KEY_ID`     | R2 access key                       | For documents   |
+| `R2_SECRET_ACCESS_KEY` | R2 secret key                       | For documents   |
+| `R2_BUCKET_NAME`       | R2 bucket name                      | For documents   |
 
 ### Document Categories
 
 ```typescript
 const DOCUMENT_CATEGORIES = [
-  'deed',        // Property deeds
-  'title',       // Title documents
-  'appraisal',   // Appraisal reports
-  'insurance',   // Insurance policies
-  'tax',         // Tax documents
-  'receipt',     // Purchase receipts
+  'deed', // Property deeds
+  'title', // Title documents
+  'appraisal', // Appraisal reports
+  'insurance', // Insurance policies
+  'tax', // Tax documents
+  'receipt', // Purchase receipts
   'certificate', // Certificates of authenticity
-  'general',     // General documents
+  'general', // General documents
 ];
 ```
 
@@ -225,12 +225,12 @@ const ALLOWED_FILE_TYPES = [
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `spaces` | Access control and organizational context |
-| `storage` | R2 document storage via R2StorageService |
-| `integrations/zillow` | Property valuation API |
-| `wealth` | Manual assets contribute to net worth |
+| Module                | Relationship                              |
+| --------------------- | ----------------------------------------- |
+| `spaces`              | Access control and organizational context |
+| `storage`             | R2 document storage via R2StorageService  |
+| `integrations/zillow` | Property valuation API                    |
+| `wealth`              | Manual assets contribute to net worth     |
 
 ## Testing
 

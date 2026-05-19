@@ -1,12 +1,10 @@
 import { HttpStatus, HttpException } from '@nestjs/common';
-import {
-  PrismaClientKnownRequestError,
-  PrismaClientValidationError,
-} from '@db';
 
+import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@db';
+
+import { ProviderException, SecurityException } from '../../core/exceptions/domain-exceptions';
 import { GlobalExceptionFilter } from '../../core/filters/global-exception.filter';
 import { TimeoutError } from '../../core/utils/timeout.util';
-import { ProviderException, SecurityException } from '../../core/exceptions/domain-exceptions';
 
 function createMockHost(url = '/test', method = 'GET') {
   const mockResponse = {
@@ -117,9 +115,7 @@ describe('Global Exception Filter Chaos Tests', () => {
       filter.catch(error, host as any);
 
       // Sentry context should not contain sensitive headers
-      const requestContext = mockSentry.setContext.mock.calls.find(
-        (c: any) => c[0] === 'request'
-      );
+      const requestContext = mockSentry.setContext.mock.calls.find((c: any) => c[0] === 'request');
       if (requestContext) {
         const headers = requestContext[1].headers;
         expect(headers.authorization).toBeUndefined();

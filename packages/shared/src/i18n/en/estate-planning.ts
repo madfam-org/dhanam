@@ -59,7 +59,8 @@ export const estatePlanning = {
   notesOptional: 'Notes (Optional)',
 
   legalDisclaimer: 'Legal Disclaimer',
-  legalDisclaimerText: 'I understand this is a digital will and I should consult with a legal advisor',
+  legalDisclaimerText:
+    'I understand this is a digital will and I should consult with a legal advisor',
   acceptLegalDisclaimer: 'I accept the legal disclaimer',
 
   percentage: 'Percentage',
@@ -139,8 +140,10 @@ export const estatePlanning = {
   upgradeToPremium: 'Upgrade to Premium',
 
   // Descriptions
-  createWillDescription: 'Create a draft will for your household. You can add beneficiaries and executors before activating it.',
-  activateWillDescription: 'Activating this will makes it legally binding (subject to legal review)',
+  createWillDescription:
+    'Create a draft will for your household. You can add beneficiaries and executors before activating it.',
+  activateWillDescription:
+    'Activating this will makes it legally binding (subject to legal review)',
   revokeWillDescription: 'Revoking this will makes it invalid. This action cannot be undone.',
 
   draftWillsOnly: 'Only draft wills can be deleted',
@@ -152,10 +155,12 @@ export const estatePlanning = {
 
   // Tooltips & Help
   whatIsDigitalWill: 'What is a digital will?',
-  digitalWillExplanation: 'A digital will is an estate planning tool that helps you organize asset distribution. Always consult with a legal advisor for legal validity.',
+  digitalWillExplanation:
+    'A digital will is an estate planning tool that helps you organize asset distribution. Always consult with a legal advisor for legal validity.',
 
   beneficiaryAllocationHelp: 'Percentage allocations must add up to 100% for each asset type',
-  executorOrderHelp: 'The primary executor is responsible for executing the will. Secondary executors serve as backups.',
+  executorOrderHelp:
+    'The primary executor is responsible for executing the will. Secondary executors serve as backups.',
 
   // Page-level keys (used by estate-planning page component)
   page: {
@@ -172,7 +177,8 @@ export const estatePlanning = {
   dialog: {
     createWill: {
       title: 'Create New Will',
-      description: 'Create a draft will for your household. You can add beneficiaries and executors before activating it.',
+      description:
+        'Create a draft will for your household. You can add beneficiaries and executors before activating it.',
     },
   },
   fields: {
@@ -198,7 +204,7 @@ export const estatePlanning = {
   },
   lifeBeat: {
     title: 'Life Beat',
-    description: 'Your financial safety net for life\'s uncertainties',
+    description: "Your financial safety net for life's uncertainties",
     protectionStatus: 'Protection Status',
     statusDescription: 'Life Beat monitors your activity and alerts trusted contacts if needed',
     lastActivity: 'Last Activity',
@@ -206,11 +212,13 @@ export const estatePlanning = {
     alertThresholds: 'Alert Thresholds',
     trustedExecutors: 'Trusted Executors',
     pendingAlerts: 'Pending Alerts',
-    pendingAlertsDescription: 'You have {{count}} pending inactivity alert(s). Check in to reset your timer.',
-    checkIn: 'I\'m Okay - Check In Now',
+    pendingAlertsDescription:
+      'You have {{count}} pending inactivity alert(s). Check in to reset your timer.',
+    checkIn: "I'm Okay - Check In Now",
     disabled: {
       title: 'Life Beat is Disabled',
-      description: 'Enable Life Beat to ensure your designated executors can access your financial information if something happens to you.',
+      description:
+        'Enable Life Beat to ensure your designated executors can access your financial information if something happens to you.',
       enable: 'Enable Life Beat',
     },
     executors: {
@@ -249,7 +257,7 @@ export const estatePlanning = {
       title: 'How Life Beat Works',
       step1: {
         title: 'Activity Monitoring',
-        description: 'We track your logins and activity. If you\'re active, nothing happens.',
+        description: "We track your logins and activity. If you're active, nothing happens.",
       },
       step2: {
         title: 'Escalating Alerts',
@@ -257,7 +265,7 @@ export const estatePlanning = {
       },
       step3: {
         title: 'Executor Access',
-        description: 'If you don\'t respond, your executors can request read-only access.',
+        description: "If you don't respond, your executors can request read-only access.",
       },
     },
     enableDialog: {
@@ -265,10 +273,13 @@ export const estatePlanning = {
       description: 'Configure your inactivity thresholds and accept the legal disclaimer.',
       thresholdLabel: 'Alert Thresholds (days of inactivity)',
       days: '{{days}} days',
-      thresholdHint: 'You\'ll receive reminders at each threshold. Executors are notified at the final threshold.',
+      thresholdHint:
+        "You'll receive reminders at each threshold. Executors are notified at the final threshold.",
       legalTitle: 'Important Legal Notice',
-      legalDescription: 'Life Beat provides read-only access to financial summaries. It does not grant transaction authority, account access, or legal power of attorney. This feature is designed for informational purposes only and should complement, not replace, proper estate planning with legal counsel.',
-      legalCheckbox: 'I understand that Life Beat provides read-only financial visibility and does not constitute legal power of attorney or account access authority. I agree to the Terms of Service for this feature.',
+      legalDescription:
+        'Life Beat provides read-only access to financial summaries. It does not grant transaction authority, account access, or legal power of attorney. This feature is designed for informational purposes only and should complement, not replace, proper estate planning with legal counsel.',
+      legalCheckbox:
+        'I understand that Life Beat provides read-only financial visibility and does not constitute legal power of attorney or account access authority. I agree to the Terms of Service for this feature.',
       cancel: 'Cancel',
       enable: 'Enable Life Beat',
     },

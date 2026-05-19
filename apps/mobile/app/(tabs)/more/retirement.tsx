@@ -1,7 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { ScrollView, RefreshControl, Alert } from 'react-native';
 
-import { useSimulateRetirement, RetirementConfig, RetirementSimulationResult } from '@/hooks/api/useRetirement';
+import {
+  useSimulateRetirement,
+  RetirementConfig,
+  RetirementSimulationResult,
+} from '@/hooks/api/useRetirement';
 import { useAuth } from '@/hooks/useAuth';
 import { useSpaces } from '@/hooks/useSpaces';
 import {
@@ -33,7 +37,10 @@ function formatPercent(value: number): string {
 
 type RiskTolerance = 'conservative' | 'moderate' | 'aggressive';
 
-const RISK_PROFILES: Record<RiskTolerance, { expectedReturn: number; volatility: number; label: string }> = {
+const RISK_PROFILES: Record<
+  RiskTolerance,
+  { expectedReturn: number; volatility: number; label: string }
+> = {
   conservative: { expectedReturn: 0.05, volatility: 0.08, label: 'Conservative' },
   moderate: { expectedReturn: 0.07, volatility: 0.12, label: 'Moderate' },
   aggressive: { expectedReturn: 0.09, volatility: 0.18, label: 'Aggressive' },
@@ -119,7 +126,8 @@ export default function RetirementScreen() {
                 Premium Feature
               </Text>
               <Text variant="bodyMedium" style={styles.premiumDescription}>
-                Retirement planning with Monte Carlo simulations is available to premium subscribers.
+                Retirement planning with Monte Carlo simulations is available to premium
+                subscribers.
               </Text>
               <View style={styles.premiumFeatures}>
                 <View style={styles.featureRow}>
@@ -167,9 +175,7 @@ export default function RetirementScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Configuration Card */}
         <Card style={styles.card}>
@@ -282,7 +288,8 @@ export default function RetirementScreen() {
               style={styles.segmentedButtons}
             />
             <Text variant="bodySmall" style={styles.riskDescription}>
-              {RISK_PROFILES[riskTolerance].label}: {formatPercent(RISK_PROFILES[riskTolerance].expectedReturn)} expected return,{' '}
+              {RISK_PROFILES[riskTolerance].label}:{' '}
+              {formatPercent(RISK_PROFILES[riskTolerance].expectedReturn)} expected return,{' '}
               {formatPercent(RISK_PROFILES[riskTolerance].volatility)} volatility
             </Text>
 
@@ -333,8 +340,8 @@ export default function RetirementScreen() {
                       result.withdrawalPhase.probabilityOfNotRunningOut >= 0.8
                         ? styles.successHigh
                         : result.withdrawalPhase.probabilityOfNotRunningOut >= 0.6
-                        ? styles.successMedium
-                        : styles.successLow,
+                          ? styles.successMedium
+                          : styles.successLow,
                     ]}
                   >
                     {formatPercent(result.withdrawalPhase.probabilityOfNotRunningOut)}
@@ -369,10 +376,12 @@ export default function RetirementScreen() {
                 </View>
                 <View style={styles.rangeRow}>
                   <Text variant="bodySmall" style={styles.rangeLabel}>
-                    10th percentile: {formatCurrency(result.accumulationPhase.finalBalanceP10, currency)}
+                    10th percentile:{' '}
+                    {formatCurrency(result.accumulationPhase.finalBalanceP10, currency)}
                   </Text>
                   <Text variant="bodySmall" style={styles.rangeLabel}>
-                    90th percentile: {formatCurrency(result.accumulationPhase.finalBalanceP90, currency)}
+                    90th percentile:{' '}
+                    {formatCurrency(result.accumulationPhase.finalBalanceP90, currency)}
                   </Text>
                 </View>
                 <Divider style={styles.resultDivider} />
@@ -432,7 +441,8 @@ export default function RetirementScreen() {
             </Card>
 
             {/* Recommendations Card */}
-            {(result.recommendations.increaseContributionBy || result.recommendations.canRetireEarlierBy) && (
+            {(result.recommendations.increaseContributionBy ||
+              result.recommendations.canRetireEarlierBy) && (
               <Card style={styles.card}>
                 <Card.Content>
                   <View style={styles.cardHeader}>

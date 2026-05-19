@@ -28,7 +28,7 @@ import { ConfigService } from '@nestjs/config';
 // `svix` is a pure-TS client; install with `pnpm add -F @dhanam/api svix`.
 // We require() it lazily so the api container doesn't hard-fail to start
 // when Svix is intentionally disabled in a dev environment.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 type SvixSDK = any;
 
 import { ErrorCode, InfrastructureException } from '../../../core/exceptions/domain-exceptions';

@@ -113,10 +113,7 @@ export default function FeatureTourScreen() {
       >
         {features.map((feature, index) => (
           <View key={index} style={[styles.slide, { width }]}>
-            <LinearGradient
-              colors={feature.gradient}
-              style={styles.slideGradient}
-            >
+            <LinearGradient colors={feature.gradient} style={styles.slideGradient}>
               <View style={styles.slideIconCircle}>
                 <Ionicons name={feature.icon} size={56} color="white" />
               </View>
@@ -135,10 +132,7 @@ export default function FeatureTourScreen() {
         {features.map((_, index) => (
           <View
             key={index}
-            style={[
-              styles.dot,
-              currentIndex === index ? styles.dotActive : styles.dotInactive,
-            ]}
+            style={[styles.dot, currentIndex === index ? styles.dotActive : styles.dotInactive]}
           />
         ))}
       </View>

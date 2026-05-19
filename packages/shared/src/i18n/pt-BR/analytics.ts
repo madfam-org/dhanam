@@ -84,9 +84,11 @@ export const analytics = {
     },
     longTerm: {
       netWorthProjection: 'Projeção do patrimônio líquido',
-      netWorthDescription: 'Seu patrimônio líquido projetado ao longo do tempo. A área sombreada mostra os anos de aposentadoria.',
+      netWorthDescription:
+        'Seu patrimônio líquido projetado ao longo do tempo. A área sombreada mostra os anos de aposentadoria.',
       incomeVsExpenses: 'Receitas vs Despesas',
-      incomeVsExpensesDescription: 'Receitas e despesas projetadas ao longo do tempo. A área verde mostra fluxo de caixa positivo.',
+      incomeVsExpensesDescription:
+        'Receitas e despesas projetadas ao longo do tempo. A área verde mostra fluxo de caixa positivo.',
       totalAssets: 'Ativos totais',
       netWorth: 'Patrimônio líquido',
       totalDebt: 'Dívida total',
@@ -107,7 +109,8 @@ export const analytics = {
       worst10: 'Pior 10%',
       p10: 'Percentil 10',
       p90: 'Percentil 90',
-      confidenceNote: 'A área sombreada representa o intervalo de confiança de 80% (percentil 10 ao 90). A linha mediana mostra o resultado mais provável.',
+      confidenceNote:
+        'A área sombreada representa o intervalo de confiança de 80% (percentil 10 ao 90). A linha mediana mostra o resultado mais provável.',
     },
     budget: {
       categorySpending: 'Gasto por categoria',

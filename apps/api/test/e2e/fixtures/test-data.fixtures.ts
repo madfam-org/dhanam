@@ -403,7 +403,8 @@ export const TestDataFixtures = {
 
   errorScenarios: {
     invalidToken: 'invalid.jwt.token',
-    expiredToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+    expiredToken:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
     malformedRequest: { invalid: 'data', missing: 'required fields' },
     unauthorizedAccess: { spaceId: 'other-users-space-id' },
     nonExistentResource: { id: 'non-existent-id' },

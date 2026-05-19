@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ConflictException } from '@nestjs/common';
-import { BudgetsService } from '../budgets.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { TestDataFactory } from '../../../../test/helpers/test-data-factory';
+import { TestDatabase } from '../../../../test/helpers/test-database';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { SpacesService } from '../../spaces/spaces.service';
-import { TestDatabase } from '../../../../test/helpers/test-database';
-import { TestDataFactory } from '../../../../test/helpers/test-data-factory';
+import { BudgetsService } from '../budgets.service';
 import { CreateBudgetDto, UpdateBudgetDto } from '../dto';
 
 // Skip integration tests when no test database is available

@@ -1,7 +1,8 @@
-import { ProviderOrchestratorService } from '../../modules/providers/orchestrator/provider-orchestrator.service';
 import { CircuitBreakerService } from '../../modules/providers/orchestrator/circuit-breaker.service';
-import { MockFinancialProvider } from './helpers/mock-provider';
+import { ProviderOrchestratorService } from '../../modules/providers/orchestrator/provider-orchestrator.service';
+
 import { createMockPrismaService } from './helpers/mock-prisma';
+import { MockFinancialProvider } from './helpers/mock-provider';
 
 const Provider = {
   plaid: 'plaid',

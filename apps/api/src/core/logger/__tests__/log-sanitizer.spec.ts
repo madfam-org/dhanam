@@ -140,8 +140,9 @@ describe('LogSanitizer', () => {
     });
 
     it('should redact JWT-like patterns in strings', () => {
-      const jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
-      
+      const jwtToken =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
       const data = {
         message: `Token received: ${jwtToken}`,
       };
@@ -156,7 +157,8 @@ describe('LogSanitizer', () => {
   describe('sanitizeError', () => {
     it('should sanitize error objects', () => {
       // Use a realistic JWT token with proper length sections
-      const jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      const jwtToken =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
       const error = new Error(`Invalid token: ${jwtToken}`);
       error.stack = `Error: Invalid token\n  at Function.test\n  accessToken=${jwtToken}`;
 
@@ -208,7 +210,7 @@ describe('LogSanitizer', () => {
         method: 'POST',
         url: '/auth/login',
         headers: {
-          'authorization': 'Bearer token123',
+          authorization: 'Bearer token123',
           'content-type': 'application/json',
           'x-api-key': 'secret-key',
         },
@@ -243,7 +245,7 @@ describe('LogSanitizer', () => {
         method: 'GET',
         url: '/',
         headers: {
-          'cookie': 'session=abc123',
+          cookie: 'session=abc123',
           'set-cookie': 'token=xyz789',
         },
       };

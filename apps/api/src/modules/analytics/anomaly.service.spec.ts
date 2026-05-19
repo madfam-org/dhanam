@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AnomalyService, SpendingAnomaly } from './anomaly.service';
+import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
-import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
+
+import { AnomalyService, SpendingAnomaly } from './anomaly.service';
 
 describe('AnomalyService', () => {
   let service: AnomalyService;
@@ -37,7 +38,9 @@ describe('AnomalyService', () => {
     beforeEach(() => {
       // Default empty returns for detection methods
       prismaMock.transaction.findMany.mockResolvedValue([]);
-      prismaMock.transaction.aggregate.mockResolvedValue({ _sum: { amount: { toNumber: () => 0 } } });
+      prismaMock.transaction.aggregate.mockResolvedValue({
+        _sum: { amount: { toNumber: () => 0 } },
+      });
       prismaMock.transaction.groupBy.mockResolvedValue([]);
       prismaMock.category.findMany.mockResolvedValue([]);
     });
@@ -204,11 +207,36 @@ describe('AnomalyService', () => {
       // Historical low-amount transactions for merchant stats
       // Need 3+ transactions with different amounts for stdDev > 0
       const historicalTxns = [
-        { amount: -45, merchant: 'Amazon', description: 'Amazon purchase', date: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000) },
-        { amount: -50, merchant: 'Amazon', description: 'Amazon purchase', date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000) },
-        { amount: -55, merchant: 'Amazon', description: 'Amazon purchase', date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000) },
-        { amount: -48, merchant: 'Amazon', description: 'Amazon purchase', date: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000) },
-        { amount: -52, merchant: 'Amazon', description: 'Amazon purchase', date: new Date(Date.now() - 55 * 24 * 60 * 60 * 1000) },
+        {
+          amount: -45,
+          merchant: 'Amazon',
+          description: 'Amazon purchase',
+          date: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
+        },
+        {
+          amount: -50,
+          merchant: 'Amazon',
+          description: 'Amazon purchase',
+          date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+        },
+        {
+          amount: -55,
+          merchant: 'Amazon',
+          description: 'Amazon purchase',
+          date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+        },
+        {
+          amount: -48,
+          merchant: 'Amazon',
+          description: 'Amazon purchase',
+          date: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000),
+        },
+        {
+          amount: -52,
+          merchant: 'Amazon',
+          description: 'Amazon purchase',
+          date: new Date(Date.now() - 55 * 24 * 60 * 60 * 1000),
+        },
       ];
 
       // Use mockImplementation to handle parallel Promise.all calls correctly
@@ -256,8 +284,18 @@ describe('AnomalyService', () => {
 
       // Only 2 historical transactions (below threshold of 3 for stats)
       const historicalTxns = [
-        { amount: -50, merchant: 'NewMerchant', description: 'Purchase', date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000) },
-        { amount: -55, merchant: 'NewMerchant', description: 'Purchase', date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000) },
+        {
+          amount: -50,
+          merchant: 'NewMerchant',
+          description: 'Purchase',
+          date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+        },
+        {
+          amount: -55,
+          merchant: 'NewMerchant',
+          description: 'Purchase',
+          date: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
+        },
       ];
 
       prismaMock.transaction.findMany
@@ -302,7 +340,9 @@ describe('AnomalyService', () => {
 
   describe('detectNewMerchantLargeTransactions (via detectAnomalies)', () => {
     beforeEach(() => {
-      prismaMock.transaction.aggregate.mockResolvedValue({ _sum: { amount: { toNumber: () => 0 } } });
+      prismaMock.transaction.aggregate.mockResolvedValue({
+        _sum: { amount: { toNumber: () => 0 } },
+      });
       prismaMock.transaction.groupBy.mockResolvedValue([]);
       prismaMock.category.findMany.mockResolvedValue([]);
     });
@@ -337,14 +377,10 @@ describe('AnomalyService', () => {
       // For a spike: recentAmount / (historical * daysRatio) > 1.5
       // If historical = 300 over 90 days → normalized = 300 * 0.333 = 100
       // If recent = 500 over 30 days → ratio = 500/100 = 5 (way above 1.5 threshold)
-      const historicalSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 },
-      ];
+      const historicalSpending = [{ categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 }];
 
       // Recent category spending (much higher relative to period)
-      const recentSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -500 }, _count: 5 },
-      ];
+      const recentSpending = [{ categoryId: 'cat-1', _sum: { amount: -500 }, _count: 5 }];
 
       const categories = [{ id: 'cat-1', name: 'Entertainment' }];
 
@@ -364,7 +400,9 @@ describe('AnomalyService', () => {
 
   describe('detectDuplicateCharges (via detectAnomalies)', () => {
     beforeEach(() => {
-      prismaMock.transaction.aggregate.mockResolvedValue({ _sum: { amount: { toNumber: () => 0 } } });
+      prismaMock.transaction.aggregate.mockResolvedValue({
+        _sum: { amount: { toNumber: () => 0 } },
+      });
       prismaMock.transaction.groupBy.mockResolvedValue([]);
       prismaMock.category.findMany.mockResolvedValue([]);
     });
@@ -507,7 +545,9 @@ describe('AnomalyService', () => {
   describe('getAnomalySummary', () => {
     beforeEach(() => {
       prismaMock.transaction.findMany.mockResolvedValue([]);
-      prismaMock.transaction.aggregate.mockResolvedValue({ _sum: { amount: { toNumber: () => 0 } } });
+      prismaMock.transaction.aggregate.mockResolvedValue({
+        _sum: { amount: { toNumber: () => 0 } },
+      });
       prismaMock.transaction.groupBy.mockResolvedValue([]);
       prismaMock.category.findMany.mockResolvedValue([]);
     });
@@ -631,10 +671,7 @@ describe('AnomalyService', () => {
 
     it('should detect large transaction at new merchant', async () => {
       // Historical merchants (known)
-      const historicalMerchants = [
-        { merchant: 'OldStore' },
-        { merchant: 'RegularShop' },
-      ];
+      const historicalMerchants = [{ merchant: 'OldStore' }, { merchant: 'RegularShop' }];
 
       // Recent large transaction at NEW merchant
       const largeTxns = [
@@ -731,9 +768,7 @@ describe('AnomalyService', () => {
     });
 
     it('should not flag transaction if merchant is known', async () => {
-      const historicalMerchants = [
-        { merchant: 'ExpensiveStore' },
-      ];
+      const historicalMerchants = [{ merchant: 'ExpensiveStore' }];
 
       const largeTxns = [
         {
@@ -945,9 +980,7 @@ describe('AnomalyService', () => {
     });
 
     it('should skip categories with null categoryId', async () => {
-      const historicalSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 },
-      ];
+      const historicalSpending = [{ categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 }];
 
       // Recent spending with null categoryId (should be skipped)
       const recentSpending = [
@@ -973,9 +1006,7 @@ describe('AnomalyService', () => {
       // No historical spending for this category
       const historicalSpending: any[] = [];
 
-      const recentSpending = [
-        { categoryId: 'cat-new', _sum: { amount: -500 }, _count: 5 },
-      ];
+      const recentSpending = [{ categoryId: 'cat-new', _sum: { amount: -500 }, _count: 5 }];
 
       const categories = [{ id: 'cat-new', name: 'New Category' }];
 
@@ -997,9 +1028,7 @@ describe('AnomalyService', () => {
         { categoryId: 'cat-1', _sum: { amount: -50 }, _count: 2 }, // Only 2 transactions
       ];
 
-      const recentSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -500 }, _count: 5 },
-      ];
+      const recentSpending = [{ categoryId: 'cat-1', _sum: { amount: -500 }, _count: 5 }];
 
       const categories = [{ id: 'cat-1', name: 'Entertainment' }];
 
@@ -1017,9 +1046,7 @@ describe('AnomalyService', () => {
 
     it('should skip categories with low recent amount', async () => {
       // Recent spending below $100 threshold
-      const historicalSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -30 }, _count: 10 },
-      ];
+      const historicalSpending = [{ categoryId: 'cat-1', _sum: { amount: -30 }, _count: 10 }];
 
       const recentSpending = [
         { categoryId: 'cat-1', _sum: { amount: -90 }, _count: 5 }, // Below 100 threshold
@@ -1040,14 +1067,10 @@ describe('AnomalyService', () => {
     });
 
     it('should assign low severity for ratio 1.5-1.75', async () => {
-      const historicalSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 },
-      ];
+      const historicalSpending = [{ categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 }];
 
       // 160% of normalized historical = just above 1.5 but below 1.75
-      const recentSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -160 }, _count: 3 },
-      ];
+      const recentSpending = [{ categoryId: 'cat-1', _sum: { amount: -160 }, _count: 3 }];
 
       const categories = [{ id: 'cat-1', name: 'Entertainment' }];
 
@@ -1064,14 +1087,10 @@ describe('AnomalyService', () => {
     });
 
     it('should assign medium severity for ratio 1.75-2.5', async () => {
-      const historicalSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 },
-      ];
+      const historicalSpending = [{ categoryId: 'cat-1', _sum: { amount: -300 }, _count: 10 }];
 
       // 200% of normalized historical = 2.0 ratio (between 1.75 and 2.5)
-      const recentSpending = [
-        { categoryId: 'cat-1', _sum: { amount: -200 }, _count: 3 },
-      ];
+      const recentSpending = [{ categoryId: 'cat-1', _sum: { amount: -200 }, _count: 3 }];
 
       const categories = [{ id: 'cat-1', name: 'Entertainment' }];
 
@@ -1102,7 +1121,12 @@ describe('AnomalyService', () => {
 
       // Only 1 historical transaction (needs >= 2 for stats)
       const historicalTxns = [
-        { amount: -50, merchant: 'SingleUseMerchant', description: 'Purchase', date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000) },
+        {
+          amount: -50,
+          merchant: 'SingleUseMerchant',
+          description: 'Purchase',
+          date: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+        },
       ];
 
       prismaMock.transaction.findMany.mockImplementation((params: any) => {
@@ -1129,7 +1153,9 @@ describe('AnomalyService', () => {
   describe('edge cases', () => {
     beforeEach(() => {
       prismaMock.transaction.findMany.mockResolvedValue([]);
-      prismaMock.transaction.aggregate.mockResolvedValue({ _sum: { amount: { toNumber: () => 0 } } });
+      prismaMock.transaction.aggregate.mockResolvedValue({
+        _sum: { amount: { toNumber: () => 0 } },
+      });
       prismaMock.transaction.groupBy.mockResolvedValue([]);
       prismaMock.category.findMany.mockResolvedValue([]);
     });

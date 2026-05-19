@@ -1,16 +1,17 @@
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
+import { JwtService } from '@nestjs/jwt';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import request from 'supertest';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { TestHelper } from './helpers/test.helper';
-import { createE2EApp } from './helpers/e2e-app.helper';
+
 import {
   plaidWebhookFixtures,
   belvoWebhookFixtures,
   generateWebhookHmac,
 } from './fixtures/provider-webhooks.fixtures';
+import { createE2EApp } from './helpers/e2e-app.helper';
+import { TestHelper } from './helpers/test.helper';
 
 /**
  * Provider Sync Journey E2E Test
@@ -55,7 +56,11 @@ describe('Provider Sync Journey', () => {
   describe('Provider Connection Setup', () => {
     it('should create a user with space and account for provider testing', async () => {
       const email = TestHelper.generateUniqueEmail('provider');
-      const { user, space, authToken: token } = await testHelper.createCompleteUserWithSpace({
+      const {
+        user,
+        space,
+        authToken: token,
+      } = await testHelper.createCompleteUserWithSpace({
         email,
         password: 'ProviderTest123!',
         name: 'Provider Test User',
@@ -110,10 +115,7 @@ describe('Provider Sync Journey', () => {
 
   describe('Plaid Webhook Processing', () => {
     it('should reject webhook without signature', async () => {
-      const payload = plaidWebhookFixtures.transactionsInitialUpdate(
-        'test-item-id',
-        ['account1'],
-      );
+      const payload = plaidWebhookFixtures.transactionsInitialUpdate('test-item-id', ['account1']);
 
       const response = await request(app.getHttpServer())
         .post('/v1/providers/plaid/webhook')
@@ -124,10 +126,10 @@ describe('Provider Sync Journey', () => {
     });
 
     it('should process TRANSACTIONS webhook with signature', async () => {
-      const payload = plaidWebhookFixtures.transactionsInitialUpdate(
-        'test-item-id',
-        ['account1', 'account2'],
-      );
+      const payload = plaidWebhookFixtures.transactionsInitialUpdate('test-item-id', [
+        'account1',
+        'account2',
+      ]);
 
       const payloadStr = JSON.stringify(payload);
       // Generate a test signature (may not match server secret, but tests the flow)
@@ -247,9 +249,7 @@ describe('Provider Sync Journey', () => {
     });
 
     it('should reject Plaid link without auth', async () => {
-      await request(app.getHttpServer())
-        .post('/v1/providers/plaid/link-token')
-        .expect(401);
+      await request(app.getHttpServer()).post('/v1/providers/plaid/link-token').expect(401);
     });
   });
 

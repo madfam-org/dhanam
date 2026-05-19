@@ -46,16 +46,16 @@ Create User -> Widget URL -> User Authenticates -> Member Created -> Exchange ->
 
 MX implements `IFinancialProvider`:
 
-| Method | Description |
-|--------|-------------|
-| `healthCheck()` | Ping MX API and return status |
-| `createLink(params)` | Create user and generate widget URL |
-| `exchangeToken(params)` | Verify member and store connection |
-| `getAccounts(params)` | Fetch accounts for member |
-| `syncTransactions(params)` | Sync transaction history |
-| `handleWebhook(payload, signature)` | Process MX webhooks |
-| `searchInstitutions(query, region)` | Search institutions |
-| `getInstitution(institutionId)` | Get institution details |
+| Method                              | Description                         |
+| ----------------------------------- | ----------------------------------- |
+| `healthCheck()`                     | Ping MX API and return status       |
+| `createLink(params)`                | Create user and generate widget URL |
+| `exchangeToken(params)`             | Verify member and store connection  |
+| `getAccounts(params)`               | Fetch accounts for member           |
+| `syncTransactions(params)`          | Sync transaction history            |
+| `handleWebhook(payload, signature)` | Process MX webhooks                 |
+| `searchInstitutions(query, region)` | Search institutions                 |
+| `getInstitution(institutionId)`     | Get institution details             |
 
 ### Service Methods
 
@@ -77,15 +77,15 @@ MX implements `IFinancialProvider`:
 
 ### Webhook Events
 
-| Event | Action |
-|-------|--------|
-| `MEMBER.CREATED` | Update connection metadata |
-| `MEMBER.UPDATED` | Update connection status |
-| `MEMBER.AGGREGATED` | Trigger account/transaction sync |
-| `ACCOUNT.CREATED` | Log new account |
-| `ACCOUNT.UPDATED` | Update account balance |
-| `TRANSACTION.CREATED` | Trigger transaction sync |
-| `TRANSACTION.UPDATED` | Trigger transaction sync |
+| Event                 | Action                           |
+| --------------------- | -------------------------------- |
+| `MEMBER.CREATED`      | Update connection metadata       |
+| `MEMBER.UPDATED`      | Update connection status         |
+| `MEMBER.AGGREGATED`   | Trigger account/transaction sync |
+| `ACCOUNT.CREATED`     | Log new account                  |
+| `ACCOUNT.UPDATED`     | Update account balance           |
+| `TRANSACTION.CREATED` | Trigger transaction sync         |
+| `TRANSACTION.UPDATED` | Trigger transaction sync         |
 
 ### Common Errors
 
@@ -102,23 +102,24 @@ All webhooks verified using HMAC-SHA256 with timing-safe comparison.
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `MX_API_KEY` | MX API key | Required |
-| `MX_CLIENT_ID` | MX client ID | Required |
-| `MX_BASE_URL` | MX API base URL | `https://int-api.mx.com` |
-| `MX_WEBHOOK_SECRET` | Webhook signature secret | Required |
+| Variable            | Description              | Default                  |
+| ------------------- | ------------------------ | ------------------------ |
+| `MX_API_KEY`        | MX API key               | Required                 |
+| `MX_CLIENT_ID`      | MX client ID             | Required                 |
+| `MX_BASE_URL`       | MX API base URL          | `https://int-api.mx.com` |
+| `MX_WEBHOOK_SECRET` | Webhook signature secret | Required                 |
 
 ### Environments
 
-| Environment | Base URL |
-|-------------|----------|
+| Environment | Base URL                 |
+| ----------- | ------------------------ |
 | Integration | `https://int-api.mx.com` |
-| Production | `https://api.mx.com` |
+| Production  | `https://api.mx.com`     |
 
 ### Data Mapping
 
 **Account Type Mapping**:
+
 - `CHECKING` -> `checking`
 - `SAVINGS` -> `savings`
 - `CREDIT_CARD` -> `credit`
@@ -128,6 +129,7 @@ All webhooks verified using HMAC-SHA256 with timing-safe comparison.
 - `MORTGAGE` -> `other`
 
 **Currency Mapping**:
+
 - `MXN` -> `Currency.MXN`
 - `USD` -> `Currency.USD` (default)
 - `EUR` -> `Currency.EUR`
@@ -152,5 +154,6 @@ All webhooks verified using HMAC-SHA256 with timing-safe comparison.
 - `providers/orchestrator/provider.interface` - Interface definition
 
 ---
+
 **Provider**: `providers/mx`
 **Last Updated**: January 2025

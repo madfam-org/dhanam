@@ -1,4 +1,10 @@
-import { AuthTokens, ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from '@dhanam/shared';
+import {
+  AuthTokens,
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from '@dhanam/shared';
 
 import { AuthService } from '../auth.service';
 import { LocalAuthProvider } from '../providers/local-auth.provider';

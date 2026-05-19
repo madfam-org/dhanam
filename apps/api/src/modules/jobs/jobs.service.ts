@@ -1,10 +1,11 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import * as Sentry from '@sentry/node';
+
 import { PrismaService } from '@core/prisma/prisma.service';
 import { RulesService } from '@modules/categories/rules.service';
 import { BitsoService } from '@modules/providers/bitso/bitso.service';
 import { BlockchainService } from '@modules/providers/blockchain/blockchain.service';
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import * as Sentry from '@sentry/node';
 
 /** Emails of the 5 base demo persona templates — never deleted by cleanup. */
 const DEMO_PERSONA_EMAILS = [

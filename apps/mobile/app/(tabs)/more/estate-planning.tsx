@@ -1,10 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ScrollView, RefreshControl, Alert } from 'react-native';
 
-import {
-  useHouseholds,
-  Household,
-} from '@/hooks/api/useHouseholds';
+import { useHouseholds, Household } from '@/hooks/api/useHouseholds';
 import {
   useWillsByHousehold,
   useWill,
@@ -60,8 +57,16 @@ export default function EstatePlanningScreen() {
   const [willName, setWillName] = useState('');
   const [willNotes, setWillNotes] = useState('');
 
-  const { data: households, isLoading: householdsLoading, refetch: refetchHouseholds } = useHouseholds();
-  const { data: wills, isLoading: willsLoading, refetch: refetchWills } = useWillsByHousehold(selectedHouseholdId);
+  const {
+    data: households,
+    isLoading: householdsLoading,
+    refetch: refetchHouseholds,
+  } = useHouseholds();
+  const {
+    data: wills,
+    isLoading: willsLoading,
+    refetch: refetchWills,
+  } = useWillsByHousehold(selectedHouseholdId);
   const { data: selectedWill } = useWill(selectedWillId);
   const { data: validationResult } = useValidateWill(selectedWillId);
   const createMutation = useCreateWill();
@@ -178,9 +183,7 @@ export default function EstatePlanningScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Info Card */}
         <Card style={styles.infoCard}>
@@ -383,7 +386,9 @@ export default function EstatePlanningScreen() {
                       </View>
                       <View style={styles.executorBadges}>
                         {executor.isPrimary && (
-                          <Chip compact style={styles.primaryChip}>Primary</Chip>
+                          <Chip compact style={styles.primaryChip}>
+                            Primary
+                          </Chip>
                         )}
                         <Chip compact>{executor.executor?.relationship}</Chip>
                       </View>

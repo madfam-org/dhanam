@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
 import { AuditService } from '../../../core/audit/audit.service';
-import { TransactionExecutionService } from '../../transaction-execution/transaction-execution.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { ProviderFactoryService } from '../../transaction-execution/providers/provider-factory.service';
+import { TransactionExecutionService } from '../../transaction-execution/transaction-execution.service';
 import { GoalsExecutionService, RebalancingAction } from '../goals-execution.service';
 
 describe('GoalsExecutionService', () => {
@@ -98,7 +98,9 @@ describe('GoalsExecutionService', () => {
     service = module.get<GoalsExecutionService>(GoalsExecutionService);
     prisma = module.get(PrismaService) as jest.Mocked<PrismaService>;
     audit = module.get(AuditService) as jest.Mocked<AuditService>;
-    transactionExecution = module.get(TransactionExecutionService) as jest.Mocked<TransactionExecutionService>;
+    transactionExecution = module.get(
+      TransactionExecutionService
+    ) as jest.Mocked<TransactionExecutionService>;
     providerFactory = module.get(ProviderFactoryService) as jest.Mocked<ProviderFactoryService>;
 
     // Suppress logger output during tests

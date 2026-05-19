@@ -151,7 +151,7 @@ export class TestUtils {
   static createMockBudget(overrides: Partial<MockBudget> = {}): MockBudget {
     const startDate = new Date('2024-01-01');
     const endDate = new Date('2024-12-31');
-    
+
     return {
       id: 'test-budget-' + randomUUID().slice(0, 9),
       spaceId: 'test-space-id',
@@ -228,7 +228,7 @@ export class TestUtils {
     const end = new Date();
     const start = new Date();
     start.setDate(start.getDate() - days);
-    
+
     return { start, end };
   }
 
@@ -238,7 +238,7 @@ export class TestUtils {
       currency: currency,
       minimumFractionDigits: 2,
     });
-    
+
     return formatter.format(amount);
   }
 }

@@ -13,18 +13,18 @@ The Search module provides intelligent search capabilities:
 
 ## Key Entities
 
-| Service | Description |
-|---------|-------------|
-| `SearchController` | REST endpoint handlers |
+| Service                  | Description                      |
+| ------------------------ | -------------------------------- |
+| `SearchController`       | REST endpoint handlers           |
 | `NaturalLanguageService` | Query parsing and interpretation |
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/search` | GET | Global search across all entities |
-| `/search/transactions` | GET | Transaction-specific search |
-| `/search/natural` | POST | Natural language query processing |
+| Endpoint               | Method | Description                       |
+| ---------------------- | ------ | --------------------------------- |
+| `/search`              | GET    | Global search across all entities |
+| `/search/transactions` | GET    | Transaction-specific search       |
+| `/search/natural`      | POST   | Natural language query processing |
 
 ## Service Architecture
 
@@ -57,12 +57,12 @@ The Search module provides intelligent search capabilities:
 
 ## Natural Language Examples
 
-| Query | Parsed Filters |
-|-------|----------------|
-| "coffee last month" | merchant: coffee, date: last 30 days |
-| "spending over $100" | amount: > 100, type: expense |
+| Query                 | Parsed Filters                       |
+| --------------------- | ------------------------------------ |
+| "coffee last month"   | merchant: coffee, date: last 30 days |
+| "spending over $100"  | amount: > 100, type: expense         |
 | "groceries this week" | category: groceries, date: this week |
-| "income from January" | type: income, date: January |
+| "income from January" | type: income, date: January          |
 
 ## Search Features
 
@@ -73,20 +73,20 @@ The Search module provides intelligent search capabilities:
 
 ## Error Handling
 
-| Error | HTTP Status | Description |
-|-------|-------------|-------------|
-| Invalid query | 400 | Cannot parse search query |
-| No results | 200 | Empty results array |
-| Access denied | 403 | User lacks space access |
+| Error         | HTTP Status | Description               |
+| ------------- | ----------- | ------------------------- |
+| Invalid query | 400         | Cannot parse search query |
+| No results    | 200         | Empty results array       |
+| Access denied | 403         | User lacks space access   |
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| [`transactions`](../transactions/README.md) | Primary search target |
-| [`accounts`](../accounts/README.md) | Account search support |
-| [`categories`](../categories/README.md) | Category-based filtering |
-| [`ml`](../ml/README.md) | Query understanding enhancement |
+| Module                                      | Relationship                    |
+| ------------------------------------------- | ------------------------------- |
+| [`transactions`](../transactions/README.md) | Primary search target           |
+| [`accounts`](../accounts/README.md)         | Account search support          |
+| [`categories`](../categories/README.md)     | Category-based filtering        |
+| [`ml`](../ml/README.md)                     | Query understanding enhancement |
 
 ## Testing
 

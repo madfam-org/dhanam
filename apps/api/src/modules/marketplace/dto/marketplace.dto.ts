@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Currency } from '@db';
 import { IsEnum, IsInt, IsOptional, IsString, IsUrl, Min } from 'class-validator';
+
+import { Currency } from '@db';
 
 export class CreateMerchantDto {
   @ApiProperty({ example: 'US' })

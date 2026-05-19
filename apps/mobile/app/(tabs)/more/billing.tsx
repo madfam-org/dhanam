@@ -177,10 +177,7 @@ export default function BillingScreen() {
       });
 
       // Open checkout URL in browser
-      const result = await WebBrowser.openAuthSessionAsync(
-        response.checkoutUrl,
-        successUrl
-      );
+      const result = await WebBrowser.openAuthSessionAsync(response.checkoutUrl, successUrl);
 
       if (result.type === 'success') {
         // Refresh subscription status after returning from checkout
@@ -238,11 +235,9 @@ export default function BillingScreen() {
       }
     } catch (error) {
       console.error('Restore purchases error:', error);
-      Alert.alert(
-        'Error',
-        'Failed to check subscription status. Please try again.',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Error', 'Failed to check subscription status. Please try again.', [
+        { text: 'OK' },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -303,10 +298,7 @@ export default function BillingScreen() {
           <Card.Content>
             <View style={styles.statusHeader}>
               <View
-                style={[
-                  styles.statusBadge,
-                  isPremium ? styles.premiumBadge : styles.freeBadge,
-                ]}
+                style={[styles.statusBadge, isPremium ? styles.premiumBadge : styles.freeBadge]}
               >
                 <Ionicons
                   name={isPremium ? 'star' : 'star-outline'}
@@ -315,10 +307,7 @@ export default function BillingScreen() {
                 />
                 <Text
                   variant="labelLarge"
-                  style={[
-                    styles.statusText,
-                    isPremium ? styles.premiumText : styles.freeText,
-                  ]}
+                  style={[styles.statusText, isPremium ? styles.premiumText : styles.freeText]}
                 >
                   {isPremium ? 'Premium' : 'Free Plan'}
                 </Text>

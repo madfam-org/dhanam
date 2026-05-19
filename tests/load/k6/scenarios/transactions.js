@@ -11,7 +11,7 @@ export const options = {
 export function setup() {
   const auth = login(
     __ENV.TEST_EMAIL || 'loadtest@example.com',
-    __ENV.TEST_PASSWORD || 'LoadTest123!',
+    __ENV.TEST_PASSWORD || 'LoadTest123!'
   );
   return { token: auth?.accessToken };
 }
@@ -24,7 +24,7 @@ export default function (data) {
   // List transactions (bulk read)
   const listRes = http.get(
     `${BASE_URL}/v1/spaces/${spaceId}/transactions?limit=100`,
-    authHeaders(data.token),
+    authHeaders(data.token)
   );
 
   check(listRes, {

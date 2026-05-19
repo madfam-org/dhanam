@@ -1,6 +1,3 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
-import { AuthenticatedRequest } from '@core/types/authenticated-request';
-import { Currency } from '@db';
 import {
   NetWorthResponse,
   CashflowForecast,
@@ -22,6 +19,10 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
+import { AuthenticatedRequest } from '@core/types/authenticated-request';
+import { Currency } from '@db';
 
 import {
   NetWorthHistoryPoint,

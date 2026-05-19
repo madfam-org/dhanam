@@ -85,7 +85,8 @@ export const households = {
   noHouseholdsDescription: 'Crea tu primer hogar para comenzar la planificación familiar',
 
   noMembersYet: 'Aún No Hay Miembros',
-  noMembersDescription: 'Agrega miembros a tu hogar para comenzar la planificación multigeneracional',
+  noMembersDescription:
+    'Agrega miembros a tu hogar para comenzar la planificación multigeneracional',
 
   householdCreatedSuccess: 'Hogar creado exitosamente',
   householdUpdatedSuccess: 'Hogar actualizado exitosamente',
@@ -137,13 +138,16 @@ export const households = {
 
   // Tooltips & Help
   whatIsHousehold: '¿Qué es un hogar?',
-  householdExplanation: 'Un hogar es un grupo de personas que comparten planificación financiera, como una familia, fideicomiso o patrimonio.',
+  householdExplanation:
+    'Un hogar es un grupo de personas que comparten planificación financiera, como una familia, fideicomiso o patrimonio.',
 
-  multiGenPlanningHelp: 'La planificación multigeneracional te ayuda a coordinar objetivos financieros en múltiples generaciones',
+  multiGenPlanningHelp:
+    'La planificación multigeneracional te ayuda a coordinar objetivos financieros en múltiples generaciones',
 
   minorAccessHelp: 'Los menores tienen acceso limitado hasta que alcancen la mayoría de edad',
 
-  currencyHelp: 'La moneda base se utiliza para todos los cálculos de patrimonio neto de este hogar',
+  currencyHelp:
+    'La moneda base se utiliza para todos los cálculos de patrimonio neto de este hogar',
 
   // Page-level keys (used by households page component)
   page: {
@@ -177,7 +181,8 @@ export const households = {
     members: 'Miembros',
     minor: 'Menor de edad',
     yoursMineOurs: 'Tuyo, mío y nuestro',
-    ownershipDescription: 'Visualiza las finanzas del hogar por titularidad. Filtra cuentas entre propiedad individual y conjunta.',
+    ownershipDescription:
+      'Visualiza las finanzas del hogar por titularidad. Filtra cuentas entre propiedad individual y conjunta.',
     yourAccounts: 'Tus cuentas',
     partnerAccounts: 'Cuentas de tu pareja',
     jointAccounts: 'Cuentas conjuntas',

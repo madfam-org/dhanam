@@ -19,6 +19,7 @@ The Monte Carlo simulation module provides probabilistic wealth forecasting usin
 ### Premium Tier Gating
 
 All simulation endpoints require **Premium subscription** and are usage-metered:
+
 - Free tier: 3 simulations/day
 - Premium tier: Unlimited simulations
 
@@ -46,6 +47,7 @@ r = μ + σ * Z
 ```
 
 Where:
+
 - `r` = realized monthly return
 - `μ` = expected monthly return (drift)
 - `σ` = monthly volatility (standard deviation)
@@ -69,22 +71,22 @@ Where:
 
 ### Key Parameters
 
-| Parameter | Type | Description | Typical Range |
-|-----------|------|-------------|---------------|
-| `initialBalance` | number | Starting portfolio value | $0 - $10M |
-| `monthlyContribution` | number | Monthly savings | $0 - $50k |
-| `months` | number | Time horizon | 12 - 600 (1-50 years) |
-| `iterations` | number | Simulation runs | 1,000 - 50,000 |
-| `expectedReturn` | number | Annual return (decimal) | -0.20 to 0.20 |
-| `volatility` | number | Annual std dev (decimal) | 0.05 to 0.80 |
+| Parameter             | Type   | Description              | Typical Range         |
+| --------------------- | ------ | ------------------------ | --------------------- |
+| `initialBalance`      | number | Starting portfolio value | $0 - $10M             |
+| `monthlyContribution` | number | Monthly savings          | $0 - $50k             |
+| `months`              | number | Time horizon             | 12 - 600 (1-50 years) |
+| `iterations`          | number | Simulation runs          | 1,000 - 50,000        |
+| `expectedReturn`      | number | Annual return (decimal)  | -0.20 to 0.20         |
+| `volatility`          | number | Annual std dev (decimal) | 0.05 to 0.80          |
 
 ### Recommended Asset Allocations
 
 | Risk Profile | Stocks/Bonds | Expected Return | Volatility |
-|--------------|--------------|-----------------|------------|
-| Conservative | 40/60 | 5% | 10% |
-| Moderate | 60/40 | 7% | 15% |
-| Aggressive | 80/20 | 9% | 20% |
+| ------------ | ------------ | --------------- | ---------- |
+| Conservative | 40/60        | 5%              | 10%        |
+| Moderate     | 60/40        | 7%              | 15%        |
+| Aggressive   | 80/20        | 9%              | 20%        |
 
 ---
 
@@ -215,18 +217,18 @@ curl -X POST https://api.dhanam.io/simulations/goal-probability \
 
 ```typescript
 {
-  probabilityOfSuccess: number;       // 0.0 to 1.0
-  medianOutcome: number;              // Expected final value
-  expectedShortfall: number;          // Avg shortfall if goal not met
+  probabilityOfSuccess: number; // 0.0 to 1.0
+  medianOutcome: number; // Expected final value
+  expectedShortfall: number; // Avg shortfall if goal not met
   confidence90Range: {
-    low: number;                      // 10th percentile
-    high: number;                     // 90th percentile
-  };
+    low: number; // 10th percentile
+    high: number; // 90th percentile
+  }
   recommendedMonthlyContribution: number; // For 75% success rate
   currentMonthlyContribution: number;
   targetAmount: number;
   monthsRemaining: number;
-  simulation: SimulationResult;      // Full simulation data
+  simulation: SimulationResult; // Full simulation data
 }
 ```
 
@@ -241,8 +243,8 @@ curl -X POST https://api.dhanam.io/simulations/goal-probability \
     "low": 78234.12,
     "high": 132456.78
   },
-  "recommendedMonthlyContribution": 1150.00,
-  "currentMonthlyContribution": 1000.00,
+  "recommendedMonthlyContribution": 1150.0,
+  "currentMonthlyContribution": 1000.0,
   "targetAmount": 100000,
   "monthsRemaining": 60
 }
@@ -258,6 +260,7 @@ curl -X POST https://api.dhanam.io/simulations/goal-probability \
 **Usage**: Tracks `monte_carlo_simulation`
 
 Two-phase retirement planning:
+
 1. **Accumulation**: Current age → retirement (save + invest)
 2. **Withdrawal**: Retirement → life expectancy (withdraw + invest)
 
@@ -333,7 +336,7 @@ curl -X POST https://api.dhanam.io/simulations/retirement \
   "accumulationPhase": {
     "yearsToRetirement": 30,
     "finalBalanceMedian": 1234567.89,
-    "finalBalanceP10": 945678.90,
+    "finalBalanceP10": 945678.9,
     "finalBalanceP90": 1678901.23,
     "totalContributions": 540000
   },
@@ -363,13 +366,13 @@ Compare baseline simulation against historical market crash scenarios.
 
 #### Available Scenarios
 
-| Scenario | Magnitude | Duration | Recovery | Historical Example |
-|----------|-----------|----------|----------|-------------------|
-| `BEAR_MARKET` | -30% | 6 months | 12 months | 2018, 2022 |
-| `GREAT_RECESSION` | -50% | 12 months | 24 months | 2008-2009 |
-| `DOT_COM_BUST` | -45% | 18 months | 36 months | 2000-2002 |
-| `MILD_RECESSION` | -15% | 3 months | 6 months | 2020 COVID crash |
-| `MARKET_CORRECTION` | -10% | 1 month | 3 months | Regular corrections |
+| Scenario            | Magnitude | Duration  | Recovery  | Historical Example  |
+| ------------------- | --------- | --------- | --------- | ------------------- |
+| `BEAR_MARKET`       | -30%      | 6 months  | 12 months | 2018, 2022          |
+| `GREAT_RECESSION`   | -50%      | 12 months | 24 months | 2008-2009           |
+| `DOT_COM_BUST`      | -45%      | 18 months | 36 months | 2000-2002           |
+| `MILD_RECESSION`    | -15%      | 3 months  | 6 months  | 2020 COVID crash    |
+| `MARKET_CORRECTION` | -10%      | 1 month   | 3 months  | Regular corrections |
 
 #### Request
 
@@ -390,17 +393,17 @@ curl -X POST https://api.dhanam.io/simulations/scenarios/GREAT_RECESSION \
 
 ```typescript
 {
-  baseline: SimulationResult;       // Normal market conditions
-  scenario: SimulationResult;       // With market crash applied
-  scenarioName: string;             // e.g., "GREAT_RECESSION"
-  scenarioDescription: string;      // Human-readable description
+  baseline: SimulationResult; // Normal market conditions
+  scenario: SimulationResult; // With market crash applied
+  scenarioName: string; // e.g., "GREAT_RECESSION"
+  scenarioDescription: string; // Human-readable description
   comparison: {
-    medianDifference: number;       // How much worse scenario is
+    medianDifference: number; // How much worse scenario is
     medianDifferencePercent: number; // Percentage impact
-    p10Difference: number;          // Impact on worst case
-    recoveryMonths: number;         // How long crash + recovery lasts
-    worthStressTesting: boolean;    // If impact > 10%
-  };
+    p10Difference: number; // Impact on worst case
+    recoveryMonths: number; // How long crash + recovery lasts
+    worthStressTesting: boolean; // If impact > 10%
+  }
 }
 ```
 
@@ -444,8 +447,8 @@ curl -X POST https://api.dhanam.io/simulations/recommended-allocation \
   "expectedReturn": 0.07,
   "volatility": 0.15,
   "allocation": {
-    "stocks": 0.60,
-    "bonds": 0.40
+    "stocks": 0.6,
+    "bonds": 0.4
   },
   "description": "Balanced portfolio with moderate growth potential"
 }
@@ -466,7 +469,7 @@ const config = {
   months: 120,
   expectedReturn: 0.07,
   volatility: 0.15,
-  iterations: 10000
+  iterations: 10000,
 };
 
 const result = await simulationsService.runSimulation(config);
@@ -487,7 +490,7 @@ const goalConfig = {
   monthsRemaining: 60,
   monthlyContribution: 1000,
   expectedReturn: 0.07,
-  volatility: 0.15
+  volatility: 0.15,
 };
 
 const result = await simulationsService.calculateGoalProbability(goalConfig, userId);
@@ -511,12 +514,14 @@ const retirementConfig = {
   monthlyExpenses: 5000,
   socialSecurityIncome: 2000,
   expectedReturn: 0.07,
-  volatility: 0.15
+  volatility: 0.15,
 };
 
 const result = await simulationsService.simulateRetirement(retirementConfig, userId);
 
-console.log(`Probability of success: ${(result.withdrawalPhase.probabilityOfNotRunningOut * 100).toFixed(1)}%`);
+console.log(
+  `Probability of success: ${(result.withdrawalPhase.probabilityOfNotRunningOut * 100).toFixed(1)}%`
+);
 ```
 
 ### Type 4: Stress Testing
@@ -524,12 +529,11 @@ console.log(`Probability of success: ${(result.withdrawalPhase.probabilityOfNotR
 **Use case**: Understand downside risk during market crashes
 
 ```typescript
-const baseConfig = { /* ... */ };
+const baseConfig = {
+  /* ... */
+};
 
-const comparison = await simulationsService.compareScenarios(
-  baseConfig,
-  'GREAT_RECESSION'
-);
+const comparison = await simulationsService.compareScenarios(baseConfig, 'GREAT_RECESSION');
 
 console.log(`Median impact: -$${comparison.comparison.medianDifference.toFixed(2)}`);
 console.log(`Crash duration: ${comparison.comparison.recoveryMonths} months`);
@@ -560,6 +564,7 @@ Market shocks are modeled as discrete events with three phases:
 ```
 
 **Timeline**:
+
 - Months 0-23: Normal stochastic returns
 - Months 24-35: -50% / 12 = -4.17% per month (crash)
 - Months 36-59: Gradual recovery back to baseline
@@ -568,12 +573,14 @@ Market shocks are modeled as discrete events with three phases:
 ### When to Use Scenario Analysis
 
 ✅ **Use scenario analysis when**:
+
 - Client is within 5-10 years of retirement
 - Client has low risk tolerance
 - Portfolio is heavily concentrated
 - Client wants to understand downside protection
 
 ❌ **Don't use scenario analysis when**:
+
 - Time horizon > 30 years (volatility already captures risk)
 - Educational purposes for young investors
 - It would cause undue anxiety
@@ -587,15 +594,15 @@ const customShocks: MarketShock[] = [
     magnitude: -0.35,
     startMonth: 12,
     durationMonths: 8,
-    recoveryMonths: 16
+    recoveryMonths: 16,
   },
   {
     type: 'recession',
-    magnitude: -0.20,
+    magnitude: -0.2,
     startMonth: 60,
     durationMonths: 6,
-    recoveryMonths: 12
-  }
+    recoveryMonths: 12,
+  },
 ];
 
 const result = await monteCarloEngine.simulateWithShocks(config, customShocks);
@@ -612,13 +619,13 @@ The `StatisticsUtil` class provides 25+ statistical functions.
 ```typescript
 import { StatisticsUtil } from '@modules/simulations/utils/statistics.util';
 
-const returns = [0.05, 0.10, -0.03, 0.08, 0.12];
+const returns = [0.05, 0.1, -0.03, 0.08, 0.12];
 
 // Descriptive statistics
-const mean = StatisticsUtil.mean(returns);           // 0.064
-const median = StatisticsUtil.median(returns);       // 0.08
-const stdDev = StatisticsUtil.stdDev(returns);       // ~0.058
-const p90 = StatisticsUtil.percentile(returns, 0.90); // 0.11
+const mean = StatisticsUtil.mean(returns); // 0.064
+const median = StatisticsUtil.median(returns); // 0.08
+const stdDev = StatisticsUtil.stdDev(returns); // ~0.058
+const p90 = StatisticsUtil.percentile(returns, 0.9); // 0.11
 
 // Summary
 const summary = StatisticsUtil.summary(returns);
@@ -639,9 +646,9 @@ const pv = StatisticsUtil.presentValue(19671.51, 0.07, 10); // $10,000
 
 // Annuity Payment (mortgage calculator)
 const payment = StatisticsUtil.annuityPayment(
-  100000,        // Loan amount
-  0.05 / 12,     // Monthly rate
-  360            // 30 years
+  100000, // Loan amount
+  0.05 / 12, // Monthly rate
+  360 // 30 years
 );
 // $536.82 per month
 ```
@@ -650,10 +657,10 @@ const payment = StatisticsUtil.annuityPayment(
 
 ```typescript
 // Annual to monthly
-const monthlyReturn = StatisticsUtil.monthlyReturn(0.10);
+const monthlyReturn = StatisticsUtil.monthlyReturn(0.1);
 // (1.10)^(1/12) - 1 = 0.00797
 
-const monthlyVol = StatisticsUtil.monthlyVolatility(0.20);
+const monthlyVol = StatisticsUtil.monthlyVolatility(0.2);
 // 0.20 / sqrt(12) = 0.0577
 
 // Monthly to annual
@@ -668,16 +675,16 @@ const annualVol = StatisticsUtil.annualizeVolatility(0.0577);
 
 ```typescript
 // Sharpe Ratio
-const returns = [0.10, 0.12, 0.08, 0.15, 0.05];
+const returns = [0.1, 0.12, 0.08, 0.15, 0.05];
 const riskFreeRate = 0.03;
 const sharpe = StatisticsUtil.sharpeRatio(returns, riskFreeRate);
 
 // Value at Risk (95% confidence)
 const var95 = StatisticsUtil.valueAtRisk(
-  100000,   // Mean
-  20000,    // Std Dev
-  0.95,     // Confidence
-  100000    // Initial value
+  100000, // Mean
+  20000, // Std Dev
+  0.95, // Confidence
+  100000 // Initial value
 );
 
 // Maximum Drawdown
@@ -863,13 +870,13 @@ npm test simulations
 
 ### Benchmarks
 
-| Iterations | Months | Time | Requests/sec |
-|------------|--------|------|--------------|
-| 1,000 | 60 | ~50ms | 20 |
-| 5,000 | 120 | ~200ms | 5 |
-| 10,000 | 120 | ~400ms | 2.5 |
-| 10,000 | 480 | ~1.2s | 0.8 |
-| 50,000 | 120 | ~2s | 0.5 |
+| Iterations | Months | Time   | Requests/sec |
+| ---------- | ------ | ------ | ------------ |
+| 1,000      | 60     | ~50ms  | 20           |
+| 5,000      | 120    | ~200ms | 5            |
+| 10,000     | 120    | ~400ms | 2.5          |
+| 10,000     | 480    | ~1.2s  | 0.8          |
+| 50,000     | 120    | ~2s    | 0.5          |
 
 ### Optimization Tips
 
@@ -990,20 +997,20 @@ npm test simulations
 
 ## Glossary
 
-| Term | Definition |
-|------|------------|
-| **Monte Carlo Simulation** | Statistical technique using random sampling to model uncertainty |
-| **Geometric Brownian Motion** | Mathematical model for random stock price movements |
-| **Percentile** | Value below which a percentage of observations fall |
-| **Volatility** | Standard deviation of returns (measure of risk) |
-| **Expected Return** | Average return anticipated over time |
-| **Sharpe Ratio** | Risk-adjusted return metric (higher is better) |
-| **Value at Risk (VaR)** | Maximum expected loss at a given confidence level |
-| **Drawdown** | Peak-to-trough decline in portfolio value |
-| **CAGR** | Compound Annual Growth Rate |
-| **Time Series** | Sequence of data points indexed in time order |
-| **Stochastic** | Randomly determined; having a random probability distribution |
-| **Iteration** | Single run through the simulation loop |
+| Term                          | Definition                                                       |
+| ----------------------------- | ---------------------------------------------------------------- |
+| **Monte Carlo Simulation**    | Statistical technique using random sampling to model uncertainty |
+| **Geometric Brownian Motion** | Mathematical model for random stock price movements              |
+| **Percentile**                | Value below which a percentage of observations fall              |
+| **Volatility**                | Standard deviation of returns (measure of risk)                  |
+| **Expected Return**           | Average return anticipated over time                             |
+| **Sharpe Ratio**              | Risk-adjusted return metric (higher is better)                   |
+| **Value at Risk (VaR)**       | Maximum expected loss at a given confidence level                |
+| **Drawdown**                  | Peak-to-trough decline in portfolio value                        |
+| **CAGR**                      | Compound Annual Growth Rate                                      |
+| **Time Series**               | Sequence of data points indexed in time order                    |
+| **Stochastic**                | Randomly determined; having a random probability distribution    |
+| **Iteration**                 | Single run through the simulation loop                           |
 
 ---
 
@@ -1024,6 +1031,7 @@ npm test simulations
 ## Support
 
 For questions or issues:
+
 - **GitHub Issues**: https://github.com/madfam-io/dhanam/issues
 - **Documentation**: https://docs.dhanam.io/simulations
 - **Email**: support@dhanam.io

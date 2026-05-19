@@ -47,13 +47,13 @@ User -> Link Token -> Plaid Link UI -> Public Token -> Exchange -> Access Token 
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/providers/plaid/link-token` | Generate Plaid Link token |
-| `POST` | `/providers/plaid/spaces/:spaceId/link` | Exchange token and link account |
-| `POST` | `/providers/plaid/webhook` | Webhook handler |
-| `GET` | `/providers/plaid/spaces/:spaceId/bills/upcoming` | Get upcoming bill payments |
-| `GET` | `/providers/plaid/health` | Service health check |
+| Method | Endpoint                                          | Description                     |
+| ------ | ------------------------------------------------- | ------------------------------- |
+| `POST` | `/providers/plaid/link-token`                     | Generate Plaid Link token       |
+| `POST` | `/providers/plaid/spaces/:spaceId/link`           | Exchange token and link account |
+| `POST` | `/providers/plaid/webhook`                        | Webhook handler                 |
+| `GET`  | `/providers/plaid/spaces/:spaceId/bills/upcoming` | Get upcoming bill payments      |
+| `GET`  | `/providers/plaid/health`                         | Service health check            |
 
 ### Service Methods
 
@@ -68,28 +68,28 @@ User -> Link Token -> Plaid Link UI -> Public Token -> Exchange -> Access Token 
 
 The provider syncs detailed liability information:
 
-| Field | Description |
-|-------|-------------|
-| `apr` | Annual percentage rate |
-| `minimumPayment` | Minimum payment amount |
-| `nextPaymentDueDate` | Due date for next payment |
-| `lastPaymentAmount` | Last payment made |
-| `isOverdue` | Overdue status flag |
-| `creditLimit` | Credit limit (credit cards) |
-| `originalPrincipal` | Original loan amount |
+| Field                | Description                 |
+| -------------------- | --------------------------- |
+| `apr`                | Annual percentage rate      |
+| `minimumPayment`     | Minimum payment amount      |
+| `nextPaymentDueDate` | Due date for next payment   |
+| `lastPaymentAmount`  | Last payment made           |
+| `isOverdue`          | Overdue status flag         |
+| `creditLimit`        | Credit limit (credit cards) |
+| `originalPrincipal`  | Original loan amount        |
 
 ## Error Handling
 
 ### Webhook Types
 
-| Type | Events | Action |
-|------|--------|--------|
-| `TRANSACTIONS` | `SYNC_UPDATES_AVAILABLE`, `DEFAULT_UPDATE`, `INITIAL_UPDATE`, `HISTORICAL_UPDATE` | Trigger transaction sync |
-| `TRANSACTIONS` | `TRANSACTIONS_REMOVED` | Remove deleted transactions |
-| `ACCOUNTS` | Account updates | Re-sync account balances |
-| `ITEM` | `ERROR` | Mark connection as errored, disable accounts |
-| `ITEM` | `PENDING_EXPIRATION` | Flag for re-authentication |
-| `ITEM` | `USER_PERMISSION_REVOKED` | Mark as revoked, disable accounts |
+| Type           | Events                                                                            | Action                                       |
+| -------------- | --------------------------------------------------------------------------------- | -------------------------------------------- |
+| `TRANSACTIONS` | `SYNC_UPDATES_AVAILABLE`, `DEFAULT_UPDATE`, `INITIAL_UPDATE`, `HISTORICAL_UPDATE` | Trigger transaction sync                     |
+| `TRANSACTIONS` | `TRANSACTIONS_REMOVED`                                                            | Remove deleted transactions                  |
+| `ACCOUNTS`     | Account updates                                                                   | Re-sync account balances                     |
+| `ITEM`         | `ERROR`                                                                           | Mark connection as errored, disable accounts |
+| `ITEM`         | `PENDING_EXPIRATION`                                                              | Flag for re-authentication                   |
+| `ITEM`         | `USER_PERMISSION_REVOKED`                                                         | Mark as revoked, disable accounts            |
 
 ### Common Errors
 
@@ -105,22 +105,24 @@ All webhooks verified using HMAC-SHA256 signature in `plaid-verification` header
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PLAID_CLIENT_ID` | Plaid client ID | Required |
-| `PLAID_SECRET` | Plaid secret key | Required |
-| `PLAID_ENV` | Environment (sandbox/development/production) | `sandbox` |
-| `PLAID_WEBHOOK_URL` | Webhook endpoint URL | Required |
-| `PLAID_WEBHOOK_SECRET` | Webhook signature secret | Required |
+| Variable               | Description                                  | Default   |
+| ---------------------- | -------------------------------------------- | --------- |
+| `PLAID_CLIENT_ID`      | Plaid client ID                              | Required  |
+| `PLAID_SECRET`         | Plaid secret key                             | Required  |
+| `PLAID_ENV`            | Environment (sandbox/development/production) | `sandbox` |
+| `PLAID_WEBHOOK_URL`    | Webhook endpoint URL                         | Required  |
+| `PLAID_WEBHOOK_SECRET` | Webhook signature secret                     | Required  |
 
 ### Data Mapping
 
 **Currency Mapping**:
+
 - `USD` -> `Currency.USD` (default)
 - `MXN` -> `Currency.MXN`
 - `EUR` -> `Currency.EUR`
 
 **Account Type Mapping**:
+
 - `depository` -> `checking`
 - `credit` -> `credit`
 - `investment` -> `investment`
@@ -135,5 +137,6 @@ All webhooks verified using HMAC-SHA256 signature in `plaid-verification` header
 - `providers/connection-health` - Connection status monitoring
 
 ---
+
 **Provider**: `providers/plaid`
 **Last Updated**: January 2025

@@ -7,7 +7,7 @@
 > access as platform bootstrap or documented break-glass only, and record any
 > missing Enclii adapter gap.
 
-> **Last Updated**: 2026-03-03
+> **Last Updated**: 2026-05-19
 
 ## Overview
 
@@ -15,12 +15,13 @@ Dhanam deploys to bare-metal Kubernetes via **Enclii** (MADFAM's PaaS). The prim
 
 ### Production URLs
 
-| Service          | URL                        |
-| ---------------- | -------------------------- |
-| Web Dashboard    | `https://app.dhan.am`      |
-| Admin Dashboard  | `https://admin.dhanam.com` |
-| API Backend      | `https://api.dhan.am`      |
-| Auth (Janua SSO) | `https://auth.madfam.io`   |
+| Service          | URL                      |
+| ---------------- | ------------------------ |
+| Web Dashboard    | `https://app.dhan.am`    |
+| Landing Page     | `https://dhan.am`        |
+| Admin Dashboard  | `https://admin.dhan.am`  |
+| API Backend      | `https://api.dhan.am`    |
+| Auth (Janua SSO) | `https://auth.madfam.io` |
 
 ### Infrastructure
 
@@ -44,12 +45,12 @@ git push origin main
 # Enclii detects → builds Docker images → deploys to K8s
 ```
 
-Verify deployment:
+Verify deployment through Enclii:
 
 ```bash
-kubectl -n dhanam rollout status deployment/dhanam-api
-kubectl -n dhanam rollout status deployment/dhanam-web
-kubectl -n dhanam get pods
+enclii ps dhanam-api --env production
+enclii ps dhanam-web --env production
+enclii ps dhanam-admin --env production
 ```
 
 ### Manual Deploy via Enclii CLI
@@ -58,7 +59,11 @@ kubectl -n dhanam get pods
 enclii deploy --app dhanam --env production
 ```
 
-### Manual Deploy via kubectl (Fallback)
+### Manual Deploy via kubectl (Break-Glass Only)
+
+Use this only for platform bootstrap or documented incidents when Enclii is
+unavailable or lacks the required adapter. Record the actor, reason, commands,
+result, and follow-up Enclii adapter gap.
 
 ```bash
 # Update image directly
@@ -76,7 +81,10 @@ kubectl -n dhanam set image deployment/dhanam-web \
 | `ci.yml`               | All PRs         | Lint, test, typecheck                         |
 | `deploy-enclii.yml`    | Manual dispatch | Fallback Enclii deploy                        |
 | `deploy-staging.yml`   | Push to main    | Auto-deploy staging (1 replica, `:main` tags) |
-| `deploy-web-k8s.yml`   | Manual dispatch | Web-only K8s deploy                           |
+| `deploy-k8s.yml`       | Manual dispatch | Break-glass API K8s deploy                    |
+| `deploy-web-k8s.yml`   | Manual dispatch | Break-glass web-only K8s deploy               |
+| `deploy-admin-k8s.yml` | Manual dispatch | Break-glass admin-only K8s deploy             |
+| `promote-to-prod.yml`  | Manual dispatch | Promote soaked staging digest to production   |
 | `publish-packages.yml` | Tag / manual    | npm publish to npm.madfam.io                  |
 
 ---

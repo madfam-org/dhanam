@@ -163,8 +163,7 @@ export default function AnalyticsScreen() {
                 style={[
                   styles.savingsAmount,
                   {
-                    color:
-                      (analytics?.netSavings || 0) >= 0 ? '#4CAF50' : '#F44336',
+                    color: (analytics?.netSavings || 0) >= 0 ? '#4CAF50' : '#F44336',
                   },
                 ]}
               >
@@ -204,8 +203,7 @@ export default function AnalyticsScreen() {
                       styles.categoryDot,
                       {
                         backgroundColor:
-                          CATEGORY_COLORS[category.category.toLowerCase()] ||
-                          '#757575',
+                          CATEGORY_COLORS[category.category.toLowerCase()] || '#757575',
                       },
                     ]}
                   />

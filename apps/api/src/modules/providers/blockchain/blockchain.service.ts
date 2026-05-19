@@ -418,19 +418,9 @@ export class BlockchainService {
       throw new BadRequestException('Address derivation only supported for Bitcoin');
     }
 
-    const addresses: string[] = [];
     // Bitcoin HD wallet derivation - bip32 not available in newer versions
     // Would need to use @scure/bip32 or similar library
     throw new BadRequestException('xPub import temporarily disabled');
-
-    // Derive first 20 addresses
-    // for (let i = 0; i < 20; i++) {
-    //   const child = hdNode.derive(0).derive(i); // m/0/i for receive addresses
-    //   const address = bitcoin.payments.p2pkh({ pubkey: child.publicKey }).address!;
-    //   addresses.push(address);
-    // }
-
-    return addresses;
   }
 
   @MonitorPerformance(10000) // 10 second threshold

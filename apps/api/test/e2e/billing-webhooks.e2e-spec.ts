@@ -1,13 +1,14 @@
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import request from 'supertest';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { TestHelper } from './helpers/test.helper';
-import { createE2EApp } from './helpers/e2e-app.helper';
+
 import { stripeWebhookFixtures } from './fixtures/billing.fixtures';
+import { createE2EApp } from './helpers/e2e-app.helper';
+import { TestHelper } from './helpers/test.helper';
 
 /**
  * Billing Webhooks Journey E2E Test
@@ -117,10 +118,7 @@ describe('Billing Webhooks Journey', () => {
       // Attempt to call the actual webhook endpoint.
       // This will likely fail signature verification since we cannot
       // generate a valid Stripe signature, but it tests the route exists.
-      const payload = stripeWebhookFixtures.checkoutCompleted(
-        stripeCustomerId,
-        userEmail,
-      );
+      const payload = stripeWebhookFixtures.checkoutCompleted(stripeCustomerId, userEmail);
 
       const response = await request(app.getHttpServer())
         .post('/v1/billing/webhook')
@@ -230,9 +228,7 @@ describe('Billing Webhooks Journey', () => {
     it('should handle missing signature header', async () => {
       const payload = stripeWebhookFixtures.subscriptionCreated(stripeCustomerId);
 
-      const response = await request(app.getHttpServer())
-        .post('/v1/billing/webhook')
-        .send(payload);
+      const response = await request(app.getHttpServer()).post('/v1/billing/webhook').send(payload);
 
       // Missing stripe-signature header
       expect(response.status).toBe(200);
@@ -310,29 +306,21 @@ describe('Billing Webhooks Journey', () => {
 
   describe('Billing Endpoint Authorization', () => {
     it('should require auth for billing status', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/billing/status')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/billing/status').expect(401);
     });
 
     it('should require auth for billing usage', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/billing/usage')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/billing/usage').expect(401);
     });
 
     it('should allow public access to pricing endpoint', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/billing/pricing')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/v1/billing/pricing').expect(200);
 
       expect(response.body).toBeDefined();
     });
 
     it('should require auth for portal session creation', async () => {
-      await request(app.getHttpServer())
-        .post('/v1/billing/portal')
-        .expect(401);
+      await request(app.getHttpServer()).post('/v1/billing/portal').expect(401);
     });
   });
 });

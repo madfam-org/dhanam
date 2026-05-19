@@ -60,7 +60,7 @@ describe('MerchantService', () => {
 
     expect(created).toEqual({ id: 'ma_1' });
     expect(stripeConnect.createMerchantAccount).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: 'u1', country: 'US' }),
+      expect.objectContaining({ userId: 'u1', country: 'US' })
     );
     expect(prisma.merchantAccount.create).toHaveBeenCalledWith({
       data: expect.objectContaining({

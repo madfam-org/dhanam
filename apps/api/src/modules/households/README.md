@@ -12,78 +12,78 @@ The Households module enables users to create household groups that aggregate mu
 
 Container entity grouping related spaces and goals.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Unique identifier |
-| `name` | string | Household display name |
-| `type` | enum | Household type |
-| `baseCurrency` | enum | Default currency for aggregations |
-| `description` | string | Optional description |
-| `createdAt` | datetime | Creation timestamp |
-| `updatedAt` | datetime | Last modification timestamp |
+| Field          | Type     | Description                       |
+| -------------- | -------- | --------------------------------- |
+| `id`           | UUID     | Unique identifier                 |
+| `name`         | string   | Household display name            |
+| `type`         | enum     | Household type                    |
+| `baseCurrency` | enum     | Default currency for aggregations |
+| `description`  | string   | Optional description              |
+| `createdAt`    | datetime | Creation timestamp                |
+| `updatedAt`    | datetime | Last modification timestamp       |
 
 ### HouseholdType
 
-| Type | Description |
-|------|-------------|
-| `family` | Traditional family household |
-| `couple` | Two-person partnership |
-| `roommates` | Shared living arrangement |
-| `business_partners` | Business partnership |
-| `other` | Custom arrangement |
+| Type                | Description                  |
+| ------------------- | ---------------------------- |
+| `family`            | Traditional family household |
+| `couple`            | Two-person partnership       |
+| `roommates`         | Shared living arrangement    |
+| `business_partners` | Business partnership         |
+| `other`             | Custom arrangement           |
 
 ### HouseholdMember
 
 Links users to households with relationship metadata.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Unique identifier |
-| `householdId` | UUID | Reference to household |
-| `userId` | UUID | Reference to user |
-| `relationship` | enum | Member's relationship type |
-| `isMinor` | boolean | Minor status (restricted access) |
-| `accessStartDate` | datetime | When access becomes active |
-| `notes` | string | Member notes |
-| `createdAt` | datetime | Join timestamp |
+| Field             | Type     | Description                      |
+| ----------------- | -------- | -------------------------------- |
+| `id`              | UUID     | Unique identifier                |
+| `householdId`     | UUID     | Reference to household           |
+| `userId`          | UUID     | Reference to user                |
+| `relationship`    | enum     | Member's relationship type       |
+| `isMinor`         | boolean  | Minor status (restricted access) |
+| `accessStartDate` | datetime | When access becomes active       |
+| `notes`           | string   | Member notes                     |
+| `createdAt`       | datetime | Join timestamp                   |
 
 ### RelationshipType
 
-| Type | Description |
-|------|-------------|
-| `spouse` | Married partner |
-| `partner` | Unmarried partner |
-| `parent` | Parent |
-| `child` | Child |
-| `sibling` | Sibling |
-| `other` | Other relationship |
+| Type      | Description        |
+| --------- | ------------------ |
+| `spouse`  | Married partner    |
+| `partner` | Unmarried partner  |
+| `parent`  | Parent             |
+| `child`   | Child              |
+| `sibling` | Sibling            |
+| `other`   | Other relationship |
 
 ## API Endpoints
 
 ### Household Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/households` | Create a new household |
-| `GET` | `/households` | List user's households |
-| `GET` | `/households/:id` | Get household details |
-| `PUT` | `/households/:id` | Update household |
-| `DELETE` | `/households/:id` | Delete household |
+| Method   | Endpoint          | Description            |
+| -------- | ----------------- | ---------------------- |
+| `POST`   | `/households`     | Create a new household |
+| `GET`    | `/households`     | List user's households |
+| `GET`    | `/households/:id` | Get household details  |
+| `PUT`    | `/households/:id` | Update household       |
+| `DELETE` | `/households/:id` | Delete household       |
 
 ### Aggregated Views
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/households/:id/net-worth` | Get consolidated net worth |
-| `GET` | `/households/:id/goals/summary` | Get goal summary |
+| Method | Endpoint                        | Description                |
+| ------ | ------------------------------- | -------------------------- |
+| `GET`  | `/households/:id/net-worth`     | Get consolidated net worth |
+| `GET`  | `/households/:id/goals/summary` | Get goal summary           |
 
 ### Member Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/households/:id/members` | Add household member |
-| `PUT` | `/households/:id/members/:memberId` | Update member details |
-| `DELETE` | `/households/:id/members/:memberId` | Remove member |
+| Method   | Endpoint                            | Description           |
+| -------- | ----------------------------------- | --------------------- |
+| `POST`   | `/households/:id/members`           | Add household member  |
+| `PUT`    | `/households/:id/members/:memberId` | Update member details |
+| `DELETE` | `/households/:id/members/:memberId` | Remove member         |
 
 ### Request/Response Examples
 
@@ -116,33 +116,33 @@ Links users to households with relationship metadata.
 
 ```json
 {
-  "totalNetWorth": 250000.00,
+  "totalNetWorth": 250000.0,
   "bySpace": [
     {
       "spaceId": "uuid",
       "spaceName": "Joint Accounts",
-      "netWorth": 150000.00,
-      "assets": 160000.00,
-      "liabilities": 10000.00
+      "netWorth": 150000.0,
+      "assets": 160000.0,
+      "liabilities": 10000.0
     },
     {
       "spaceId": "uuid",
       "spaceName": "Partner A Personal",
-      "netWorth": 50000.00,
-      "assets": 50000.00,
+      "netWorth": 50000.0,
+      "assets": 50000.0,
       "liabilities": 0
     },
     {
       "spaceId": "uuid",
       "spaceName": "Partner B Personal",
-      "netWorth": 50000.00,
-      "assets": 55000.00,
-      "liabilities": 5000.00
+      "netWorth": 50000.0,
+      "assets": 55000.0,
+      "liabilities": 5000.0
     }
   ],
   "byCurrency": {
-    "USD": 200000.00,
-    "MXN": 50000.00
+    "USD": 200000.0,
+    "MXN": 50000.0
   }
 }
 ```
@@ -154,7 +154,7 @@ Links users to households with relationship metadata.
   "totalGoals": 5,
   "activeGoals": 4,
   "achievedGoals": 1,
-  "totalTargetAmount": 500000.00,
+  "totalTargetAmount": 500000.0,
   "byType": {
     "retirement": 2,
     "emergency_fund": 1,
@@ -238,10 +238,10 @@ HouseholdsController
 
 ## Error Handling
 
-| Error | Status | Condition |
-|-------|--------|-----------|
-| `NotFoundException` | 404 | Household, user, or member not found |
-| `BadRequestException` | 400 | Duplicate member, has associations, last member |
+| Error                 | Status | Condition                                       |
+| --------------------- | ------ | ----------------------------------------------- |
+| `NotFoundException`   | 404    | Household, user, or member not found            |
+| `BadRequestException` | 400    | Duplicate member, has associations, last member |
 
 ### Error Messages
 
@@ -256,13 +256,14 @@ HouseholdsController
 
 The household structure supports three ownership perspectives:
 
-| View | Description | Implementation |
-|------|-------------|----------------|
-| **Yours** | Partner A's personal spaces | Filter by userId |
-| **Mine** | Partner B's personal spaces | Filter by userId |
-| **Ours** | Shared household spaces | Filter by householdId |
+| View      | Description                 | Implementation        |
+| --------- | --------------------------- | --------------------- |
+| **Yours** | Partner A's personal spaces | Filter by userId      |
+| **Mine**  | Partner B's personal spaces | Filter by userId      |
+| **Ours**  | Shared household spaces     | Filter by householdId |
 
 This model enables:
+
 - Individual financial privacy
 - Collaborative household planning
 - Consolidated net worth visibility
@@ -270,12 +271,12 @@ This model enables:
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
+| Module   | Relationship                    |
+| -------- | ------------------------------- |
 | `spaces` | Spaces can belong to households |
-| `goals` | Goals can be household-level |
-| `users` | Members reference user accounts |
-| `audit` | Household actions are audited |
+| `goals`  | Goals can be household-level    |
+| `users`  | Members reference user accounts |
+| `audit`  | Household actions are audited   |
 
 ## Testing
 
@@ -318,5 +319,6 @@ pnpm test:cov -- households
 - Update member relationships
 
 ---
+
 **Module**: `households`
 **Last Updated**: January 2025

@@ -1,5 +1,6 @@
-import { PrismaService } from '@core/prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
+
+import { PrismaService } from '@core/prisma/prisma.service';
 
 export interface ErrorReport {
   id: string;

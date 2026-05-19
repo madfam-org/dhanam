@@ -16,7 +16,8 @@ export const reports = {
   templates: {
     heading: 'Modelos de relatórios',
     financialSummary: 'Resumo financeiro',
-    financialSummaryDesc: 'Panorama financeiro completo incluindo receitas, despesas e patrimônio líquido',
+    financialSummaryDesc:
+      'Panorama financeiro completo incluindo receitas, despesas e patrimônio líquido',
     transactionExport: 'Exportar transações',
     transactionExportDesc: 'Exporte todas as transações do período selecionado',
     budgetPerformance: 'Desempenho do orçamento',
@@ -52,7 +53,8 @@ export const reports = {
   },
   createDialog: {
     title: 'Criar relatório salvo',
-    description: 'Salve uma configuração de relatório para gerar e arquivar sob demanda ou de forma agendada.',
+    description:
+      'Salve uma configuração de relatório para gerar e arquivar sob demanda ou de forma agendada.',
     reportName: 'Nome do relatório',
     reportNamePlaceholder: 'Resumo financeiro mensal',
     reportDescription: 'Descrição (Opcional)',

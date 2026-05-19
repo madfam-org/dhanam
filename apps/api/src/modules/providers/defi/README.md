@@ -10,32 +10,32 @@ The DeFi provider enables tracking of decentralized finance positions across mul
 
 ### Supported Networks
 
-| Network | Chain ID | Description |
-|---------|----------|-------------|
-| `ethereum` | 1 | Ethereum Mainnet |
-| `polygon` | 137 | Polygon PoS |
-| `arbitrum` | 42161 | Arbitrum One |
-| `optimism` | 10 | Optimism |
-| `base` | 8453 | Base |
-| `avalanche` | 43114 | Avalanche C-Chain |
-| `bsc` | 56 | BNB Smart Chain |
+| Network     | Chain ID | Description       |
+| ----------- | -------- | ----------------- |
+| `ethereum`  | 1        | Ethereum Mainnet  |
+| `polygon`   | 137      | Polygon PoS       |
+| `arbitrum`  | 42161    | Arbitrum One      |
+| `optimism`  | 10       | Optimism          |
+| `base`      | 8453     | Base              |
+| `avalanche` | 43114    | Avalanche C-Chain |
+| `bsc`       | 56       | BNB Smart Chain   |
 
 ### Supported Protocols
 
-| Protocol | Position Types |
-|----------|---------------|
-| `uniswap-v2` | Liquidity pools |
-| `uniswap-v3` | Concentrated liquidity |
-| `aave-v2` / `aave-v3` | Lending, borrowing |
-| `compound-v2` / `compound-v3` | Lending, borrowing |
-| `curve` | Liquidity pools, staking |
-| `lido` | ETH staking (stETH) |
-| `yearn` | Yield vaults |
-| `maker` | CDP, DAI minting |
-| `convex` | Curve staking |
-| `balancer` | Liquidity pools |
-| `sushiswap` | Liquidity pools, farming |
-| `pancakeswap` | Liquidity pools (BSC) |
+| Protocol                      | Position Types           |
+| ----------------------------- | ------------------------ |
+| `uniswap-v2`                  | Liquidity pools          |
+| `uniswap-v3`                  | Concentrated liquidity   |
+| `aave-v2` / `aave-v3`         | Lending, borrowing       |
+| `compound-v2` / `compound-v3` | Lending, borrowing       |
+| `curve`                       | Liquidity pools, staking |
+| `lido`                        | ETH staking (stETH)      |
+| `yearn`                       | Yield vaults             |
+| `maker`                       | CDP, DAI minting         |
+| `convex`                      | Curve staking            |
+| `balancer`                    | Liquidity pools          |
+| `sushiswap`                   | Liquidity pools, farming |
+| `pancakeswap`                 | Liquidity pools (BSC)    |
 
 ### Position Types
 
@@ -64,6 +64,7 @@ Wallet Address -> Zapper API -> Protocol Positions -> Aggregated Portfolio
 ### API Authentication
 
 Zapper API uses Basic Auth with API key:
+
 ```
 Authorization: Basic {base64(apiKey + ':')}
 ```
@@ -72,23 +73,25 @@ Authorization: Basic {base64(apiKey + ':')}
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/spaces/:spaceId/defi/status` | Check DeFi integration status |
-| `GET` | `/spaces/:spaceId/defi/summary` | Get space DeFi summary |
-| `GET` | `/spaces/:spaceId/defi/accounts/:accountId` | Get account positions |
-| `POST` | `/spaces/:spaceId/defi/accounts/:accountId/sync` | Sync account positions |
-| `POST` | `/spaces/:spaceId/defi/sync-all` | Sync all crypto accounts |
+| Method | Endpoint                                         | Description                   |
+| ------ | ------------------------------------------------ | ----------------------------- |
+| `GET`  | `/spaces/:spaceId/defi/status`                   | Check DeFi integration status |
+| `GET`  | `/spaces/:spaceId/defi/summary`                  | Get space DeFi summary        |
+| `GET`  | `/spaces/:spaceId/defi/accounts/:accountId`      | Get account positions         |
+| `POST` | `/spaces/:spaceId/defi/accounts/:accountId/sync` | Sync account positions        |
+| `POST` | `/spaces/:spaceId/defi/sync-all`                 | Sync all crypto accounts      |
 
 ### Service Methods
 
 **ZapperService**:
+
 - `getPortfolio(address, network)` - Fetch all positions for wallet
 - `getProtocolPositions(address, protocols, network)` - Filter by protocols
 - `getMultiNetworkStats(address, networks)` - Aggregate across networks
 - `isAvailable()` - Check if Zapper API is configured
 
 **DeFiService**:
+
 - `getAccountPositions(spaceId, accountId)` - Get positions for account
 - `getSpaceDeFiSummary(spaceId)` - Aggregate all DeFi in space
 - `syncAccountPositions(spaceId, accountId)` - Refresh positions
@@ -106,7 +109,7 @@ interface DeFiPosition {
   tokens: DeFiToken[];
   balanceUsd: number;
   apy?: number;
-  healthFactor?: number;  // For lending
+  healthFactor?: number; // For lending
   borrowedUsd?: number;
   suppliedUsd?: number;
 }
@@ -124,6 +127,7 @@ interface DeFiPosition {
 ### Fallback Behavior
 
 When Zapper API unavailable:
+
 - Mock data generated for development/testing
 - Deterministic mock based on address hash
 - Realistic position structures for UI testing
@@ -138,11 +142,11 @@ When Zapper API unavailable:
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ZAPPER_API_KEY` | Zapper API key | Required for production |
-| `ZAPPER_API_URL` | Zapper API base URL | `https://api.zapper.xyz/v2` |
-| `ZAPPER_RATE_LIMIT` | Requests per minute | `30` |
+| Variable            | Description         | Default                     |
+| ------------------- | ------------------- | --------------------------- |
+| `ZAPPER_API_KEY`    | Zapper API key      | Required for production     |
+| `ZAPPER_API_URL`    | Zapper API base URL | `https://api.zapper.xyz/v2` |
+| `ZAPPER_RATE_LIMIT` | Requests per minute | `30`                        |
 
 ### Caching
 
@@ -153,6 +157,7 @@ When Zapper API unavailable:
 ### Account Metadata Requirements
 
 Crypto accounts must have metadata with:
+
 ```json
 {
   "walletAddress": "0x...",
@@ -168,5 +173,6 @@ Crypto accounts must have metadata with:
 - `providers/blockchain` - Wallet management
 
 ---
+
 **Provider**: `providers/defi`
 **Last Updated**: January 2025

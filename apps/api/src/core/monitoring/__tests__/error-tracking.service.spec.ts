@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { ErrorTrackingService, ErrorReport } from '../error-tracking.service';
 import { PrismaService } from '@core/prisma/prisma.service';
+
+import { ErrorTrackingService, ErrorReport } from '../error-tracking.service';
 
 describe('ErrorTrackingService', () => {
   let service: ErrorTrackingService;
@@ -124,9 +125,7 @@ describe('ErrorTrackingService', () => {
       prisma.errorLog.create.mockRejectedValue(new Error('Database unavailable'));
 
       // Should not throw
-      await expect(
-        service.reportError(new Error('Test error'))
-      ).resolves.not.toThrow();
+      await expect(service.reportError(new Error('Test error'))).resolves.not.toThrow();
     });
 
     it('should include timestamp in error report', async () => {
@@ -197,7 +196,11 @@ describe('ErrorTrackingService', () => {
       prisma.errorLog.groupBy
         .mockResolvedValueOnce([{ level: 'error', _count: { level: 10 } }])
         .mockResolvedValueOnce([
-          { message: 'Connection timeout', _count: { message: 5 }, _max: { timestamp: new Date() } },
+          {
+            message: 'Connection timeout',
+            _count: { message: 5 },
+            _max: { timestamp: new Date() },
+          },
           { message: 'Invalid token', _count: { message: 3 }, _max: { timestamp: new Date() } },
         ]);
 
@@ -322,10 +325,7 @@ describe('ErrorTrackingService', () => {
     });
 
     it('should concatenate validation error messages', async () => {
-      const validationErrors = [
-        { message: 'Field A invalid' },
-        { message: 'Field B invalid' },
-      ];
+      const validationErrors = [{ message: 'Field A invalid' }, { message: 'Field B invalid' }];
 
       // This tests the message formatting - we'd need to verify logging
       await expect(
@@ -391,9 +391,7 @@ describe('ErrorTrackingService', () => {
       prisma.errorLog.create.mockRejectedValue(new Error('Table does not exist'));
 
       // Should not throw and should complete gracefully
-      await expect(
-        service.reportError(new Error('Test error'))
-      ).resolves.not.toThrow();
+      await expect(service.reportError(new Error('Test error'))).resolves.not.toThrow();
     });
   });
 });

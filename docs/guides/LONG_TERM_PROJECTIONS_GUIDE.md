@@ -14,18 +14,18 @@ The projection engine uses Monte Carlo simulation to model uncertainty:
 
 ```typescript
 interface ProjectionConfig {
-  horizon: number;           // Years (10, 20, 30)
-  scenarios: number;         // Simulation runs (100-10000)
+  horizon: number; // Years (10, 20, 30)
+  scenarios: number; // Simulation runs (100-10000)
   assumptions: ProjectionAssumptions;
   lifeEvents: LifeEvent[];
 }
 
 interface ProjectionAssumptions {
-  inflationRate: number;       // Annual inflation (e.g., 0.03)
-  incomeGrowthRate: number;    // Annual income growth (e.g., 0.025)
-  portfolioReturn: number;     // Expected return (e.g., 0.07)
+  inflationRate: number; // Annual inflation (e.g., 0.03)
+  incomeGrowthRate: number; // Annual income growth (e.g., 0.025)
+  portfolioReturn: number; // Expected return (e.g., 0.07)
   portfolioVolatility: number; // Standard deviation (e.g., 0.15)
-  retirementAge?: number;      // When income drops
+  retirementAge?: number; // When income drops
   retirementSpending?: number; // Annual spending in retirement
 }
 ```
@@ -43,7 +43,7 @@ function runScenario(config: ProjectionConfig, seed: number): YearlyOutcome[] {
 
   for (let year = 1; year <= config.horizon; year++) {
     // Apply life events
-    const event = config.lifeEvents.find(e => e.year === year);
+    const event = config.lifeEvents.find((e) => e.year === year);
     if (event) {
       netWorth += event.amount || 0;
       income += event.incomeChange || 0;
@@ -65,7 +65,7 @@ function runScenario(config: ProjectionConfig, seed: number): YearlyOutcome[] {
 
     // Apply income growth
     if (!isRetired(year, config.assumptions)) {
-      income *= (1 + config.assumptions.incomeGrowthRate);
+      income *= 1 + config.assumptions.incomeGrowthRate;
     }
 
     outcomes.push({
@@ -74,7 +74,7 @@ function runScenario(config: ProjectionConfig, seed: number): YearlyOutcome[] {
       income,
       expenses,
       savings,
-      portfolioReturn: return_
+      portfolioReturn: return_,
     });
   }
 
@@ -89,12 +89,12 @@ Results are aggregated across all scenarios:
 ```typescript
 interface ProjectionResults {
   median: YearlyOutcome[];
-  percentile10: YearlyOutcome[];  // Pessimistic
+  percentile10: YearlyOutcome[]; // Pessimistic
   percentile25: YearlyOutcome[];
   percentile75: YearlyOutcome[];
-  percentile90: YearlyOutcome[];  // Optimistic
-  successProbability: number;     // % of scenarios with positive net worth
-  runOutYear: number | null;      // Year of first negative net worth
+  percentile90: YearlyOutcome[]; // Optimistic
+  successProbability: number; // % of scenarios with positive net worth
+  runOutYear: number | null; // Year of first negative net worth
 }
 ```
 
@@ -104,17 +104,17 @@ Model significant financial events:
 
 ### Supported Event Types
 
-| Type | Description | Parameters |
-|------|-------------|------------|
-| `home_purchase` | Buy a home | `amount` (down payment + closing) |
-| `home_sale` | Sell a home | `amount` (proceeds after costs) |
-| `college` | Education expenses | `amount` (total cost) |
-| `wedding` | Wedding expenses | `amount` |
-| `inheritance` | Receive inheritance | `amount` |
-| `retirement` | Stop working | `incomeChange` (salary to $0) |
-| `career_change` | Change careers | `incomeChange` (delta) |
-| `child` | New child | `expenseChange` (annual increase) |
-| `custom` | Custom event | `amount`, `incomeChange`, `expenseChange` |
+| Type            | Description         | Parameters                                |
+| --------------- | ------------------- | ----------------------------------------- |
+| `home_purchase` | Buy a home          | `amount` (down payment + closing)         |
+| `home_sale`     | Sell a home         | `amount` (proceeds after costs)           |
+| `college`       | Education expenses  | `amount` (total cost)                     |
+| `wedding`       | Wedding expenses    | `amount`                                  |
+| `inheritance`   | Receive inheritance | `amount`                                  |
+| `retirement`    | Stop working        | `incomeChange` (salary to $0)             |
+| `career_change` | Change careers      | `incomeChange` (delta)                    |
+| `child`         | New child           | `expenseChange` (annual increase)         |
+| `custom`        | Custom event        | `amount`, `incomeChange`, `expenseChange` |
 
 ### Example Life Event Timeline
 
@@ -124,26 +124,26 @@ const lifeEvents: LifeEvent[] = [
     year: 3,
     type: 'home_purchase',
     label: 'Buy first home',
-    amount: -80000  // Down payment + closing costs
+    amount: -80000, // Down payment + closing costs
   },
   {
     year: 5,
     type: 'child',
     label: 'First child',
-    expenseChange: 15000  // Annual childcare costs
+    expenseChange: 15000, // Annual childcare costs
   },
   {
     year: 18,
     type: 'college',
     label: 'Child college',
-    amount: -200000  // Total 4-year cost
+    amount: -200000, // Total 4-year cost
   },
   {
     year: 25,
     type: 'retirement',
     label: 'Retire at 65',
-    incomeChange: -120000  // Salary stops
-  }
+    incomeChange: -120000, // Salary stops
+  },
 ];
 ```
 
@@ -156,6 +156,7 @@ GET /projections/long-term?spaceId=space_123&years=30&scenarios=1000
 ```
 
 **Response:**
+
 ```json
 {
   "projection": {
@@ -236,6 +237,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "scenarios": [
@@ -267,17 +269,17 @@ Compare different assumptions:
 ```typescript
 // Example: Impact of retiring 5 years later
 const baseCase = await runProjection({
-  assumptions: { retirementAge: 60 }
+  assumptions: { retirementAge: 60 },
 });
 
 const laterRetirement = await runProjection({
-  assumptions: { retirementAge: 65 }
+  assumptions: { retirementAge: 65 },
 });
 
 // Compare outcomes
 const improvement = {
   successProbability: laterRetirement.successProbability - baseCase.successProbability,
-  medianYear30: laterRetirement.outcomes.median.year30 - baseCase.outcomes.median.year30
+  medianYear30: laterRetirement.outcomes.median.year30 - baseCase.outcomes.median.year30,
 };
 ```
 
@@ -290,7 +292,7 @@ import { MonteCarloEngine, ProjectionConfig } from '@dhanam/simulations';
 
 const engine = new MonteCarloEngine({
   scenarios: 5000,
-  seed: Date.now()
+  seed: Date.now(),
 });
 
 const results = await engine.runProjection({
@@ -299,7 +301,7 @@ const results = await engine.runProjection({
   annualIncome: income,
   annualExpenses: expenses,
   assumptions: config.assumptions,
-  lifeEvents: config.lifeEvents
+  lifeEvents: config.lifeEvents,
 });
 ```
 
@@ -314,7 +316,7 @@ import { ProjectionFanChart } from '@/components/projections/fan-chart';
   projection={projectionResults}
   showPercentiles={[10, 25, 50, 75, 90]}
   lifeEvents={lifeEvents}
-/>
+/>;
 ```
 
 ### Scenario Comparison
@@ -322,10 +324,7 @@ import { ProjectionFanChart } from '@/components/projections/fan-chart';
 ```tsx
 import { ScenarioComparison } from '@/components/projections/scenario-comparison';
 
-<ScenarioComparison
-  scenarios={savedScenarios}
-  highlightMetric="successProbability"
-/>
+<ScenarioComparison scenarios={savedScenarios} highlightMetric="successProbability" />;
 ```
 
 ### Life Event Timeline
@@ -333,23 +332,19 @@ import { ScenarioComparison } from '@/components/projections/scenario-comparison
 ```tsx
 import { LifeEventTimeline } from '@/components/projections/life-event-timeline';
 
-<LifeEventTimeline
-  events={lifeEvents}
-  onEdit={handleEditEvent}
-  onAdd={handleAddEvent}
-/>
+<LifeEventTimeline events={lifeEvents} onEdit={handleEditEvent} onAdd={handleAddEvent} />;
 ```
 
 ## Assumptions & Limitations
 
 ### Default Assumptions
 
-| Parameter | Default | Range |
-|-----------|---------|-------|
-| Inflation Rate | 3% | 1-6% |
-| Income Growth | 2.5% | 0-5% |
-| Portfolio Return | 7% | 3-12% |
-| Portfolio Volatility | 15% | 5-30% |
+| Parameter            | Default | Range |
+| -------------------- | ------- | ----- |
+| Inflation Rate       | 3%      | 1-6%  |
+| Income Growth        | 2.5%    | 0-5%  |
+| Portfolio Return     | 7%      | 3-12% |
+| Portfolio Volatility | 15%     | 5-30% |
 
 ### Limitations
 

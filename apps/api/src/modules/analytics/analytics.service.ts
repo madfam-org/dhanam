@@ -1,4 +1,3 @@
-import { Currency } from '@db';
 import {
   ANALYTICS,
   NetWorthResponse,
@@ -10,6 +9,8 @@ import {
 } from '@dhanam/shared';
 import { Injectable, Logger } from '@nestjs/common';
 import { subDays, startOfDay, eachDayOfInterval, format } from 'date-fns';
+
+import { Currency } from '@db';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { FxRatesService } from '../fx-rates/fx-rates.service';

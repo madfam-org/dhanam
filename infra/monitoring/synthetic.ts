@@ -131,7 +131,9 @@ async function main() {
 
   for (const result of results) {
     const icon = result.passed ? '✅' : '❌';
-    console.log(`${icon} ${result.name} (${result.durationMs}ms)${result.error ? ` - ${result.error}` : ''}`);
+    console.log(
+      `${icon} ${result.name} (${result.durationMs}ms)${result.error ? ` - ${result.error}` : ''}`
+    );
   }
 
   const failed = results.filter((r) => !r.passed);

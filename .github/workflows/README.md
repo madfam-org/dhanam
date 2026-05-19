@@ -4,26 +4,29 @@ This directory contains GitHub Actions workflows for CI/CD, quality checks, and 
 
 ## Workflow Overview
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `ci.yml` | Push, PR | Core CI pipeline - lint, test, build |
-| `lint.yml` | Push, PR | Code quality checks (ESLint, Prettier) |
-| `test-coverage.yml` | Push, PR | Test execution with coverage reporting |
-| `check-migrations.yml` | PR | Database migration validation |
-| `deploy-enclii.yml` | Manual | Trigger Enclii deployment (fallback) |
-| `deploy-k8s.yml` | Manual | Deploy to Kubernetes (fallback) |
-| `deploy-web-k8s.yml` | Manual | Deploy web app only (fallback) |
+| Workflow               | Trigger  | Purpose                                |
+| ---------------------- | -------- | -------------------------------------- |
+| `ci.yml`               | Push, PR | Core CI pipeline - lint, test, build   |
+| `lint.yml`             | Push, PR | Code quality checks (ESLint, Prettier) |
+| `test-coverage.yml`    | Push, PR | Test execution with coverage reporting |
+| `check-migrations.yml` | PR       | Database migration validation          |
+| `deploy-enclii.yml`    | Manual   | Trigger Enclii deployment fallback     |
+| `deploy-k8s.yml`       | Manual   | Break-glass API Kubernetes deploy      |
+| `deploy-web-k8s.yml`   | Manual   | Break-glass web Kubernetes deploy      |
+| `deploy-admin-k8s.yml` | Manual   | Break-glass admin Kubernetes deploy    |
 
 ## Primary Deployment
 
-**Production deployments are handled by Enclii PaaS, NOT GitHub Actions.**
+**Production deployments are handled by Enclii PaaS and manual digest promotion, NOT raw GitHub Actions deploys.**
 
 When you push to `main`:
-1. Enclii auto-detects the change
-2. Builds Docker images
-3. Deploys to production Kubernetes cluster
 
-The deployment workflows here are **fallback options** for manual intervention.
+1. CI validates the change
+2. `deploy-staging.yml` builds api/web/admin and patches digest-pinned staging images
+3. ArgoCD reconciles staging
+4. `promote-to-prod.yml` manually promotes a soaked staging digest to production
+
+The raw K8s deployment workflows here are **break-glass options** for manual intervention when Enclii or promotion is unavailable.
 
 ## CI/CD Pipeline
 
@@ -48,6 +51,7 @@ check-migrations.yml →  Validates Prisma migrations
 Main CI pipeline that runs on all pushes and PRs.
 
 **Jobs:**
+
 - Install dependencies
 - Lint codebase
 - Run tests
@@ -59,6 +63,7 @@ Main CI pipeline that runs on all pushes and PRs.
 Runs ESLint and Prettier checks.
 
 **Checks:**
+
 - TypeScript type checking
 - ESLint rule violations
 - Prettier formatting
@@ -68,6 +73,7 @@ Runs ESLint and Prettier checks.
 Executes test suites and reports coverage.
 
 **Features:**
+
 - Jest test execution
 - Coverage threshold enforcement (80%+)
 - Codecov integration
@@ -78,6 +84,7 @@ Executes test suites and reports coverage.
 Validates database migrations on PRs.
 
 **Checks:**
+
 - Migration file syntax
 - Schema consistency
 - No destructive changes without review
@@ -87,31 +94,33 @@ Validates database migrations on PRs.
 Manual trigger to invoke Enclii deployment.
 
 **Usage:**
+
 ```bash
 # Via GitHub UI: Actions → deploy-enclii → Run workflow
 # Or via gh CLI:
 gh workflow run deploy-enclii.yml
 ```
 
-### deploy-k8s.yml / deploy-web-k8s.yml
+### deploy-k8s.yml / deploy-web-k8s.yml / deploy-admin-k8s.yml
 
 Manual Kubernetes deployment workflows.
 
 **Usage:**
-- Emergency deployments when Enclii is unavailable
-- Staging environment deployments
-- Rollback procedures
+
+- Emergency deployments when Enclii/promotion is unavailable
+- Documented incident response only
+- Record the missing Enclii adapter gap after use
 
 ## Environment Secrets
 
 Required secrets in GitHub repository settings:
 
-| Secret | Purpose |
-|--------|---------|
+| Secret             | Purpose                    |
+| ------------------ | -------------------------- |
 | `NPM_MADFAM_TOKEN` | MADFAM npm registry access |
-| `CODECOV_TOKEN` | Coverage reporting |
-| `ENCLII_API_KEY` | Enclii deployment trigger |
-| `KUBECONFIG` | K8s deployment (fallback) |
+| `CODECOV_TOKEN`    | Coverage reporting         |
+| `ENCLII_API_KEY`   | Enclii deployment trigger  |
+| `KUBECONFIG`       | K8s deployment (fallback)  |
 
 ## Branch Protection
 

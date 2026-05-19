@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { hash } from 'argon2';
 import request from 'supertest';
+
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { hash } from 'argon2';
 
 describe('Spaces and Budgets Integration (e2e)', () => {
   let app: INestApplication;
@@ -20,7 +21,7 @@ describe('Spaces and Budgets Integration (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     prisma = app.get<PrismaService>(PrismaService);
-    
+
     await app.init();
 
     // Clean database
@@ -42,12 +43,10 @@ describe('Spaces and Budgets Integration (e2e)', () => {
     });
     userId = user.id;
 
-    const loginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        email: 'spaces@example.com',
-        password: 'SpacesPass123!',
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+      email: 'spaces@example.com',
+      password: 'SpacesPass123!',
+    });
 
     accessToken = loginResponse.body.accessToken;
   });

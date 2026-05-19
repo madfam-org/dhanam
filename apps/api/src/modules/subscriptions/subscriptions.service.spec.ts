@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ConflictException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { SubscriptionsService } from './subscriptions.service';
-import { SubscriptionDetectorService } from './subscription-detector.service';
+import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
-import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
+
+import { SubscriptionDetectorService } from './subscription-detector.service';
+import { SubscriptionsService } from './subscriptions.service';
 
 describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
@@ -89,7 +90,11 @@ describe('SubscriptionsService', () => {
 
       const result = await service.findAll(testSpaceId, testUserId);
 
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'viewer');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'viewer'
+      );
       expect(prismaMock.subscription.findMany).toHaveBeenCalledWith({
         where: { spaceId: testSpaceId },
         orderBy: { nextBillingDate: 'asc' },
@@ -126,7 +131,10 @@ describe('SubscriptionsService', () => {
     it('should filter by both status and category', async () => {
       prismaMock.subscription.findMany.mockResolvedValue([]);
 
-      await service.findAll(testSpaceId, testUserId, { status: 'active', category: 'entertainment' });
+      await service.findAll(testSpaceId, testUserId, {
+        status: 'active',
+        category: 'entertainment',
+      });
 
       expect(prismaMock.subscription.findMany).toHaveBeenCalledWith({
         where: { spaceId: testSpaceId, status: 'active', category: 'entertainment' },
@@ -183,16 +191,18 @@ describe('SubscriptionsService', () => {
           merchantName: 'Netflix',
           occurrenceCount: 12,
           lastOccurrence: new Date(),
-          transactions: [
-            { id: 'txn-1', date: new Date(), amount: 15.99, description: 'Netflix' },
-          ],
+          transactions: [{ id: 'txn-1', date: new Date(), amount: 15.99, description: 'Netflix' }],
         },
       };
       prismaMock.subscription.findFirst.mockResolvedValue(subWithRecurring);
 
       const result = await service.findOne(testSpaceId, testUserId, testSubId);
 
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'viewer');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'viewer'
+      );
       expect(result.serviceName).toBe('Netflix');
       expect(result.recurringPattern).not.toBeNull();
     });
@@ -200,8 +210,9 @@ describe('SubscriptionsService', () => {
     it('should throw NotFoundException when subscription not found', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(null);
 
-      await expect(service.findOne(testSpaceId, testUserId, 'non-existent'))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.findOne(testSpaceId, testUserId, 'non-existent')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -228,7 +239,11 @@ describe('SubscriptionsService', () => {
     it('should create a new subscription', async () => {
       const result = await service.create(testSpaceId, testUserId, createDto);
 
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'member');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'member'
+      );
       expect(detectorServiceMock.calculateAnnualCost).toHaveBeenCalledWith(9.99, 'monthly');
       expect(prismaMock.subscription.create).toHaveBeenCalled();
       expect(result.serviceName).toBe('Spotify');
@@ -237,8 +252,9 @@ describe('SubscriptionsService', () => {
     it('should throw ConflictException for duplicate active subscription', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(mockSubscription);
 
-      await expect(service.create(testSpaceId, testUserId, createDto))
-        .rejects.toThrow(ConflictException);
+      await expect(service.create(testSpaceId, testUserId, createDto)).rejects.toThrow(
+        ConflictException
+      );
     });
 
     it('should validate recurring pattern if provided', async () => {
@@ -263,8 +279,9 @@ describe('SubscriptionsService', () => {
       prismaMock.subscription.findFirst.mockResolvedValue(null);
       prismaMock.recurringTransaction.findFirst.mockResolvedValue(null);
 
-      await expect(service.create(testSpaceId, testUserId, { ...createDto, recurringId: 'non-existent' }))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.create(testSpaceId, testUserId, { ...createDto, recurringId: 'non-existent' })
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ConflictException if recurring pattern already linked', async () => {
@@ -274,8 +291,9 @@ describe('SubscriptionsService', () => {
 
       prismaMock.recurringTransaction.findFirst.mockResolvedValue({ id: 'rec-1' });
 
-      await expect(service.create(testSpaceId, testUserId, { ...createDto, recurringId: 'rec-1' }))
-        .rejects.toThrow(ConflictException);
+      await expect(
+        service.create(testSpaceId, testUserId, { ...createDto, recurringId: 'rec-1' })
+      ).rejects.toThrow(ConflictException);
     });
 
     it('should set default values for optional fields', async () => {
@@ -336,7 +354,11 @@ describe('SubscriptionsService', () => {
     it('should update a subscription', async () => {
       const result = await service.update(testSpaceId, testUserId, testSubId, { amount: 19.99 });
 
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'member');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'member'
+      );
       expect(prismaMock.subscription.update).toHaveBeenCalled();
       expect(result.amount).toBe(19.99);
     });
@@ -344,8 +366,9 @@ describe('SubscriptionsService', () => {
     it('should throw NotFoundException for non-existent subscription', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(null);
 
-      await expect(service.update(testSpaceId, testUserId, 'non-existent', { amount: 19.99 }))
-        .rejects.toThrow(NotFoundException);
+      await expect(
+        service.update(testSpaceId, testUserId, 'non-existent', { amount: 19.99 })
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should recalculate annual cost when amount changes', async () => {
@@ -361,7 +384,9 @@ describe('SubscriptionsService', () => {
     });
 
     it('should generate savings recommendation when usage frequency is set', async () => {
-      detectorServiceMock.generateSavingsRecommendation!.mockReturnValue('Consider cancelling - low usage');
+      detectorServiceMock.generateSavingsRecommendation!.mockReturnValue(
+        'Consider cancelling - low usage'
+      );
 
       await service.update(testSpaceId, testUserId, testSubId, { usageFrequency: 'rarely' });
 
@@ -396,7 +421,9 @@ describe('SubscriptionsService', () => {
     });
 
     it('should cancel a subscription', async () => {
-      const result = await service.cancel(testSpaceId, testUserId, testSubId, { reason: 'Too expensive' });
+      const result = await service.cancel(testSpaceId, testUserId, testSubId, {
+        reason: 'Too expensive',
+      });
 
       expect(prismaMock.subscription.update).toHaveBeenCalledWith({
         where: { id: testSubId },
@@ -411,8 +438,9 @@ describe('SubscriptionsService', () => {
     it('should throw NotFoundException for non-existent subscription', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(null);
 
-      await expect(service.cancel(testSpaceId, testUserId, 'non-existent', {}))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.cancel(testSpaceId, testUserId, 'non-existent', {})).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw ConflictException for already cancelled subscription', async () => {
@@ -421,8 +449,9 @@ describe('SubscriptionsService', () => {
         status: 'cancelled',
       });
 
-      await expect(service.cancel(testSpaceId, testUserId, testSubId, {}))
-        .rejects.toThrow(ConflictException);
+      await expect(service.cancel(testSpaceId, testUserId, testSubId, {})).rejects.toThrow(
+        ConflictException
+      );
     });
 
     it('should set end date if provided', async () => {
@@ -462,8 +491,9 @@ describe('SubscriptionsService', () => {
     it('should throw NotFoundException for non-existent subscription', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(null);
 
-      await expect(service.pause(testSpaceId, testUserId, 'non-existent'))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.pause(testSpaceId, testUserId, 'non-existent')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw ConflictException for non-active subscription', async () => {
@@ -472,8 +502,9 @@ describe('SubscriptionsService', () => {
         status: 'cancelled',
       });
 
-      await expect(service.pause(testSpaceId, testUserId, testSubId))
-        .rejects.toThrow(ConflictException);
+      await expect(service.pause(testSpaceId, testUserId, testSubId)).rejects.toThrow(
+        ConflictException
+      );
     });
   });
 
@@ -502,15 +533,17 @@ describe('SubscriptionsService', () => {
     it('should throw NotFoundException for non-existent subscription', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(null);
 
-      await expect(service.resume(testSpaceId, testUserId, 'non-existent'))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.resume(testSpaceId, testUserId, 'non-existent')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw ConflictException for non-paused subscription', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(mockSubscription); // active
 
-      await expect(service.resume(testSpaceId, testUserId, testSubId))
-        .rejects.toThrow(ConflictException);
+      await expect(service.resume(testSpaceId, testUserId, testSubId)).rejects.toThrow(
+        ConflictException
+      );
     });
   });
 
@@ -523,7 +556,11 @@ describe('SubscriptionsService', () => {
     it('should delete a subscription', async () => {
       await service.remove(testSpaceId, testUserId, testSubId);
 
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'member');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'member'
+      );
       expect(prismaMock.subscription.delete).toHaveBeenCalledWith({
         where: { id: testSubId },
       });
@@ -532,8 +569,9 @@ describe('SubscriptionsService', () => {
     it('should throw NotFoundException for non-existent subscription', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(null);
 
-      await expect(service.remove(testSpaceId, testUserId, 'non-existent'))
-        .rejects.toThrow(NotFoundException);
+      await expect(service.remove(testSpaceId, testUserId, 'non-existent')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -586,13 +624,16 @@ describe('SubscriptionsService', () => {
     });
 
     it('should throw non-duplicate errors', async () => {
-      const detectedSubs = [{ serviceName: 'Spotify', amount: 9.99, currency: 'USD', billingCycle: 'monthly' }];
+      const detectedSubs = [
+        { serviceName: 'Spotify', amount: 9.99, currency: 'USD', billingCycle: 'monthly' },
+      ];
 
       detectorServiceMock.detectSubscriptions!.mockResolvedValue(detectedSubs);
       prismaMock.subscription.create.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.detectAndCreate(testSpaceId, testUserId))
-        .rejects.toThrow('Database error');
+      await expect(service.detectAndCreate(testSpaceId, testUserId)).rejects.toThrow(
+        'Database error'
+      );
     });
 
     it('should return empty when no subscriptions detected', async () => {
@@ -680,7 +721,11 @@ describe('SubscriptionsService', () => {
 
     it('should return savings opportunities', async () => {
       const withSavings = [
-        { ...mockSubscription, savingsRecommendation: 'Consider cancelling - low usage', annualCost: 191.88 },
+        {
+          ...mockSubscription,
+          savingsRecommendation: 'Consider cancelling - low usage',
+          annualCost: 191.88,
+        },
       ];
 
       prismaMock.subscription.findMany
@@ -775,13 +820,21 @@ describe('SubscriptionsService', () => {
     it('should require viewer access for findAll', async () => {
       prismaMock.subscription.findMany.mockResolvedValue([]);
       await service.findAll(testSpaceId, testUserId);
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'viewer');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'viewer'
+      );
     });
 
     it('should require viewer access for findOne', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(mockSubscription);
       await service.findOne(testSpaceId, testUserId, testSubId);
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'viewer');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'viewer'
+      );
     });
 
     it('should require member access for create', async () => {
@@ -794,35 +847,58 @@ describe('SubscriptionsService', () => {
         billingCycle: 'monthly',
         startDate: '2025-01-15',
       });
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'member');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'member'
+      );
     });
 
     it('should require member access for update', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(mockSubscription);
       prismaMock.subscription.update.mockResolvedValue(mockSubscription);
       await service.update(testSpaceId, testUserId, testSubId, { amount: 19.99 });
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'member');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'member'
+      );
     });
 
     it('should require member access for cancel', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(mockSubscription);
-      prismaMock.subscription.update.mockResolvedValue({ ...mockSubscription, status: 'cancelled' });
+      prismaMock.subscription.update.mockResolvedValue({
+        ...mockSubscription,
+        status: 'cancelled',
+      });
       await service.cancel(testSpaceId, testUserId, testSubId, {});
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'member');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'member'
+      );
     });
 
     it('should require member access for remove', async () => {
       prismaMock.subscription.findFirst.mockResolvedValue(mockSubscription);
       prismaMock.subscription.delete.mockResolvedValue(mockSubscription);
       await service.remove(testSpaceId, testUserId, testSubId);
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'member');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'member'
+      );
     });
 
     it('should require viewer access for getSummary', async () => {
       prismaMock.subscription.findMany.mockResolvedValue([]);
       prismaMock.subscription.groupBy.mockResolvedValue([]);
       await service.getSummary(testSpaceId, testUserId);
-      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(testUserId, testSpaceId, 'viewer');
+      expect(spacesServiceMock.verifyUserAccess).toHaveBeenCalledWith(
+        testUserId,
+        testSpaceId,
+        'viewer'
+      );
     });
   });
 });

@@ -1,13 +1,3 @@
-import type { SentryService } from '@core/monitoring/sentry.service';
-import {
-  PrismaClientKnownRequestError,
-  PrismaClientValidationError,
-  PrismaClientRustPanicError,
-  PrismaClientInitializationError,
-  PrismaClientUnknownRequestError,
-} from '@db';
-
-import { isPrismaKnownRequestError } from './prisma-error.guard';
 import {
   ArgumentsHost,
   Catch,
@@ -20,8 +10,19 @@ import {
 } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
+import type { SentryService } from '@core/monitoring/sentry.service';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+  PrismaClientRustPanicError,
+  PrismaClientInitializationError,
+  PrismaClientUnknownRequestError,
+} from '@db';
+
 import { isDomainException, ErrorCode } from '../exceptions/domain-exceptions';
 import { TimeoutError } from '../utils/timeout.util';
+
+import { isPrismaKnownRequestError } from './prisma-error.guard';
 
 export interface ErrorResponse {
   success: false;

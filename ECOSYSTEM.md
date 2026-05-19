@@ -26,11 +26,11 @@ Dhanam is the ecosystem's billing backbone: 6 payment gateways (Stripe, Mercado 
 
 ### Deployed services
 
-| Service        | Public domain | Container port |
-| -------------- | ------------- | -------------- |
-| `dhanam-web`   | dhan.am       | 3000           |
-| `dhanam-api`   | api.dhan.am   | 8000           |
-| `dhanam-admin` | admin.dhan.am | 3001           |
+| Service        | Public domain        | Container port |
+| -------------- | -------------------- | -------------- |
+| `dhanam-web`   | dhan.am, app.dhan.am | 3000           |
+| `dhanam-api`   | api.dhan.am          | 8000           |
+| `dhanam-admin` | admin.dhan.am        | 3001           |
 
 **Kubernetes namespace**: `dhanam`
 **Cluster**: bare-metal k3s on Hetzner (see topology section below).

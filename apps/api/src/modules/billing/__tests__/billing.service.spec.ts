@@ -1,14 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { UsageMetricType } from '@db';
+import { Test, TestingModule } from '@nestjs/testing';
 import Stripe from 'stripe';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
+import { UsageMetricType } from '@db';
+
 import { AuditService } from '../../../core/audit/audit.service';
-import { BillingService } from '../billing.service';
-import { StripeService } from '../stripe.service';
-import { JanuaBillingService } from '../janua-billing.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { PostHogService } from '../../analytics/posthog.service';
+import { BillingService } from '../billing.service';
+import { JanuaBillingService } from '../janua-billing.service';
+import { StripeService } from '../stripe.service';
 
 describe('BillingService', () => {
   let service: BillingService;
@@ -393,6 +394,8 @@ describe('BillingService', () => {
           subscriptionTier: 'community',
           subscriptionExpiresAt: null,
           stripeSubscriptionId: null,
+          cancelledAt: expect.any(Date),
+          cancellationReason: null,
         },
       });
       expect(prisma.billingEvent.create).toHaveBeenCalledWith({
@@ -963,6 +966,15 @@ describe('BillingService', () => {
               createCheckoutSession: jest.fn(),
               createPortalSession: jest.fn(),
               cancelSubscription: jest.fn(),
+            },
+          },
+          {
+            provide: PostHogService,
+            useValue: {
+              capture: jest.fn(),
+              identify: jest.fn(),
+              flush: jest.fn(),
+              isAnalyticsEnabled: jest.fn().mockReturnValue(false),
             },
           },
         ],

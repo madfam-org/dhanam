@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException, ConflictException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
 
-import { TagsService } from './tags.service';
 import { CreateTagDto, UpdateTagDto } from './dto';
+import { TagsService } from './tags.service';
 
 describe('TagsService', () => {
   let service: TagsService;

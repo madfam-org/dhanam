@@ -1,6 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { getQueueToken } from '@nestjs/bull';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { Queue } from 'bull';
 import * as nodemailer from 'nodemailer';
 
@@ -163,11 +163,10 @@ describe('EmailService', () => {
         delay: 5000,
       });
 
-      expect(emailQueue.add).toHaveBeenCalledWith(
-        'send-email',
-        expect.any(Object),
-        { priority: 2, delay: 5000 }
-      );
+      expect(emailQueue.add).toHaveBeenCalledWith('send-email', expect.any(Object), {
+        priority: 2,
+        delay: 5000,
+      });
     });
   });
 
@@ -831,7 +830,7 @@ describe('EmailService - SMTP verification failure', () => {
       expect.objectContaining({
         host: 'smtp.test.com',
         port: 587,
-      }),
+      })
     );
   });
 
@@ -913,7 +912,7 @@ describe('EmailService - sendMail failure', () => {
         template: 'welcome' as EmailTemplate,
         context: { userName: 'John' },
         priority: 'normal',
-      }),
+      })
     ).rejects.toThrow('SMTP connection failed');
   });
 });
@@ -979,8 +978,8 @@ describe('EmailService - sendTransactionCategorizedEmail', () => {
 
   it('should send transaction categorized email with correct subject', async () => {
     const transactions = [
-      { id: 'tx1', description: 'Grocery Store', amount: 50.00, category: 'Food' },
-      { id: 'tx2', description: 'Gas Station', amount: 35.00, category: 'Transportation' },
+      { id: 'tx1', description: 'Grocery Store', amount: 50.0, category: 'Food' },
+      { id: 'tx2', description: 'Gas Station', amount: 35.0, category: 'Transportation' },
     ];
 
     await service.sendTransactionCategorizedEmail('test@example.com', 'John', transactions);
@@ -998,14 +997,12 @@ describe('EmailService - sendTransactionCategorizedEmail', () => {
         }),
         priority: 'low',
       }),
-      expect.any(Object),
+      expect.any(Object)
     );
   });
 
   it('should handle single transaction correctly', async () => {
-    const transactions = [
-      { id: 'tx1', description: 'Coffee Shop', amount: 5.00, category: 'Food' },
-    ];
+    const transactions = [{ id: 'tx1', description: 'Coffee Shop', amount: 5.0, category: 'Food' }];
 
     await service.sendTransactionCategorizedEmail('test@example.com', 'Jane', transactions);
 
@@ -1017,7 +1014,7 @@ describe('EmailService - sendTransactionCategorizedEmail', () => {
           count: 1,
         }),
       }),
-      expect.any(Object),
+      expect.any(Object)
     );
   });
 });

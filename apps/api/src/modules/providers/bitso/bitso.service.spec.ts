@@ -1,11 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
-import { BitsoService } from './bitso.service';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { CryptoService } from '@core/crypto/crypto.service';
-import { CircuitBreakerService } from '../orchestrator/circuit-breaker.service';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+
+import { CryptoService } from '@core/crypto/crypto.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+
+import { CircuitBreakerService } from '../orchestrator/circuit-breaker.service';
+
+import { BitsoService } from './bitso.service';
 
 // Create mock client with interceptors that axios.create() will return
 const mockAxiosClient = {
@@ -180,9 +183,7 @@ describe('BitsoService', () => {
         },
       ];
 
-      const mockUserSpaces = [
-        { spaceId: 'space1', space: { id: 'space1' } },
-      ];
+      const mockUserSpaces = [{ spaceId: 'space1', space: { id: 'space1' } }];
 
       prisma.providerConnection.findMany.mockResolvedValue(mockConnections as any);
       prisma.userSpace.findMany.mockResolvedValue(mockUserSpaces as any);
@@ -214,7 +215,7 @@ describe('BitsoService', () => {
       prisma.account.findMany.mockResolvedValue(mockAccounts as any);
 
       const result = await service.getPortfolioSummary('user1');
-      
+
       expect(result).toBeDefined();
       expect(result.totalValue).toBe(1500);
       expect(result.holdings).toHaveLength(2);
@@ -227,7 +228,7 @@ describe('BitsoService', () => {
     it('should verify valid webhook signature', () => {
       const payload = '{"test":"data"}';
       const secret = 'webhook-secret';
-      
+
       const crypto = require('crypto');
       const expectedSignature = crypto
         .createHmac('sha256', secret)

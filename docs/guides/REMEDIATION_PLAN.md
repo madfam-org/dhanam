@@ -1,4 +1,5 @@
 # Dhanam Ledger - Remediation Plan
+
 **Version:** 1.0
 **Date:** 2025-11-16
 **Status:** Draft
@@ -11,6 +12,7 @@
 This remediation plan addresses critical gaps identified in the codebase analysis to ensure the Dhanam Ledger platform is production-ready. The plan is organized into 3 priority tiers with 47 specific tasks across 5 work streams.
 
 **Key Metrics:**
+
 - Total Tasks: 47
 - Estimated Effort: 18-24 developer-weeks
 - Critical Issues: 7 security vulnerabilities
@@ -33,16 +35,19 @@ This remediation plan addresses critical gaps identified in the codebase analysi
 ---
 
 ## Priority 1: Critical Security Fixes
+
 **Timeline:** Week 1-2
 **Effort:** 5-7 days
 **Risk Level:** 🔴 Critical
 
 ### Task 1.1: Fix JWT Secret Management
+
 **File:** `apps/api/src/core/auth/auth.service.ts`
 **Issue:** JWT secret has unsafe fallback without error throwing
 **Impact:** Could allow JWT signing with predictable secret in production
 
 **Implementation Steps:**
+
 ```typescript
 // Current (UNSAFE):
 const secret = process.env.JWT_SECRET || 'fallback-secret';
@@ -55,6 +60,7 @@ if (!secret) {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Remove all fallback secrets in auth configuration
 - [ ] Add environment variable validation on app startup
 - [ ] Create startup validation service that checks all required secrets
@@ -66,7 +72,9 @@ if (!secret) {
 ---
 
 ### Task 1.2: Sanitize Password Reset Token Logging
+
 **Files:**
+
 - `apps/api/src/modules/users/users.service.ts`
 - `apps/api/src/core/logger/logger.service.ts`
 
@@ -74,12 +82,14 @@ if (!secret) {
 **Impact:** Token exposure in logs could allow unauthorized password resets
 
 **Implementation Steps:**
+
 1. Create a logger sanitization middleware
 2. Add sensitive field redaction (tokens, passwords, secrets)
 3. Audit all log statements containing user input
 4. Add structured logging with explicit field filtering
 
 **Code Changes:**
+
 ```typescript
 // Create apps/api/src/core/logger/sanitizer.ts
 export class LogSanitizer {
@@ -114,6 +124,7 @@ log(message: string, context?: any) {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Create LogSanitizer utility class
 - [ ] Update all logger methods to sanitize data
 - [ ] Audit all existing log statements
@@ -125,12 +136,14 @@ log(message: string, context?: any) {
 ---
 
 ### Task 1.3: Remove Hardcoded TOTP Secrets from Seed Data
+
 **File:** `apps/api/prisma/seed.ts`
 
 **Issue:** Hardcoded TOTP secrets in development seed data
 **Impact:** Known secrets could be used if seed data accidentally runs in production
 
 **Implementation Steps:**
+
 ```typescript
 // Current (UNSAFE):
 totpSecret: 'JBSWY3DPEHPK3PXP',
@@ -140,6 +153,7 @@ totpSecret: generateSecureSecret(), // Generate random secret per seed run
 ```
 
 **Code Changes:**
+
 ```typescript
 import * as speakeasy from 'speakeasy';
 
@@ -154,6 +168,7 @@ totpSecret: process.env.NODE_ENV === 'development'
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Replace all hardcoded secrets with generated values
 - [ ] Add warning comment in seed file about production usage
 - [ ] Add environment check to prevent seed in production
@@ -165,12 +180,14 @@ totpSecret: process.env.NODE_ENV === 'development'
 ---
 
 ### Task 1.4: Strengthen Backup Code Generation
+
 **File:** `apps/api/src/core/auth/totp.service.ts`
 
 **Issue:** Backup codes use weak random generation pattern
 **Impact:** Potentially predictable backup codes
 
 **Implementation Steps:**
+
 ```typescript
 // Current (WEAK):
 Math.random().toString(36).substring(2, 10);
@@ -181,14 +198,12 @@ import { randomBytes } from 'crypto';
 function generateBackupCode(): string {
   // Generate 8 characters from secure random bytes
   const bytes = randomBytes(6);
-  return bytes.toString('base64')
-    .replace(/[+/=]/g, '')
-    .substring(0, 8)
-    .toUpperCase();
+  return bytes.toString('base64').replace(/[+/=]/g, '').substring(0, 8).toUpperCase();
 }
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Replace Math.random() with crypto.randomBytes()
 - [ ] Generate 10 backup codes per user (current: 8)
 - [ ] Add checksum/validation to backup codes
@@ -201,7 +216,9 @@ function generateBackupCode(): string {
 ---
 
 ### Task 1.5: Implement AWS KMS Integration for Provider Tokens
+
 **Files:**
+
 - New: `apps/api/src/core/crypto/kms.service.ts`
 - Update: `apps/api/src/core/crypto/crypto.service.ts`
 - Update: `apps/api/src/modules/providers/*/providers.service.ts`
@@ -212,6 +229,7 @@ function generateBackupCode(): string {
 **Implementation Steps:**
 
 1. **Create KMS Service**
+
 ```typescript
 // apps/api/src/core/crypto/kms.service.ts
 import { KMSClient, EncryptCommand, DecryptCommand } from '@aws-sdk/client-kms';
@@ -275,6 +293,7 @@ export class KmsService {
 4. **Create migration script for existing encrypted data**
 
 **Acceptance Criteria:**
+
 - [ ] Create KMS service with encrypt/decrypt methods
 - [ ] Add KMS client dependency (@aws-sdk/client-kms)
 - [ ] Update CryptoService to delegate to KMS in production
@@ -289,18 +308,21 @@ export class KmsService {
 ---
 
 ### Task 1.6: Add Webhook Signature Verification Audit
+
 **Files:** All webhook handlers in `apps/api/src/modules/providers/*/webhooks/`
 
 **Issue:** Need to verify all webhook handlers properly validate signatures
 **Impact:** Unsigned webhooks could allow malicious data injection
 
 **Implementation Steps:**
+
 1. Audit all webhook handlers (Belvo, Plaid, Bitso)
 2. Verify signature validation is the first step
 3. Add signature verification tests
 4. Document signature validation requirements
 
 **Checklist:**
+
 - [ ] Belvo webhook signature verification ✓ (already implemented)
 - [ ] Plaid webhook signature verification (needs implementation)
 - [ ] Bitso webhook signature verification ✓ (already implemented)
@@ -313,7 +335,9 @@ export class KmsService {
 ---
 
 ### Task 1.7: Implement Rate Limiting for Sensitive Endpoints
+
 **Files:**
+
 - New: `apps/api/src/core/guards/rate-limit.guard.ts`
 - Update: `apps/api/src/modules/users/users.controller.ts`
 - Update: `apps/api/src/core/auth/auth.controller.ts`
@@ -352,6 +376,7 @@ async verifyTotp(@Body() dto: VerifyTotpDto) { ... }
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Create custom rate limit guards for auth operations
 - [ ] Apply strict limits to login (5/15min)
 - [ ] Apply strict limits to password reset (3/hour)
@@ -366,28 +391,32 @@ async verifyTotp(@Body() dto: VerifyTotpDto) { ... }
 ---
 
 ## Priority 2: Test Coverage Expansion
+
 **Timeline:** Week 2-4
 **Effort:** 10-12 days
 **Risk Level:** 🟡 High
 
 ### Test Coverage Goals
 
-| Component | Current | Target | Gap |
-|-----------|---------|--------|-----|
-| API | 15-20% | 80% | +60% |
-| Web | 5% | 70% | +65% |
-| Mobile | 0% | 60% | +60% |
-| Packages | 30% | 80% | +50% |
+| Component | Current | Target | Gap  |
+| --------- | ------- | ------ | ---- |
+| API       | 15-20%  | 80%    | +60% |
+| Web       | 5%      | 70%    | +65% |
+| Mobile    | 0%      | 60%    | +60% |
+| Packages  | 30%     | 80%    | +50% |
 
 ---
 
 ### Task 2.1: API Unit Tests - Core Services
+
 **Effort:** 3 days
 
 #### 2.1.1 Authentication Service Tests
+
 **File:** `apps/api/src/core/auth/__tests__/auth.service.spec.ts`
 
 **Test Cases to Add:**
+
 ```typescript
 describe('AuthService', () => {
   describe('register', () => {
@@ -427,6 +456,7 @@ describe('AuthService', () => {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] 95%+ coverage of auth.service.ts
 - [ ] All edge cases tested (expired tokens, invalid inputs)
 - [ ] Mock Prisma and email services
@@ -436,9 +466,11 @@ describe('AuthService', () => {
 ---
 
 #### 2.1.2 TOTP Service Tests
+
 **File:** `apps/api/src/core/auth/__tests__/totp.service.spec.ts`
 
 **Test Cases:**
+
 ```typescript
 describe('TotpService', () => {
   describe('setupTotp', () => {
@@ -469,6 +501,7 @@ describe('TotpService', () => {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] 95%+ coverage of totp.service.ts
 - [ ] Test secret generation cryptographic strength
 - [ ] Test QR code generation
@@ -477,9 +510,11 @@ describe('TotpService', () => {
 ---
 
 #### 2.1.3 Transaction Rules Engine Tests
+
 **File:** `apps/api/src/modules/categories/__tests__/rules.service.spec.ts`
 
 **Test Cases:**
+
 ```typescript
 describe('RulesService', () => {
   describe('applyRules', () => {
@@ -508,6 +543,7 @@ describe('RulesService', () => {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] 90%+ coverage of rules.service.ts
 - [ ] Test all condition operators
 - [ ] Test priority-based rule ordering
@@ -516,12 +552,15 @@ describe('RulesService', () => {
 ---
 
 ### Task 2.2: API Integration Tests
+
 **Effort:** 3 days
 
 #### 2.2.1 Authentication Flow E2E Tests
+
 **File:** `apps/api/test/auth.e2e-spec.ts`
 
 **Test Scenarios:**
+
 ```typescript
 describe('Authentication (e2e)', () => {
   it('POST /auth/register - should register new user', async () => {
@@ -555,6 +594,7 @@ describe('Authentication (e2e)', () => {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Full authentication flow tested end-to-end
 - [ ] Use test database (separate from development)
 - [ ] Clean up test data after each test
@@ -564,9 +604,11 @@ describe('Authentication (e2e)', () => {
 ---
 
 #### 2.2.2 Budget Management E2E Tests
+
 **File:** `apps/api/test/budgets.e2e-spec.ts`
 
 **Test Scenarios:**
+
 ```typescript
 describe('Budgets (e2e)', () => {
   it('POST /budgets - should create budget');
@@ -588,9 +630,11 @@ describe('Budgets (e2e)', () => {
 ---
 
 #### 2.2.3 Provider Integration E2E Tests
+
 **File:** `apps/api/test/providers.e2e-spec.ts`
 
 **Test Scenarios:**
+
 ```typescript
 describe('Providers (e2e)', () => {
   describe('Belvo', () => {
@@ -614,6 +658,7 @@ describe('Providers (e2e)', () => {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Mock external provider APIs
 - [ ] Test webhook signature verification
 - [ ] Test error handling for provider failures
@@ -622,12 +667,15 @@ describe('Providers (e2e)', () => {
 ---
 
 ### Task 2.3: Frontend Component Tests
+
 **Effort:** 3 days
 
 #### 2.3.1 Web Component Tests
+
 **Files:** Create tests for all components in `apps/web/src/components/`
 
 **Priority Components:**
+
 ```typescript
 // apps/web/src/components/auth/__tests__/LoginForm.test.tsx
 describe('LoginForm', () => {
@@ -658,11 +706,13 @@ describe('BelvoConnect', () => {
 ```
 
 **Testing Libraries:**
+
 - React Testing Library
 - Jest
 - MSW (Mock Service Worker) for API mocking
 
 **Acceptance Criteria:**
+
 - [ ] Test all 20+ components in /components
 - [ ] Test user interactions (clicks, form inputs)
 - [ ] Test loading and error states
@@ -672,9 +722,11 @@ describe('BelvoConnect', () => {
 ---
 
 #### 2.3.2 Mobile Component Tests
+
 **Files:** Create tests for screens in `apps/mobile/src/screens/`
 
 **Priority Screens:**
+
 ```typescript
 // apps/mobile/src/screens/__tests__/LoginScreen.test.tsx
 describe('LoginScreen', () => {
@@ -694,10 +746,12 @@ describe('DashboardScreen', () => {
 ```
 
 **Testing Libraries:**
+
 - React Native Testing Library
 - Jest
 
 **Acceptance Criteria:**
+
 - [ ] Test all 19 mobile screens
 - [ ] Test navigation flows
 - [ ] Test biometric authentication
@@ -706,12 +760,15 @@ describe('DashboardScreen', () => {
 ---
 
 ### Task 2.4: Package Unit Tests
+
 **Effort:** 2 days
 
 #### 2.4.1 ESG Package Tests
+
 **File:** `packages/esg/__tests__/ESGManager.spec.ts`
 
 **Test Cases:**
+
 ```typescript
 describe('ESGManager', () => {
   describe('getAssetScore', () => {
@@ -736,6 +793,7 @@ describe('PortfolioESGAnalyzer', () => {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] 90%+ coverage of ESG package
 - [ ] Mock Dhanam API responses
 - [ ] Test caching behavior
@@ -744,9 +802,11 @@ describe('PortfolioESGAnalyzer', () => {
 ---
 
 ### Task 2.5: Test Infrastructure Setup
+
 **Effort:** 1 day
 
 **Tasks:**
+
 - [ ] Configure Jest for monorepo
 - [ ] Set up test database (PostgreSQL in Docker)
 - [ ] Configure MSW for API mocking
@@ -756,6 +816,7 @@ describe('PortfolioESGAnalyzer', () => {
 - [ ] Document testing practices
 
 **Coverage Thresholds:**
+
 ```json
 {
   "coverageThreshold": {
@@ -772,17 +833,20 @@ describe('PortfolioESGAnalyzer', () => {
 ---
 
 ## Priority 3: Provider Integration Completion
+
 **Timeline:** Week 3-5
 **Effort:** 5-7 days
 **Risk Level:** 🟡 Medium
 
 ### Task 3.1: Complete Plaid Integration
+
 **File:** `apps/api/src/modules/providers/plaid/plaid.service.ts`
 **Effort:** 2 days
 
 **Current Status:** 40% complete (link token creation only)
 
 #### 3.1.1 Implement Account Fetching
+
 ```typescript
 async fetchAccounts(connectionId: string): Promise<Account[]> {
   const connection = await this.prisma.providerConnection.findUnique({
@@ -810,6 +874,7 @@ async fetchAccounts(connectionId: string): Promise<Account[]> {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Implement accountsGet API call
 - [ ] Map Plaid account types to internal schema
 - [ ] Handle pagination for large account lists
@@ -821,6 +886,7 @@ async fetchAccounts(connectionId: string): Promise<Account[]> {
 ---
 
 #### 3.1.2 Implement Transaction Sync
+
 ```typescript
 async syncTransactions(
   accountId: string,
@@ -881,6 +947,7 @@ async syncTransactions(
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Implement transactionsSync API
 - [ ] Handle incremental updates with cursor
 - [ ] Process added/modified/removed transactions
@@ -894,6 +961,7 @@ async syncTransactions(
 ---
 
 #### 3.1.3 Implement Webhook Handlers
+
 **File:** `apps/api/src/modules/providers/plaid/webhooks/plaid-webhook.controller.ts`
 
 ```typescript
@@ -901,13 +969,13 @@ async syncTransactions(
 export class PlaidWebhookController {
   constructor(
     private readonly plaidService: PlaidService,
-    private readonly jobsService: JobsService,
+    private readonly jobsService: JobsService
   ) {}
 
   @Post()
   async handleWebhook(
     @Body() payload: PlaidWebhookPayload,
-    @Headers('plaid-verification') signature: string,
+    @Headers('plaid-verification') signature: string
   ) {
     // Verify webhook signature
     if (!this.verifySignature(payload, signature)) {
@@ -954,9 +1022,7 @@ export class PlaidWebhookController {
 
       case 'TRANSACTIONS_REMOVED':
         // Handle removed transactions
-        await this.plaidService.handleRemovedTransactions(
-          payload.removed_transactions,
-        );
+        await this.plaidService.handleRemovedTransactions(payload.removed_transactions);
         break;
     }
   }
@@ -969,15 +1035,13 @@ export class PlaidWebhookController {
     hmac.update(JSON.stringify(payload));
     const expectedSignature = hmac.digest('hex');
 
-    return crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature),
-    );
+    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
   }
 }
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Implement webhook signature verification
 - [ ] Handle TRANSACTIONS webhooks
 - [ ] Handle ITEM webhooks (connection status)
@@ -990,12 +1054,14 @@ export class PlaidWebhookController {
 ---
 
 ### Task 3.2: Complete Bitso Integration
+
 **File:** `apps/api/src/modules/providers/bitso/bitso.service.ts`
 **Effort:** 1.5 days
 
 **Current Status:** 60% complete (basic API calls, missing real-time sync)
 
 #### 3.2.1 Implement Real-time Balance Updates
+
 ```typescript
 async syncBalances(connectionId: string): Promise<void> {
   const connection = await this.getConnection(connectionId);
@@ -1032,6 +1098,7 @@ async syncBalances(connectionId: string): Promise<void> {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Implement balance syncing
 - [ ] Create daily valuation snapshots
 - [ ] Handle multiple cryptocurrencies
@@ -1041,6 +1108,7 @@ async syncBalances(connectionId: string): Promise<void> {
 ---
 
 #### 3.2.2 Implement Transaction History
+
 ```typescript
 async fetchTransactions(
   accountId: string,
@@ -1064,12 +1132,14 @@ async fetchTransactions(
 ---
 
 ### Task 3.3: Implement Blockchain Address Tracking
+
 **File:** `apps/api/src/modules/providers/blockchain/blockchain.service.ts`
 **Effort:** 2 days
 
 **Current Status:** 50% complete (address validation only)
 
 #### 3.3.1 Implement ETH Balance Querying
+
 ```typescript
 import { ethers } from 'ethers';
 
@@ -1101,6 +1171,7 @@ async getErc20Balance(
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Implement ETH balance querying
 - [ ] Implement ERC-20 token balance querying
 - [ ] Support multiple RPC providers
@@ -1111,6 +1182,7 @@ async getErc20Balance(
 ---
 
 #### 3.3.2 Implement BTC Balance Querying
+
 ```typescript
 async getBtcBalance(address: string): Promise<Decimal> {
   // Use public Bitcoin API (e.g., Blockchair, Blockchain.info)
@@ -1138,6 +1210,7 @@ async getXpubBalance(xpub: string): Promise<Decimal> {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Implement BTC address balance
 - [ ] Implement xPub balance aggregation
 - [ ] Handle API rate limits
@@ -1147,6 +1220,7 @@ async getXpubBalance(xpub: string): Promise<Decimal> {
 ---
 
 #### 3.3.3 Create Background Sync Jobs
+
 ```typescript
 @Injectable()
 export class BlockchainSyncJob {
@@ -1198,6 +1272,7 @@ export class BlockchainSyncJob {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Create scheduled sync jobs
 - [ ] Sync every 6 hours
 - [ ] Create valuation snapshots
@@ -1207,16 +1282,19 @@ export class BlockchainSyncJob {
 ---
 
 ## Priority 4: Type Safety Improvements
+
 **Timeline:** Week 4-5
 **Effort:** 3-4 days
 **Risk Level:** 🟢 Low
 
 ### Task 4.1: Eliminate `as any` Type Assertions
+
 **Effort:** 2 days
 
 **Current Count:** 82 instances
 
 **Strategy:**
+
 1. Run grep to find all `as any` usages
 2. Categorize by pattern (API responses, external libraries, etc.)
 3. Replace with proper types
@@ -1241,6 +1319,7 @@ const client: BelvoClient = this.belvoClient;
 ```
 
 **Files to Audit:**
+
 ```bash
 # Find all instances
 rg "as any" --type ts -l
@@ -1252,6 +1331,7 @@ apps/web/src/lib/api/client.ts                          # 15 instances
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Reduce `as any` from 82 to <10
 - [ ] Create proper type definitions for provider responses
 - [ ] Document why any remaining `as any` is necessary
@@ -1260,11 +1340,13 @@ apps/web/src/lib/api/client.ts                          # 15 instances
 ---
 
 ### Task 4.2: Add Type Annotations to Untyped Parameters
+
 **Effort:** 1.5 days
 
 **Current Count:** 133 instances of `: any`
 
 **Strategy:**
+
 1. Find all `: any` parameter annotations
 2. Infer proper types from usage
 3. Add type definitions
@@ -1297,6 +1379,7 @@ function processTransaction(txn: RawTransaction) {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Reduce `: any` from 133 to <20
 - [ ] Create shared type definitions in `packages/shared/src/types`
 - [ ] Add strict TypeScript compiler options
@@ -1305,6 +1388,7 @@ function processTransaction(txn: RawTransaction) {
 ---
 
 ### Task 4.3: Type API Responses
+
 **Effort:** 1 day
 
 **Create comprehensive API response types:**
@@ -1355,6 +1439,7 @@ export interface UserProfileResponse {
 ```
 
 **Update API client:**
+
 ```typescript
 // apps/web/src/lib/api/client.ts
 import type { AuthTokenResponse, UserProfileResponse } from '@dhanam/shared';
@@ -1362,16 +1447,17 @@ import type { AuthTokenResponse, UserProfileResponse } from '@dhanam/shared';
 export const api = {
   auth: {
     login: (dto: LoginDto): Promise<AuthTokenResponse> =>
-      apiClient.post('/auth/login', dto).then(res => res.data),
+      apiClient.post('/auth/login', dto).then((res) => res.data),
 
     profile: (): Promise<UserProfileResponse> =>
-      apiClient.get('/auth/profile').then(res => res.data),
+      apiClient.get('/auth/profile').then((res) => res.data),
   },
   // ... more endpoints
 };
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Create types for all API responses
 - [ ] Update API client to use typed responses
 - [ ] Add runtime validation with Zod
@@ -1380,11 +1466,13 @@ export const api = {
 ---
 
 ## Priority 5: Performance & Reliability
+
 **Timeline:** Week 5-6
 **Effort:** 3-4 days
 **Risk Level:** 🟢 Low
 
 ### Task 5.1: Configure Prisma Connection Pooling
+
 **File:** `apps/api/src/core/database/prisma.service.ts`
 **Effort:** 4 hours
 
@@ -1403,9 +1491,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
           url: process.env.DATABASE_URL,
         },
       },
-      log: process.env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
-        : ['error'],
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
       errorFormat: 'pretty',
 
       // Connection pool configuration
@@ -1424,9 +1510,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         const result = await next(params);
         const after = Date.now();
 
-        console.log(
-          `Query ${params.model}.${params.action} took ${after - before}ms`,
-        );
+        console.log(`Query ${params.model}.${params.action} took ${after - before}ms`);
 
         return result;
       });
@@ -1442,6 +1526,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 ```
 
 **Environment Variables:**
+
 ```bash
 # .env
 DB_POOL_SIZE=10              # Default pool size
@@ -1450,6 +1535,7 @@ DATABASE_URL="postgresql://user:pass@localhost:5432/dhanam?connection_limit=10&p
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Configure connection pool size (10-20)
 - [ ] Set pool timeout (10s)
 - [ ] Add query performance logging
@@ -1460,6 +1546,7 @@ DATABASE_URL="postgresql://user:pass@localhost:5432/dhanam?connection_limit=10&p
 ---
 
 ### Task 5.2: Implement Query Performance Monitoring
+
 **Effort:** 6 hours
 
 **Create performance monitoring middleware:**
@@ -1524,6 +1611,7 @@ export class QueryMonitorService {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Track query execution time
 - [ ] Log queries >1s
 - [ ] Send metrics to monitoring
@@ -1533,6 +1621,7 @@ export class QueryMonitorService {
 ---
 
 ### Task 5.3: Add Database Indices
+
 **File:** `apps/api/prisma/schema.prisma`
 **Effort:** 3 hours
 
@@ -1582,6 +1671,7 @@ model WebhookEvent {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Analyze query patterns
 - [ ] Add indices for common queries
 - [ ] Run migration to add indices
@@ -1591,6 +1681,7 @@ model WebhookEvent {
 ---
 
 ### Task 5.4: Implement Caching Strategy
+
 **Effort:** 1 day
 
 **Add Redis caching for expensive operations:**
@@ -1613,11 +1704,7 @@ export class CacheService {
     await this.redis.set(key, JSON.stringify(value), 'EX', ttl);
   }
 
-  async remember<T>(
-    key: string,
-    ttl: number,
-    callback: () => Promise<T>,
-  ): Promise<T> {
+  async remember<T>(key: string, ttl: number, callback: () => Promise<T>): Promise<T> {
     const cached = await this.get<T>(key);
     if (cached) return cached;
 
@@ -1644,13 +1731,14 @@ export class BudgetsService {
       async () => {
         // Expensive calculation
         return this.calculateAnalytics(budgetId);
-      },
+      }
     );
   }
 }
 ```
 
 **Cache Strategy:**
+
 - User profile: 15 minutes
 - Budget analytics: 5 minutes
 - ESG scores: 1 hour (already implemented)
@@ -1658,6 +1746,7 @@ export class BudgetsService {
 - Account balances: 5 minutes
 
 **Acceptance Criteria:**
+
 - [ ] Implement cache service
 - [ ] Add caching to expensive operations
 - [ ] Implement cache invalidation on updates
@@ -1667,6 +1756,7 @@ export class BudgetsService {
 ---
 
 ### Task 5.5: Add Health Checks
+
 **File:** `apps/api/src/health/health.controller.ts`
 **Effort:** 3 hours
 
@@ -1682,7 +1772,7 @@ export class HealthController {
   constructor(
     private health: HealthCheckService,
     private db: PrismaHealthIndicator,
-    private redis: RedisHealthIndicator,
+    private redis: RedisHealthIndicator
   ) {}
 
   @Get()
@@ -1698,7 +1788,7 @@ export class HealthController {
 
   private async checkDiskSpace() {
     // Check available disk space
-    const stats = await import('fs').then(fs => fs.promises.statfs('/'));
+    const stats = await import('fs').then((fs) => fs.promises.statfs('/'));
     const available = stats.bavail * stats.bsize;
     const total = stats.blocks * stats.bsize;
     const usage = ((total - available) / total) * 100;
@@ -1727,6 +1817,7 @@ export class HealthController {
 ```
 
 **Acceptance Criteria:**
+
 - [ ] Add database health check
 - [ ] Add Redis health check
 - [ ] Add disk space check
@@ -1739,33 +1830,36 @@ export class HealthController {
 ## Implementation Timeline
 
 ### Week 1-2: Critical Security Fixes
-| Days | Tasks | Owner |
-|------|-------|-------|
-| Day 1-2 | Tasks 1.1-1.4 (JWT, logging, TOTP, backup codes) | Backend Dev |
-| Day 3-5 | Task 1.5 (AWS KMS integration) | Backend Dev + DevOps |
-| Day 5 | Tasks 1.6-1.7 (Webhook audit, rate limiting) | Backend Dev |
+
+| Days    | Tasks                                            | Owner                |
+| ------- | ------------------------------------------------ | -------------------- |
+| Day 1-2 | Tasks 1.1-1.4 (JWT, logging, TOTP, backup codes) | Backend Dev          |
+| Day 3-5 | Task 1.5 (AWS KMS integration)                   | Backend Dev + DevOps |
+| Day 5   | Tasks 1.6-1.7 (Webhook audit, rate limiting)     | Backend Dev          |
 
 **Deliverable:** All 7 critical security vulnerabilities fixed and tested
 
 ---
 
 ### Week 2-3: Test Coverage Expansion (API)
-| Days | Tasks | Owner |
-|------|-------|-------|
-| Day 1-3 | Task 2.1 (Unit tests for core services) | Backend Dev |
-| Day 4-6 | Task 2.2 (Integration/E2E tests) | Backend Dev + QA |
-| Day 7 | Task 2.5 (Test infrastructure) | DevOps |
+
+| Days    | Tasks                                   | Owner            |
+| ------- | --------------------------------------- | ---------------- |
+| Day 1-3 | Task 2.1 (Unit tests for core services) | Backend Dev      |
+| Day 4-6 | Task 2.2 (Integration/E2E tests)        | Backend Dev + QA |
+| Day 7   | Task 2.5 (Test infrastructure)          | DevOps           |
 
 **Deliverable:** API test coverage at 70-80%
 
 ---
 
 ### Week 3-4: Provider Integration + Frontend Tests
-| Days | Tasks | Owner |
-|------|-------|-------|
-| Day 1-2 | Task 3.1 (Plaid integration) | Backend Dev |
-| Day 3 | Task 3.2 (Bitso completion) | Backend Dev |
-| Day 4-5 | Task 3.3 (Blockchain tracking) | Backend Dev |
+
+| Days    | Tasks                               | Owner        |
+| ------- | ----------------------------------- | ------------ |
+| Day 1-2 | Task 3.1 (Plaid integration)        | Backend Dev  |
+| Day 3   | Task 3.2 (Bitso completion)         | Backend Dev  |
+| Day 4-5 | Task 3.3 (Blockchain tracking)      | Backend Dev  |
 | Day 6-7 | Task 2.3 (Frontend component tests) | Frontend Dev |
 
 **Deliverable:** All providers 90%+ complete, frontend coverage 60-70%
@@ -1773,26 +1867,28 @@ export class HealthController {
 ---
 
 ### Week 4-5: Type Safety + Mobile Tests
-| Days | Tasks | Owner |
-|------|-------|-------|
-| Day 1-2 | Task 4.1 (Eliminate `as any`) | Full-stack Dev |
-| Day 3 | Task 4.2 (Type annotations) | Full-stack Dev |
-| Day 4 | Task 4.3 (API response types) | Full-stack Dev |
-| Day 5-7 | Task 2.4 (Mobile + package tests) | Mobile Dev |
+
+| Days    | Tasks                             | Owner          |
+| ------- | --------------------------------- | -------------- |
+| Day 1-2 | Task 4.1 (Eliminate `as any`)     | Full-stack Dev |
+| Day 3   | Task 4.2 (Type annotations)       | Full-stack Dev |
+| Day 4   | Task 4.3 (API response types)     | Full-stack Dev |
+| Day 5-7 | Task 2.4 (Mobile + package tests) | Mobile Dev     |
 
 **Deliverable:** Type safety >90%, mobile coverage 60%+
 
 ---
 
 ### Week 5-6: Performance & Reliability
-| Days | Tasks | Owner |
-|------|-------|-------|
-| Day 1 | Task 5.1 (Connection pooling) | Backend Dev + DevOps |
-| Day 2 | Task 5.2 (Query monitoring) | Backend Dev |
-| Day 3 | Task 5.3 (Database indices) | Backend Dev |
-| Day 4-5 | Task 5.4 (Caching strategy) | Backend Dev |
-| Day 6 | Task 5.5 (Health checks) | DevOps |
-| Day 7 | Final testing and deployment prep | Full Team |
+
+| Days    | Tasks                             | Owner                |
+| ------- | --------------------------------- | -------------------- |
+| Day 1   | Task 5.1 (Connection pooling)     | Backend Dev + DevOps |
+| Day 2   | Task 5.2 (Query monitoring)       | Backend Dev          |
+| Day 3   | Task 5.3 (Database indices)       | Backend Dev          |
+| Day 4-5 | Task 5.4 (Caching strategy)       | Backend Dev          |
+| Day 6   | Task 5.5 (Health checks)          | DevOps               |
+| Day 7   | Final testing and deployment prep | Full Team            |
 
 **Deliverable:** Production-ready system with monitoring
 
@@ -1801,6 +1897,7 @@ export class HealthController {
 ## Success Criteria
 
 ### Security ✅
+
 - [ ] All 7 critical vulnerabilities fixed
 - [ ] AWS KMS integration in production
 - [ ] Rate limiting on all auth endpoints
@@ -1809,6 +1906,7 @@ export class HealthController {
 - [ ] Security audit passes
 
 ### Testing ✅
+
 - [ ] API coverage: 80%+ (branches, functions, lines, statements)
 - [ ] Web coverage: 70%+
 - [ ] Mobile coverage: 60%+
@@ -1817,6 +1915,7 @@ export class HealthController {
 - [ ] CI/CD enforces coverage thresholds
 
 ### Provider Integration ✅
+
 - [ ] Plaid: 100% complete (accounts, transactions, webhooks)
 - [ ] Belvo: 100% complete (already at 80%)
 - [ ] Bitso: 90%+ complete (real-time sync)
@@ -1825,6 +1924,7 @@ export class HealthController {
 - [ ] Provider sync jobs running reliably
 
 ### Type Safety ✅
+
 - [ ] `as any` count: <10 (from 82)
 - [ ] `: any` count: <20 (from 133)
 - [ ] All API responses typed
@@ -1832,6 +1932,7 @@ export class HealthController {
 - [ ] No TypeScript errors in CI
 
 ### Performance ✅
+
 - [ ] Database connection pooling configured
 - [ ] Query performance monitoring active
 - [ ] All slow queries optimized (<100ms p95)
@@ -1847,6 +1948,7 @@ export class HealthController {
 
 **Risk:** AWS KMS integration may have unexpected AWS configuration issues
 **Mitigation:**
+
 - Test in staging environment first
 - Use LocalStack for local development
 - Have rollback plan to existing encryption
@@ -1854,6 +1956,7 @@ export class HealthController {
 
 **Risk:** Test coverage expansion may reveal critical bugs
 **Mitigation:**
+
 - Fix bugs as they're discovered
 - Prioritize security-critical bugs
 - Add regression tests
@@ -1863,6 +1966,7 @@ export class HealthController {
 
 **Risk:** Plaid integration changes may break existing functionality
 **Mitigation:**
+
 - Write comprehensive tests first
 - Use feature flags for gradual rollout
 - Test with Plaid sandbox thoroughly
@@ -1870,6 +1974,7 @@ export class HealthController {
 
 **Risk:** Database migration for indices may cause downtime
 **Mitigation:**
+
 - Create indices concurrently in PostgreSQL
 - Run migrations during low-traffic periods
 - Have rollback plan
@@ -1879,6 +1984,7 @@ export class HealthController {
 
 **Risk:** Type safety improvements may require significant refactoring
 **Mitigation:**
+
 - Take incremental approach
 - Fix high-impact files first
 - Use automated tools where possible
@@ -1889,6 +1995,7 @@ export class HealthController {
 ## Post-Remediation Checklist
 
 ### Before Production Launch
+
 - [ ] All Priority 1 tasks complete (security)
 - [ ] All Priority 2 tasks complete (testing)
 - [ ] All Priority 3 tasks complete (providers)
@@ -1901,6 +2008,7 @@ export class HealthController {
 - [ ] Incident response plan ready
 
 ### Production Deployment
+
 - [ ] Blue-green deployment strategy
 - [ ] Database migration tested
 - [ ] Feature flags configured
@@ -1911,6 +2019,7 @@ export class HealthController {
 - [ ] Post-launch monitoring active
 
 ### Post-Launch (Week 1)
+
 - [ ] Monitor error rates
 - [ ] Check performance metrics
 - [ ] Review security logs
@@ -1925,6 +2034,7 @@ export class HealthController {
 ## Resources Required
 
 ### Team
+
 - 2x Backend Developers (full-time, 6 weeks)
 - 1x Frontend Developer (full-time, 4 weeks)
 - 1x Mobile Developer (full-time, 2 weeks)
@@ -1932,17 +2042,20 @@ export class HealthController {
 - 1x QA Engineer (part-time, 4 weeks)
 
 ### Infrastructure
+
 - AWS account with KMS access
 - Staging environment matching production
 - LocalStack for local KMS testing
 - PostHog or similar monitoring
 
 ### External Services
+
 - Plaid sandbox account (already have)
 - Belvo sandbox account (already have)
 - Bitso test API access
 
 ### Budget Estimate
+
 - Development time: 18-24 developer-weeks
 - Infrastructure costs: ~$500/month (staging + testing)
 - External services: Included in existing plans

@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { RateLimiterService } from './rate-limiter.service';
-import { PrismaService } from '../../../core/prisma/prisma.service';
 import { createPrismaMock, createLoggerMock } from '../../../../test/helpers/api-mock-factory';
+import { PrismaService } from '../../../core/prisma/prisma.service';
+
+import { RateLimiterService } from './rate-limiter.service';
 
 describe('RateLimiterService', () => {
   let service: RateLimiterService;
@@ -16,10 +17,7 @@ describe('RateLimiterService', () => {
     prismaMock = createPrismaMock();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        RateLimiterService,
-        { provide: PrismaService, useValue: prismaMock },
-      ],
+      providers: [RateLimiterService, { provide: PrismaService, useValue: prismaMock }],
     }).compile();
 
     service = module.get<RateLimiterService>(RateLimiterService);
@@ -476,7 +474,15 @@ describe('RateLimiterService', () => {
   });
 
   describe('provider configurations', () => {
-    const providers = ['belvo', 'plaid', 'mx', 'finicity', 'bitso', 'blockchain', 'manual'] as const;
+    const providers = [
+      'belvo',
+      'plaid',
+      'mx',
+      'finicity',
+      'bitso',
+      'blockchain',
+      'manual',
+    ] as const;
 
     it.each(providers)('should have valid config for %s', async (provider) => {
       const status = await service.getRateLimitStatus(provider);

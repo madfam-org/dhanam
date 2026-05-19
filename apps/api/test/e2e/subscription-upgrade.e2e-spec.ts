@@ -1,12 +1,13 @@
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
+import { JwtService } from '@nestjs/jwt';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import request from 'supertest';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { TestHelper } from './helpers/test.helper';
-import { createE2EApp } from './helpers/e2e-app.helper';
+
 import { stripeWebhookFixtures } from './fixtures/billing.fixtures';
+import { createE2EApp } from './helpers/e2e-app.helper';
+import { TestHelper } from './helpers/test.helper';
 
 /**
  * Subscription Upgrade Journey E2E Test
@@ -50,13 +51,11 @@ describe('Subscription Upgrade Journey', () => {
     it('should register a new community-tier user', async () => {
       userEmail = TestHelper.generateUniqueEmail('billing');
 
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({
-          email: userEmail,
-          password: 'BillingTest123!',
-          name: 'Billing Test User',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/register').send({
+        email: userEmail,
+        password: 'BillingTest123!',
+        name: 'Billing Test User',
+      });
 
       if (response.status !== 201) {
         console.error('Registration failed:', JSON.stringify(response.body, null, 2));
@@ -284,9 +283,7 @@ describe('Subscription Upgrade Journey', () => {
 
   describe('Billing Endpoint Security', () => {
     it('should reject billing status without auth', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/billing/status')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/billing/status').expect(401);
     });
 
     it('should reject upgrade without auth', async () => {
@@ -297,9 +294,7 @@ describe('Subscription Upgrade Journey', () => {
     });
 
     it('should reject billing history without auth', async () => {
-      await request(app.getHttpServer())
-        .get('/v1/billing/history')
-        .expect(401);
+      await request(app.getHttpServer()).get('/v1/billing/history').expect(401);
     });
   });
 });

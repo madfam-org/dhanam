@@ -1,5 +1,5 @@
-import { TotpService, TotpSetupResponse } from '../totp.service';
 import { LocalMfaProvider } from '../providers/local-mfa.provider';
+import { TotpService, TotpSetupResponse } from '../totp.service';
 
 describe('LocalMfaProvider', () => {
   let provider: LocalMfaProvider;

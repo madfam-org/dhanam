@@ -9,30 +9,35 @@ The Dhanam Ledger mobile app is built with React Native and Expo, providing a co
 ### 📱 Core Screens
 
 #### Dashboard
+
 - **Portfolio Overview** - Real-time net worth with interactive charts
 - **Quick Actions** - Connect accounts, view recent transactions, budget alerts
 - **Account Summary** - All connected accounts with balances and last sync status
 - **ESG Score** - Portfolio-weighted sustainability score
 
 #### Accounts Management
+
 - **Connected Accounts** - List of all linked financial accounts
 - **Provider Integration** - Support for Plaid (US), Belvo (MX), Bitso (crypto)
 - **Account Details** - Balance history, sync status, provider information
 - **Connection Flow** - Secure account linking with OAuth and API keys
 
 #### Transactions
+
 - **Transaction History** - Searchable list with smart filtering
 - **Categorization** - Auto-categorization with manual override
 - **Search & Filters** - By amount, date, category, account, merchant
 - **Transaction Details** - Location data, tags, notes, receipts
 
 #### Budget Management
+
 - **Budget Overview** - Visual progress bars and spending insights
 - **Category Tracking** - Spending by category with alerts
 - **Budget Alerts** - Push notifications for threshold breaches
 - **Historical Analysis** - Month-over-month budget performance
 
 #### ESG Scoring
+
 - **Portfolio ESG Score** - Weighted sustainability rating
 - **Asset Breakdown** - Individual crypto asset ESG analysis
 - **Trend Analysis** - ESG score changes over time
@@ -41,18 +46,21 @@ The Dhanam Ledger mobile app is built with React Native and Expo, providing a co
 ### 🔐 Security Features
 
 #### Biometric Authentication
+
 - **TouchID/FaceID** - Native biometric authentication
 - **Setup Flow** - Guided biometric enrollment
 - **Fallback Options** - PIN/Password backup authentication
 - **Security Settings** - Enable/disable biometric access
 
 #### Multi-Factor Authentication
+
 - **TOTP Support** - Time-based one-time passwords
 - **QR Code Setup** - Easy authenticator app integration
 - **Backup Codes** - Recovery codes for account access
 - **Security Notifications** - Alerts for suspicious activities
 
 #### Data Protection
+
 - **Encrypted Storage** - Local data encrypted with Expo SecureStore
 - **Secure Network** - TLS 1.3 for all API communications
 - **Token Management** - Automatic token refresh and rotation
@@ -61,6 +69,7 @@ The Dhanam Ledger mobile app is built with React Native and Expo, providing a co
 ## Architecture
 
 ### Technology Stack
+
 - **Framework**: React Native 0.74 with Expo SDK 51
 - **Navigation**: Expo Router with file-based routing
 - **State Management**: Zustand for app state, React Query for server state
@@ -69,6 +78,7 @@ The Dhanam Ledger mobile app is built with React Native and Expo, providing a co
 - **Authentication**: JWT with biometric integration
 
 ### Project Structure
+
 ```
 apps/mobile/
 ├── app/                    # Expo Router screens
@@ -90,14 +100,10 @@ apps/mobile/
 ### Key Components
 
 #### Authentication Flow
+
 ```typescript
 // Biometric authentication hook
-const { 
-  isAvailable, 
-  isEnabled, 
-  authenticate,
-  enableBiometric 
-} = useBiometric();
+const { isAvailable, isEnabled, authenticate, enableBiometric } = useBiometric();
 
 // Check biometric authentication
 const result = await authenticate('Access your account');
@@ -107,9 +113,14 @@ if (result.success) {
 ```
 
 #### API Integration
+
 ```typescript
 // React Query for server state
-const { data: accounts, isLoading, refetch } = useQuery({
+const {
+  data: accounts,
+  isLoading,
+  refetch,
+} = useQuery({
   queryKey: ['accounts', currentSpace?.id],
   queryFn: () => apiClient.get(`/accounts?spaceId=${currentSpace!.id}`),
   enabled: !!currentSpace,
@@ -117,6 +128,7 @@ const { data: accounts, isLoading, refetch } = useQuery({
 ```
 
 #### Provider Connections
+
 ```typescript
 // Plaid connection flow
 const handlePlaidConnect = async () => {
@@ -124,12 +136,12 @@ const handlePlaidConnect = async () => {
     spaceId: currentSpace.id,
     userId: user.id,
   });
-  
+
   // Open Plaid Link (would use react-native-plaid-link-sdk)
   const { publicToken, metadata } = await PlaidLink.open({
-    linkToken: linkResponse.data.linkToken
+    linkToken: linkResponse.data.linkToken,
   });
-  
+
   // Exchange token
   await apiClient.post('/providers/plaid/exchange-token', {
     spaceId: currentSpace.id,
@@ -146,6 +158,7 @@ const handlePlaidConnect = async () => {
 Main overview screen with portfolio summary.
 
 **Features:**
+
 - Net worth calculation and trend chart
 - Quick account balance overview
 - Recent transactions list
@@ -153,6 +166,7 @@ Main overview screen with portfolio summary.
 - ESG score summary
 
 **State Management:**
+
 - Uses React Query for account and transaction data
 - Real-time updates with automatic refetch
 - Optimistic updates for better UX
@@ -162,12 +176,14 @@ Main overview screen with portfolio summary.
 Account management and connection interface.
 
 **Features:**
+
 - Connected account list with provider badges
 - Account balance and last sync status
 - Provider-specific connection flows
 - Account settings and disconnection
 
 **Provider Integration:**
+
 - Plaid: OAuth-based connection for US banks
 - Belvo: Credential-based connection for Mexican banks
 - Bitso: API key-based connection for crypto exchange
@@ -178,6 +194,7 @@ Account management and connection interface.
 Comprehensive transaction management.
 
 **Features:**
+
 - Searchable transaction list
 - Advanced filtering (date, amount, category, account)
 - Automatic categorization with manual override
@@ -185,23 +202,25 @@ Comprehensive transaction management.
 - Bulk operations for categorization
 
 **Search & Filters:**
+
 ```typescript
 const filteredTransactions = useMemo(() => {
   let filtered = transactions || [];
-  
+
   // Apply search filter
   if (searchQuery) {
-    filtered = filtered.filter(tx => 
-      tx.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tx.merchantName?.toLowerCase().includes(searchQuery.toLowerCase())
+    filtered = filtered.filter(
+      (tx) =>
+        tx.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tx.merchantName?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
-  
+
   // Apply type filter
   if (selectedFilter !== 'all') {
-    filtered = filtered.filter(tx => tx.type === selectedFilter);
+    filtered = filtered.filter((tx) => tx.type === selectedFilter);
   }
-  
+
   return filtered;
 }, [transactions, searchQuery, selectedFilter]);
 ```
@@ -211,6 +230,7 @@ const filteredTransactions = useMemo(() => {
 Budget tracking and management interface.
 
 **Features:**
+
 - Budget overview with total spent/remaining
 - Individual budget cards with progress bars
 - Category allocation breakdown
@@ -218,6 +238,7 @@ Budget tracking and management interface.
 - Historical budget performance
 
 **Budget Visualization:**
+
 ```typescript
 const progressPercentage = Math.min((budget.spent / budget.amount) * 100, 100);
 const progressColor = getProgressColor(budget.spent, budget.amount);
@@ -234,6 +255,7 @@ const progressColor = getProgressColor(budget.spent, budget.amount);
 ESG scoring and sustainability analysis.
 
 **Features:**
+
 - Portfolio-weighted ESG score
 - Individual crypto asset analysis
 - ESG component breakdown (Environmental, Social, Governance)
@@ -241,6 +263,7 @@ ESG scoring and sustainability analysis.
 - Impact metrics (carbon footprint, energy usage)
 
 **ESG Data Structure:**
+
 ```typescript
 interface ESGScore {
   symbol: string;
@@ -263,6 +286,7 @@ interface ESGScore {
 Comprehensive biometric authentication system.
 
 **Features:**
+
 - Hardware availability detection
 - Biometric enrollment checking
 - Multiple biometric types support (TouchID, FaceID, Fingerprint)
@@ -270,6 +294,7 @@ Comprehensive biometric authentication system.
 - Fallback authentication options
 
 **Implementation:**
+
 ```typescript
 export function useBiometric(): BiometricHook {
   const [biometricState, setBiometricState] = useState({
@@ -286,7 +311,7 @@ export function useBiometric(): BiometricHook {
       fallbackLabel: 'Use Passcode',
       disableDeviceFallback: false,
     });
-    
+
     return { success: result.success, error: result.error };
   };
 }
@@ -307,6 +332,7 @@ export function useBiometric(): BiometricHook {
 US banking integration through Plaid Link.
 
 **Connection Flow:**
+
 1. Create Link token via API
 2. Open Plaid Link interface
 3. User selects institution and provides credentials
@@ -316,6 +342,7 @@ US banking integration through Plaid Link.
 7. Sync account data
 
 **Security Measures:**
+
 - Read-only access permissions
 - Encrypted token storage with AES-256-GCM
 - Webhook signature verification
@@ -326,6 +353,7 @@ US banking integration through Plaid Link.
 Cryptocurrency exchange integration with API credentials.
 
 **Connection Flow:**
+
 1. User provides Bitso API key and secret
 2. Validate credentials with test API call
 3. Store encrypted credentials
@@ -333,6 +361,7 @@ Cryptocurrency exchange integration with API credentials.
 5. Enable ESG scoring for crypto assets
 
 **Security Features:**
+
 - API credentials encrypted at rest
 - Read-only permissions enforced
 - Regular balance synchronization
@@ -343,12 +372,14 @@ Cryptocurrency exchange integration with API credentials.
 ### Setup Instructions
 
 1. **Install Dependencies**
+
    ```bash
    cd apps/mobile
    pnpm install
    ```
 
 2. **Configure Environment**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
@@ -364,12 +395,14 @@ Cryptocurrency exchange integration with API credentials.
 ### Build Process
 
 #### Development Builds
+
 ```bash
 pnpm build:dev          # Development build
 pnpm build:preview      # Preview build for testing
 ```
 
 #### Production Builds
+
 ```bash
 pnpm build:ios          # iOS production build
 pnpm build:android      # Android production build
@@ -377,6 +410,7 @@ pnpm build:all          # Build for all platforms
 ```
 
 #### App Store Submission
+
 ```bash
 pnpm submit:ios         # Submit to Apple App Store
 pnpm submit:android     # Submit to Google Play Store
@@ -385,6 +419,7 @@ pnpm submit:android     # Submit to Google Play Store
 ### Testing
 
 #### Unit Testing
+
 ```bash
 pnpm test               # Run unit tests
 pnpm test:watch         # Run tests in watch mode
@@ -392,6 +427,7 @@ pnpm test:coverage      # Generate coverage report
 ```
 
 #### E2E Testing
+
 ```bash
 pnpm test:e2e           # Run end-to-end tests
 pnpm test:e2e:ios       # E2E tests on iOS
@@ -401,18 +437,21 @@ pnpm test:e2e:android   # E2E tests on Android
 ### Performance Optimization
 
 #### Bundle Size Optimization
+
 - Tree shaking unused dependencies
 - Lazy loading screens and components
 - Optimizing asset sizes and formats
 - Using Hermes JavaScript engine
 
 #### Memory Management
+
 - Proper cleanup of subscriptions and listeners
 - Image caching and optimization
 - Efficient list rendering with FlatList
 - Background task management
 
 #### Battery Optimization
+
 - Reduced background processing
 - Efficient data synchronization
 - Smart push notification handling
@@ -423,12 +462,14 @@ pnpm test:e2e:android   # E2E tests on Android
 ### App Store Guidelines
 
 #### iOS App Store
+
 - Follow Apple's Human Interface Guidelines
 - Implement proper biometric authentication flows
 - Handle App Store review requirements
 - Support latest iOS versions and devices
 
 #### Google Play Store
+
 - Follow Material Design guidelines
 - Implement Android-specific features
 - Handle Google Play review requirements
@@ -437,6 +478,7 @@ pnpm test:e2e:android   # E2E tests on Android
 ### Release Process
 
 1. **Version Bumping**
+
    ```bash
    pnpm version:patch      # Patch release (1.0.1)
    pnpm version:minor      # Minor release (1.1.0)
@@ -444,6 +486,7 @@ pnpm test:e2e:android   # E2E tests on Android
    ```
 
 2. **Build Generation**
+
    ```bash
    pnpm build:production   # Generate production builds
    pnpm test:final        # Run comprehensive tests
@@ -457,6 +500,7 @@ pnpm test:e2e:android   # E2E tests on Android
 ### Environment Configuration
 
 #### Development
+
 ```env
 API_BASE_URL=http://localhost:4000
 EXPO_PUBLIC_API_URL=http://localhost:4000
@@ -464,6 +508,7 @@ EXPO_PUBLIC_POSTHOG_KEY=phc-dev-key
 ```
 
 #### Production
+
 ```env
 API_BASE_URL=https://api.dhanam.io/v1
 EXPO_PUBLIC_API_URL=https://api.dhanam.io/v1
@@ -475,16 +520,19 @@ EXPO_PUBLIC_POSTHOG_KEY=phc-prod-key
 ### Common Issues
 
 #### Build Failures
+
 - **Metro bundler issues**: Clear cache with `pnpm start --clear`
 - **Native dependencies**: Run `cd ios && pod install` for iOS
 - **Android build errors**: Clean with `cd android && ./gradlew clean`
 
 #### Authentication Issues
+
 - **Biometric not working**: Check device enrollment and app permissions
 - **Token refresh failures**: Verify API connectivity and token storage
 - **Login loops**: Clear AsyncStorage and restart app
 
 #### Provider Connection Issues
+
 - **Plaid Link errors**: Verify Link token generation and expiration
 - **Bitso API failures**: Check API credentials and network connectivity
 - **Sync timeouts**: Increase timeout values in API client configuration
@@ -492,6 +540,7 @@ EXPO_PUBLIC_POSTHOG_KEY=phc-prod-key
 ### Debug Tools
 
 #### React Native Debugger
+
 ```bash
 # Install React Native Debugger
 brew install --cask react-native-debugger
@@ -501,6 +550,7 @@ react-native-debugger
 ```
 
 #### Flipper Integration
+
 ```bash
 # Install Flipper
 brew install --cask flipper
@@ -510,6 +560,7 @@ brew install --cask flipper
 ```
 
 #### Expo DevTools
+
 ```bash
 # Open Expo DevTools
 pnpm start
@@ -521,16 +572,19 @@ pnpm start
 ## Support and Resources
 
 ### Documentation
+
 - [Expo Documentation](https://docs.expo.dev/)
 - [React Native Documentation](https://reactnative.dev/docs/getting-started)
 - [React Native Paper](https://reactnativepaper.com/)
 
 ### Community
+
 - [Discord Community](https://discord.gg/dhanam)
 - [GitHub Discussions](https://github.com/aldoruizluna/dhanam/discussions)
 - [Stack Overflow](https://stackoverflow.com/questions/tagged/dhanam)
 
 ### Support
+
 - **Technical Support**: [mobile@dhanam.io](mailto:mobile@dhanam.io)
 - **Bug Reports**: [GitHub Issues](https://github.com/aldoruizluna/dhanam/issues)
 - **Feature Requests**: [GitHub Discussions](https://github.com/aldoruizluna/dhanam/discussions)

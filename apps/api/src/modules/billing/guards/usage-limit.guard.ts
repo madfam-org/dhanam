@@ -1,6 +1,7 @@
-import { UsageMetricType } from '@db';
 import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+
+import { UsageMetricType } from '@db';
 
 import { BillingService } from '../billing.service';
 import { USAGE_METRIC_KEY } from '../decorators';

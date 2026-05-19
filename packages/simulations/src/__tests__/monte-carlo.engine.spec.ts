@@ -1,4 +1,8 @@
-import { MonteCarloEngine, SimulationConfig, monteCarloEngine } from '../engines/monte-carlo.engine';
+import {
+  MonteCarloEngine,
+  SimulationConfig,
+  monteCarloEngine,
+} from '../engines/monte-carlo.engine';
 
 describe('MonteCarloEngine', () => {
   let engine: MonteCarloEngine;
@@ -199,7 +203,7 @@ describe('MonteCarloEngine', () => {
 
       // Success rate should decrease over time in retirement
       const firstRetirementAge = result.successByAge.find(
-        s => s.age === retirementConfig.retirementAge
+        (s) => s.age === retirementConfig.retirementAge
       );
       expect(firstRetirementAge?.successRate).toBeDefined();
     });
@@ -239,10 +243,12 @@ describe('MonteCarloEngine', () => {
         successProbability: 0.95,
         expectedReturn: 0.06,
         returnVolatility: 0.15,
+        iterations: 500,
+        maxAttempts: 12,
       });
 
       expect(result).toBeGreaterThanOrEqual(0.01);
-      expect(result).toBeLessThanOrEqual(0.10);
+      expect(result).toBeLessThanOrEqual(0.1);
     });
 
     it('should return higher rate for shorter retirement', () => {
@@ -252,6 +258,8 @@ describe('MonteCarloEngine', () => {
         successProbability: 0.95,
         expectedReturn: 0.06,
         returnVolatility: 0.15,
+        iterations: 500,
+        maxAttempts: 12,
       });
 
       const longRetirement = engine.calculateSafeWithdrawalRate({
@@ -260,6 +268,8 @@ describe('MonteCarloEngine', () => {
         successProbability: 0.95,
         expectedReturn: 0.06,
         returnVolatility: 0.15,
+        iterations: 500,
+        maxAttempts: 12,
       });
 
       expect(shortRetirement).toBeGreaterThan(longRetirement);
@@ -269,9 +279,11 @@ describe('MonteCarloEngine', () => {
       const lowerProbability = engine.calculateSafeWithdrawalRate({
         portfolioValue: 1000000,
         yearsInRetirement: 30,
-        successProbability: 0.80,
+        successProbability: 0.8,
         expectedReturn: 0.06,
         returnVolatility: 0.15,
+        iterations: 500,
+        maxAttempts: 12,
       });
 
       const higherProbability = engine.calculateSafeWithdrawalRate({
@@ -280,6 +292,8 @@ describe('MonteCarloEngine', () => {
         successProbability: 0.99,
         expectedReturn: 0.06,
         returnVolatility: 0.15,
+        iterations: 500,
+        maxAttempts: 12,
       });
 
       expect(lowerProbability).toBeGreaterThan(higherProbability);
@@ -339,7 +353,7 @@ describe('MonteCarloEngine', () => {
         years: 5,
         iterations: 100,
         expectedReturn: 0,
-        returnVolatility: 0.10,
+        returnVolatility: 0.1,
       });
 
       // With zero expected return, median should be close to initial
@@ -358,7 +372,7 @@ describe('MonteCarloEngine', () => {
       });
 
       // Some outcomes should hit zero but not go negative
-      expect(result.allOutcomes.every(balance => balance >= 0)).toBe(true);
+      expect(result.allOutcomes.every((balance) => balance >= 0)).toBe(true);
     });
   });
 });

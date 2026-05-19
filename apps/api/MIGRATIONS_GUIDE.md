@@ -42,6 +42,7 @@ pnpm db:migrate:rollback
 ### 1. Naming Conventions
 
 Use descriptive names that indicate the change:
+
 ```bash
 # Good
 pnpm db:migrate:dev --name add_user_preferences_table
@@ -58,6 +59,7 @@ pnpm db:migrate:dev --name changes
 For breaking changes (renaming columns, changing types), use this pattern:
 
 **Step 1: Add new field (backward compatible)**
+
 ```prisma
 model User {
   email     String  @unique
@@ -66,12 +68,14 @@ model User {
 ```
 
 **Step 2: Deploy data migration**
+
 ```sql
 -- In migration file, add custom SQL
 UPDATE users SET email_new = email WHERE email_new IS NULL;
 ```
 
 **Step 3: Make new field required**
+
 ```prisma
 model User {
   email     String  @unique
@@ -80,6 +84,7 @@ model User {
 ```
 
 **Step 4: Drop old field**
+
 ```prisma
 model User {
   emailNew  String  @unique
@@ -87,6 +92,7 @@ model User {
 ```
 
 **Step 5: Rename field**
+
 ```prisma
 model User {
   email  String  @unique  // Renamed back

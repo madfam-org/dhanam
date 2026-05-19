@@ -127,7 +127,7 @@ export class DlqController {
         id: row.id,
         resolvedAt: row.resolvedAt,
       };
-    } catch (err) {
+    } catch (_err) {
       // Prisma throws P2025 when the id doesn't exist; map to 404.
       this.logger.warn(`Resolve attempted on missing/invalid DLQ row ${id}`);
       throw new NotFoundException('Failure not found');

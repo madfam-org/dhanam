@@ -20,7 +20,7 @@ import { BelvoService } from './belvo.service';
     PrismaModule,
     CryptoModule,
     AuditModule,
-    AccountsModule,
+    forwardRef(() => AccountsModule),
     TransactionsModule,
     OrchestratorModule,
     forwardRef(() => BillingModule),

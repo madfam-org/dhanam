@@ -1,11 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { Decimal } from '@db';
 
-import { ManualAssetsService } from './manual-assets.service';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
+
 import { AddValuationDto } from './dto';
+import { ManualAssetsService } from './manual-assets.service';
 
 describe('ManualAssetsService - Valuation', () => {
   let service: ManualAssetsService;

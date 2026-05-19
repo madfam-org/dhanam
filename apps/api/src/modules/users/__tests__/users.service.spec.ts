@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { PrismaService } from '@core/prisma/prisma.service';
-import { LoggerService } from '@core/logger/logger.service';
-import { UsersService } from '../users.service';
-import { UpdateUserDto } from '../dto/update-user.dto';
 import { BusinessRuleException, ValidationException } from '@core/exceptions/domain-exceptions';
+import { LoggerService } from '@core/logger/logger.service';
+import { PrismaService } from '@core/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@db';
+
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { UsersService } from '../users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -165,12 +166,8 @@ describe('UsersService', () => {
     it('should throw BusinessRuleException if user does not exist', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.getProfile('nonexistent-user')).rejects.toThrow(
-        BusinessRuleException
-      );
-      await expect(service.getProfile('nonexistent-user')).rejects.toThrow(
-        'User not found'
-      );
+      await expect(service.getProfile('nonexistent-user')).rejects.toThrow(BusinessRuleException);
+      await expect(service.getProfile('nonexistent-user')).rejects.toThrow('User not found');
     });
 
     it('should include all user profile fields', async () => {
@@ -519,9 +516,7 @@ describe('UsersService', () => {
           space: {
             id: 'space-solo',
             name: 'Solo Space',
-            userSpaces: [
-              { userId: 'user-123', spaceId: 'space-solo', role: 'owner' },
-            ],
+            userSpaces: [{ userId: 'user-123', spaceId: 'space-solo', role: 'owner' }],
           },
         },
         {
@@ -696,9 +691,9 @@ describe('UsersService', () => {
 
   describe('updateProfile error handling', () => {
     it('should throw ValidationException for empty name', async () => {
-      await expect(
-        service.updateProfile('user-123', { name: '   ' })
-      ).rejects.toThrow('Invalid input for field: name');
+      await expect(service.updateProfile('user-123', { name: '   ' })).rejects.toThrow(
+        'Invalid input for field: name'
+      );
     });
 
     it('should throw BusinessRuleException on Prisma P2025 error', async () => {
@@ -709,9 +704,9 @@ describe('UsersService', () => {
 
       prisma.user.update.mockRejectedValue(prismaError);
 
-      await expect(
-        service.updateProfile('nonexistent', { name: 'Test' })
-      ).rejects.toThrow(BusinessRuleException);
+      await expect(service.updateProfile('nonexistent', { name: 'Test' })).rejects.toThrow(
+        BusinessRuleException
+      );
     });
 
     it('should throw ValidationException on Prisma P2002 (duplicate) error', async () => {
@@ -723,9 +718,9 @@ describe('UsersService', () => {
 
       prisma.user.update.mockRejectedValue(prismaError);
 
-      await expect(
-        service.updateProfile('user-123', { name: 'Test' })
-      ).rejects.toThrow(ValidationException);
+      await expect(service.updateProfile('user-123', { name: 'Test' })).rejects.toThrow(
+        ValidationException
+      );
     });
 
     it('should throw InfrastructureException on unknown Prisma error code', async () => {
@@ -736,17 +731,17 @@ describe('UsersService', () => {
 
       prisma.user.update.mockRejectedValue(prismaError);
 
-      await expect(
-        service.updateProfile('user-123', { name: 'Test' })
-      ).rejects.toThrow('Database operation failed');
+      await expect(service.updateProfile('user-123', { name: 'Test' })).rejects.toThrow(
+        'Database operation failed'
+      );
     });
 
     it('should throw InfrastructureException on generic non-Prisma error', async () => {
       prisma.user.update.mockRejectedValue(new Error('Connection lost'));
 
-      await expect(
-        service.updateProfile('user-123', { name: 'Test' })
-      ).rejects.toThrow('Database operation failed');
+      await expect(service.updateProfile('user-123', { name: 'Test' })).rejects.toThrow(
+        'Database operation failed'
+      );
     });
   });
 
@@ -768,21 +763,19 @@ describe('UsersService', () => {
 
   describe('handlePrismaError', () => {
     it('should pass through BusinessRuleException', async () => {
-      prisma.user.update.mockRejectedValue(
-        BusinessRuleException.resourceNotFound('User', 'test')
-      );
+      prisma.user.update.mockRejectedValue(BusinessRuleException.resourceNotFound('User', 'test'));
 
-      await expect(
-        service.updateProfile('user-123', { name: 'Test' })
-      ).rejects.toThrow(BusinessRuleException);
+      await expect(service.updateProfile('user-123', { name: 'Test' })).rejects.toThrow(
+        BusinessRuleException
+      );
     });
 
     it('should wrap non-Error values as InfrastructureException', async () => {
       prisma.user.update.mockRejectedValue('string error');
 
-      await expect(
-        service.updateProfile('user-123', { name: 'Test' })
-      ).rejects.toThrow('Database operation failed');
+      await expect(service.updateProfile('user-123', { name: 'Test' })).rejects.toThrow(
+        'Database operation failed'
+      );
     });
   });
 

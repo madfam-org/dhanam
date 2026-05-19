@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import * as qrcode from 'qrcode';
 import * as speakeasy from 'speakeasy';
 
-import * as qrcode from 'qrcode';
-
 import { CryptoService } from '@core/crypto/crypto.service';
-import { PrismaService } from '@core/prisma/prisma.service';
 import { LoggerService } from '@core/logger/logger.service';
+import { PrismaService } from '@core/prisma/prisma.service';
 import { PrismaClientKnownRequestError } from '@db';
 
 import { TotpService } from '../totp.service';
@@ -165,9 +164,7 @@ describe('TotpService', () => {
 
       prisma.user.findUnique.mockResolvedValue(userWithTempSecret as any);
 
-      await expect(service.enableTotp(mockUser.id, '000000')).rejects.toThrow(
-        'Invalid TOTP token',
-      );
+      await expect(service.enableTotp(mockUser.id, '000000')).rejects.toThrow('Invalid TOTP token');
 
       expect(prisma.user.update).not.toHaveBeenCalled();
     });
@@ -176,7 +173,7 @@ describe('TotpService', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser as any);
 
       await expect(service.enableTotp(mockUser.id, '123456')).rejects.toThrow(
-        'No TOTP setup in progress',
+        'No TOTP setup in progress'
       );
     });
 
@@ -184,7 +181,7 @@ describe('TotpService', () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(service.enableTotp('nonexistent-user', '123456')).rejects.toThrow(
-        'No TOTP setup in progress',
+        'No TOTP setup in progress'
       );
     });
 
@@ -211,7 +208,7 @@ describe('TotpService', () => {
       expect(verifySpy).toHaveBeenCalledWith(
         expect.objectContaining({
           window: 2, // 2-step window for clock drift
-        }),
+        })
       );
     });
   });
@@ -264,23 +261,21 @@ describe('TotpService', () => {
       prisma.user.findUnique.mockResolvedValue(userWithTotp as any);
 
       await expect(service.disableTotp(mockUser.id, '000000')).rejects.toThrow(
-        'Invalid TOTP token',
+        'Invalid TOTP token'
       );
     });
 
     it('should throw error if TOTP not enabled', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUser as any);
 
-      await expect(service.disableTotp(mockUser.id, '123456')).rejects.toThrow(
-        'TOTP not enabled',
-      );
+      await expect(service.disableTotp(mockUser.id, '123456')).rejects.toThrow('TOTP not enabled');
     });
 
     it('should throw error if user is not found (line 93 null user branch)', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
       await expect(service.disableTotp('nonexistent-user', '123456')).rejects.toThrow(
-        'TOTP not enabled',
+        'TOTP not enabled'
       );
     });
   });
@@ -330,7 +325,7 @@ describe('TotpService', () => {
       expect(verifySpy).toHaveBeenCalledWith(
         expect.objectContaining({
           window: 2,
-        }),
+        })
       );
     });
   });
@@ -437,17 +432,14 @@ describe('TotpService', () => {
 
       expect(logger.log).toHaveBeenCalledWith(
         `Backup codes generated for user: ${mockUser.id}`,
-        'TotpService',
+        'TotpService'
       );
     });
   });
 
   describe('verifyBackupCode', () => {
     const validCode = '12345678';
-    const hashedCode = require('crypto')
-      .createHash('sha256')
-      .update(validCode)
-      .digest('hex');
+    const hashedCode = require('crypto').createHash('sha256').update(validCode).digest('hex');
 
     it('should verify valid backup code', async () => {
       const userWithBackupCodes = {
@@ -526,7 +518,7 @@ describe('TotpService', () => {
 
       expect(logger.log).toHaveBeenCalledWith(
         `Backup code used for user: ${mockUser.id}`,
-        'TotpService',
+        'TotpService'
       );
     });
 
@@ -539,7 +531,7 @@ describe('TotpService', () => {
       expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to verify backup code'),
         expect.any(String),
-        'TotpService',
+        'TotpService'
       );
     });
 
@@ -563,9 +555,9 @@ describe('TotpService', () => {
       });
       prisma.user.update.mockRejectedValue(prismaError);
 
-      await expect(
-        service.storeBackupCodes(mockUser.id, ['12345678']),
-      ).rejects.toThrow('not found');
+      await expect(service.storeBackupCodes(mockUser.id, ['12345678'])).rejects.toThrow(
+        'not found'
+      );
     });
 
     it('should map other PrismaClientKnownRequestError to InfrastructureException', async () => {
@@ -575,30 +567,26 @@ describe('TotpService', () => {
       });
       prisma.user.update.mockRejectedValue(prismaError);
 
-      await expect(
-        service.storeBackupCodes(mockUser.id, ['12345678']),
-      ).rejects.toThrow('Database operation failed');
+      await expect(service.storeBackupCodes(mockUser.id, ['12345678'])).rejects.toThrow(
+        'Database operation failed'
+      );
     });
 
     it('should wrap unknown errors as InfrastructureException', async () => {
       prisma.user.update.mockRejectedValue(new Error('Unknown error'));
 
-      await expect(
-        service.storeBackupCodes(mockUser.id, ['12345678']),
-      ).rejects.toThrow();
+      await expect(service.storeBackupCodes(mockUser.id, ['12345678'])).rejects.toThrow();
       expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining('TOTP operation failed'),
         expect.any(String),
-        'TotpService',
+        'TotpService'
       );
     });
 
     it('should wrap non-Error values as InfrastructureException', async () => {
       prisma.user.update.mockRejectedValue('string error');
 
-      await expect(
-        service.storeBackupCodes(mockUser.id, ['12345678']),
-      ).rejects.toThrow();
+      await expect(service.storeBackupCodes(mockUser.id, ['12345678'])).rejects.toThrow();
     });
   });
 
@@ -606,22 +594,20 @@ describe('TotpService', () => {
     it('should propagate handleError on prisma failure', async () => {
       prisma.user.update.mockRejectedValue(new Error('DB error'));
 
-      await expect(
-        service.setupTotp(mockUser.id, mockUser.email),
-      ).rejects.toThrow();
+      await expect(service.setupTotp(mockUser.id, mockUser.email)).rejects.toThrow();
     });
   });
 
   describe('enableTotp error paths', () => {
     it('should throw ValidationException for non-6-digit token', async () => {
       await expect(service.enableTotp(mockUser.id, 'abc')).rejects.toThrow(
-        'Invalid input for field: token',
+        'Invalid input for field: token'
       );
     });
 
     it('should throw ValidationException for empty token', async () => {
       await expect(service.enableTotp(mockUser.id, '')).rejects.toThrow(
-        'Invalid input for field: token',
+        'Invalid input for field: token'
       );
     });
   });
@@ -629,13 +615,13 @@ describe('TotpService', () => {
   describe('disableTotp error paths', () => {
     it('should throw ValidationException for non-6-digit token', async () => {
       await expect(service.disableTotp(mockUser.id, 'abc')).rejects.toThrow(
-        'Invalid input for field: token',
+        'Invalid input for field: token'
       );
     });
 
     it('should throw ValidationException for empty token', async () => {
       await expect(service.disableTotp(mockUser.id, '')).rejects.toThrow(
-        'Invalid input for field: token',
+        'Invalid input for field: token'
       );
     });
   });

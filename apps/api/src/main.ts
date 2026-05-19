@@ -1,29 +1,23 @@
-// eslint-disable-next-line import/no-named-as-default -- Reason: @dhanam/shared uses named + default export pattern
-import { GlobalExceptionFilter } from '@core/filters/global-exception.filter';
-import { LoggingInterceptor } from '@core/interceptors/logging.interceptor';
-import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
-import { HealthService } from '@core/monitoring/health.service';
-import { SentryService } from '@core/monitoring/sentry.service';
 import { SECURITY_HEADERS, SHUTDOWN_TIMEOUT_MS } from '@dhanam/shared';
 import fastifyCompress from '@fastify/compress';
-// eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
 import fastifyCookie from '@fastify/cookie';
-// eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
 import fastifyCors from '@fastify/cors';
-// eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
 import fastifyCsrfProtection from '@fastify/csrf-protection';
-// eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
 import fastifyHelmet from '@fastify/helmet';
-// eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
-import fastifyRateLimit from '@fastify/rate-limit';
-// eslint-disable-next-line import/no-named-as-default -- Reason: Fastify plugins export both default and named; we need the default
 import fastifyMultipart from '@fastify/multipart';
-import { QueueService } from '@modules/jobs/queue.service';
+import fastifyRateLimit from '@fastify/rate-limit';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import { GlobalExceptionFilter } from '@core/filters/global-exception.filter';
+import { LoggingInterceptor } from '@core/interceptors/logging.interceptor';
+import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
+import { HealthService } from '@core/monitoring/health.service';
+import { SentryService } from '@core/monitoring/sentry.service';
+import { QueueService } from '@modules/jobs/queue.service';
 
 import { AppModule } from './app.module';
 
@@ -56,19 +50,19 @@ async function bootstrap() {
   });
 
   // Cookie support (required for httpOnly refresh tokens)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+
   await app.register(fastifyCookie as any, {
     secret: configService.get('COOKIE_SECRET') || configService.get('JWT_SECRET'),
   });
 
   // CSRF protection (double-submit cookie pattern, skip safe methods)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+
   await app.register(fastifyCsrfProtection as any, {
     cookieOpts: { signed: true, httpOnly: true, sameSite: 'strict', secure: true, path: '/' },
   });
 
   // Security headers
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+
   await app.register(fastifyHelmet as any, {
     contentSecurityPolicy: {
       directives: {
@@ -91,7 +85,7 @@ async function bootstrap() {
 
   // CORS configuration
   const corsOrigins = configService.get('CORS_ORIGINS');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+
   await app.register(fastifyCors as any, {
     origin: corsOrigins
       ? corsOrigins.split(',')
@@ -100,22 +94,21 @@ async function bootstrap() {
   });
 
   // Compression
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+
   await app.register(fastifyCompress as any, { encodings: ['gzip', 'deflate'] });
 
   // Multipart form data (for compliance document uploads)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+
   await app.register(fastifyMultipart as any, {
     limits: {
       fileSize: 25 * 1024 * 1024, // 25MB max per file
-      files: 1,                   // one file per request
+      files: 1, // one file per request
     },
   });
 
   // Rate limiting
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Reason: Fastify plugin type mismatch with NestJS adapter requires cast
+
   await app.register(fastifyRateLimit as any, {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Reason: Guarded by truthy check on same line
     max: configService.get('RATE_LIMIT_MAX') ? parseInt(configService.get('RATE_LIMIT_MAX')!) : 100,
     timeWindow: (configService.get('RATE_LIMIT_WINDOW') as string) || '15 minutes',
     allowList: (req) => {

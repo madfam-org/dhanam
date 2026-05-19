@@ -80,7 +80,10 @@ export function createMockPrismaService(config: MockPrismaConfig = {}) {
           // Find record by id field
           key = '';
           for (const [k, v] of providerHealthRecords.entries()) {
-            if (v.id === where.id) { key = k; break; }
+            if (v.id === where.id) {
+              key = k;
+              break;
+            }
           }
         }
         const record = providerHealthRecords.get(key);

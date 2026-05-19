@@ -1,12 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { ProviderException } from '../../../core/exceptions/domain-exceptions';
 import { EventsService } from '../../../core/events/events.service';
-import { ProviderOrchestratorService } from './provider-orchestrator.service';
-import { CircuitBreakerService } from './circuit-breaker.service';
-import { ProviderSelectionService } from '../../ml/provider-selection.service';
+import { ProviderException } from '../../../core/exceptions/domain-exceptions';
 import { PrismaService } from '../../../core/prisma/prisma.service';
+import { ProviderSelectionService } from '../../ml/provider-selection.service';
+
+import { CircuitBreakerService } from './circuit-breaker.service';
+import { ProviderOrchestratorService } from './provider-orchestrator.service';
 import { IFinancialProvider } from './provider.interface';
 
 describe('ProviderOrchestratorService', () => {

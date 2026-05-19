@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import Stripe from 'stripe';
 
 import { StripeService } from '../stripe.service';
@@ -72,7 +72,9 @@ describe('StripeService', () => {
       } as Stripe.Customer;
 
       // Mock the Stripe customers.create method
-      const createSpy = jest.spyOn(service['stripe'].customers, 'create').mockResolvedValue(mockCustomer);
+      const createSpy = jest
+        .spyOn(service['stripe'].customers, 'create')
+        .mockResolvedValue(mockCustomer);
 
       const result = await service.createCustomer({
         email: 'test@example.com',
@@ -95,7 +97,9 @@ describe('StripeService', () => {
         metadata: {},
       } as Stripe.Customer;
 
-      const createSpy = jest.spyOn(service['stripe'].customers, 'create').mockResolvedValue(mockCustomer);
+      const createSpy = jest
+        .spyOn(service['stripe'].customers, 'create')
+        .mockResolvedValue(mockCustomer);
 
       await service.createCustomer({ email: 'test@example.com' });
 
@@ -116,7 +120,9 @@ describe('StripeService', () => {
         mode: 'subscription',
       } as Stripe.Checkout.Session;
 
-      const createSpy = jest.spyOn(service['stripe'].checkout.sessions, 'create').mockResolvedValue(mockSession);
+      const createSpy = jest
+        .spyOn(service['stripe'].checkout.sessions, 'create')
+        .mockResolvedValue(mockSession);
 
       const result = await service.createCheckoutSession({
         customerId: 'cus_test123',
@@ -148,7 +154,9 @@ describe('StripeService', () => {
         mode: 'subscription',
       } as Stripe.Checkout.Session;
 
-      const createSpy = jest.spyOn(service['stripe'].checkout.sessions, 'create').mockResolvedValue(mockSession);
+      const createSpy = jest
+        .spyOn(service['stripe'].checkout.sessions, 'create')
+        .mockResolvedValue(mockSession);
 
       await service.createCheckoutSession({
         customerId: 'cus_test123',
@@ -180,7 +188,9 @@ describe('StripeService', () => {
         customer: 'cus_test123',
       } as Stripe.BillingPortal.Session;
 
-      const createSpy = jest.spyOn(service['stripe'].billingPortal.sessions, 'create').mockResolvedValue(mockSession);
+      const createSpy = jest
+        .spyOn(service['stripe'].billingPortal.sessions, 'create')
+        .mockResolvedValue(mockSession);
 
       const result = await service.createPortalSession({
         customerId: 'cus_test123',
@@ -202,7 +212,9 @@ describe('StripeService', () => {
         status: 'canceled',
       } as Stripe.Subscription;
 
-      const cancelSpy = jest.spyOn(service['stripe'].subscriptions, 'cancel').mockResolvedValue(mockSubscription);
+      const cancelSpy = jest
+        .spyOn(service['stripe'].subscriptions, 'cancel')
+        .mockResolvedValue(mockSubscription);
 
       const result = await service.cancelSubscription('sub_test123');
 
@@ -218,7 +230,9 @@ describe('StripeService', () => {
         status: 'active',
       } as Stripe.Subscription;
 
-      const updateSpy = jest.spyOn(service['stripe'].subscriptions, 'update').mockResolvedValue(mockSubscription);
+      const updateSpy = jest
+        .spyOn(service['stripe'].subscriptions, 'update')
+        .mockResolvedValue(mockSubscription);
 
       const params: Stripe.SubscriptionUpdateParams = {
         metadata: { updated: 'true' },
@@ -239,7 +253,9 @@ describe('StripeService', () => {
         customer: 'cus_test123',
       } as Stripe.Subscription;
 
-      const retrieveSpy = jest.spyOn(service['stripe'].subscriptions, 'retrieve').mockResolvedValue(mockSubscription);
+      const retrieveSpy = jest
+        .spyOn(service['stripe'].subscriptions, 'retrieve')
+        .mockResolvedValue(mockSubscription);
 
       const result = await service.getSubscription('sub_test123');
 
@@ -255,7 +271,9 @@ describe('StripeService', () => {
         email: 'test@example.com',
       } as Stripe.Customer;
 
-      const retrieveSpy = jest.spyOn(service['stripe'].customers, 'retrieve').mockResolvedValue(mockCustomer);
+      const retrieveSpy = jest
+        .spyOn(service['stripe'].customers, 'retrieve')
+        .mockResolvedValue(mockCustomer);
 
       const result = await service.getCustomer('cus_test123');
 
@@ -325,7 +343,9 @@ describe('StripeService', () => {
         ],
       } as Stripe.ApiList<Stripe.Invoice>;
 
-      const listSpy = jest.spyOn(service['stripe'].invoices, 'list').mockResolvedValue(mockInvoiceList);
+      const listSpy = jest
+        .spyOn(service['stripe'].invoices, 'list')
+        .mockResolvedValue(mockInvoiceList);
 
       const result = await service.listInvoices('cus_test123');
 
@@ -338,7 +358,9 @@ describe('StripeService', () => {
         data: [{ id: 'in_1', amount_due: 1999 }],
       } as Stripe.ApiList<Stripe.Invoice>;
 
-      const listSpy = jest.spyOn(service['stripe'].invoices, 'list').mockResolvedValue(mockInvoiceList);
+      const listSpy = jest
+        .spyOn(service['stripe'].invoices, 'list')
+        .mockResolvedValue(mockInvoiceList);
 
       await service.listInvoices('cus_test123', 5);
 

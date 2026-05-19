@@ -11,6 +11,7 @@
 The Goal Tracking System enables users to set financial goals (retirement, education, house purchase, etc.) and track their progress by allocating portions of their accounts toward specific goals.
 
 **Key Features:**
+
 - Multi-goal support per space
 - Fractional account allocation (e.g., 40% retirement, 60% house)
 - Automatic progress calculation
@@ -92,6 +93,7 @@ enum GoalStatus {
 **POST** `/goals`
 
 **Request Body:**
+
 ```json
 {
   "spaceId": "uuid",
@@ -107,6 +109,7 @@ enum GoalStatus {
 ```
 
 **Response:** `201 Created`
+
 ```json
 {
   "id": "goal-uuid",
@@ -130,6 +133,7 @@ enum GoalStatus {
 **GET** `/goals/space/:spaceId`
 
 **Response:** `200 OK`
+
 ```json
 [
   {
@@ -176,6 +180,7 @@ enum GoalStatus {
 **GET** `/goals/space/:spaceId/summary`
 
 **Response:** `200 OK`
+
 ```json
 {
   "totalGoals": 3,
@@ -194,6 +199,7 @@ enum GoalStatus {
 **GET** `/goals/:id`
 
 **Response:** `200 OK`
+
 ```json
 {
   "id": "goal-uuid",
@@ -232,6 +238,7 @@ enum GoalStatus {
 **PUT** `/goals/:id`
 
 **Request Body:** (all fields optional)
+
 ```json
 {
   "name": "Updated Retirement Fund",
@@ -260,6 +267,7 @@ enum GoalStatus {
 **GET** `/goals/:id/progress`
 
 **Response:** `200 OK`
+
 ```json
 {
   "goalId": "goal-uuid",
@@ -290,6 +298,7 @@ enum GoalStatus {
 ```
 
 **Progress Indicators:**
+
 - `percentComplete`: Percentage of target amount reached
 - `timeProgress`: Percentage of time elapsed since creation
 - `onTrack`: `true` if currentValue >= expectedValue for time elapsed (within 10% tolerance)
@@ -303,6 +312,7 @@ enum GoalStatus {
 **POST** `/goals/:id/allocations`
 
 **Request Body:**
+
 ```json
 {
   "accountId": "account-uuid",
@@ -312,11 +322,13 @@ enum GoalStatus {
 ```
 
 **Validation:**
+
 - Account must belong to the same space as the goal
 - Total percentage across all allocations cannot exceed 100%
 - Cannot create duplicate allocation for the same account
 
 **Response:** `201 Created`
+
 ```json
 {
   "id": "alloc-uuid",
@@ -349,13 +361,13 @@ const retirementGoal = await fetch('/goals', {
   method: 'POST',
   body: JSON.stringify({
     spaceId: userSpace.id,
-    name: "Retirement at 65",
-    type: "retirement",
+    name: 'Retirement at 65',
+    type: 'retirement',
     targetAmount: 1000000,
-    currency: "USD",
-    targetDate: "2045-12-31",
-    priority: 1
-  })
+    currency: 'USD',
+    targetDate: '2045-12-31',
+    priority: 1,
+  }),
 });
 
 // 2. Allocate 401(k) account (60%) to retirement
@@ -363,8 +375,8 @@ await fetch(`/goals/${retirementGoal.id}/allocations`, {
   method: 'POST',
   body: JSON.stringify({
     accountId: account401k.id,
-    percentage: 60
-  })
+    percentage: 60,
+  }),
 });
 
 // 3. Allocate Roth IRA (40%) to retirement
@@ -372,8 +384,8 @@ await fetch(`/goals/${retirementGoal.id}/allocations`, {
   method: 'POST',
   body: JSON.stringify({
     accountId: accountRothIRA.id,
-    percentage: 40
-  })
+    percentage: 40,
+  }),
 });
 
 // 4. Check progress
@@ -388,24 +400,24 @@ console.log(`Need to save: $${progress.monthlyContributionNeeded}/month`);
 
 ```typescript
 // Allocate single investment account to multiple goals
-const investmentAccount = getAccount("Investment Account");
+const investmentAccount = getAccount('Investment Account');
 
 // 40% to retirement
 await createAllocation(retirementGoal.id, {
   accountId: investmentAccount.id,
-  percentage: 40
+  percentage: 40,
 });
 
 // 30% to house down payment
 await createAllocation(houseGoal.id, {
   accountId: investmentAccount.id,
-  percentage: 30
+  percentage: 30,
 });
 
 // 30% to education fund
 await createAllocation(educationGoal.id, {
   accountId: investmentAccount.id,
-  percentage: 30
+  percentage: 30,
 });
 
 // Total: 100% of account allocated across 3 goals
@@ -430,7 +442,9 @@ for (const goal of goals) {
 
   console.log(`\n${goal.name}:`);
   console.log(`  ${progress.percentComplete}% complete`);
-  console.log(`  ${progress.onTrack ? '✓' : '✗'} ${progress.onTrack ? 'On track' : 'Behind schedule'}`);
+  console.log(
+    `  ${progress.onTrack ? '✓' : '✗'} ${progress.onTrack ? 'On track' : 'Behind schedule'}`
+  );
   console.log(`  Need: $${progress.monthlyContributionNeeded}/month`);
 }
 ```
@@ -525,13 +539,13 @@ async calculateGoalProbability(@Param('id') goalId: string) {
 
 All goal operations are logged:
 
-| Event | Action | Severity |
-|-------|--------|----------|
-| Goal created | `GOAL_CREATED` | low |
-| Goal updated | `GOAL_UPDATED` | low |
-| Goal deleted | `GOAL_DELETED` | medium |
-| Allocation added | `GOAL_ALLOCATION_ADDED` | low |
-| Allocation removed | `GOAL_ALLOCATION_REMOVED` | low |
+| Event              | Action                    | Severity |
+| ------------------ | ------------------------- | -------- |
+| Goal created       | `GOAL_CREATED`            | low      |
+| Goal updated       | `GOAL_UPDATED`            | low      |
+| Goal deleted       | `GOAL_DELETED`            | medium   |
+| Allocation added   | `GOAL_ALLOCATION_ADDED`   | low      |
+| Allocation removed | `GOAL_ALLOCATION_REMOVED` | low      |
 
 ---
 
@@ -540,6 +554,7 @@ All goal operations are logged:
 ### Common Error Responses
 
 **404 Not Found:**
+
 ```json
 {
   "statusCode": 404,
@@ -549,6 +564,7 @@ All goal operations are logged:
 ```
 
 **400 Bad Request:**
+
 ```json
 {
   "statusCode": 400,
@@ -558,6 +574,7 @@ All goal operations are logged:
 ```
 
 **400 Bad Request (Duplicate Allocation):**
+
 ```json
 {
   "statusCode": 400,
@@ -591,13 +608,13 @@ interface GoalsState {
 }
 
 // Actions
-- fetchGoalsBySpace(spaceId)
-- fetchGoalProgress(goalId)
-- createGoal(dto)
-- updateGoal(goalId, dto)
-- deleteGoal(goalId)
-- addAllocation(goalId, dto)
-- removeAllocation(goalId, accountId)
+-fetchGoalsBySpace(spaceId) -
+  fetchGoalProgress(goalId) -
+  createGoal(dto) -
+  updateGoal(goalId, dto) -
+  deleteGoal(goalId) -
+  addAllocation(goalId, dto) -
+  removeAllocation(goalId, accountId);
 ```
 
 ### Visualization Ideas

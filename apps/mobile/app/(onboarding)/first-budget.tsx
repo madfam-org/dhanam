@@ -28,7 +28,13 @@ const categories: Category[] = [
   { id: 'food', label: 'Comida', icon: 'restaurant', color: '#f97316', defaultAmount: 5000 },
   { id: 'transport', label: 'Transporte', icon: 'car', color: '#3b82f6', defaultAmount: 2000 },
   { id: 'shopping', label: 'Compras', icon: 'bag', color: '#ec4899', defaultAmount: 3000 },
-  { id: 'entertainment', label: 'Entretenimiento', icon: 'musical-notes', color: '#8b5cf6', defaultAmount: 2000 },
+  {
+    id: 'entertainment',
+    label: 'Entretenimiento',
+    icon: 'musical-notes',
+    color: '#8b5cf6',
+    defaultAmount: 2000,
+  },
   { id: 'bills', label: 'Servicios', icon: 'receipt', color: '#6b7280', defaultAmount: 4000 },
   { id: 'healthcare', label: 'Salud', icon: 'medical', color: '#ef4444', defaultAmount: 1500 },
 ];
@@ -145,9 +151,7 @@ export default function FirstBudgetScreen() {
                     <Text style={[styles.categoryLabel, isSelected && { color: cat.color }]}>
                       {cat.label}
                     </Text>
-                    {isSelected && (
-                      <Ionicons name="checkmark-circle" size={16} color={cat.color} />
-                    )}
+                    {isSelected && <Ionicons name="checkmark-circle" size={16} color={cat.color} />}
                   </TouchableOpacity>
                 );
               })}

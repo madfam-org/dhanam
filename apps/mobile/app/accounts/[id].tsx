@@ -78,7 +78,9 @@ export default function AccountDetailScreen() {
           <View style={styles.accountIcon}>
             <Ionicons name="card-outline" size={32} color="#4CAF50" />
           </View>
-          <Text variant="headlineSmall" style={styles.accountName}>{account.name}</Text>
+          <Text variant="headlineSmall" style={styles.accountName}>
+            {account.name}
+          </Text>
           <Text variant="displaySmall" style={styles.balance}>
             {formatCurrency(account.balance, account.currency)}
           </Text>
@@ -95,14 +97,22 @@ export default function AccountDetailScreen() {
         {/* Details Card */}
         <Card style={styles.detailsCard}>
           <Card.Content>
-            <Text variant="titleMedium" style={styles.sectionTitle}>Details</Text>
-            <DetailRow label="Type" value={account.type.charAt(0).toUpperCase() + account.type.slice(1)} />
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              Details
+            </Text>
+            <DetailRow
+              label="Type"
+              value={account.type.charAt(0).toUpperCase() + account.type.slice(1)}
+            />
             <Divider style={styles.divider} />
             <DetailRow label="Provider" value={account.provider.toUpperCase()} />
             <Divider style={styles.divider} />
             <DetailRow label="Currency" value={account.currency} />
             <Divider style={styles.divider} />
-            <DetailRow label="Last Synced" value={new Date(account.lastSyncedAt).toLocaleDateString()} />
+            <DetailRow
+              label="Last Synced"
+              value={new Date(account.lastSyncedAt).toLocaleDateString()}
+            />
             {account.institution && (
               <>
                 <Divider style={styles.divider} />
@@ -122,20 +132,28 @@ export default function AccountDetailScreen() {
         {account.recentTransactions && account.recentTransactions.length > 0 && (
           <Card style={styles.transactionsCard}>
             <Card.Content>
-              <Text variant="titleMedium" style={styles.sectionTitle}>Recent Transactions</Text>
+              <Text variant="titleMedium" style={styles.sectionTitle}>
+                Recent Transactions
+              </Text>
               {account.recentTransactions.slice(0, 5).map((tx) => (
                 <View key={tx.id} style={styles.txRow}>
                   <View style={styles.txInfo}>
-                    <Text variant="bodyMedium" style={styles.txDescription}>{tx.description}</Text>
+                    <Text variant="bodyMedium" style={styles.txDescription}>
+                      {tx.description}
+                    </Text>
                     <Text variant="bodySmall" style={styles.txDate}>
                       {new Date(tx.date).toLocaleDateString()}
                     </Text>
                   </View>
                   <Text
                     variant="bodyMedium"
-                    style={[styles.txAmount, { color: tx.type === 'income' ? '#4CAF50' : '#F44336' }]}
+                    style={[
+                      styles.txAmount,
+                      { color: tx.type === 'income' ? '#4CAF50' : '#F44336' },
+                    ]}
                   >
-                    {tx.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(tx.amount), account.currency)}
+                    {tx.type === 'income' ? '+' : '-'}
+                    {formatCurrency(Math.abs(tx.amount), account.currency)}
                   </Text>
                 </View>
               ))}
@@ -158,14 +176,23 @@ export default function AccountDetailScreen() {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={detailStyles.row}>
-      <Text variant="bodyMedium" style={detailStyles.label}>{label}</Text>
-      <Text variant="bodyMedium" style={detailStyles.value}>{value}</Text>
+      <Text variant="bodyMedium" style={detailStyles.label}>
+        {label}
+      </Text>
+      <Text variant="bodyMedium" style={detailStyles.value}>
+        {value}
+      </Text>
     </View>
   );
 }
 
 const detailStyles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12 },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
   label: { color: '#757575' },
   value: { color: '#212121', fontWeight: '500' },
 });
@@ -175,8 +202,13 @@ const styles = StyleSheet.create({
   scrollView: { flex: 1 },
   balanceSection: { alignItems: 'center', paddingVertical: 32, paddingHorizontal: 20 },
   accountIcon: {
-    width: 64, height: 64, borderRadius: 32, backgroundColor: '#E8F5E8',
-    alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E8F5E8',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
   accountName: { fontWeight: '600', color: '#212121', marginBottom: 8 },
   balance: { fontWeight: '700', color: '#212121', marginBottom: 12 },
@@ -188,8 +220,12 @@ const styles = StyleSheet.create({
   divider: { backgroundColor: '#f3f4f6' },
   transactionsCard: { marginHorizontal: 20, marginBottom: 16, elevation: 1 },
   txRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   txInfo: { flex: 1, marginRight: 12 },
   txDescription: { color: '#212121' },

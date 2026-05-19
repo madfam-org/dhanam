@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { LoggerService } from '../../../core/logger/logger.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
-import { AccountsService } from '../accounts.service';
-import { PlaidService } from '../../providers/plaid/plaid.service';
+import { BelvoService } from '../../providers/belvo/belvo.service';
 import { BitsoService } from '../../providers/bitso/bitso.service';
+import { PlaidService } from '../../providers/plaid/plaid.service';
+import { AccountsService } from '../accounts.service';
 
 describe('AccountsService', () => {
   let service: AccountsService;
@@ -79,6 +80,9 @@ describe('AccountsService', () => {
               update: jest.fn(),
               delete: jest.fn(),
             },
+            providerConnection: {
+              findFirst: jest.fn(),
+            },
           },
         },
         {
@@ -95,6 +99,7 @@ describe('AccountsService', () => {
             createLink: jest.fn(),
             createLinkToken: jest.fn(),
             exchangePublicToken: jest.fn(),
+            fetchTransactionsByDateRange: jest.fn(),
             getAccounts: jest.fn(),
             getTransactions: jest.fn(),
             syncTransactions: jest.fn(),
@@ -104,9 +109,16 @@ describe('AccountsService', () => {
           provide: BitsoService,
           useValue: {
             connectAccount: jest.fn(),
+            fetchBalances: jest.fn(),
             getAccounts: jest.fn(),
             getBalances: jest.fn(),
             getTransactions: jest.fn(),
+          },
+        },
+        {
+          provide: BelvoService,
+          useValue: {
+            syncTransactions: jest.fn(),
           },
         },
       ],
@@ -319,14 +331,21 @@ describe('AccountsService', () => {
   });
 
   describe('syncAccount', () => {
-    it('should initiate sync for connected account', async () => {
-      const connectedAccount = { ...mockAccount, provider: 'belvo' };
+    it('should sync a connected Belvo account', async () => {
+      const connectedAccount = {
+        ...mockAccount,
+        provider: 'belvo',
+        metadata: { linkId: 'belvo-link-123' },
+      };
       prisma.account.findFirst.mockResolvedValue(connectedAccount as any);
-      prisma.account.update.mockResolvedValue({ ...connectedAccount, lastSyncedAt: new Date() } as any);
+      prisma.account.update.mockResolvedValue({
+        ...connectedAccount,
+        lastSyncedAt: new Date(),
+      } as any);
 
       const result = await service.syncAccount('space-123', 'account-123');
 
-      expect(result.status).toBe('pending');
+      expect(result.status).toBe('completed');
       expect(result.jobId).toBeDefined();
       expect(prisma.account.update).toHaveBeenCalled();
     });
@@ -574,13 +593,9 @@ describe('AccountsService', () => {
       prisma.account.findFirst.mockResolvedValue(accountWithDifferentOwner as any);
 
       await expect(
-        service.updateSharingPermission(
-          'space-123',
-          'account-123',
-          'permission-123',
-          'user-123',
-          { canEdit: true }
-        )
+        service.updateSharingPermission('space-123', 'account-123', 'permission-123', 'user-123', {
+          canEdit: true,
+        })
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -590,7 +605,12 @@ describe('AccountsService', () => {
       prisma.account.findFirst.mockResolvedValue(mockAccount as any);
       prisma.accountSharingPermission.delete.mockResolvedValue(mockSharingPermission as any);
 
-      await service.revokeSharingPermission('space-123', 'account-123', 'permission-123', 'user-123');
+      await service.revokeSharingPermission(
+        'space-123',
+        'account-123',
+        'permission-123',
+        'user-123'
+      );
 
       expect(prisma.accountSharingPermission.delete).toHaveBeenCalledWith({
         where: { id: 'permission-123' },

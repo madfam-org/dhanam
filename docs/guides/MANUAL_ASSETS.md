@@ -11,6 +11,7 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
 ## Supported Asset Types
 
 ### 1. Real Estate
+
 - **Use Case:** Primary residence, rental properties, commercial real estate
 - **Metadata Fields:**
   - Address, city, state, zip code
@@ -20,6 +21,7 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
 - **Valuation Integration:** Zillow Zestimate API (implemented — link, refresh, unlink via `property-detail.tsx`)
 
 ### 2. Vehicles
+
 - **Use Case:** Cars, boats, aircraft, RVs
 - **Metadata Fields:**
   - VIN (Vehicle Identification Number)
@@ -29,6 +31,7 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
 - **Valuation Integration:** Future integration with KBB/NADA APIs
 
 ### 3. Web Domains
+
 - **Use Case:** Premium domain names held as investments
 - **Metadata Fields:**
   - Domain name
@@ -38,6 +41,7 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
 - **Valuation Integration:** Future integration with domain appraisal services
 
 ### 4. Private Equity
+
 - **Use Case:** PE fund investments, venture capital funds
 - **Metadata Fields:**
   - Company/fund name
@@ -48,11 +52,13 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
 - **Valuation Tracking:** Manual updates based on quarterly/annual reports
 
 ### 5. Angel Investments
+
 - **Use Case:** Direct startup investments
 - **Metadata Fields:** Same as Private Equity
 - **Liquidity Events:** Track exits, IPOs, acquisitions
 
 ### 6. Collectibles
+
 - **Use Case:** Rare items, memorabilia, vintage goods
 - **Metadata Fields:**
   - Category (sports, coins, stamps, etc.)
@@ -76,6 +82,7 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
   - `collectible-detail.tsx` — Provider status, refresh/link/unlink actions, valuation range display
 
 ### 7. Art
+
 - **Use Case:** Fine art, sculptures, photography
 - **Metadata Fields:**
   - Artist name
@@ -86,6 +93,7 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
 - **Appraisal Required:** Professional appraisal recommended
 
 ### 8. Jewelry
+
 - **Use Case:** Precious metals, gemstones, luxury watches
 - **Metadata Fields:**
   - Material (gold, platinum, diamonds)
@@ -94,12 +102,14 @@ Manual Asset Entry enables tracking of illiquid and alternative assets that cann
   - Appraiser
 
 ### 9. Other
+
 - **Use Case:** Catch-all for unique assets
 - **Examples:** Intellectual property, patents, mineral rights, royalties
 
 ## Database Schema
 
 ### ManualAsset Model
+
 ```prisma
 model ManualAsset {
   id                    String                    @id @default(uuid())
@@ -123,6 +133,7 @@ model ManualAsset {
 ```
 
 ### ManualAssetValuation Model
+
 ```prisma
 model ManualAssetValuation {
   id                String           @id @default(uuid())
@@ -141,12 +152,14 @@ model ManualAssetValuation {
 ## API Endpoints
 
 ### List All Manual Assets
+
 ```http
 GET /spaces/:spaceId/manual-assets
 Authorization: Bearer <jwt>
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -171,6 +184,7 @@ Authorization: Bearer <jwt>
 ```
 
 ### Create Manual Asset
+
 ```http
 POST /spaces/:spaceId/manual-assets
 Content-Type: application/json
@@ -193,6 +207,7 @@ Authorization: Bearer <jwt>
 ```
 
 ### Update Manual Asset
+
 ```http
 PATCH /spaces/:spaceId/manual-assets/:id
 Content-Type: application/json
@@ -205,6 +220,7 @@ Authorization: Bearer <jwt>
 ```
 
 ### Add Valuation Entry
+
 ```http
 POST /spaces/:spaceId/manual-assets/:id/valuations
 Content-Type: application/json
@@ -220,16 +236,18 @@ Authorization: Bearer <jwt>
 ```
 
 ### Get Summary
+
 ```http
 GET /spaces/:spaceId/manual-assets/summary
 Authorization: Bearer <jwt>
 ```
 
 **Response:**
+
 ```json
 {
   "totalAssets": 12,
-  "totalValue": 2450000.00,
+  "totalValue": 2450000.0,
   "currency": "USD",
   "byType": {
     "real_estate": { "count": 3, "value": 1800000 },
@@ -237,11 +255,12 @@ Authorization: Bearer <jwt>
     "vehicle": { "count": 2, "value": 85000 },
     "art": { "count": 2, "value": 65000 }
   },
-  "unrealizedGain": 450000.00
+  "unrealizedGain": 450000.0
 }
 ```
 
 ### Delete Manual Asset
+
 ```http
 DELETE /spaces/:spaceId/manual-assets/:id
 Authorization: Bearer <jwt>
@@ -250,9 +269,11 @@ Authorization: Bearer <jwt>
 ## Frontend Component
 
 ### ManualAssetForm Component
+
 **Location:** `apps/web/src/components/assets/manual-asset-form.tsx`
 
 **Features:**
+
 - Visual asset type selector with icons
 - Type-specific metadata fields (conditional rendering)
 - Unrealized gain/loss calculation
@@ -261,6 +282,7 @@ Authorization: Bearer <jwt>
 - Notes and description fields
 
 **Usage:**
+
 ```tsx
 import { ManualAssetForm } from '@/components/assets/manual-asset-form';
 
@@ -268,35 +290,42 @@ const handleSubmit = async (data: ManualAssetData) => {
   await api.post(`/spaces/${spaceId}/manual-assets`, data);
 };
 
-<ManualAssetForm onSubmit={handleSubmit} />
+<ManualAssetForm onSubmit={handleSubmit} />;
 ```
 
 ## Valuation History Tracking
 
 ### Automatic Initial Valuation
+
 When a manual asset is created, an initial valuation entry is automatically created with:
+
 - Date: Asset creation date
 - Value: `currentValue` from creation
 - Source: "Initial Entry"
 
 ### Adding Valuations
+
 Users can add manual valuations to track value changes over time:
+
 1. Professional appraisals
 2. Market comps (e.g., Zillow estimates)
 3. Self-assessed fair market value
 4. Sale offers
 
 ### Auto-Update Current Value
+
 When a new valuation is added with a date >= latest valuation date, the asset's `currentValue` is automatically updated.
 
 ## Unrealized Gain/Loss Calculation
 
 **Formula:**
+
 ```
 Unrealized Gain = Current Value - Acquisition Cost
 ```
 
 **Display Logic:**
+
 - Green text for gains (positive)
 - Red text for losses (negative)
 - Shows in asset summary and individual asset details
@@ -313,11 +342,11 @@ Real estate assets can be automatically valued using Zillow's Zestimate API.
 
 ### API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/manual-assets/:id/zillow/estimate` | Get current Zestimate |
-| `POST` | `/manual-assets/:id/zillow/lookup` | Look up property by address |
-| `POST` | `/manual-assets/:id/zillow/sync` | Sync Zestimate to asset value |
+| Method | Endpoint                             | Description                   |
+| ------ | ------------------------------------ | ----------------------------- |
+| `GET`  | `/manual-assets/:id/zillow/estimate` | Get current Zestimate         |
+| `POST` | `/manual-assets/:id/zillow/lookup`   | Look up property by address   |
+| `POST` | `/manual-assets/:id/zillow/sync`     | Sync Zestimate to asset value |
 
 ### Zillow Lookup
 
@@ -391,43 +420,41 @@ Documents are stored in Cloudflare R2 with presigned URLs for secure access:
 
 ```typescript
 // Step 1: Get presigned URL
-const { uploadUrl, documentId } = await fetch(
-  `/api/manual-assets/${assetId}/documents/presign`,
-  {
-    method: 'POST',
-    body: JSON.stringify({
-      filename: 'appraisal-2025.pdf',
-      contentType: 'application/pdf',
-      category: 'appraisal'
-    }),
-  }
-).then(r => r.json());
+const { uploadUrl, documentId } = await fetch(`/api/manual-assets/${assetId}/documents/presign`, {
+  method: 'POST',
+  body: JSON.stringify({
+    filename: 'appraisal-2025.pdf',
+    contentType: 'application/pdf',
+    category: 'appraisal',
+  }),
+}).then((r) => r.json());
 
 // Step 2: Upload to R2
 await fetch(uploadUrl, {
   method: 'PUT',
   body: file,
   headers: {
-    'Content-Type': 'application/pdf'
-  }
+    'Content-Type': 'application/pdf',
+  },
 });
 
 // Step 3: Confirm upload (optional, validates file exists)
 await fetch(`/api/manual-assets/${assetId}/documents/${documentId}/confirm`, {
-  method: 'POST'
+  method: 'POST',
 });
 ```
 
 ### Document API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/manual-assets/:id/documents/presign` | Get presigned upload URL |
-| `GET` | `/manual-assets/:id/documents` | List all documents |
-| `GET` | `/manual-assets/:id/documents/:docId` | Get document download URL |
-| `DELETE` | `/manual-assets/:id/documents/:docId` | Delete document |
+| Method   | Endpoint                               | Description               |
+| -------- | -------------------------------------- | ------------------------- |
+| `POST`   | `/manual-assets/:id/documents/presign` | Get presigned upload URL  |
+| `GET`    | `/manual-assets/:id/documents`         | List all documents        |
+| `GET`    | `/manual-assets/:id/documents/:docId`  | Get document download URL |
+| `DELETE` | `/manual-assets/:id/documents/:docId`  | Delete document           |
 
 ### Supported Document Types
+
 - Appraisal reports (PDF)
 - Purchase agreements (PDF)
 - Cap tables (Excel/PDF)
@@ -439,23 +466,23 @@ await fetch(`/api/manual-assets/${assetId}/documents/${documentId}/confirm`, {
 
 ### Document Categories
 
-| Category | Use Case |
-|----------|----------|
-| `appraisal` | Professional valuations |
-| `deed` | Property titles, ownership documents |
+| Category      | Use Case                                  |
+| ------------- | ----------------------------------------- |
+| `appraisal`   | Professional valuations                   |
+| `deed`        | Property titles, ownership documents      |
 | `certificate` | Authenticity certificates, certifications |
-| `agreement` | Purchase agreements, contracts |
-| `photo` | Asset photos, condition documentation |
-| `insurance` | Insurance policies |
-| `other` | Miscellaneous documents |
+| `agreement`   | Purchase agreements, contracts            |
+| `photo`       | Asset photos, condition documentation     |
+| `insurance`   | Insurance policies                        |
+| `other`       | Miscellaneous documents                   |
 
 ### Storage Limits
 
-| Plan | Max File Size | Total Storage |
-|------|---------------|---------------|
-| Free | 10 MB | 100 MB |
-| Premium | 50 MB | 5 GB |
-| Enterprise | 100 MB | Unlimited |
+| Plan       | Max File Size | Total Storage |
+| ---------- | ------------- | ------------- |
+| Free       | 10 MB         | 100 MB        |
+| Premium    | 50 MB         | 5 GB          |
+| Enterprise | 100 MB        | Unlimited     |
 
 ## Integration with Net Worth Calculation
 
@@ -471,12 +498,14 @@ Total Net Worth =
 ## Migration Instructions
 
 ### For Development
+
 ```bash
 cd apps/api
 npx prisma db push
 ```
 
 ### For Production
+
 ```sql
 -- Add ManualAssetType enum
 CREATE TYPE "ManualAssetType" AS ENUM (
@@ -542,14 +571,17 @@ CREATE INDEX "manual_asset_valuations_asset_id_date_idx" ON "manual_asset_valuat
 ## Implementation Impact
 
 ### Addresses Market Gap
+
 From _(removed — audit reports archived)_:
 
 **Gap Closed:** Private Equity/Illiquid Assets (Tier 1 Critical Gap)
+
 - **Business Impact:** CRITICAL for HNWI - Can't compete with Kubera without this
 - **Complexity:** LOW (as predicted)
 - **Timeline:** 2-3 weeks (achieved ✅)
 
 ### Competitive Positioning
+
 - **vs YNAB:** N/A (YNAB doesn't target HNWI market)
 - **vs Monarch:** Differentiation (Monarch has limited alternative asset support)
 - **vs Kubera:** Feature parity (Kubera has manual entry but limited metadata)
@@ -558,32 +590,38 @@ From _(removed — audit reports archived)_:
 ## Future Enhancements
 
 ### 1. Automated Valuation APIs
+
 - **Real Estate:** Zillow/Redfin API integration for auto-updates
 - **Vehicles:** KBB/NADA API for depreciation tracking
 - **Domains:** Sedo/GoDaddy appraisal API
 - **Public Equities:** Track restricted stock with lock-up periods
 
 ### 2. Document OCR
+
 - Extract data from appraisal PDFs automatically
 - Parse cap tables to populate ownership %
 - Scan title deeds for property metadata
 
 ### 3. IRR Calculation
+
 - For PE/Angel investments, calculate Internal Rate of Return
 - Factor in capital calls and distributions
 - Compare against benchmark indices
 
 ### 4. Depreciation Schedules
+
 - Auto-calculate depreciation for vehicles
 - Track capital improvements for real estate
 - Generate tax depreciation reports
 
 ### 5. Liquidity Event Tracking
+
 - Record exits, IPOs, acquisitions for PE/Angel
 - Calculate realized gains
 - Track carried interest distributions
 
 ### 6. Portfolio Diversification Analysis
+
 - Show allocation across manual + synced assets
 - Recommend rebalancing
 - Track correlation with public markets

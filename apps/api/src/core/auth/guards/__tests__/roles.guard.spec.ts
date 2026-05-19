@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '@core/prisma/prisma.service';
 
-import { RolesGuard } from '../roles.guard';
 import { ROLES_KEY } from '../../decorators/roles.decorator';
+import { RolesGuard } from '../roles.guard';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
@@ -138,10 +138,7 @@ describe('RolesGuard', () => {
 
       await guard.canActivate(context);
 
-      expect(reflector.getAllAndOverride).toHaveBeenCalledWith(ROLES_KEY, [
-        mockHandler,
-        mockClass,
-      ]);
+      expect(reflector.getAllAndOverride).toHaveBeenCalledWith(ROLES_KEY, [mockHandler, mockClass]);
     });
 
     it('should return false for non-ADMIN required roles (current implementation)', async () => {

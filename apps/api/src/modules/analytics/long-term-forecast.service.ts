@@ -446,7 +446,7 @@ export class LongTermForecastService {
       }
 
       // Annualize based on frequency
-      let annualAmount = convertedAmount;
+      let annualAmount: number;
       switch (recurring.frequency) {
         case 'weekly':
           annualAmount = convertedAmount * 52;

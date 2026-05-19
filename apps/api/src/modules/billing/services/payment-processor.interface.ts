@@ -232,17 +232,14 @@ export interface IPaymentProcessor {
   createMerchantOnboardingLink?(
     externalId: string,
     returnUrl: string,
-    refreshUrl: string,
+    refreshUrl: string
   ): Promise<OnboardingLink>;
   getMerchantAccount?(externalId: string): Promise<MerchantAccountHandle>;
   createDestinationCharge?(input: CreateDestinationChargeInput): Promise<ChargeHandle>;
   createTransfer?(input: CreateTransferInput): Promise<TransferHandle>;
   createPayout?(input: CreatePayoutInput): Promise<PayoutHandle>;
   getMerchantBalance?(externalId: string): Promise<MerchantBalance>;
-  submitDisputeEvidence?(
-    externalId: string,
-    evidence: DisputeEvidence,
-  ): Promise<DisputeHandle>;
+  submitDisputeEvidence?(externalId: string, evidence: DisputeEvidence): Promise<DisputeHandle>;
 
   // Webhooks
   verifyWebhookSignature(body: string, signature: string): Promise<VerifiedEvent>;
@@ -256,11 +253,11 @@ export interface IPaymentProcessor {
 export class ProcessorCapabilityError extends Error {
   constructor(
     public readonly processorId: ProcessorId,
-    public readonly capability: keyof ProcessorCapabilities,
+    public readonly capability: keyof ProcessorCapabilities
   ) {
     super(
       `Processor "${processorId}" does not support "${capability}". ` +
-        `Choose a processor whose capabilities.${capability} === true.`,
+        `Choose a processor whose capabilities.${capability} === true.`
     );
     this.name = 'ProcessorCapabilityError';
   }

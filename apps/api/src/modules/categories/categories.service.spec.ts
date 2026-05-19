@@ -1,8 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
-import { CategoriesService } from './categories.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
+
+import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 
 // Helper to create Decimal-like mock

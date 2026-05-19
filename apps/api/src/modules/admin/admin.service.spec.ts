@@ -1,10 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AdminService } from './admin.service';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { LoggerService } from '@core/logger/logger.service';
-import { RedisService } from '@core/redis/redis.service';
-import { AuditService } from '@core/audit/audit.service';
 import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { AuditService } from '@core/audit/audit.service';
+import { LoggerService } from '@core/logger/logger.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+import { RedisService } from '@core/redis/redis.service';
+
+import { AdminService } from './admin.service';
 import { UserSearchDto, UserSortBy, SortOrder } from './dto';
 
 describe('AdminService', () => {
@@ -145,7 +147,7 @@ describe('AdminService', () => {
               { name: { contains: 'test@example.com', mode: 'insensitive' } },
             ],
           },
-        }),
+        })
       );
     });
   });
@@ -197,16 +199,14 @@ describe('AdminService', () => {
           action: 'admin.view_user_details',
           resourceId: 'user1',
           severity: 'medium',
-        }),
+        })
       );
     });
 
     it('should throw NotFoundException for non-existent user', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.getUserDetails('invalid', 'admin1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.getUserDetails('invalid', 'admin1')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -289,11 +289,7 @@ describe('AdminService', () => {
 
       mockRedisService.hget.mockResolvedValue(existingFlag);
 
-      const result = await service.updateFeatureFlag(
-        'esg_scoring',
-        { enabled: true },
-        'admin1',
-      );
+      const result = await service.updateFeatureFlag('esg_scoring', { enabled: true }, 'admin1');
 
       expect(result.enabled).toBe(true);
       expect(mockRedisService.hset).toHaveBeenCalled();
@@ -302,7 +298,7 @@ describe('AdminService', () => {
           action: 'admin.update_feature_flag',
           resourceId: 'esg_scoring',
           severity: 'high',
-        }),
+        })
       );
     });
 
@@ -310,7 +306,7 @@ describe('AdminService', () => {
       mockRedisService.hget.mockResolvedValue(null);
 
       await expect(
-        service.updateFeatureFlag('invalid', { enabled: true }, 'admin1'),
+        service.updateFeatureFlag('invalid', { enabled: true }, 'admin1')
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -360,7 +356,7 @@ describe('AdminService', () => {
               lte: expect.any(Date),
             },
           }),
-        }),
+        })
       );
     });
 
@@ -473,7 +469,7 @@ describe('AdminService', () => {
     it('should handle database connection query failure', async () => {
       mockPrismaService.$queryRaw.mockRejectedValue(new Error('Query failed'));
       mockRedisService.get.mockResolvedValue(null);
-      
+
       // Mock all other required calls
       mockPrismaService.user.count.mockResolvedValue(0);
       mockPrismaService.space.count.mockResolvedValue(0);
@@ -497,7 +493,7 @@ describe('AdminService', () => {
         .mockResolvedValueOnce(0); // active jobs
 
       mockRedisService.get.mockResolvedValue(null);
-      
+
       // Mock all required calls
       mockPrismaService.user.count.mockResolvedValue(0);
       mockPrismaService.space.count.mockResolvedValue(0);
@@ -557,7 +553,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.user.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { isActive: true },
-        }),
+        })
       );
     });
 
@@ -576,7 +572,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.user.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { emailVerified: false },
-        }),
+        })
       );
     });
 
@@ -595,7 +591,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.user.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { totpEnabled: true },
-        }),
+        })
       );
     });
 
@@ -614,7 +610,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.user.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { onboardingCompleted: false },
-        }),
+        })
       );
     });
 
@@ -639,7 +635,7 @@ describe('AdminService', () => {
               lte: expect.any(Date),
             },
           },
-        }),
+        })
       );
     });
 
@@ -797,7 +793,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.auditLog.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ resource: 'User' }),
-        }),
+        })
       );
     });
 
@@ -816,7 +812,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.auditLog.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ resourceId: 'resource-123' }),
-        }),
+        })
       );
     });
 
@@ -835,7 +831,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.auditLog.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ severity: 'high' }),
-        }),
+        })
       );
     });
 
@@ -854,7 +850,7 @@ describe('AdminService', () => {
       expect(mockPrismaService.auditLog.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({ ipAddress: '192.168.1.100' }),
-        }),
+        })
       );
     });
   });

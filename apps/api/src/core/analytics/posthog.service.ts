@@ -1,6 +1,7 @@
-import { LoggerService } from '@core/logger/logger.service';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PostHog } from 'posthog-node';
+
+import { LoggerService } from '@core/logger/logger.service';
 
 /**
  * PostHog Analytics Service

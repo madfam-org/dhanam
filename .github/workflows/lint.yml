@@ -81,12 +81,7 @@ jobs:
           PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: 1
 
       - name: Run TypeScript type check
-        run: |
-          if grep -q '"type-check"' package.json; then
-            pnpm type-check
-          else
-            echo "Skipping type-check (script not found)"
-          fi
+        run: pnpm typecheck
 
   prettier:
     name: Prettier Format Check
@@ -111,9 +106,4 @@ jobs:
           DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
 
       - name: Check code formatting
-        run: |
-          if grep -q '"format:check"' package.json; then
-            pnpm format:check
-          else
-            echo "Skipping format check (script not found)"
-          fi
+        run: pnpm format:check

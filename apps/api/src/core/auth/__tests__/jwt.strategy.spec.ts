@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { JwtStrategy } from '../strategies/jwt.strategy';
 import { PrismaService } from '@core/prisma/prisma.service';
+
 import { JwtPayload } from '../auth.service';
+import { JwtStrategy } from '../strategies/jwt.strategy';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;

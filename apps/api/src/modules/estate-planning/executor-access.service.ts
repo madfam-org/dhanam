@@ -96,7 +96,7 @@ export class ExecutorAccessService {
     this.logger.log(`Executor ${executorData.email} added for user ${userId}`);
 
     // Send verification email to executor
-    let verificationSent = false;
+    let verificationSent: boolean;
     try {
       const webUrl = this.configService.get<string>('WEB_URL', 'https://app.dhan.am');
       const encodedEmail = encodeURIComponent(executorData.email);

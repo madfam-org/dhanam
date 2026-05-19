@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostHog } from 'posthog-node';
 
-import { PostHogService } from '../posthog.service';
 import { LoggerService } from '@core/logger/logger.service';
+
+import { PostHogService } from '../posthog.service';
 
 jest.mock('posthog-node');
 

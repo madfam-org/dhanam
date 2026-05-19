@@ -1,11 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
+import {
+  createRedisMock,
+  createConfigMock,
+  createLoggerMock,
+} from '../../../../test/helpers/api-mock-factory';
 import { RedisService } from '../../../core/redis/redis.service';
 
 import { SandboxAdapter } from './sandbox.adapter';
-
-import { createRedisMock, createConfigMock, createLoggerMock } from '../../../../test/helpers/api-mock-factory';
 
 describe('SandboxAdapter', () => {
   let adapter: SandboxAdapter;

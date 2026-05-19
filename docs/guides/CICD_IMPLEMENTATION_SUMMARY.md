@@ -18,9 +18,11 @@ Set up comprehensive GitHub Actions workflows for automated testing, coverage re
 ### 1. GitHub Actions Workflows (2 files)
 
 #### **test-coverage.yml** (230 lines)
+
 Comprehensive testing workflow with three jobs:
 
 **Job 1: Unit Tests with Coverage**
+
 - Runs on: `ubuntu-latest`
 - Timeout: 15 minutes
 - Services: Postgres 15, Redis 7
@@ -41,20 +43,24 @@ Comprehensive testing workflow with three jobs:
   14. Comment PR with coverage
 
 **Job 2: E2E Tests**
+
 - Runs after unit tests pass
 - Same environment as unit tests
 - Full API integration testing
 
 **Job 3: Build Check**
+
 - Verifies all packages build successfully
 - No database required
 - Fast feedback on build issues
 
 **Triggers:**
+
 - Push to `main`, `develop`, or `claude/**` branches
 - Pull requests to `main` or `develop`
 
 **Features:**
+
 - Concurrent execution with cancellation
 - Smart caching (pnpm store)
 - Health checks for services
@@ -63,6 +69,7 @@ Comprehensive testing workflow with three jobs:
 - Artifact upload (7 days retention)
 
 #### **lint.yml** (80 lines)
+
 Code quality workflow with three jobs:
 
 1. **ESLint** - JavaScript/TypeScript linting
@@ -77,25 +84,30 @@ Code quality workflow with three jobs:
 ### 2. Coverage Configuration
 
 #### **codecov.yml** (80 lines)
+
 Complete Codecov configuration:
 
 **Thresholds:**
+
 - Project: 80% target, 1% threshold
 - Patch: 80% target, 5% threshold
 - Changes: 80% target, 1% threshold
 
 **Component Management:**
+
 - API: `apps/api/src/**`
 - Web: `apps/web/src/**`
 - Shared: `packages/shared/src/**`
 - UI: `packages/ui/src/**`
 
 **PR Comments:**
+
 - Layout: header, diff, flags, components, footer
 - Behavior: Always comment
 - Shows coverage changes
 
 **Ignored Paths:**
+
 - Test files (`*.spec.ts`, `*.test.ts`)
 - Configuration files
 - Build artifacts
@@ -107,9 +119,11 @@ Complete Codecov configuration:
 ### 3. CI/CD Utilities
 
 #### **scripts/test-ci.sh** (Executable)
+
 Local CI simulation script:
 
 **What it does:**
+
 1. Starts Docker services (Postgres, Redis)
 2. Waits for services to be ready
 3. Sets environment variables
@@ -123,11 +137,13 @@ Local CI simulation script:
 11. Cleans up containers
 
 **Usage:**
+
 ```bash
 ./scripts/test-ci.sh
 ```
 
 **Benefits:**
+
 - Test locally before pushing
 - Reproduce CI failures
 - Verify coverage thresholds
@@ -138,9 +154,11 @@ Local CI simulation script:
 ### 4. Documentation
 
 #### **.github/CICD_SETUP.md** (600+ lines)
+
 Comprehensive setup and usage guide:
 
 **Sections:**
+
 - Quick start guide
 - Codecov integration steps
 - Workflow file explanations
@@ -157,6 +175,7 @@ Comprehensive setup and usage guide:
 - Setup checklist
 
 **Includes:**
+
 - Step-by-step Codecov setup
 - Common error solutions
 - GitHub Actions configuration
@@ -169,7 +188,9 @@ Comprehensive setup and usage guide:
 ### 5. Templates & Configuration
 
 #### **.github/pull_request_template.md**
+
 Comprehensive PR checklist covering:
+
 - Type of change
 - Related issues
 - Changes made
@@ -186,13 +207,16 @@ Comprehensive PR checklist covering:
 - Reviewer checklist
 
 **Benefits:**
+
 - Consistent PR quality
 - Forces testing consideration
 - Ensures documentation
 - Improves code review
 
 #### **.github/dependabot.yml**
+
 Automated dependency updates:
+
 - Root workspace (weekly, Monday 9am)
 - API workspace
 - Web workspace
@@ -201,6 +225,7 @@ Automated dependency updates:
 - Docker images
 
 **Grouping:**
+
 - Prisma packages
 - NestJS packages
 - Next.js + React
@@ -209,13 +234,16 @@ Automated dependency updates:
 - Minor/patch updates
 
 **Configuration:**
+
 - 10 PRs max per ecosystem
 - Auto-assign to team
 - Labeled appropriately
 - Scoped commit messages
 
 #### **README_BADGES.md**
+
 Badge templates for README:
+
 - CI/CD status badges
 - Technology stack badges
 - Coverage badges
@@ -243,6 +271,7 @@ coverageThreshold: {
 ### Codecov Integration
 
 **Status Checks:**
+
 - Project coverage must be ≥80%
 - Patch coverage must be ≥80%
 - Coverage change visible in PRs
@@ -251,6 +280,7 @@ coverageThreshold: {
 Each component tracked separately with 80% target
 
 **Flags:**
+
 - `api` - Backend tests
 - `web` - Frontend tests (future)
 - `shared` - Shared packages
@@ -279,6 +309,7 @@ Each component tracked separately with 80% target
 ### On Pull Request
 
 Everything above, PLUS:
+
 - Coverage comparison to base branch
 - PR comment with coverage diff
 - File-by-file coverage changes
@@ -297,16 +328,19 @@ Everything above, PLUS:
 ### For Developers
 
 ✅ **Fast Feedback**
+
 - Know if tests pass within minutes
 - See coverage impact immediately
 - Catch issues before code review
 
 ✅ **Confidence**
+
 - All tests run automatically
 - Coverage thresholds enforced
 - Build verified before merge
 
 ✅ **Productivity**
+
 - No manual test runs needed
 - Automated dependency updates
 - Local CI simulation script
@@ -314,16 +348,19 @@ Everything above, PLUS:
 ### For Team
 
 ✅ **Code Quality**
+
 - 80%+ coverage enforced
 - Linting catches common issues
 - Type safety verified
 
 ✅ **Security**
+
 - Automated dependency updates
 - Known vulnerabilities flagged
 - Secrets properly managed
 
 ✅ **Transparency**
+
 - Coverage visible on PRs
 - Test results in GitHub UI
 - Historical trends tracked
@@ -335,6 +372,7 @@ Everything above, PLUS:
 ### Immediate (Required)
 
 1. **Set Up Codecov** (5 minutes)
+
    ```bash
    # 1. Sign up at https://codecov.io/
    # 2. Get repository token
@@ -354,6 +392,7 @@ Everything above, PLUS:
 ### Short Term (This Week)
 
 4. **Enable Branch Protection** (5 minutes)
+
    ```
    Settings → Branches → Add rule
    - Require status checks to pass
@@ -394,16 +433,19 @@ Everything above, PLUS:
 ## 📈 Success Metrics
 
 ### Week 1
+
 - [ ] Workflows running successfully
 - [ ] Coverage reports generated
 - [ ] Team understands CI/CD process
 
 ### Month 1
+
 - [ ] 80%+ test coverage achieved
 - [ ] Zero failing builds on main branch
 - [ ] Dependabot PRs being merged regularly
 
 ### Month 3
+
 - [ ] Coverage trend stable or increasing
 - [ ] Build times optimized (<10 min)
 - [ ] Team confident in CI/CD process
@@ -413,16 +455,19 @@ Everything above, PLUS:
 ## 🔧 Maintenance
 
 ### Weekly
+
 - Review failed workflows
 - Merge Dependabot PRs
 - Monitor coverage trends
 
 ### Monthly
+
 - Review workflow performance
 - Update dependencies manually if needed
 - Optimize slow tests
 
 ### Quarterly
+
 - Review CI/CD effectiveness
 - Update documentation
 - Consider new tools/practices
@@ -432,11 +477,13 @@ Everything above, PLUS:
 ## 📚 Resources
 
 **Documentation:**
+
 - [GitHub Actions Docs](https://docs.github.com/en/actions)
 - [Codecov Docs](https://docs.codecov.com/)
 - [Dependabot Docs](https://docs.github.com/en/code-security/dependabot)
 
 **Internal:**
+
 - [CICD_SETUP.md](.github/CICD_SETUP.md) - Detailed setup guide
 - [TEST_COVERAGE_GUIDE.md](apps/api/TEST_COVERAGE_GUIDE.md) - Testing guide
 - [TEST_IMPLEMENTATION_STATUS.md](TEST_IMPLEMENTATION_STATUS.md) - Current status
@@ -448,16 +495,19 @@ Everything above, PLUS:
 After CI/CD is fully set up and running, we can move to:
 
 **Option A: Complete Test Coverage (Recommended)**
+
 - Run tests locally with Prisma client
 - Verify 80%+ coverage
 - Add missing tests
 
 **Option B: Feature Development**
+
 - PostHog Analytics integration
 - Spanish UI integration
 - Cashflow forecasting engine
 
 **Option C: Production Readiness**
+
 - Set up APM (New Relic)
 - Load testing with k6
 - Security audit preparation

@@ -1,9 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { Prisma } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
-import { StripeConnectService } from '../../billing/services/stripe-connect.service';
 import { DisputeEvidence } from '../../billing/services/payment-processor.interface';
+import { StripeConnectService } from '../../billing/services/stripe-connect.service';
 
 @Injectable()
 export class DisputeService {
@@ -11,7 +12,7 @@ export class DisputeService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly stripeConnect: StripeConnectService,
+    private readonly stripeConnect: StripeConnectService
   ) {}
 
   async get(id: string) {
@@ -24,7 +25,7 @@ export class DisputeService {
     const dispute = await this.get(id);
     const updated = await this.stripeConnect.submitDisputeEvidence(
       dispute.externalDisputeId,
-      evidence,
+      evidence
     );
 
     await this.prisma.dispute.update({
@@ -37,7 +38,7 @@ export class DisputeService {
     });
 
     this.logger.log(
-      `Dispute ${id} (${dispute.externalDisputeId}) evidence submitted; status=${updated.status}`,
+      `Dispute ${id} (${dispute.externalDisputeId}) evidence submitted; status=${updated.status}`
     );
     return updated;
   }

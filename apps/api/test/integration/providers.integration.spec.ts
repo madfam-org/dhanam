@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { hash } from 'argon2';
 import request from 'supertest';
+
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { hash } from 'argon2';
 
 describe('Financial Providers Integration (e2e)', () => {
   let app: INestApplication;
@@ -18,12 +19,12 @@ describe('Financial Providers Integration (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     prisma = app.get<PrismaService>(PrismaService);
-    
+
     await app.init();
 
     // Clean database and setup test user
     await prisma.user.deleteMany();
-    
+
     const user = await prisma.user.create({
       data: {
         email: 'providers@example.com',
@@ -32,12 +33,10 @@ describe('Financial Providers Integration (e2e)', () => {
       },
     });
 
-    const loginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        email: 'providers@example.com',
-        password: 'ProvidersPass123!',
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+      email: 'providers@example.com',
+      password: 'ProvidersPass123!',
+    });
 
     accessToken = loginResponse.body.accessToken;
 
@@ -147,7 +146,7 @@ describe('Financial Providers Integration (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .send({
           accountId,
-          amount: -25.50,
+          amount: -25.5,
           currency: 'USD',
           description: 'Coffee Shop',
           merchant: 'Local Cafe',
@@ -156,7 +155,7 @@ describe('Financial Providers Integration (e2e)', () => {
         .expect(201);
 
       expect(response.body).toHaveProperty('id');
-      expect(response.body.amount).toBe(-25.50);
+      expect(response.body.amount).toBe(-25.5);
       expect(response.body.description).toBe('Coffee Shop');
       transactionId = response.body.id;
     });

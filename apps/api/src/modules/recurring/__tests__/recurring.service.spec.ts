@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ConflictException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { SpacesService } from '../../spaces/spaces.service';
@@ -87,7 +87,11 @@ describe('RecurringService', () => {
 
       await service.findAll('space-123', 'user-123');
 
-      expect(spacesService.verifyUserAccess).toHaveBeenCalledWith('user-123', 'space-123', 'viewer');
+      expect(spacesService.verifyUserAccess).toHaveBeenCalledWith(
+        'user-123',
+        'space-123',
+        'viewer'
+      );
     });
 
     it('should return confirmed and paused patterns by default', async () => {
@@ -98,7 +102,7 @@ describe('RecurringService', () => {
       expect(prisma.recurringTransaction.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { spaceId: 'space-123', status: { in: ['confirmed', 'paused'] } },
-        }),
+        })
       );
       expect(result).toHaveLength(1);
     });
@@ -111,7 +115,7 @@ describe('RecurringService', () => {
       expect(prisma.recurringTransaction.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { spaceId: 'space-123', status: 'detected' },
-        }),
+        })
       );
     });
 
@@ -123,7 +127,7 @@ describe('RecurringService', () => {
       expect(prisma.recurringTransaction.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { spaceId: 'space-123' },
-        }),
+        })
       );
     });
 
@@ -154,7 +158,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
 
       await expect(service.findOne('space-123', 'user-123', 'missing')).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
   });
@@ -171,16 +175,26 @@ describe('RecurringService', () => {
 
     it('should verify user access as member', async () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
-      prisma.recurringTransaction.create.mockResolvedValue({ ...mockRecurring, ...createDto } as any);
+      prisma.recurringTransaction.create.mockResolvedValue({
+        ...mockRecurring,
+        ...createDto,
+      } as any);
 
       await service.create('space-123', 'user-123', createDto as any);
 
-      expect(spacesService.verifyUserAccess).toHaveBeenCalledWith('user-123', 'space-123', 'member');
+      expect(spacesService.verifyUserAccess).toHaveBeenCalledWith(
+        'user-123',
+        'space-123',
+        'member'
+      );
     });
 
     it('should create with confidence 1.0 for manual creation', async () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
-      prisma.recurringTransaction.create.mockResolvedValue({ ...mockRecurring, ...createDto } as any);
+      prisma.recurringTransaction.create.mockResolvedValue({
+        ...mockRecurring,
+        ...createDto,
+      } as any);
 
       await service.create('space-123', 'user-123', createDto as any);
 
@@ -197,7 +211,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(mockRecurring as any);
 
       await expect(service.create('space-123', 'user-123', createDto as any)).rejects.toThrow(
-        ConflictException,
+        ConflictException
       );
     });
 
@@ -233,7 +247,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.update('space-123', 'user-123', 'missing', { merchantName: 'X' } as any),
+        service.update('space-123', 'user-123', 'missing', { merchantName: 'X' } as any)
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -261,7 +275,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(mockRecurring as any); // already confirmed
 
       await expect(service.confirm('space-123', 'user-123', 'rec-123', {} as any)).rejects.toThrow(
-        ConflictException,
+        ConflictException
       );
     });
 
@@ -269,7 +283,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
 
       await expect(service.confirm('space-123', 'user-123', 'missing', {} as any)).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
   });
@@ -296,7 +310,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
 
       await expect(service.dismiss('space-123', 'user-123', 'missing')).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
   });
@@ -339,7 +353,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
 
       await expect(service.togglePause('space-123', 'user-123', 'missing')).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
   });
@@ -365,7 +379,7 @@ describe('RecurringService', () => {
       prisma.recurringTransaction.findFirst.mockResolvedValue(null);
 
       await expect(service.remove('space-123', 'user-123', 'missing')).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
   });
@@ -376,7 +390,11 @@ describe('RecurringService', () => {
 
       await service.detectAndStore('space-123', 'user-123');
 
-      expect(spacesService.verifyUserAccess).toHaveBeenCalledWith('user-123', 'space-123', 'member');
+      expect(spacesService.verifyUserAccess).toHaveBeenCalledWith(
+        'user-123',
+        'space-123',
+        'member'
+      );
     });
 
     it('should create recurring transactions from detected patterns', async () => {
@@ -499,7 +517,9 @@ describe('RecurringService', () => {
   describe('getSummary', () => {
     it('should calculate monthly total for monthly frequency', async () => {
       prisma.recurringTransaction.findMany
-        .mockResolvedValueOnce([{ ...mockRecurring, frequency: 'monthly', expectedAmount: 50 }] as any) // confirmed
+        .mockResolvedValueOnce([
+          { ...mockRecurring, frequency: 'monthly', expectedAmount: 50 },
+        ] as any) // confirmed
         .mockResolvedValueOnce([] as any); // upcoming
       prisma.recurringTransaction.count.mockResolvedValue(2);
 
@@ -511,7 +531,9 @@ describe('RecurringService', () => {
 
     it('should calculate monthly total for weekly frequency', async () => {
       prisma.recurringTransaction.findMany
-        .mockResolvedValueOnce([{ ...mockRecurring, frequency: 'weekly', expectedAmount: 10 }] as any)
+        .mockResolvedValueOnce([
+          { ...mockRecurring, frequency: 'weekly', expectedAmount: 10 },
+        ] as any)
         .mockResolvedValueOnce([] as any);
       prisma.recurringTransaction.count.mockResolvedValue(0);
 
@@ -522,7 +544,9 @@ describe('RecurringService', () => {
 
     it('should calculate monthly total for yearly frequency', async () => {
       prisma.recurringTransaction.findMany
-        .mockResolvedValueOnce([{ ...mockRecurring, frequency: 'yearly', expectedAmount: 120 }] as any)
+        .mockResolvedValueOnce([
+          { ...mockRecurring, frequency: 'yearly', expectedAmount: 120 },
+        ] as any)
         .mockResolvedValueOnce([] as any);
       prisma.recurringTransaction.count.mockResolvedValue(0);
 
@@ -544,7 +568,9 @@ describe('RecurringService', () => {
 
     it('should calculate monthly total for biweekly frequency', async () => {
       prisma.recurringTransaction.findMany
-        .mockResolvedValueOnce([{ ...mockRecurring, frequency: 'biweekly', expectedAmount: 100 }] as any)
+        .mockResolvedValueOnce([
+          { ...mockRecurring, frequency: 'biweekly', expectedAmount: 100 },
+        ] as any)
         .mockResolvedValueOnce([] as any);
       prisma.recurringTransaction.count.mockResolvedValue(0);
 
@@ -555,7 +581,9 @@ describe('RecurringService', () => {
 
     it('should calculate monthly total for quarterly frequency', async () => {
       prisma.recurringTransaction.findMany
-        .mockResolvedValueOnce([{ ...mockRecurring, frequency: 'quarterly', expectedAmount: 300 }] as any)
+        .mockResolvedValueOnce([
+          { ...mockRecurring, frequency: 'quarterly', expectedAmount: 300 },
+        ] as any)
         .mockResolvedValueOnce([] as any);
       prisma.recurringTransaction.count.mockResolvedValue(0);
 

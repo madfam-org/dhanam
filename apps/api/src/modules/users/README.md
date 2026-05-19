@@ -8,19 +8,19 @@ The Users module manages authenticated user profiles, preferences, and account l
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| User | User account with profile info and preferences |
-| UserSpace | Membership linking users to spaces with roles |
-| Space | Organizational container for financial data |
+| Entity    | Description                                    |
+| --------- | ---------------------------------------------- |
+| User      | User account with profile info and preferences |
+| UserSpace | Membership linking users to spaces with roles  |
+| Space     | Organizational container for financial data    |
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/users/me` | GET | Get current user profile with spaces |
-| `/users/me` | PATCH | Update user profile and preferences |
-| `/users/me` | DELETE | Delete user account and cleanup |
+| Endpoint    | Method | Description                          |
+| ----------- | ------ | ------------------------------------ |
+| `/users/me` | GET    | Get current user profile with spaces |
+| `/users/me` | PATCH  | Update user profile and preferences  |
+| `/users/me` | DELETE | Delete user account and cleanup      |
 
 ## Service Architecture
 
@@ -37,18 +37,21 @@ UsersService
 ## Data Flow
 
 **Profile Retrieval:**
+
 1. User ID extracted from JWT token via `@CurrentUser` decorator
 2. Service fetches user with space memberships
 3. Response includes sanitized profile (excludes passwordHash, totpSecret)
 4. Spaces array includes role for each membership
 
 **Profile Update:**
+
 1. User submits updated preferences
 2. Service updates name, locale, and/or timezone
 3. Update logged for audit trail
 4. Sanitized user returned
 
 **Account Deletion:**
+
 1. Service identifies spaces where user is sole owner
 2. Sole-owned spaces are deleted (cascades accounts, transactions)
 3. User removed from shared spaces (memberships deleted)
@@ -81,36 +84,38 @@ UsersService
 
 ## Updateable Preferences
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `name` | string | Display name |
-| `locale` | enum | Language preference: `en`, `es` |
+| Field      | Type   | Description                                 |
+| ---------- | ------ | ------------------------------------------- |
+| `name`     | string | Display name                                |
+| `locale`   | enum   | Language preference: `en`, `es`             |
 | `timezone` | string | IANA timezone (e.g., `America/Mexico_City`) |
 
 ## Security Notes
 
 **Sanitized Fields:**
+
 - `passwordHash` - Never exposed in API responses
 - `totpSecret` - Never exposed in API responses
 
 **Account Deletion Rules:**
+
 - Sole-owned spaces are fully deleted
 - Shared spaces transfer to remaining owners
 - Operation runs in database transaction for atomicity
 
 ## Error Handling
 
-| Error | HTTP Status | Description |
-|-------|-------------|-------------|
-| User not found | 404 | User does not exist |
-| Unauthorized | 401 | Invalid or missing JWT token |
+| Error          | HTTP Status | Description                  |
+| -------------- | ----------- | ---------------------------- |
+| User not found | 404         | User does not exist          |
+| Unauthorized   | 401         | Invalid or missing JWT token |
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| Auth | Authentication and token management |
-| Spaces | User membership and role management |
+| Module   | Relationship                          |
+| -------- | ------------------------------------- |
+| Auth     | Authentication and token management   |
+| Spaces   | User membership and role management   |
 | Accounts | Account ownership for Yours/Mine/Ours |
 
 ## Testing
@@ -124,5 +129,6 @@ pnpm test:cov -- users
 ```
 
 ---
+
 **Module**: `users`
 **Last Updated**: January 2025

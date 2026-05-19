@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import request from 'supertest';
+import { JwtService } from '@nestjs/jwt';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { Test, TestingModule } from '@nestjs/testing';
+import request from 'supertest';
 
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
+
 import { TestHelper } from './helpers/test.helper';
 
 describe('Transactions E2E', () => {
@@ -24,9 +25,7 @@ describe('Transactions E2E', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter()
-    );
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
     app.setGlobalPrefix('v1');
 
@@ -47,7 +46,11 @@ describe('Transactions E2E', () => {
   describe('Setup', () => {
     it('should create a user with space and account for testing', async () => {
       // Create user with space
-      const { user, space, authToken: token } = await testHelper.createCompleteUserWithSpace({
+      const {
+        user,
+        space,
+        authToken: token,
+      } = await testHelper.createCompleteUserWithSpace({
         email: 'transactions-test@example.com',
         password: 'SecurePass123!',
         name: 'Transaction Test User',
@@ -85,7 +88,7 @@ describe('Transactions E2E', () => {
       it('should create a new transaction', async () => {
         const transactionData = {
           accountId,
-          amount: -250.50,
+          amount: -250.5,
           description: 'Groceries at Walmart',
           date: new Date().toISOString(),
           currency: 'MXN',
@@ -100,7 +103,7 @@ describe('Transactions E2E', () => {
           .expect(201);
 
         expect(response.body).toHaveProperty('id');
-        expect(Number(response.body.amount)).toBe(-250.50);
+        expect(Number(response.body.amount)).toBe(-250.5);
         expect(response.body.description).toBe('Groceries at Walmart');
         expect(response.body.accountId).toBe(accountId);
 
@@ -184,7 +187,9 @@ describe('Transactions E2E', () => {
         const endDate = new Date();
 
         const response = await request(app.getHttpServer())
-          .get(`/v1/spaces/${spaceId}/transactions?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`)
+          .get(
+            `/v1/spaces/${spaceId}/transactions?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
+          )
           .set('Authorization', `Bearer ${authToken}`)
           .expect(200);
 
@@ -235,7 +240,7 @@ describe('Transactions E2E', () => {
       it('should update a transaction', async () => {
         const updateData = {
           description: 'Updated grocery purchase',
-          amount: -275.00,
+          amount: -275.0,
         };
 
         const response = await request(app.getHttpServer())
@@ -245,10 +250,10 @@ describe('Transactions E2E', () => {
           .expect(200);
 
         expect(response.body.description).toBe('Updated grocery purchase');
-        expect(Number(response.body.amount)).toBe(-275.00);
+        expect(Number(response.body.amount)).toBe(-275.0);
       });
 
-      it('should not allow updating another user\'s transaction', async () => {
+      it("should not allow updating another user's transaction", async () => {
         // Create another user
         const { authToken: otherToken } = await testHelper.createCompleteUserWithSpace({
           email: 'other-user@example.com',

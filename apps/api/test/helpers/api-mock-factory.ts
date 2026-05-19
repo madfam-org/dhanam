@@ -5,8 +5,9 @@
  * Reduces boilerplate in test files and ensures consistent mocking patterns.
  */
 
-import type { RedisService } from '../../src/core/redis/redis.service';
 import type { ConfigService } from '@nestjs/config';
+
+import type { RedisService } from '../../src/core/redis/redis.service';
 
 /**
  * Create a mock Redis service with optional cache hit simulation
@@ -190,11 +191,7 @@ export function createAuditMock() {
 /**
  * Create a mock HTTP error response for fetch
  */
-export function createFetchErrorResponse(
-  status: number,
-  statusText: string,
-  errorBody?: unknown
-) {
+export function createFetchErrorResponse(status: number, statusText: string, errorBody?: unknown) {
   return Promise.resolve({
     ok: false,
     status,

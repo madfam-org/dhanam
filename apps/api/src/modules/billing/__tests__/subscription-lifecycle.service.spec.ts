@@ -1,16 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
 import { AuditService } from '../../../core/audit/audit.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { PostHogService } from '../../analytics/posthog.service';
 import { JanuaBillingService } from '../janua-billing.service';
-import { StripeService } from '../stripe.service';
 import {
   SubscriptionLifecycleService,
   PLAN_TIER_MAP,
 } from '../services/subscription-lifecycle.service';
+import { StripeService } from '../stripe.service';
 
 describe('SubscriptionLifecycleService', () => {
   let service: SubscriptionLifecycleService;

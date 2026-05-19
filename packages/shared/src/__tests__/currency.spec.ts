@@ -1,9 +1,4 @@
-import {
-  formatCurrency,
-  parseCurrency,
-  createMoney,
-  convertCurrency,
-} from '../utils/currency';
+import { formatCurrency, parseCurrency, createMoney, convertCurrency } from '../utils/currency';
 import { Currency } from '../types';
 
 describe('Currency Utilities', () => {

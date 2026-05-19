@@ -163,35 +163,40 @@ export const common = {
   demoExploringAs: 'Explorando como',
 
   personaGuest: 'Vista Rápida',
-  personaGuestDesc: 'Finanzas personales básicas: cuenta, ahorro, tarjeta de crédito, crypto y presupuesto mensual.',
+  personaGuestDesc:
+    'Finanzas personales básicas: cuenta, ahorro, tarjeta de crédito, crypto y presupuesto mensual.',
   personaGuestFeature1: 'Presupuesto mensual',
   personaGuestFeature2: 'Vista multi-cuenta',
   personaGuestFeature3: 'Seguimiento crypto',
 
   personaMaria: 'Maria Gonz\u00e1lez',
   personaMariaArchetype: 'Joven Profesional',
-  personaMariaDesc: 'Presupuesto base cero con integración Belvo, metas de ahorro y crypto con ESG.',
+  personaMariaDesc:
+    'Presupuesto base cero con integración Belvo, metas de ahorro y crypto con ESG.',
   personaMariaFeature1: 'Presupuesto base cero',
   personaMariaFeature2: 'Sincronización Belvo',
   personaMariaFeature3: 'Puntuación ESG crypto',
 
   personaCarlos: 'Carlos Mendoza',
   personaCarlosArchetype: 'Dueño de Negocio',
-  personaCarlosDesc: 'Espacios personal + negocio, activos manuales, portafolio de inversiones y coleccionables.',
+  personaCarlosDesc:
+    'Espacios personal + negocio, activos manuales, portafolio de inversiones y coleccionables.',
   personaCarlosFeature1: 'Espacios Tuyo / Mío / Nuestro',
   personaCarlosFeature2: 'Presupuesto empresarial',
   personaCarlosFeature3: 'Activos manuales',
 
   personaPatricia: 'Patricia Ruiz',
   personaPatriciaArchetype: 'Alto Patrimonio',
-  personaPatriciaDesc: 'Portafolios de inversión, planificación patrimonial, cuentas multi-moneda USD y presupuestos empresariales.',
+  personaPatriciaDesc:
+    'Portafolios de inversión, planificación patrimonial, cuentas multi-moneda USD y presupuestos empresariales.',
   personaPatriciaFeature1: 'Planificación patrimonial',
   personaPatriciaFeature2: 'Cuentas multi-moneda',
   personaPatriciaFeature3: 'Portafolios de inversión',
 
   personaDiego: 'Diego Navarro',
   personaDiegoArchetype: 'Web3 / DeFi Nativo',
-  personaDiegoDesc: 'Posiciones DeFi en 4 cadenas, wallets gaming, NFTs, tokens de gobernanza DAO y staking.',
+  personaDiegoDesc:
+    'Posiciones DeFi en 4 cadenas, wallets gaming, NFTs, tokens de gobernanza DAO y staking.',
   personaDiegoFeature1: 'DeFi multi-cadena',
   personaDiegoFeature2: 'Wallets gaming y NFTs',
   personaDiegoFeature3: 'Gobernanza DAO',

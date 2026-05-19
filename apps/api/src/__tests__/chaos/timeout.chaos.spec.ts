@@ -6,15 +6,16 @@ import {
   withDeadlines,
   TimeoutError,
 } from '../../core/utils/timeout.util';
+
 import { createSlowOperation } from './helpers/chaos-utils';
 
 describe('Timeout Chaos Tests', () => {
   describe('withTimeout', () => {
     it('returns result when operation completes within timeout', async () => {
-      const result = await withTimeout(
-        () => Promise.resolve('fast'),
-        { timeoutMs: 1000, operationName: 'test' },
-      );
+      const result = await withTimeout(() => Promise.resolve('fast'), {
+        timeoutMs: 1000,
+        operationName: 'test',
+      });
       expect(result).toBe('fast');
     });
 
@@ -23,7 +24,7 @@ describe('Timeout Chaos Tests', () => {
         withTimeout(createSlowOperation(5000, 'slow'), {
           timeoutMs: 50,
           operationName: 'slow_op',
-        }),
+        })
       ).rejects.toThrow(TimeoutError);
     });
 
@@ -50,7 +51,7 @@ describe('Timeout Chaos Tests', () => {
           timeoutMs: 50,
           operationName: 'test',
           onTimeout,
-        }),
+        })
       ).rejects.toThrow(TimeoutError);
 
       expect(onTimeout).toHaveBeenCalled();
@@ -60,10 +61,7 @@ describe('Timeout Chaos Tests', () => {
       const error = new Error('Custom error');
 
       await expect(
-        withTimeout(
-          () => Promise.reject(error),
-          { timeoutMs: 1000, operationName: 'test' },
-        ),
+        withTimeout(() => Promise.reject(error), { timeoutMs: 1000, operationName: 'test' })
       ).rejects.toThrow('Custom error');
     });
   });
@@ -79,10 +77,10 @@ describe('Timeout Chaos Tests', () => {
 
     it('propagates non-timeout errors', async () => {
       await expect(
-        withTimeoutOrNull(
-          () => Promise.reject(new Error('Not timeout')),
-          { timeoutMs: 1000, operationName: 'test' },
-        ),
+        withTimeoutOrNull(() => Promise.reject(new Error('Not timeout')), {
+          timeoutMs: 1000,
+          operationName: 'test',
+        })
       ).rejects.toThrow('Not timeout');
     });
   });
@@ -98,10 +96,11 @@ describe('Timeout Chaos Tests', () => {
     });
 
     it('returns actual result when fast enough', async () => {
-      const result = await withTimeoutOrDefault(
-        () => Promise.resolve('actual'),
-        { timeoutMs: 1000, operationName: 'test', defaultValue: 'fallback' },
-      );
+      const result = await withTimeoutOrDefault(() => Promise.resolve('actual'), {
+        timeoutMs: 1000,
+        operationName: 'test',
+        defaultValue: 'fallback',
+      });
       expect(result).toBe('actual');
     });
   });
@@ -145,7 +144,7 @@ describe('Timeout Chaos Tests', () => {
             { ms: 100 }, // hard timeout
           ],
           operationName: 'deadline_test',
-        }),
+        })
       ).rejects.toThrow(TimeoutError);
 
       // Intermediate callbacks should have fired before the hard timeout
@@ -156,16 +155,10 @@ describe('Timeout Chaos Tests', () => {
     it('clears deadline timers on success', async () => {
       const warnCallback = jest.fn();
 
-      const result = await withDeadlines(
-        () => Promise.resolve('fast'),
-        {
-          deadlines: [
-            { ms: 1000, onDeadline: warnCallback },
-            { ms: 5000 },
-          ],
-          operationName: 'test',
-        },
-      );
+      const result = await withDeadlines(() => Promise.resolve('fast'), {
+        deadlines: [{ ms: 1000, onDeadline: warnCallback }, { ms: 5000 }],
+        operationName: 'test',
+      });
 
       expect(result).toBe('fast');
       // Wait a bit to verify callback is NOT called after cleanup

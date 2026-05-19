@@ -47,8 +47,8 @@
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
 import type { SentryService } from '../../../core/monitoring/sentry.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 
 /** Max delivery attempts (initial + retries). After this, manual only. */
 export const WEBHOOK_DLQ_MAX_ATTEMPTS = 10;
@@ -140,20 +140,16 @@ export class WebhookDlqService {
         `next_retry=${nextRetryAt?.toISOString() ?? 'never'}`
     );
 
-    this.sentry?.captureMessage(
-      `Webhook delivery failed: ${input.consumer}`,
-      'warning',
-      {
-        event_id: input.eventId,
-        consumer: input.consumer,
-        consumer_url: input.consumerUrl,
-        event_type: input.eventType,
-        attempt: 1,
-        status_code: input.statusCode,
-        error_message: input.errorMessage,
-        dlq_id: row.id,
-      }
-    );
+    this.sentry?.captureMessage(`Webhook delivery failed: ${input.consumer}`, 'warning', {
+      event_id: input.eventId,
+      consumer: input.consumer,
+      consumer_url: input.consumerUrl,
+      event_type: input.eventType,
+      attempt: 1,
+      status_code: input.statusCode,
+      error_message: input.errorMessage,
+      dlq_id: row.id,
+    });
 
     return row;
   }
@@ -193,7 +189,7 @@ export class WebhookDlqService {
 
     let statusCode: number | undefined;
     let errorMessage: string | undefined;
-    let ok = false;
+    let ok: boolean;
 
     try {
       const res = await fetch(row.consumerUrl, {

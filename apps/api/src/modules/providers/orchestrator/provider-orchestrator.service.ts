@@ -1,5 +1,6 @@
-import { Provider } from '@db';
 import { Injectable, Logger } from '@nestjs/common';
+
+import { Provider } from '@db';
 
 import { EventsService } from '../../../core/events/events.service';
 import { ProviderException } from '../../../core/exceptions/domain-exceptions';

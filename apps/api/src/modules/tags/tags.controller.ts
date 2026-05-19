@@ -1,4 +1,3 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import {
   ApiTags,
@@ -13,6 +12,8 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 
 import { CreateTagDto, UpdateTagDto } from './dto';
 import { TagsService } from './tags.service';

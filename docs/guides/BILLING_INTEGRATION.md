@@ -16,34 +16,34 @@ Dhanam's billing system supports:
 
 The billing system supports consolidated billing across multiple MADFAM products. Each product is identified by a `ProductId`:
 
-| ProductId | Product | Description |
-|-----------|---------|-------------|
-| `enclii` | Enclii | DevOps platform |
-| `tezca` | Tezca | Legal tech platform |
-| `yantra4d` | Yantra4D | 3D/CAD platform |
-| `dhanam` | Dhanam | Financial planning (default) |
+| ProductId  | Product  | Description                  |
+| ---------- | -------- | ---------------------------- |
+| `enclii`   | Enclii   | DevOps platform              |
+| `tezca`    | Tezca    | Legal tech platform          |
+| `yantra4d` | Yantra4D | 3D/CAD platform              |
+| `dhanam`   | Dhanam   | Financial planning (default) |
 
 ### Product-Prefixed Plan Slugs
 
 Plans can be prefixed with a product identifier to route billing to the correct product context:
 
-| Plan Slug | Tier | Product |
-|-----------|------|---------|
-| `essentials` | Essentials | Dhanam (default) |
-| `pro` | Pro | Dhanam (default) |
-| `madfam` | MADFAM | Dhanam (default) |
-| `enclii_essentials` | Essentials | Enclii |
-| `enclii_pro` | Pro | Enclii |
-| `enclii_madfam` | MADFAM | Enclii |
-| `tezca_essentials` | Essentials | Tezca |
-| `tezca_pro` | Pro | Tezca |
-| `tezca_madfam` | MADFAM | Tezca |
-| `yantra4d_essentials` | Essentials | Yantra4D |
-| `yantra4d_pro` | Pro | Yantra4D |
-| `yantra4d_madfam` | MADFAM | Yantra4D |
-| `dhanam_essentials` | Essentials | Dhanam |
-| `dhanam_pro` | Pro | Dhanam |
-| `dhanam_madfam` | MADFAM | Dhanam |
+| Plan Slug             | Tier       | Product          |
+| --------------------- | ---------- | ---------------- |
+| `essentials`          | Essentials | Dhanam (default) |
+| `pro`                 | Pro        | Dhanam (default) |
+| `madfam`              | MADFAM     | Dhanam (default) |
+| `enclii_essentials`   | Essentials | Enclii           |
+| `enclii_pro`          | Pro        | Enclii           |
+| `enclii_madfam`       | MADFAM     | Enclii           |
+| `tezca_essentials`    | Essentials | Tezca            |
+| `tezca_pro`           | Pro        | Tezca            |
+| `tezca_madfam`        | MADFAM     | Tezca            |
+| `yantra4d_essentials` | Essentials | Yantra4D         |
+| `yantra4d_pro`        | Pro        | Yantra4D         |
+| `yantra4d_madfam`     | MADFAM     | Yantra4D         |
+| `dhanam_essentials`   | Essentials | Dhanam           |
+| `dhanam_pro`          | Pro        | Dhanam           |
+| `dhanam_madfam`       | MADFAM     | Dhanam           |
 
 Yearly variants (`essentials_yearly`, `pro_yearly`, `madfam_yearly`) are also supported.
 
@@ -51,35 +51,36 @@ Yearly variants (`essentials_yearly`, `pro_yearly`, `madfam_yearly`) are also su
 
 ### Free Tier
 
-| Feature | Daily Limit |
-|---------|-------------|
-| ESG Calculations | 10 |
-| Monte Carlo Simulations | 3 |
-| Goal Probability Analysis | 3 |
-| Scenario Analysis | 1 |
-| Portfolio Rebalancing | Not available |
-| API Requests | 1,000 |
+| Feature                   | Daily Limit   |
+| ------------------------- | ------------- |
+| ESG Calculations          | 10            |
+| Monte Carlo Simulations   | 3             |
+| Goal Probability Analysis | 3             |
+| Scenario Analysis         | 1             |
+| Portfolio Rebalancing     | Not available |
+| API Requests              | 1,000         |
 
 ### Premium Tier
 
-| Feature | Limit |
-|---------|-------|
+| Feature      | Limit     |
+| ------------ | --------- |
 | All Features | Unlimited |
 
 ## Payment Providers
 
 ### Provider Selection by Region
 
-| Region | Primary Provider | Fallback |
-|--------|------------------|----------|
+| Region      | Primary Provider    | Fallback  |
+| ----------- | ------------------- | --------- |
 | Mexico (MX) | Conekta (via Janua) | Stripe MX |
-| LATAM | Polar (via Janua) | Stripe |
-| US/Canada | Polar (via Janua) | Stripe |
-| Other | Stripe | - |
+| LATAM       | Polar (via Janua)   | Stripe    |
+| US/Canada   | Polar (via Janua)   | Stripe    |
+| Other       | Stripe              | -         |
 
 ### Janua Integration
 
 Janua is MADFAM's unified billing platform that routes to:
+
 - **Conekta**: Mexican peso payments, local payment methods (OXXO, SPEI)
 - **Polar**: International payments, multiple currencies
 
@@ -91,21 +92,21 @@ Direct Stripe integration serves as fallback when Janua is unavailable.
 
 ### Subscription Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/billing/upgrade` | Initiate premium upgrade |
-| `GET` | `/billing/checkout` | Public checkout redirect (no auth) |
-| `POST` | `/billing/portal` | Create billing portal session |
-| `GET` | `/billing/usage` | Get current usage metrics |
-| `GET` | `/billing/history` | Get billing event history |
-| `GET` | `/billing/limits` | Get tier limits configuration |
+| Method | Endpoint            | Description                        |
+| ------ | ------------------- | ---------------------------------- |
+| `POST` | `/billing/upgrade`  | Initiate premium upgrade           |
+| `GET`  | `/billing/checkout` | Public checkout redirect (no auth) |
+| `POST` | `/billing/portal`   | Create billing portal session      |
+| `GET`  | `/billing/usage`    | Get current usage metrics          |
+| `GET`  | `/billing/history`  | Get billing event history          |
+| `GET`  | `/billing/limits`   | Get tier limits configuration      |
 
 ### Webhooks
 
-| Endpoint | Provider | Description |
-|----------|----------|-------------|
-| `POST` | `/billing/webhooks/stripe` | Stripe webhook handler |
-| `POST` | `/billing/webhooks/janua` | Janua webhook handler |
+| Endpoint | Provider                   | Description            |
+| -------- | -------------------------- | ---------------------- |
+| `POST`   | `/billing/webhooks/stripe` | Stripe webhook handler |
+| `POST`   | `/billing/webhooks/janua`  | Janua webhook handler  |
 
 ## Usage Examples
 
@@ -141,7 +142,7 @@ When initiating an upgrade from an external MADFAM product (e.g., Enclii), inclu
 const response = await fetch('/api/billing/upgrade', {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${accessToken}`,
+    Authorization: `Bearer ${accessToken}`,
   },
   body: JSON.stringify({
     plan: 'enclii_pro',
@@ -162,12 +163,12 @@ GET /billing/checkout?plan=enclii_pro&user_id=usr_123&return_url=https://app.enc
 
 Query parameters:
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `plan` | Yes | Plan slug (optionally product-prefixed) |
-| `user_id` | Yes | Janua user ID (UUID) |
-| `return_url` | Yes | URL to redirect after checkout |
-| `product` | No | Product identifier (defaults to `dhanam`) |
+| Parameter    | Required | Description                               |
+| ------------ | -------- | ----------------------------------------- |
+| `plan`       | Yes      | Plan slug (optionally product-prefixed)   |
+| `user_id`    | Yes      | Janua user ID (UUID)                      |
+| `return_url` | Yes      | URL to redirect after checkout            |
+| `product`    | No       | Product identifier (defaults to `dhanam`) |
 
 ### Using the Billing SDK
 
@@ -243,7 +244,6 @@ import { TrackUsage } from '@modules/billing/decorators';
 
 @Controller('simulations')
 export class SimulationsController {
-
   // Requires premium tier
   @RequiresTier('premium')
   @Post('portfolio-rebalance')
@@ -283,26 +283,26 @@ export class MeteredController {
 
 ### Stripe Events
 
-| Event | Handler | Action |
-|-------|---------|--------|
-| `customer.subscription.created` | `handleSubscriptionCreated` | Upgrade to premium |
-| `customer.subscription.updated` | `handleSubscriptionUpdated` | Update expiration |
-| `customer.subscription.deleted` | `handleSubscriptionCancelled` | Downgrade to free |
-| `invoice.payment_succeeded` | `handlePaymentSucceeded` | Log payment |
-| `invoice.payment_failed` | `handlePaymentFailed` | Log failure, alert user |
+| Event                           | Handler                       | Action                  |
+| ------------------------------- | ----------------------------- | ----------------------- |
+| `customer.subscription.created` | `handleSubscriptionCreated`   | Upgrade to premium      |
+| `customer.subscription.updated` | `handleSubscriptionUpdated`   | Update expiration       |
+| `customer.subscription.deleted` | `handleSubscriptionCancelled` | Downgrade to free       |
+| `invoice.payment_succeeded`     | `handlePaymentSucceeded`      | Log payment             |
+| `invoice.payment_failed`        | `handlePaymentFailed`         | Log failure, alert user |
 
 ### Janua Events
 
-| Event | Handler | Action |
-|-------|---------|--------|
-| `subscription.created` | `handleJanuaSubscriptionCreated` | Upgrade to premium |
-| `subscription.updated` | `handleJanuaSubscriptionUpdated` | Update tier |
-| `subscription.cancelled` | `handleJanuaSubscriptionCancelled` | Downgrade to free |
-| `subscription.paused` | `handleJanuaSubscriptionPaused` | Mark as paused |
-| `subscription.resumed` | `handleJanuaSubscriptionResumed` | Reactivate premium |
-| `payment.succeeded` | `handleJanuaPaymentSucceeded` | Log payment |
-| `payment.failed` | `handleJanuaPaymentFailed` | Log failure |
-| `payment.refunded` | `handleJanuaPaymentRefunded` | Log refund |
+| Event                    | Handler                            | Action             |
+| ------------------------ | ---------------------------------- | ------------------ |
+| `subscription.created`   | `handleJanuaSubscriptionCreated`   | Upgrade to premium |
+| `subscription.updated`   | `handleJanuaSubscriptionUpdated`   | Update tier        |
+| `subscription.cancelled` | `handleJanuaSubscriptionCancelled` | Downgrade to free  |
+| `subscription.paused`    | `handleJanuaSubscriptionPaused`    | Mark as paused     |
+| `subscription.resumed`   | `handleJanuaSubscriptionResumed`   | Reactivate premium |
+| `payment.succeeded`      | `handleJanuaPaymentSucceeded`      | Log payment        |
+| `payment.failed`         | `handleJanuaPaymentFailed`         | Log failure        |
+| `payment.refunded`       | `handleJanuaPaymentRefunded`       | Log refund         |
 
 ## Database Schema
 
@@ -379,7 +379,7 @@ JANUA_WEBHOOK_SECRET=jwh_xxx
 JANUA_ENABLED=true
 
 # URLs
-WEB_URL=https://app.dhanam.com
+WEB_URL=https://app.dhan.am
 ```
 
 ## Error Handling
@@ -390,7 +390,7 @@ WEB_URL=https://app.dhanam.com
 import {
   PaymentRequiredException,
   SubscriptionExpiredException,
-  UsageLimitExceededException
+  UsageLimitExceededException,
 } from '@modules/billing/exceptions';
 
 // Returns 402 Payment Required
@@ -409,12 +409,12 @@ throw new UsageLimitExceededException('Daily limit reached for ESG calculations'
 
 ```typescript
 // Use test API keys
-STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_SECRET_KEY = sk_test_xxx;
 
 // Test card numbers
-4242424242424242  // Successful payment
-4000000000000002  // Declined payment
-4000000000000341  // Attaches but fails payment
+4242424242424242; // Successful payment
+4000000000000002; // Declined payment
+4000000000000341; // Attaches but fails payment
 ```
 
 ### Webhook Testing
@@ -431,12 +431,12 @@ stripe trigger customer.subscription.created
 
 All billing operations are logged:
 
-| Action | Severity | Details |
-|--------|----------|---------|
-| `BILLING_UPGRADE_INITIATED` | Medium | Session ID, provider |
-| `SUBSCRIPTION_ACTIVATED` | High | Tier, subscription ID |
-| `SUBSCRIPTION_CANCELLED` | Medium | Subscription ID |
-| `PAYMENT_FAILED` | High | Amount, invoice ID |
+| Action                      | Severity | Details               |
+| --------------------------- | -------- | --------------------- |
+| `BILLING_UPGRADE_INITIATED` | Medium   | Session ID, provider  |
+| `SUBSCRIPTION_ACTIVATED`    | High     | Tier, subscription ID |
+| `SUBSCRIPTION_CANCELLED`    | Medium   | Subscription ID       |
+| `PAYMENT_FAILED`            | High     | Amount, invoice ID    |
 
 ## Related Documentation
 

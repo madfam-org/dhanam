@@ -9,6 +9,7 @@ The Transaction Execution API provides autonomous transaction management capabil
 **Authentication:** Required (Bearer token)
 
 **Rate Limiting:**
+
 - Order creation: 10 requests/minute
 - OTP verification: 5 requests/5 minutes
 
@@ -472,60 +473,60 @@ curl -X GET https://api.dhanam.io/v1/spaces/space-123/orders/order-789/execution
 
 Main order entity representing a financial transaction.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| id | string | Yes | UUID |
-| spaceId | string | Yes | UUID of space |
-| userId | string | Yes | UUID of user who created |
-| accountId | string | Yes | UUID of source account |
-| idempotencyKey | string | Yes | Unique key for deduplication |
-| type | OrderType | Yes | Type of transaction |
-| status | OrderStatus | Yes | Current status |
-| priority | OrderPriority | Yes | Execution priority |
-| amount | number | Yes | Transaction amount |
-| currency | Currency | Yes | Currency code |
-| assetSymbol | string | No | Asset for buy/sell orders |
-| targetPrice | number | No | Target price for limit orders |
-| toAccountId | string | No | Destination account UUID |
-| provider | ExecutionProvider | Yes | Execution provider |
-| dryRun | boolean | Yes | Simulation mode flag |
-| otpVerified | boolean | Yes | OTP verification status |
-| goalId | string | No | Linked goal UUID |
-| autoExecute | boolean | Yes | Auto-execution flag |
-| executedAmount | number | No | Actual executed amount |
-| executedPrice | number | No | Actual execution price |
-| fees | number | No | Transaction fees |
-| feeCurrency | string | No | Fee currency |
-| errorCode | string | No | Error code if failed |
-| errorMessage | string | No | Error message |
-| notes | string | No | User notes |
-| metadata | object | No | Custom metadata |
-| createdAt | string | Yes | ISO 8601 timestamp |
-| updatedAt | string | Yes | ISO 8601 timestamp |
-| expiresAt | string | Yes | Expiration timestamp (24h) |
-| executedAt | string | No | Execution timestamp |
+| Field          | Type              | Required | Description                   |
+| -------------- | ----------------- | -------- | ----------------------------- |
+| id             | string            | Yes      | UUID                          |
+| spaceId        | string            | Yes      | UUID of space                 |
+| userId         | string            | Yes      | UUID of user who created      |
+| accountId      | string            | Yes      | UUID of source account        |
+| idempotencyKey | string            | Yes      | Unique key for deduplication  |
+| type           | OrderType         | Yes      | Type of transaction           |
+| status         | OrderStatus       | Yes      | Current status                |
+| priority       | OrderPriority     | Yes      | Execution priority            |
+| amount         | number            | Yes      | Transaction amount            |
+| currency       | Currency          | Yes      | Currency code                 |
+| assetSymbol    | string            | No       | Asset for buy/sell orders     |
+| targetPrice    | number            | No       | Target price for limit orders |
+| toAccountId    | string            | No       | Destination account UUID      |
+| provider       | ExecutionProvider | Yes      | Execution provider            |
+| dryRun         | boolean           | Yes      | Simulation mode flag          |
+| otpVerified    | boolean           | Yes      | OTP verification status       |
+| goalId         | string            | No       | Linked goal UUID              |
+| autoExecute    | boolean           | Yes      | Auto-execution flag           |
+| executedAmount | number            | No       | Actual executed amount        |
+| executedPrice  | number            | No       | Actual execution price        |
+| fees           | number            | No       | Transaction fees              |
+| feeCurrency    | string            | No       | Fee currency                  |
+| errorCode      | string            | No       | Error code if failed          |
+| errorMessage   | string            | No       | Error message                 |
+| notes          | string            | No       | User notes                    |
+| metadata       | object            | No       | Custom metadata               |
+| createdAt      | string            | Yes      | ISO 8601 timestamp            |
+| updatedAt      | string            | Yes      | ISO 8601 timestamp            |
+| expiresAt      | string            | Yes      | Expiration timestamp (24h)    |
+| executedAt     | string            | No       | Execution timestamp           |
 
 ### OrderExecution
 
 Represents a single execution attempt for an order.
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| id | string | Yes | UUID |
-| orderId | string | Yes | Parent order UUID |
-| attempt | number | Yes | Attempt number (1-indexed) |
-| status | string | Yes | Execution status |
-| providerOrderId | string | No | Provider's order ID |
-| executedAmount | number | No | Executed amount |
-| executedPrice | number | No | Execution price |
-| fees | number | No | Fees charged |
-| feeCurrency | string | No | Fee currency |
-| errorCode | string | No | Error code if failed |
-| errorMessage | string | No | Error message |
-| rawResponse | object | No | Full provider response |
-| startedAt | string | Yes | Start timestamp |
-| completedAt | string | No | Completion timestamp |
-| executionTime | number | No | Duration in milliseconds |
+| Field           | Type   | Required | Description                |
+| --------------- | ------ | -------- | -------------------------- |
+| id              | string | Yes      | UUID                       |
+| orderId         | string | Yes      | Parent order UUID          |
+| attempt         | number | Yes      | Attempt number (1-indexed) |
+| status          | string | Yes      | Execution status           |
+| providerOrderId | string | No       | Provider's order ID        |
+| executedAmount  | number | No       | Executed amount            |
+| executedPrice   | number | No       | Execution price            |
+| fees            | number | No       | Fees charged               |
+| feeCurrency     | string | No       | Fee currency               |
+| errorCode       | string | No       | Error code if failed       |
+| errorMessage    | string | No       | Error message              |
+| rawResponse     | object | No       | Full provider response     |
+| startedAt       | string | Yes      | Start timestamp            |
+| completedAt     | string | No       | Completion timestamp       |
+| executionTime   | number | No       | Duration in milliseconds   |
 
 ---
 
@@ -533,43 +534,46 @@ Represents a single execution attempt for an order.
 
 ### Order Creation Errors
 
-| Code | Description | HTTP Status |
-|------|-------------|-------------|
-| `IDEMPOTENCY_CONFLICT` | Idempotency key already used with different request | 409 |
-| `INVALID_ACCOUNT` | Account not found or not accessible | 403 |
-| `LIMIT_EXCEEDED` | Order exceeds daily/weekly/monthly limits | 400 |
-| `INVALID_AMOUNT` | Amount below minimum or above maximum | 400 |
-| `INVALID_CURRENCY` | Currency not supported by provider | 400 |
-| `MISSING_DESTINATION` | Transfer requires toAccountId | 400 |
-| `PREMIUM_REQUIRED` | Transaction execution requires premium tier | 403 |
-| `RATE_LIMIT_EXCEEDED` | Too many requests | 429 |
+| Code                   | Description                                         | HTTP Status |
+| ---------------------- | --------------------------------------------------- | ----------- |
+| `IDEMPOTENCY_CONFLICT` | Idempotency key already used with different request | 409         |
+| `INVALID_ACCOUNT`      | Account not found or not accessible                 | 403         |
+| `LIMIT_EXCEEDED`       | Order exceeds daily/weekly/monthly limits           | 400         |
+| `INVALID_AMOUNT`       | Amount below minimum or above maximum               | 400         |
+| `INVALID_CURRENCY`     | Currency not supported by provider                  | 400         |
+| `MISSING_DESTINATION`  | Transfer requires toAccountId                       | 400         |
+| `PREMIUM_REQUIRED`     | Transaction execution requires premium tier         | 403         |
+| `RATE_LIMIT_EXCEEDED`  | Too many requests                                   | 429         |
 
 ### Execution Errors
 
-| Code | Description |
-|------|-------------|
-| `EXPIRED_ORDER` | Order expired (>24 hours old) |
-| `INVALID_STATUS` | Order not in executable state |
-| `NOT_VERIFIED` | OTP verification required |
-| `PROVIDER_ERROR` | Provider API returned error |
-| `INSUFFICIENT_BALANCE` | Account balance too low |
-| `INVALID_CREDENTIALS` | Provider credentials missing/invalid |
-| `NETWORK_ERROR` | Network connectivity issue |
-| `TIMEOUT` | Operation timed out |
+| Code                   | Description                          |
+| ---------------------- | ------------------------------------ |
+| `EXPIRED_ORDER`        | Order expired (>24 hours old)        |
+| `INVALID_STATUS`       | Order not in executable state        |
+| `NOT_VERIFIED`         | OTP verification required            |
+| `PROVIDER_ERROR`       | Provider API returned error          |
+| `INSUFFICIENT_BALANCE` | Account balance too low              |
+| `INVALID_CREDENTIALS`  | Provider credentials missing/invalid |
+| `NETWORK_ERROR`        | Network connectivity issue           |
+| `TIMEOUT`              | Operation timed out                  |
 
 ### Provider-Specific Errors
 
 **Bitso:**
+
 - `INVALID_BOOK` - Trading pair not supported
 - `ORDER_SIZE_TOO_SMALL` - Below minimum order size
 - `INSUFFICIENT_FUNDS` - Not enough balance
 
 **Plaid:**
+
 - `AUTHORIZATION_DECLINED` - Transfer authorization failed
 - `INVALID_ACCESS_TOKEN` - Account not linked or expired
 - `TRANSFER_LIMIT_EXCEEDED` - Exceeds same-day ACH limit
 
 **Belvo:**
+
 - `INVALID_CLABE` - Invalid CLABE number format
 - `PAYMENT_INTENT_FAILED` - Payment intent creation failed
 - `INSUFFICIENT_FUNDS` - Not enough balance
@@ -640,13 +644,14 @@ const createOrderWithRetry = async (data, retries = 3) => {
 
 ## Webhooks
 
-*Coming soon* - Configure webhooks to receive real-time updates on order status changes.
+_Coming soon_ - Configure webhooks to receive real-time updates on order status changes.
 
 ---
 
 ## Support
 
 For questions or issues:
+
 - Email: support@dhanam.io
 - GitHub: https://github.com/madfam-io/dhanam/issues
 - Documentation: https://docs.dhanam.io

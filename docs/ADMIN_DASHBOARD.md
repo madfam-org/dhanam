@@ -18,6 +18,7 @@ The Dhanam Admin Dashboard provides comprehensive tools for system administrator
 The main dashboard displays real-time system statistics:
 
 #### User Metrics
+
 - **Total Users**: All registered users
 - **Active Users**: Users who logged in within last 30 days
 - **New Users**: Registrations in the last 7 days
@@ -25,6 +26,7 @@ The main dashboard displays real-time system statistics:
 - **2FA Enabled**: Users with TOTP authentication active
 
 #### System Health
+
 - **Database Status**: PostgreSQL connection health
 - **Redis Status**: Cache server availability
 - **Queue Status**: Background job processing metrics
@@ -32,6 +34,7 @@ The main dashboard displays real-time system statistics:
 - **Error Rate**: Failed requests percentage
 
 #### Financial Overview
+
 - **Total Spaces**: Personal + Business spaces
 - **Connected Accounts**: By provider (Plaid, Belvo, Bitso, etc.)
 - **Transaction Volume**: Last 30 days
@@ -42,6 +45,7 @@ The main dashboard displays real-time system statistics:
 Search and view user information (read-only):
 
 #### Search Filters
+
 - **Email**: Partial match search
 - **Name**: Full or partial name search
 - **Status**: Active/Inactive
@@ -51,6 +55,7 @@ Search and view user information (read-only):
 - **Date Range**: Registration date filter
 
 #### User Details View
+
 - Basic Information (name, email, locale, timezone)
 - Account Status (active, verified, 2FA)
 - Space Memberships (spaces and roles)
@@ -65,6 +70,7 @@ Search and view user information (read-only):
 Comprehensive security audit trail:
 
 #### Log Filters
+
 - **User**: Filter by user email/ID
 - **Action**: Specific action types
 - **Resource**: Entity type affected
@@ -72,6 +78,7 @@ Comprehensive security audit trail:
 - **Date Range**: Custom date selection
 
 #### Log Entry Details
+
 - Timestamp
 - User who performed action
 - Action type
@@ -81,6 +88,7 @@ Comprehensive security audit trail:
 - Detailed metadata
 
 #### Common Audit Events
+
 - User login/logout
 - Password changes
 - 2FA enable/disable
@@ -93,6 +101,7 @@ Comprehensive security audit trail:
 ### 4. Analytics
 
 #### Onboarding Funnel
+
 Visual funnel showing conversion rates for each onboarding step:
 
 1. **Welcome** → Email Verification
@@ -104,12 +113,14 @@ Visual funnel showing conversion rates for each onboarding step:
 7. **Feature Tour** → Completion
 
 Metrics shown:
+
 - Conversion rate per step
 - Average time per step
 - Abandonment points
 - Completion rate by time period
 
 #### Provider Adoption
+
 - Percentage of users with connected accounts
 - Breakdown by provider
 - Average accounts per user
@@ -120,6 +131,7 @@ Metrics shown:
 Manage feature rollouts and A/B tests:
 
 #### Flag Properties
+
 - **Key**: Unique identifier
 - **Name**: Human-readable name
 - **Description**: What the feature does
@@ -129,6 +141,7 @@ Manage feature rollouts and A/B tests:
 - **Metadata**: Additional configuration
 
 #### Available Flags (Default)
+
 - `esg_scoring`: ESG features visibility
 - `mobile_biometrics`: Mobile biometric auth
 - `advanced_budgeting`: Advanced budget features
@@ -139,6 +152,7 @@ Manage feature rollouts and A/B tests:
 - `multi_currency`: Multi-currency support
 
 #### Flag Management
+
 - Toggle features on/off instantly
 - Gradual rollout with percentage control
 - User-specific targeting for beta testing
@@ -164,18 +178,21 @@ All admin actions are logged with high severity:
 ## Best Practices
 
 ### Security
+
 1. **Principle of Least Privilege**: Admin dashboard is read-only for user data
 2. **Audit Everything**: All admin actions are logged
 3. **Session Security**: Admin sessions expire after 1 hour of inactivity
 4. **Two-Factor**: Admins should have 2FA enabled
 
 ### Performance
+
 1. **Caching**: System stats are cached for 5 minutes
 2. **Pagination**: User lists and logs are paginated (default: 20 items)
 3. **Lazy Loading**: User details are fetched on-demand
 4. **Background Jobs**: Heavy analytics are processed asynchronously
 
 ### Feature Flag Strategy
+
 1. **Start Small**: Begin with 1-5% rollout
 2. **Monitor Metrics**: Watch error rates during rollout
 3. **Target Beta Users**: Use specific user targeting for testing
@@ -187,16 +204,19 @@ All admin actions are logged with high severity:
 ### Common Issues
 
 #### "Access Denied" Error
+
 - Verify user has admin/owner role: `SELECT * FROM user_spaces WHERE user_id = ?`
 - Check JWT token hasn't expired
 - Confirm space membership is active
 
 #### Statistics Not Updating
+
 - Check Redis connection: `redis-cli ping`
 - Clear cache: `redis-cli FLUSHDB`
 - Verify background jobs are running
 
 #### Feature Flags Not Working
+
 - Ensure Redis is running
 - Check flag key matches exactly
 - Verify user ID format in targets
@@ -215,7 +235,7 @@ this.logger.setLogLevel('debug');
 
 ```sql
 -- Find all admin users
-SELECT DISTINCT u.* 
+SELECT DISTINCT u.*
 FROM users u
 JOIN user_spaces us ON u.id = us.user_id
 WHERE us.role IN ('admin', 'owner');
@@ -250,6 +270,7 @@ POST /api/admin/feature-flags/:key
 ### Response Formats
 
 #### System Stats
+
 ```json
 {
   "users": {
@@ -268,6 +289,7 @@ POST /api/admin/feature-flags/:key
 ```
 
 #### Feature Flag Update
+
 ```json
 {
   "key": "esg_scoring",
@@ -280,7 +302,8 @@ POST /api/admin/feature-flags/:key
 ---
 
 For technical implementation details, see:
+
 - [Admin Module Code](../apps/api/src/modules/admin/)
 - [Standalone Admin App](../apps/admin/) — production admin at admin.dhan.am
-- [Web-Embedded Admin (dev fallback)](../apps/web/src/app/(admin)/) — redirects to standalone in production
+- [Web-Embedded Admin (dev fallback)](<../apps/web/src/app/(admin)/>) — redirects to standalone in production
 - [Infrastructure Guide](./INFRASTRUCTURE.md)

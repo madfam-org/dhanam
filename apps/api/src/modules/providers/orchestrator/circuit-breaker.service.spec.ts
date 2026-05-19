@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { PrismaService } from '../../../core/prisma/prisma.service';
 
 import { CircuitBreakerService } from './circuit-breaker.service';
-import { PrismaService } from '../../../core/prisma/prisma.service';
 
 describe('CircuitBreakerService', () => {
   let service: CircuitBreakerService;

@@ -1,11 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { Prisma } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { StripeConnectService } from '../../billing/services/stripe-connect.service';
-
 import { EventDispatcherService } from '../../webhook-outbound/services/event-dispatcher.service';
-
 import type { CreateTransferDto } from '../dto/marketplace.dto';
 
 @Injectable()
@@ -15,7 +14,7 @@ export class TransferService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripeConnect: StripeConnectService,
-    private readonly events: EventDispatcherService,
+    private readonly events: EventDispatcherService
   ) {}
 
   async create(dto: CreateTransferDto) {
@@ -85,5 +84,4 @@ export class TransferService {
       data: { status: 'paid' },
     });
   }
-
 }

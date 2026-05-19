@@ -122,6 +122,7 @@ export const goals = {
     worst10: 'Peor 10%',
     best10: 'Mejor 10%',
     increaseSavings: 'Aumenta el ahorro para mejorar las probabilidades',
-    recommendedContribution: 'Contribución mensual recomendada: ${{recommended}} (actual: ${{current}})',
+    recommendedContribution:
+      'Contribución mensual recomendada: ${{recommended}} (actual: ${{current}})',
   },
 } as const;

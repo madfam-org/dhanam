@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Currency, Prisma } from '@db';
 import type Stripe from 'stripe';
+
+import { Currency, Prisma } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { EventDispatcherService } from '../../webhook-outbound/services/event-dispatcher.service';
@@ -32,7 +33,7 @@ export class ConnectWebhookHandler {
     private readonly charges: ChargeService,
     private readonly transfers: TransferService,
     private readonly payouts: PayoutService,
-    private readonly events: EventDispatcherService,
+    private readonly events: EventDispatcherService
   ) {}
 
   async handle(event: Stripe.Event): Promise<boolean> {
@@ -50,10 +51,7 @@ export class ConnectWebhookHandler {
         return true;
 
       case 'payout.paid':
-        await this.payouts.updateStatusFromWebhook(
-          (event.data.object as Stripe.Payout).id,
-          'paid',
-        );
+        await this.payouts.updateStatusFromWebhook((event.data.object as Stripe.Payout).id, 'paid');
         return true;
       case 'payout.failed': {
         const p = event.data.object as Stripe.Payout;
@@ -63,7 +61,7 @@ export class ConnectWebhookHandler {
 
       case 'transfer.created':
         await this.transfers.promoteFromPendingByExternalId(
-          (event.data.object as Stripe.Transfer).id,
+          (event.data.object as Stripe.Transfer).id
         );
         return true;
       case 'transfer.reversed':
@@ -85,7 +83,7 @@ export class ConnectWebhookHandler {
     // a merchant, we still persist the dispute with a null merchant.
     // In practice dhanam sees disputes only for merchants it created.
     const merchant = await this.findMerchantForCharge(
-      typeof d.charge === 'string' ? d.charge : d.charge.id,
+      typeof d.charge === 'string' ? d.charge : d.charge.id
     );
     if (!merchant) {
       this.logger.warn(`charge.dispute.created for unknown merchant: charge=${d.charge}`);
@@ -120,8 +118,7 @@ export class ConnectWebhookHandler {
       where: { externalDisputeId: d.id },
     });
     if (!row) return;
-    const resolved =
-      d.status === 'won' || d.status === 'lost' || d.status === 'warning_closed';
+    const resolved = d.status === 'won' || d.status === 'lost' || d.status === 'warning_closed';
     await this.prisma.dispute.update({
       where: { id: row.id },
       data: {
@@ -134,8 +131,7 @@ export class ConnectWebhookHandler {
   }
 
   private async onApplicationFeeCreated(fee: Stripe.ApplicationFee) {
-    const merchantExternalId =
-      typeof fee.account === 'string' ? fee.account : fee.account.id;
+    const merchantExternalId = typeof fee.account === 'string' ? fee.account : fee.account.id;
     await this.charges.recordApplicationFee({
       externalFeeId: fee.id,
       externalChargeId: typeof fee.charge === 'string' ? fee.charge : fee.charge.id,

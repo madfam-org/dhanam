@@ -241,11 +241,11 @@ export const OnboardingTestData = {
     dropoffRates: {
       welcome: 0.05,
       email_verification: 0.15,
-      preferences: 0.10,
+      preferences: 0.1,
       space_setup: 0.08,
       connect_accounts: 0.25,
       first_budget: 0.12,
-      feature_tour: 0.20,
+      feature_tour: 0.2,
     },
   },
 };

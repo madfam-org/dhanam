@@ -1,11 +1,12 @@
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
+import { JwtService } from '@nestjs/jwt';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import request from 'supertest';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { TestHelper } from './helpers/test.helper';
+
 import { createE2EApp } from './helpers/e2e-app.helper';
+import { TestHelper } from './helpers/test.helper';
 
 /**
  * Core Value Loop Journey E2E Test
@@ -57,13 +58,11 @@ describe('Core Value Loop Journey', () => {
     it('should register a new user and return tokens', async () => {
       testUserEmail = TestHelper.generateUniqueEmail('coreloop');
 
-      const response = await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({
-          email: testUserEmail,
-          password: 'CoreLoopSecure123!',
-          name: 'Core Loop Test User',
-        });
+      const response = await request(app.getHttpServer()).post('/v1/auth/register').send({
+        email: testUserEmail,
+        password: 'CoreLoopSecure123!',
+        name: 'Core Loop Test User',
+      });
 
       if (response.status !== 201) {
         console.error('Registration failed:', JSON.stringify(response.body, null, 2));
@@ -371,7 +370,7 @@ describe('Core Value Loop Journey', () => {
 
       const response = await request(app.getHttpServer())
         .get(
-          `/v1/analytics/${spaceId}/spending-by-category?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+          `/v1/analytics/${spaceId}/spending-by-category?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`
         )
         .set('Authorization', `Bearer ${authToken}`);
 
@@ -380,7 +379,7 @@ describe('Core Value Loop Journey', () => {
         // Should include at least the Food & Dining category with spending
         if (response.body.length > 0) {
           const foodSpending = response.body.find(
-            (c: any) => c.categoryId === foodCategoryId || c.name === 'Food & Dining',
+            (c: any) => c.categoryId === foodCategoryId || c.name === 'Food & Dining'
           );
           if (foodSpending) {
             expect(Number(foodSpending.totalSpent || foodSpending.amount)).toBeGreaterThan(0);
@@ -423,9 +422,7 @@ describe('Core Value Loop Journey', () => {
 
   describe('Security Boundaries', () => {
     it('should reject unauthenticated access to transactions', async () => {
-      await request(app.getHttpServer())
-        .get(`/v1/spaces/${spaceId}/transactions`)
-        .expect(401);
+      await request(app.getHttpServer()).get(`/v1/spaces/${spaceId}/transactions`).expect(401);
     });
 
     it('should reject access from another user to this space', async () => {

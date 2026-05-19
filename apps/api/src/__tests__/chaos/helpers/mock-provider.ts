@@ -127,7 +127,9 @@ export class MockFinancialProvider implements IFinancialProvider {
 /**
  * Create a set of mock providers for testing failover
  */
-export function createMockProviderSet(configs?: Partial<MockProviderConfig>[]): Map<Provider, MockFinancialProvider> {
+export function createMockProviderSet(
+  configs?: Partial<MockProviderConfig>[]
+): Map<Provider, MockFinancialProvider> {
   const defaults: MockProviderConfig[] = [
     { name: 'plaid' as Provider, behavior: 'succeed' },
     { name: 'belvo' as Provider, behavior: 'succeed' },

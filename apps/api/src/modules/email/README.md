@@ -18,22 +18,22 @@ The Email module provides a robust email delivery system for all application not
 
 Available templates in `/templates/*.hbs`:
 
-| Template | Priority | Description |
-|----------|----------|-------------|
-| `welcome` | High | New user registration |
-| `password-reset` | High | Password reset request |
-| `password-changed` | High | Password change confirmation |
-| `two-factor-enabled` | High | 2FA activation notice |
-| `two-factor-disabled` | High | 2FA deactivation notice |
-| `login-alert` | High | Suspicious login notification |
-| `email-verification` | High | Email verification link |
-| `onboarding-complete` | High | Onboarding completion |
-| `budget-alert` | Normal | Budget threshold warning |
-| `transaction-categorized` | Low | Batch categorization notice |
-| `sync-completed` | Low | Provider sync success |
-| `sync-failed` | Normal | Provider sync failure |
-| `weekly-summary` | Low | Weekly financial summary |
-| `monthly-report` | Normal | Monthly report with PDF attachment |
+| Template                  | Priority | Description                        |
+| ------------------------- | -------- | ---------------------------------- |
+| `welcome`                 | High     | New user registration              |
+| `password-reset`          | High     | Password reset request             |
+| `password-changed`        | High     | Password change confirmation       |
+| `two-factor-enabled`      | High     | 2FA activation notice              |
+| `two-factor-disabled`     | High     | 2FA deactivation notice            |
+| `login-alert`             | High     | Suspicious login notification      |
+| `email-verification`      | High     | Email verification link            |
+| `onboarding-complete`     | High     | Onboarding completion              |
+| `budget-alert`            | Normal   | Budget threshold warning           |
+| `transaction-categorized` | Low      | Batch categorization notice        |
+| `sync-completed`          | Low      | Provider sync success              |
+| `sync-failed`             | Normal   | Provider sync failure              |
+| `weekly-summary`          | Low      | Weekly financial summary           |
+| `monthly-report`          | Normal   | Monthly report with PDF attachment |
 
 ### Email Job Data Structure
 
@@ -50,9 +50,9 @@ interface EmailJobData {
 
 ## API Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/email/test` | JWT (Admin) | Send test welcome email |
+| Method | Endpoint       | Auth        | Description                               |
+| ------ | -------------- | ----------- | ----------------------------------------- |
+| `POST` | `/email/test`  | JWT (Admin) | Send test welcome email                   |
 | `POST` | `/email/batch` | JWT (Admin) | Queue batch emails to multiple recipients |
 
 ### Example: Send Batch Emails
@@ -111,26 +111,26 @@ EmailModule
 
 ### Priority Queue Mapping
 
-| Priority | BullMQ Priority | Use Case |
-|----------|-----------------|----------|
-| `high` | 1 | Security alerts, verification |
-| `normal` | 2 | Standard notifications |
-| `low` | 3 | Reports, batch updates |
+| Priority | BullMQ Priority | Use Case                      |
+| -------- | --------------- | ----------------------------- |
+| `high`   | 1               | Security alerts, verification |
+| `normal` | 2               | Standard notifications        |
+| `low`    | 3               | Reports, batch updates        |
 
 ## Configuration
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SMTP_HOST` | SMTP server hostname | None (emails skipped) |
-| `SMTP_PORT` | SMTP server port | `587` |
-| `SMTP_USER` | SMTP authentication user | None |
-| `SMTP_PASSWORD` | SMTP authentication password | None |
-| `SMTP_SECURE` | Use TLS | `false` |
-| `EMAIL_FROM` | Sender address | `Dhanam <noreply@dhanam.io>` |
-| `APP_URL` | Application URL for links | `https://app.dhanam.io` |
-| `SUPPORT_EMAIL` | Support contact | `support@dhanam.io` |
+| Variable        | Description                  | Default                      |
+| --------------- | ---------------------------- | ---------------------------- |
+| `SMTP_HOST`     | SMTP server hostname         | None (emails skipped)        |
+| `SMTP_PORT`     | SMTP server port             | `587`                        |
+| `SMTP_USER`     | SMTP authentication user     | None                         |
+| `SMTP_PASSWORD` | SMTP authentication password | None                         |
+| `SMTP_SECURE`   | Use TLS                      | `false`                      |
+| `EMAIL_FROM`    | Sender address               | `Dhanam <noreply@dhanam.io>` |
+| `APP_URL`       | Application URL for links    | `https://app.dhanam.io`      |
+| `SUPPORT_EMAIL` | Support contact              | `support@dhanam.io`          |
 
 ### Development Setup (MailHog)
 
@@ -162,14 +162,14 @@ All templates receive these common variables:
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
+| Module       | Relationship                                |
+| ------------ | ------------------------------------------- |
 | `onboarding` | Triggers verification and completion emails |
-| `auth` | Triggers password reset and security emails |
-| `budgets` | Triggers budget alert emails |
-| `providers` | Triggers sync status emails |
-| `reports` | Triggers weekly/monthly report emails |
-| `jobs` | Queue integration for email processing |
+| `auth`       | Triggers password reset and security emails |
+| `budgets`    | Triggers budget alert emails                |
+| `providers`  | Triggers sync status emails                 |
+| `reports`    | Triggers weekly/monthly report emails       |
+| `jobs`       | Queue integration for email processing      |
 
 ## Testing
 
@@ -211,5 +211,6 @@ redis-cli
 ```
 
 ---
+
 **Module**: `email`
 **Last Updated**: January 2025

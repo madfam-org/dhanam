@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { PostHogService } from '../analytics/posthog.service';
 
 import { TransactionsAnalytics } from './transactions.analytics';
-import { PostHogService } from '../analytics/posthog.service';
 
 describe('TransactionsAnalytics', () => {
   let service: TransactionsAnalytics;
@@ -246,9 +247,7 @@ describe('TransactionsAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackTransactionDeleted('user-123', 'txn-789')
-      ).resolves.not.toThrow();
+      await expect(service.trackTransactionDeleted('user-123', 'txn-789')).resolves.not.toThrow();
     });
   });
 
@@ -282,9 +281,7 @@ describe('TransactionsAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackTransactionSplit('user-123', 'txn-456', 3)
-      ).resolves.not.toThrow();
+      await expect(service.trackTransactionSplit('user-123', 'txn-456', 3)).resolves.not.toThrow();
     });
   });
 
@@ -304,9 +301,7 @@ describe('TransactionsAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackTransactionViewed('user-123', 'txn-789')
-      ).resolves.not.toThrow();
+      await expect(service.trackTransactionViewed('user-123', 'txn-789')).resolves.not.toThrow();
     });
   });
 
@@ -433,9 +428,7 @@ describe('TransactionsAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackTransactionExport('user-123', 'csv', 150)
-      ).resolves.not.toThrow();
+      await expect(service.trackTransactionExport('user-123', 'csv', 150)).resolves.not.toThrow();
     });
   });
 

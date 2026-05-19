@@ -1,6 +1,7 @@
-import { Currency } from '@db';
 import { SEARCH_DEFAULTS } from '@dhanam/shared';
 import { Injectable, Logger } from '@nestjs/common';
+
+import { Currency } from '@db';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
@@ -269,8 +270,8 @@ export class NaturalLanguageService {
     const now = new Date();
     let start: Date;
     let end: Date = new Date(now);
-    let period: TimeRange['period'] = 'month';
-    let periodLabel = 'this month';
+    let period: TimeRange['period'];
+    let periodLabel: string;
 
     // Today
     if (this.patterns.today.test(query)) {

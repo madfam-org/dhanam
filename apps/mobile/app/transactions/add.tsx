@@ -17,8 +17,14 @@ import { TextInput } from '@/lib/react-native-compat';
 import { apiClient } from '@/services/api';
 
 const categories = [
-  'Food', 'Transport', 'Shopping', 'Entertainment',
-  'Bills', 'Healthcare', 'Investment', 'Other',
+  'Food',
+  'Transport',
+  'Shopping',
+  'Entertainment',
+  'Bills',
+  'Healthcare',
+  'Investment',
+  'Other',
 ];
 
 export default function AddTransactionScreen() {
@@ -157,11 +163,7 @@ export default function AddTransactionScreen() {
 
       {/* Actions */}
       <View style={styles.actions}>
-        <Button
-          mode="outlined"
-          onPress={() => router.back()}
-          style={styles.cancelButton}
-        >
+        <Button mode="outlined" onPress={() => router.back()} style={styles.cancelButton}>
           Cancel
         </Button>
         <Button

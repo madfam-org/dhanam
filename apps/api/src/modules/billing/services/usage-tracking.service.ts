@@ -1,5 +1,6 @@
-import { UsageMetricType } from '@db';
 import { Injectable, Logger } from '@nestjs/common';
+
+import { UsageMetricType } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 

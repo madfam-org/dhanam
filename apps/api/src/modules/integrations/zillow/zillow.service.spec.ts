@@ -1,8 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { ZillowService } from './zillow.service';
-import { RedisService } from '../../../core/redis/redis.service';
 import {
   createRedisMock,
   createConfigMock,
@@ -11,6 +9,9 @@ import {
   createFetchErrorResponse,
 } from '../../../../test/helpers/api-mock-factory';
 import { TimeTestHelper } from '../../../../test/helpers/time-testing';
+import { RedisService } from '../../../core/redis/redis.service';
+
+import { ZillowService } from './zillow.service';
 
 describe('ZillowService', () => {
   let service: ZillowService;
@@ -235,9 +236,9 @@ describe('ZillowService', () => {
       await serviceWithKey.lookupAddress(streetAddress, city, state);
 
       // Second request should throw rate limit error
-      await expect(
-        serviceWithKey.lookupAddress('456 Oak Ave', city, state)
-      ).rejects.toThrow('Rate limit exceeded');
+      await expect(serviceWithKey.lookupAddress('456 Oak Ave', city, state)).rejects.toThrow(
+        'Rate limit exceeded'
+      );
     });
 
     it('should reset rate limit counter after one minute', async () => {
@@ -276,9 +277,9 @@ describe('ZillowService', () => {
     it('should throw error on API failure', async () => {
       configMock = createConfigMock({ ZILLOW_API_KEY: 'test-api-key' });
 
-      global.fetch = jest.fn().mockResolvedValue(
-        createFetchErrorResponse(500, 'Internal Server Error')
-      );
+      global.fetch = jest
+        .fn()
+        .mockResolvedValue(createFetchErrorResponse(500, 'Internal Server Error'));
 
       const module = await Test.createTestingModule({
         providers: [
@@ -291,9 +292,9 @@ describe('ZillowService', () => {
       const serviceWithKey = module.get<ZillowService>(ZillowService);
       (serviceWithKey as any).logger = createLoggerMock();
 
-      await expect(
-        serviceWithKey.lookupAddress(streetAddress, city, state)
-      ).rejects.toThrow('Zillow API error: 500 Internal Server Error');
+      await expect(serviceWithKey.lookupAddress(streetAddress, city, state)).rejects.toThrow(
+        'Zillow API error: 500 Internal Server Error'
+      );
     });
   });
 
@@ -397,9 +398,7 @@ describe('ZillowService', () => {
     it('should return null when property not found', async () => {
       configMock = createConfigMock({ ZILLOW_API_KEY: 'test-api-key' });
 
-      global.fetch = jest.fn().mockResolvedValue(
-        createFetchErrorResponse(404, 'Not Found')
-      );
+      global.fetch = jest.fn().mockResolvedValue(createFetchErrorResponse(404, 'Not Found'));
 
       const module = await Test.createTestingModule({
         providers: [
@@ -454,9 +453,9 @@ describe('ZillowService', () => {
         ZILLOW_RATE_LIMIT: 1,
       });
 
-      global.fetch = jest.fn().mockResolvedValue(
-        createFetchResponse({ bundle: [{ zpid, zestimate: 500000 }] })
-      );
+      global.fetch = jest
+        .fn()
+        .mockResolvedValue(createFetchResponse({ bundle: [{ zpid, zestimate: 500000 }] }));
 
       const module = await Test.createTestingModule({
         providers: [
@@ -474,9 +473,9 @@ describe('ZillowService', () => {
       await serviceWithKey.getPropertyValuation(zpid);
 
       // Second request should throw
-      await expect(
-        serviceWithKey.getPropertyValuation('another-zpid')
-      ).rejects.toThrow('Rate limit exceeded');
+      await expect(serviceWithKey.getPropertyValuation('another-zpid')).rejects.toThrow(
+        'Rate limit exceeded'
+      );
     });
   });
 
@@ -529,9 +528,9 @@ describe('ZillowService', () => {
       }
 
       // Search should throw
-      await expect(
-        serviceWithKey.searchProperties('Oak Ave')
-      ).rejects.toThrow('Rate limit exceeded');
+      await expect(serviceWithKey.searchProperties('Oak Ave')).rejects.toThrow(
+        'Rate limit exceeded'
+      );
     });
   });
 

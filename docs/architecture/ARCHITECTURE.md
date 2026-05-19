@@ -59,10 +59,12 @@ Dhanam Ledger is a full-stack financial management platform built as a monorepo 
 ## Tech Stack
 
 ### Frontend
+
 - **Web**: Next.js 14 (App Router), Tailwind CSS, shadcn/ui, Zustand, React Query
 - **Mobile**: React Native 0.73, Expo, React Navigation
 
 ### Backend
+
 - **Framework**: NestJS with Fastify
 - **Database**: PostgreSQL 15 with Prisma ORM
 - **Cache**: Redis 7
@@ -70,6 +72,7 @@ Dhanam Ledger is a full-stack financial management platform built as a monorepo 
 - **Auth**: JWT with refresh tokens, TOTP 2FA
 
 ### Infrastructure
+
 - **Container**: Docker & Docker Compose
 - **Orchestration**: AWS ECS/Fargate
 - **IaC**: Terraform
@@ -77,6 +80,7 @@ Dhanam Ledger is a full-stack financial management platform built as a monorepo 
 - **Monitoring**: Sentry, PostHog
 
 ### Monorepo Tools
+
 - **Package Manager**: pnpm 8
 - **Build System**: Turborepo
 - **Code Quality**: ESLint, Prettier, TypeScript strict mode
@@ -84,29 +88,34 @@ Dhanam Ledger is a full-stack financial management platform built as a monorepo 
 ## Key Features
 
 ### Multi-Tenant Architecture
+
 - **Spaces**: Personal and Business financial contexts
 - **Role-Based Access**: Owner, Admin, Member permissions
 - **Data Isolation**: Space-scoped queries and transactions
 
 ### Security
+
 - **Authentication**: Argon2id password hashing, JWT (15min) + refresh tokens (30d)
 - **Encryption**: AES-256-GCM for sensitive data (provider tokens, credentials)
 - **2FA**: TOTP-based two-factor authentication
 - **Audit Logging**: All sensitive operations tracked
 
 ### Provider Integrations
+
 - **Belvo**: Mexico bank accounts (OAuth, read-only)
 - **Plaid**: US bank accounts (Link SDK, webhooks)
 - **Bitso**: Crypto exchange (API integration)
 - **Blockchain**: Non-custodial wallet tracking (ETH, BTC via public APIs)
 
 ### Background Processing
+
 - **Sync Jobs**: Hourly account balance and transaction updates
 - **FX Rates**: Daily currency exchange rate updates (Banxico API)
 - **Email Jobs**: Weekly summaries, monthly reports
 - **Cashflow**: 60-day forecast generation
 
 ### ESG Scoring
+
 - Integration with Dhanam package for crypto asset ESG metrics
 - Environmental, Social, Governance composite scores
 - Transparent methodology with source links
@@ -135,6 +144,7 @@ CashflowForecast (id, spaceId, predictedBalance, forecastDate)
 ## Deployment
 
 ### Development
+
 ```bash
 # Start local infrastructure
 pnpm dev:infra
@@ -144,6 +154,7 @@ pnpm dev
 ```
 
 ### Production
+
 - **Hosting**: AWS ECS on Fargate
 - **Database**: RDS PostgreSQL (Multi-AZ)
 - **Cache**: ElastiCache Redis

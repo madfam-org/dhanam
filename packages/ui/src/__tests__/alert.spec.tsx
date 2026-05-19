@@ -148,17 +148,13 @@ describe('Alert Composition', () => {
     render(
       <Alert>
         <AlertTitle>Heads up!</AlertTitle>
-        <AlertDescription>
-          You can add components and dependencies.
-        </AlertDescription>
+        <AlertDescription>You can add components and dependencies.</AlertDescription>
       </Alert>
     );
 
     expect(screen.getByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('Heads up!')).toBeInTheDocument();
-    expect(
-      screen.getByText('You can add components and dependencies.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('You can add components and dependencies.')).toBeInTheDocument();
   });
 
   it('should render destructive alert with icon', () => {

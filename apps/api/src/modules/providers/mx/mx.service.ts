@@ -1,7 +1,5 @@
 import * as crypto from 'crypto';
 
-import { Provider, AccountType, Currency, Prisma as _Prisma } from '@db';
-import type { InputJsonValue } from '@db';
 import { PROVIDER_DEFAULTS } from '@dhanam/shared';
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -14,6 +12,9 @@ import {
   AccountsApi,
   TransactionsApi,
 } from 'mx-platform-node';
+
+import type { InputJsonValue } from '@db';
+import { Provider, AccountType, Currency, Prisma as _Prisma } from '@db';
 
 import { CryptoService } from '../../../core/crypto/crypto.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';

@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { DocumentService } from './document.service';
+import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { R2StorageService } from '../storage/r2.service';
-import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
+
+import { DocumentService } from './document.service';
 
 describe('DocumentService', () => {
   let service: DocumentService;
@@ -98,13 +99,7 @@ describe('DocumentService', () => {
     });
 
     it('should use default category when not specified', async () => {
-      await service.getUploadUrl(
-        testSpaceId,
-        testUserId,
-        testAssetId,
-        'photo.jpg',
-        'image/jpeg'
-      );
+      await service.getUploadUrl(testSpaceId, testUserId, testAssetId, 'photo.jpg', 'image/jpeg');
 
       expect(r2StorageMock.getPresignedUploadUrl).toHaveBeenCalledWith(
         testSpaceId,
@@ -354,9 +349,9 @@ describe('DocumentService', () => {
     it('should throw NotFoundException when asset does not exist', async () => {
       prismaMock.manualAsset.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.getDocuments(testSpaceId, testUserId, testAssetId)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getDocuments(testSpaceId, testUserId, testAssetId)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 

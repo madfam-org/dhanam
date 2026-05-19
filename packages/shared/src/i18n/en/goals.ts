@@ -59,12 +59,12 @@ export const goals = {
     low: 'Low',
   },
   messages: {
-    noGoals: 'You don\'t have any financial goals yet',
+    noGoals: "You don't have any financial goals yet",
     createFirstGoal: 'Create your first goal to start planning your future',
     goalCreated: 'Goal created successfully',
     goalUpdated: 'Goal updated successfully',
     goalDeleted: 'Goal deleted',
-    goalAchieved: 'Congratulations! You\'ve achieved your goal',
+    goalAchieved: "Congratulations! You've achieved your goal",
     goalAtRisk: 'This goal is at risk of not being met',
     increaseContributions: 'Consider increasing your contributions',
     deleteConfirm: 'Are you sure you want to delete this goal?',
@@ -122,6 +122,7 @@ export const goals = {
     worst10: 'Worst 10%',
     best10: 'Best 10%',
     increaseSavings: 'Increase savings to improve odds',
-    recommendedContribution: 'Recommended monthly contribution: ${{recommended}} (current: ${{current}})',
+    recommendedContribution:
+      'Recommended monthly contribution: ${{recommended}} (current: ${{current}})',
   },
 } as const;

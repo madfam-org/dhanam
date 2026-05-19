@@ -806,17 +806,55 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Build packages and web app
-        run: pnpm build:packages && cd apps/web && pnpm build
+      - name: Build packages, API, and web app
+        run: |
+          pnpm build:packages
+          pnpm --dir apps/api build
+          pnpm --dir apps/web build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4010/v1
+          NEXT_PUBLIC_BASE_URL: http://localhost:3040
+          NEXT_PUBLIC_ADMIN_URL: http://localhost:3400
 
       - name: Start API server
-        run: cd apps/api && pnpm start:prod &
+        working-directory: apps/api
+        run: pnpm start:prod &
         env:
+          PORT: 4010
           DATABASE_URL: postgresql://test:test@localhost:5432/dhanam_pw
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: ci-playwright-jwt-secret-32chars
           JWT_REFRESH_SECRET: ci-playwright-refresh-32chars0
+          ENCRYPTION_KEY: ci-test-encryption-key-exactly32
           NODE_ENV: test
+
+      - name: Wait for API server
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:4010/v1/monitoring/health/live >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          curl -fsS http://localhost:4010/v1/monitoring/health/live
+
+      - name: Start web app
+        working-directory: apps/web
+        run: pnpm start &
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4010/v1
+          NEXT_PUBLIC_BASE_URL: http://localhost:3040
+          NEXT_PUBLIC_ADMIN_URL: http://localhost:3400
+
+      - name: Wait for web app
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:3040 >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          curl -fsS http://localhost:3040
 
       - name: Run Playwright tests
         working-directory: apps/web
@@ -928,25 +966,53 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Build packages and admin app
-        run: pnpm build:packages && cd apps/admin && pnpm build
+      - name: Build packages, API, and admin app
+        run: |
+          pnpm build:packages
+          pnpm --dir apps/api build
+          pnpm --dir apps/admin build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4010/v1
+          NEXT_PUBLIC_APP_URL: http://localhost:3040
 
       - name: Start API server
-        run: cd apps/api && pnpm start:prod &
+        working-directory: apps/api
+        run: pnpm start:prod &
         env:
+          PORT: 4010
           DATABASE_URL: postgresql://test:test@localhost:5432/dhanam_pw_admin
           REDIS_URL: redis://localhost:6379
           JWT_SECRET: ci-playwright-jwt-secret-32chars
           JWT_REFRESH_SECRET: ci-playwright-refresh-32chars0
+          ENCRYPTION_KEY: ci-test-encryption-key-exactly32
           NODE_ENV: test
+
+      - name: Wait for API server
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:4010/v1/monitoring/health/live >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          curl -fsS http://localhost:4010/v1/monitoring/health/live
 
       - name: Start admin app
-        run: cd apps/admin && pnpm start &
+        working-directory: apps/admin
+        run: pnpm start &
         env:
-          NODE_ENV: test
+          NEXT_PUBLIC_API_URL: http://localhost:4010/v1
+          NEXT_PUBLIC_APP_URL: http://localhost:3040
 
       - name: Wait for admin app to be ready
-        run: npx wait-on http://localhost:3400 --timeout 60000
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://localhost:3400 >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          curl -fsS http://localhost:3400
 
       - name: Run Playwright admin tests
         working-directory: apps/admin

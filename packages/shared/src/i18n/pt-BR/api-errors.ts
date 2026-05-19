@@ -1,6 +1,7 @@
 export const apiErrors = {
   AUTH_INVALID_CREDENTIALS: 'E-mail ou senha incorretos',
-  AUTH_ACCOUNT_LOCKED: 'Sua conta foi bloqueada por segurança. Por favor verifique seu e-mail para desbloqueá-la',
+  AUTH_ACCOUNT_LOCKED:
+    'Sua conta foi bloqueada por segurança. Por favor verifique seu e-mail para desbloqueá-la',
   AUTH_SESSION_EXPIRED: 'Sua sessão expirou. Por favor faça login novamente',
   AUTH_TOKEN_INVALID: 'Token de autenticação inválido',
   AUTH_TOKEN_EXPIRED: 'O token de autenticação expirou',
@@ -30,44 +31,55 @@ export const apiErrors = {
 
   // Connection health: rate limit
   CONN_RATE_LIMIT_TITLE: 'Sincronização pausada temporariamente',
-  CONN_RATE_LIMIT_MESSAGE: 'Fizemos muitas requisições ao {{provider}} em pouco tempo. Isso é normal e será resolvido automaticamente.',
+  CONN_RATE_LIMIT_MESSAGE:
+    'Fizemos muitas requisições ao {{provider}} em pouco tempo. Isso é normal e será resolvido automaticamente.',
   CONN_RATE_LIMIT_ACTION: 'Aguarde alguns minutos antes de tentar novamente.',
   CONN_RATE_LIMIT_BUTTON: 'Tentar sincronização novamente',
 
   // Connection health: authentication
   CONN_AUTH_TITLE: 'Reconexão necessária',
-  CONN_AUTH_MESSAGE: 'Sua conexão com {{provider}} precisa ser atualizada. Isso acontece periodicamente por segurança.',
-  CONN_AUTH_ACTION: 'Por favor reconecte sua conta para continuar sincronizando. Seu histórico de transações será preservado.',
+  CONN_AUTH_MESSAGE:
+    'Sua conexão com {{provider}} precisa ser atualizada. Isso acontece periodicamente por segurança.',
+  CONN_AUTH_ACTION:
+    'Por favor reconecte sua conta para continuar sincronizando. Seu histórico de transações será preservado.',
   CONN_AUTH_BUTTON: 'Reconectar conta',
 
   // Connection health: connection error
   CONN_CONNECTION_TITLE: 'Problema de conexão',
-  CONN_CONNECTION_MESSAGE: 'Estamos com dificuldades para acessar {{provider}}. Geralmente é um problema temporário de rede.',
-  CONN_CONNECTION_ACTION: 'Verifique sua conexão com a internet e tente novamente em alguns minutos.',
+  CONN_CONNECTION_MESSAGE:
+    'Estamos com dificuldades para acessar {{provider}}. Geralmente é um problema temporário de rede.',
+  CONN_CONNECTION_ACTION:
+    'Verifique sua conexão com a internet e tente novamente em alguns minutos.',
   CONN_CONNECTION_BUTTON: 'Tentar novamente',
 
   // Connection health: timeout
   CONN_TIMEOUT_TITLE: 'Sincronização demorando mais que o esperado',
-  CONN_TIMEOUT_MESSAGE: '{{provider}} está demorando mais que o normal para responder. Seus dados estão seguros.',
+  CONN_TIMEOUT_MESSAGE:
+    '{{provider}} está demorando mais que o normal para responder. Seus dados estão seguros.',
   CONN_TIMEOUT_ACTION: 'Tentaremos novamente automaticamente. Você também pode tentar manualmente.',
   CONN_TIMEOUT_BUTTON: 'Tentar sincronização novamente',
 
   // Connection health: maintenance
   CONN_MAINTENANCE_TITLE: 'Manutenção programada',
-  CONN_MAINTENANCE_MESSAGE: '{{provider}} está em manutenção. A sincronização será retomada automaticamente ao término.',
-  CONN_MAINTENANCE_ACTION: 'Nenhuma ação necessária. Sincronizaremos seus dados quando o serviço voltar.',
+  CONN_MAINTENANCE_MESSAGE:
+    '{{provider}} está em manutenção. A sincronização será retomada automaticamente ao término.',
+  CONN_MAINTENANCE_ACTION:
+    'Nenhuma ação necessária. Sincronizaremos seus dados quando o serviço voltar.',
   CONN_MAINTENANCE_BUTTON: 'Ver status',
 
   // Connection health: institution error
   CONN_INSTITUTION_TITLE: 'Problema com a instituição bancária',
-  CONN_INSTITUTION_MESSAGE: 'Seu banco ou instituição está com dificuldades técnicas. O problema é deles, não seu.',
-  CONN_INSTITUTION_ACTION: 'Aguarde a instituição resolver o problema. Você pode tentar reconectar se o problema persistir.',
+  CONN_INSTITUTION_MESSAGE:
+    'Seu banco ou instituição está com dificuldades técnicas. O problema é deles, não seu.',
+  CONN_INSTITUTION_ACTION:
+    'Aguarde a instituição resolver o problema. Você pode tentar reconectar se o problema persistir.',
   CONN_INSTITUTION_BUTTON: 'Ver status',
 
   // Connection health: default error
   CONN_DEFAULT_TITLE: 'Problema de sincronização',
   CONN_DEFAULT_MESSAGE: 'Encontramos um problema ao sincronizar com {{provider}}.',
-  CONN_DEFAULT_ACTION: 'Tente atualizar a conexão. Se o problema persistir, entre em contato com o suporte.',
+  CONN_DEFAULT_ACTION:
+    'Tente atualizar a conexão. Se o problema persistir, entre em contato com o suporte.',
   CONN_DEFAULT_BUTTON: 'Tentar novamente',
 
   // Connection health: summary messages

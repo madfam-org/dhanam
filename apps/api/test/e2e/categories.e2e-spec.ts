@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import request from 'supertest';
+import { JwtService } from '@nestjs/jwt';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { Test, TestingModule } from '@nestjs/testing';
+import request from 'supertest';
 
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
+
 import { TestHelper } from './helpers/test.helper';
 
 describe('Categories E2E', () => {
@@ -24,9 +25,7 @@ describe('Categories E2E', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter()
-    );
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
     app.setGlobalPrefix('v1');
 
@@ -47,7 +46,11 @@ describe('Categories E2E', () => {
   describe('Setup', () => {
     it('should create a user with space and budget for testing', async () => {
       // Create user with space
-      const { user, space, authToken: token } = await testHelper.createCompleteUserWithSpace({
+      const {
+        user,
+        space,
+        authToken: token,
+      } = await testHelper.createCompleteUserWithSpace({
         email: 'categories-test@example.com',
         password: 'SecurePass123!',
         name: 'Category Test User',
@@ -269,7 +272,7 @@ describe('Categories E2E', () => {
         expect(response.body.color).toBe('#E74C3C');
       });
 
-      it('should not allow updating another user\'s category', async () => {
+      it("should not allow updating another user's category", async () => {
         // Create another user
         const { authToken: otherToken } = await testHelper.createCompleteUserWithSpace({
           email: 'other-category-user@example.com',
@@ -365,7 +368,8 @@ describe('Categories E2E', () => {
         .expect(200);
 
       // totalBudgeted comes from the spending response structure
-      const remaining = Number(response.body.spending.totalBudgeted) - Number(response.body.spending.totalSpent);
+      const remaining =
+        Number(response.body.spending.totalBudgeted) - Number(response.body.spending.totalSpent);
       expect(remaining).toBeLessThanOrEqual(Number(response.body.spending.totalBudgeted));
     });
 
@@ -452,7 +456,7 @@ describe('Categories E2E', () => {
       // Create a transaction that matches the rule
       const txData = {
         accountId,
-        amount: -85.50,
+        amount: -85.5,
         description: 'Uber trip downtown',
         date: new Date().toISOString(),
         currency: 'MXN',

@@ -10,7 +10,7 @@ export const email = {
     subject: 'Welcome to Dhanam! 🎉',
     title: 'Welcome to Dhanam!',
     greeting: 'Hi {{userName}},',
-    body: 'We\'re thrilled to have you with us! You\'re about to take full control of your personal and business finances. Start by connecting your first account and explore all the tools we have for you.',
+    body: "We're thrilled to have you with us! You're about to take full control of your personal and business finances. Start by connecting your first account and explore all the tools we have for you.",
     cta: 'Go to your dashboard',
   },
   passwordReset: {
@@ -32,14 +32,14 @@ export const email = {
     subject: 'Your account has been locked - Dhanam',
     title: 'Account Locked for Security',
     greeting: 'Hi {{userName}},',
-    body: 'Your account has been temporarily locked due to multiple failed login attempts. If this was you, you can unlock your account by clicking the button below. If you don\'t recognize this activity, please contact our support team immediately.',
+    body: "Your account has been temporarily locked due to multiple failed login attempts. If this was you, you can unlock your account by clicking the button below. If you don't recognize this activity, please contact our support team immediately.",
     cta: 'Unlock my account',
   },
   weeklyDigest: {
     subject: 'Your weekly summary - Dhanam',
     title: 'Weekly Financial Summary',
     greeting: 'Hi {{userName}},',
-    body: 'Here\'s your weekly financial summary. Review your spending, income, and budget progress.',
+    body: "Here's your weekly financial summary. Review your spending, income, and budget progress.",
   },
   monthlyReport: {
     subject: 'Your monthly report - Dhanam',

@@ -5,9 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
-
-import { UsageAlertsController } from '../usage-alerts.controller';
 import { UsageAlertsService, WaybillAlertPayload } from '../services/usage-alerts.service';
+import { UsageAlertsController } from '../usage-alerts.controller';
 
 describe('UsageAlertsController (P2.2)', () => {
   let controller: UsageAlertsController;
@@ -93,10 +92,13 @@ describe('UsageAlertsController (P2.2)', () => {
   it('rejects signature with wrong secret', async () => {
     const req = makeReq(samplePayload);
     const ts = Math.floor(Date.now() / 1000);
-    const badHmac = crypto.createHmac('sha256', 'wrong-secret').update(`${ts}.${req.rawBody}`).digest('hex');
-    await expect(
-      controller.ingest(req, `t=${ts},v1=${badHmac}`, samplePayload)
-    ).rejects.toThrow(UnauthorizedException);
+    const badHmac = crypto
+      .createHmac('sha256', 'wrong-secret')
+      .update(`${ts}.${req.rawBody}`)
+      .digest('hex');
+    await expect(controller.ingest(req, `t=${ts},v1=${badHmac}`, samplePayload)).rejects.toThrow(
+      UnauthorizedException
+    );
   });
 
   it('rejects replayed signatures outside the window', async () => {

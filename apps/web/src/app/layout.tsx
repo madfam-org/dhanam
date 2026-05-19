@@ -1,9 +1,9 @@
-import { EcosystemBanner } from '@dhanam/ui';
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { Toaster } from 'sonner';
 
+import { EcosystemBannerClient } from '~/components/ecosystem-banner-client';
 import { Providers } from '~/lib/providers';
 import '~/styles/globals.css';
 
@@ -97,7 +97,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           non-authenticated chrome element. Sticky-bottom, dismissible,
           versioned via packages/ui/src/components/ecosystem-banner/.
         */}
-        <EcosystemBanner />
+        <EcosystemBannerClient />
       </body>
     </html>
   );

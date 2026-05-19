@@ -137,9 +137,11 @@ export const households = {
 
   // Tooltips & Help
   whatIsHousehold: 'What is a household?',
-  householdExplanation: 'A household is a group of people who share financial planning, such as a family, trust, or estate.',
+  householdExplanation:
+    'A household is a group of people who share financial planning, such as a family, trust, or estate.',
 
-  multiGenPlanningHelp: 'Multi-generational planning helps you coordinate financial goals across multiple generations',
+  multiGenPlanningHelp:
+    'Multi-generational planning helps you coordinate financial goals across multiple generations',
 
   minorAccessHelp: 'Minors have limited access until they reach adulthood',
 
@@ -177,7 +179,8 @@ export const households = {
     members: 'Members',
     minor: 'Minor',
     yoursMineOurs: 'Yours, Mine & Ours',
-    ownershipDescription: 'View your household finances by ownership. Filter accounts between individual and joint ownership.',
+    ownershipDescription:
+      'View your household finances by ownership. Filter accounts between individual and joint ownership.',
     yourAccounts: 'Your Accounts',
     partnerAccounts: "Partner's Accounts",
     jointAccounts: 'Joint Accounts',

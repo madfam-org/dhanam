@@ -106,7 +106,8 @@ export const assets = {
   },
   empty: {
     title: 'Ainda não há ativos',
-    description: 'Comece a registrar seus ativos ilíquidos como imóveis, capital privado e colecionáveis',
+    description:
+      'Comece a registrar seus ativos ilíquidos como imóveis, capital privado e colecionáveis',
     addFirst: 'Adicione seu primeiro ativo',
   },
   detail: {
@@ -126,7 +127,8 @@ export const assets = {
     created: 'Criado',
     lastUpdated: 'Última Atualização',
     uploadDocuments: 'Enviar Documentos',
-    uploadDescription: 'Anexe escrituras, avaliações, apólices de seguro e outros documentos importantes',
+    uploadDescription:
+      'Anexe escrituras, avaliações, apólices de seguro e outros documentos importantes',
     uploadedDocuments: 'Documentos Enviados',
     editDialog: {
       title: 'Editar Ativo',
@@ -134,7 +136,8 @@ export const assets = {
     },
     deleteDialog: {
       title: 'Excluir Ativo',
-      description: 'Tem certeza que deseja excluir "{{name}}"? Isso também excluirá todos os documentos associados. Esta ação não pode ser desfeita.',
+      description:
+        'Tem certeza que deseja excluir "{{name}}"? Isso também excluirá todos os documentos associados. Esta ação não pode ser desfeita.',
       cancel: 'Cancelar',
       deleting: 'Excluindo...',
       confirm: 'Excluir',

@@ -36,10 +36,10 @@ console.error = (...args: any[]) => {
   if (
     typeof args[0] === 'string' &&
     (args[0].includes('Warning:') ||
-     args[0].includes('ReactDOM.render') ||
-     args[0].includes('ReactDOMTestUtils.act') ||
-     args[0].includes('was passed a style object') ||
-     args[0].includes('not wrapped in act'))
+      args[0].includes('ReactDOM.render') ||
+      args[0].includes('ReactDOMTestUtils.act') ||
+      args[0].includes('was passed a style object') ||
+      args[0].includes('not wrapped in act'))
   ) {
     return;
   }

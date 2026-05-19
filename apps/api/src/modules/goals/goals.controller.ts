@@ -1,4 +1,3 @@
-import { GoalShareRole, UsageMetricType } from '@db';
 import {
   Controller,
   Get,
@@ -26,6 +25,8 @@ import {
   ApiNoContentResponse,
   ApiPaymentRequiredResponse,
 } from '@nestjs/swagger';
+
+import { GoalShareRole, UsageMetricType } from '@db';
 
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from '../../core/types/authenticated-request';

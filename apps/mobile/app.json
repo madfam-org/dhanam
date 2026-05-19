@@ -11,9 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#1a1a1a"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.dhanam.ledger",
@@ -30,11 +28,7 @@
       },
       "package": "com.dhanam.ledger",
       "versionCode": 1,
-      "permissions": [
-        "USE_BIOMETRIC",
-        "USE_FINGERPRINT",
-        "CAMERA"
-      ]
+      "permissions": ["USE_BIOMETRIC", "USE_FINGERPRINT", "CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png",

@@ -106,7 +106,8 @@ export const assets = {
   },
   empty: {
     title: 'No assets yet',
-    description: 'Start tracking your illiquid assets like real estate, private equity, and collectibles',
+    description:
+      'Start tracking your illiquid assets like real estate, private equity, and collectibles',
     addFirst: 'Add Your First Asset',
   },
   detail: {
@@ -126,7 +127,8 @@ export const assets = {
     created: 'Created',
     lastUpdated: 'Last Updated',
     uploadDocuments: 'Upload Documents',
-    uploadDescription: 'Attach deeds, appraisals, insurance policies, and other important documents',
+    uploadDescription:
+      'Attach deeds, appraisals, insurance policies, and other important documents',
     uploadedDocuments: 'Uploaded Documents',
     editDialog: {
       title: 'Edit Asset',
@@ -134,7 +136,8 @@ export const assets = {
     },
     deleteDialog: {
       title: 'Delete Asset',
-      description: 'Are you sure you want to delete "{{name}}"? This will also delete all associated documents. This action cannot be undone.',
+      description:
+        'Are you sure you want to delete "{{name}}"? This will also delete all associated documents. This action cannot be undone.',
       cancel: 'Cancel',
       deleting: 'Deleting...',
       confirm: 'Delete',

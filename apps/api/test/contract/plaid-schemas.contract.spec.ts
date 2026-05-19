@@ -186,20 +186,18 @@ describe('Plaid Schema Contracts', () => {
   describe('Webhook event shapes', () => {
     it('SYNC_UPDATES_AVAILABLE matches transactions webhook schema', () => {
       expect(() =>
-        PlaidTransactionsSyncWebhookSchema.parse(webhookFixtures.transactionsSync),
+        PlaidTransactionsSyncWebhookSchema.parse(webhookFixtures.transactionsSync)
       ).not.toThrow();
     });
 
     it('INITIAL_UPDATE matches transactions webhook schema', () => {
       expect(() =>
-        PlaidTransactionsSyncWebhookSchema.parse(webhookFixtures.transactionsInitial),
+        PlaidTransactionsSyncWebhookSchema.parse(webhookFixtures.transactionsInitial)
       ).not.toThrow();
     });
 
     it('balance update matches webhook schema', () => {
-      expect(() =>
-        PlaidBalanceWebhookSchema.parse(webhookFixtures.balanceUpdate),
-      ).not.toThrow();
+      expect(() => PlaidBalanceWebhookSchema.parse(webhookFixtures.balanceUpdate)).not.toThrow();
     });
   });
 });

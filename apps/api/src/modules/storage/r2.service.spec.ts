@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { createConfigMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 import { R2StorageService } from './r2.service';
-import { createConfigMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 // Mock AWS SDK
 jest.mock('@aws-sdk/client-s3', () => ({
@@ -44,10 +45,7 @@ describe('R2StorageService', () => {
       });
 
       const module: TestingModule = await Test.createTestingModule({
-        providers: [
-          R2StorageService,
-          { provide: ConfigService, useValue: configMock },
-        ],
+        providers: [R2StorageService, { provide: ConfigService, useValue: configMock }],
       }).compile();
 
       service = module.get<R2StorageService>(R2StorageService);
@@ -176,11 +174,9 @@ describe('R2StorageService', () => {
       it('should respect custom expiration time', async () => {
         await service.getPresignedDownloadUrl('key.pdf', 7200);
 
-        expect(getSignedUrl).toHaveBeenCalledWith(
-          expect.any(Object),
-          expect.any(Object),
-          { expiresIn: 7200 }
-        );
+        expect(getSignedUrl).toHaveBeenCalledWith(expect.any(Object), expect.any(Object), {
+          expiresIn: 7200,
+        });
       });
     });
 
@@ -200,7 +196,9 @@ describe('R2StorageService', () => {
         );
 
         expect(result.key).toBe('spaces/space-123/assets/asset-456/contract/mock-uuid-1234.pdf');
-        expect(result.url).toBe('https://test.r2.dev/spaces/space-123/assets/asset-456/contract/mock-uuid-1234.pdf');
+        expect(result.url).toBe(
+          'https://test.r2.dev/spaces/space-123/assets/asset-456/contract/mock-uuid-1234.pdf'
+        );
         expect(result.filename).toBe('document.pdf');
         expect(result.fileType).toBe('application/pdf');
         expect(result.fileSize).toBe(buffer.length);
@@ -212,13 +210,7 @@ describe('R2StorageService', () => {
         mockS3Client.send = jest.fn().mockResolvedValue({});
 
         const buffer = Buffer.from('col1,col2\nval1,val2');
-        await service.uploadFile(
-          'space-123',
-          'asset-456',
-          buffer,
-          'data.csv',
-          'text/csv'
-        );
+        await service.uploadFile('space-123', 'asset-456', buffer, 'data.csv', 'text/csv');
 
         expect(mockS3Client.send).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -377,13 +369,9 @@ describe('R2StorageService', () => {
       });
 
       it('should pass custom metadata to PutObjectCommand', async () => {
-        await service.getPresignedUploadUrlGeneric(
-          'space-123',
-          'file.csv',
-          'text/csv',
-          'general',
-          { customField: 'value' }
-        );
+        await service.getPresignedUploadUrlGeneric('space-123', 'file.csv', 'text/csv', 'general', {
+          customField: 'value',
+        });
 
         expect(getSignedUrl).toHaveBeenCalled();
       });
@@ -407,10 +395,7 @@ describe('R2StorageService', () => {
       });
 
       const module: TestingModule = await Test.createTestingModule({
-        providers: [
-          R2StorageService,
-          { provide: ConfigService, useValue: configMock },
-        ],
+        providers: [R2StorageService, { provide: ConfigService, useValue: configMock }],
       }).compile();
 
       service = module.get<R2StorageService>(R2StorageService);
@@ -449,9 +434,7 @@ describe('R2StorageService', () => {
 
     describe('deleteFile', () => {
       it('should throw error when not configured', async () => {
-        await expect(service.deleteFile('key.pdf')).rejects.toThrow(
-          'R2 Storage is not configured'
-        );
+        await expect(service.deleteFile('key.pdf')).rejects.toThrow('R2 Storage is not configured');
       });
     });
 
@@ -482,10 +465,7 @@ describe('R2StorageService', () => {
       });
 
       const module = await Test.createTestingModule({
-        providers: [
-          R2StorageService,
-          { provide: ConfigService, useValue: configMock },
-        ],
+        providers: [R2StorageService, { provide: ConfigService, useValue: configMock }],
       }).compile();
 
       const svc = module.get<R2StorageService>(R2StorageService);
@@ -503,10 +483,7 @@ describe('R2StorageService', () => {
       });
 
       const module = await Test.createTestingModule({
-        providers: [
-          R2StorageService,
-          { provide: ConfigService, useValue: configMock },
-        ],
+        providers: [R2StorageService, { provide: ConfigService, useValue: configMock }],
       }).compile();
 
       const svc = module.get<R2StorageService>(R2StorageService);
@@ -526,7 +503,10 @@ describe('R2StorageService', () => {
     });
 
     it('should throw when file exceeds max size', () => {
-      const buffer = Buffer.alloc(11 * 1024 * 1024); // 11MB
+      const buffer = Buffer.concat([
+        Buffer.from([0x25, 0x50, 0x44, 0x46]),
+        Buffer.alloc(26 * 1024 * 1024),
+      ]);
       expect(() => service.validateUpload(buffer, 'application/pdf', 'huge.pdf')).toThrow(
         'File exceeds maximum size'
       );
@@ -548,9 +528,7 @@ describe('R2StorageService', () => {
 
     it('should throw for missing extension', () => {
       const buffer = Buffer.from('test');
-      expect(() => service.validateUpload(buffer, 'text/csv', 'noext')).toThrow(
-        'is not allowed'
-      );
+      expect(() => service.validateUpload(buffer, 'text/csv', 'noext')).toThrow('is not allowed');
     });
 
     it('should throw when magic bytes mismatch', () => {
@@ -577,10 +555,7 @@ describe('R2StorageService', () => {
       });
 
       const module = await Test.createTestingModule({
-        providers: [
-          R2StorageService,
-          { provide: ConfigService, useValue: configMock },
-        ],
+        providers: [R2StorageService, { provide: ConfigService, useValue: configMock }],
       }).compile();
 
       const svc = module.get<R2StorageService>(R2StorageService);
@@ -599,10 +574,7 @@ describe('R2StorageService', () => {
       });
 
       const module = await Test.createTestingModule({
-        providers: [
-          R2StorageService,
-          { provide: ConfigService, useValue: configMock },
-        ],
+        providers: [R2StorageService, { provide: ConfigService, useValue: configMock }],
       }).compile();
 
       const svc = module.get<R2StorageService>(R2StorageService);
@@ -623,10 +595,7 @@ describe('R2StorageService', () => {
       });
 
       const module = await Test.createTestingModule({
-        providers: [
-          R2StorageService,
-          { provide: ConfigService, useValue: configMock },
-        ],
+        providers: [R2StorageService, { provide: ConfigService, useValue: configMock }],
       }).compile();
 
       const svc = module.get<R2StorageService>(R2StorageService);

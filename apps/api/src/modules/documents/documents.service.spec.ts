@@ -1,18 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuditService } from '@core/audit/audit.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { DocumentStatus } from '@db';
 
+import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { BillingService } from '../billing/billing.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { R2StorageService } from '../storage/r2.service';
 
 import { CsvPreviewService } from './csv-preview.service';
 import { DocumentsService } from './documents.service';
-
-import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 describe('DocumentsService', () => {
   let service: DocumentsService;
@@ -163,10 +162,15 @@ describe('DocumentsService', () => {
     it('should bypass access check for admin', async () => {
       prisma.document.create.mockResolvedValue(mockDocument);
 
-      await service.requestUploadUrl('space-1', 'admin-1', {
-        filename: 'test.pdf',
-        contentType: 'application/pdf',
-      } as any, true);
+      await service.requestUploadUrl(
+        'space-1',
+        'admin-1',
+        {
+          filename: 'test.pdf',
+          contentType: 'application/pdf',
+        } as any,
+        true
+      );
 
       expect(spacesService.verifyUserAccess).not.toHaveBeenCalled();
     });
@@ -175,11 +179,17 @@ describe('DocumentsService', () => {
       prisma.document.aggregate.mockResolvedValue({ _sum: { fileSize: 0 }, _count: 0 });
       prisma.document.create.mockResolvedValue(mockDocument);
 
-      await service.requestUploadUrl('space-1', 'user-1', {
-        filename: 'test.pdf',
-        contentType: 'application/pdf',
-        estimatedSize: 1000,
-      } as any, false, 'essentials');
+      await service.requestUploadUrl(
+        'space-1',
+        'user-1',
+        {
+          filename: 'test.pdf',
+          contentType: 'application/pdf',
+          estimatedSize: 1000,
+        } as any,
+        false,
+        'essentials'
+      );
 
       expect(prisma.document.aggregate).toHaveBeenCalled();
     });
@@ -214,11 +224,17 @@ describe('DocumentsService', () => {
       });
 
       await expect(
-        service.requestUploadUrl('space-1', 'user-1', {
-          filename: 'test.pdf',
-          contentType: 'application/pdf',
-          estimatedSize: 10 * 1024 * 1024, // 10MB would exceed 500MB
-        } as any, false, 'essentials')
+        service.requestUploadUrl(
+          'space-1',
+          'user-1',
+          {
+            filename: 'test.pdf',
+            contentType: 'application/pdf',
+            estimatedSize: 10 * 1024 * 1024, // 10MB would exceed 500MB
+          } as any,
+          false,
+          'essentials'
+        )
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -232,11 +248,17 @@ describe('DocumentsService', () => {
       // Community tier has Infinity storage — quota check skipped entirely
       // (still subject to per-file 50MB limit)
       await expect(
-        service.requestUploadUrl('space-1', 'user-1', {
-          filename: 'test.pdf',
-          contentType: 'application/pdf',
-          estimatedSize: 10 * 1024 * 1024, // 10MB (under 50MB per-file limit)
-        } as any, false, 'community')
+        service.requestUploadUrl(
+          'space-1',
+          'user-1',
+          {
+            filename: 'test.pdf',
+            contentType: 'application/pdf',
+            estimatedSize: 10 * 1024 * 1024, // 10MB (under 50MB per-file limit)
+          } as any,
+          false,
+          'community'
+        )
       ).resolves.toBeDefined();
 
       // aggregate should NOT be called since community has Infinity storage
@@ -366,10 +388,16 @@ describe('DocumentsService', () => {
       r2Storage.getFileSize.mockResolvedValue(1024);
       prisma.document.update.mockResolvedValue({ ...mockDocument, status: 'uploaded' });
 
-      await service.confirmUpload('space-1', 'admin-1', 'doc-1', {
-        filename: 'test.pdf',
-        contentType: 'application/pdf',
-      } as any, true);
+      await service.confirmUpload(
+        'space-1',
+        'admin-1',
+        'doc-1',
+        {
+          filename: 'test.pdf',
+          contentType: 'application/pdf',
+        } as any,
+        true
+      );
 
       expect(spacesService.verifyUserAccess).not.toHaveBeenCalled();
     });
@@ -588,7 +616,10 @@ describe('DocumentsService', () => {
   describe('updateCsvMapping', () => {
     it('should update CSV mapping', async () => {
       prisma.document.findFirst.mockResolvedValue({ ...mockDocument, contentType: 'text/csv' });
-      prisma.document.update.mockResolvedValue({ ...mockDocument, csvMapping: { dateCol: 'Date' } });
+      prisma.document.update.mockResolvedValue({
+        ...mockDocument,
+        csvMapping: { dateCol: 'Date' },
+      });
 
       const result = await service.updateCsvMapping('space-1', 'user-1', 'doc-1', {
         dateCol: 'Date',
@@ -651,10 +682,17 @@ describe('DocumentsService', () => {
       r2Storage.getFileSize.mockResolvedValue(10 * 1024 * 1024); // 10MB
 
       await expect(
-        service.confirmUpload('space-1', 'user-1', 'doc-1', {
-          filename: 'test.pdf',
-          contentType: 'application/pdf',
-        } as any, false, 'pro')
+        service.confirmUpload(
+          'space-1',
+          'user-1',
+          'doc-1',
+          {
+            filename: 'test.pdf',
+            contentType: 'application/pdf',
+          } as any,
+          false,
+          'pro'
+        )
       ).rejects.toThrow(BadRequestException);
     });
   });

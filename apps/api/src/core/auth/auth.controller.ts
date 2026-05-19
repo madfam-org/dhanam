@@ -1,6 +1,3 @@
-import { AuditService } from '@core/audit/audit.service';
-import { SecurityConfigService } from '@core/config/security.config';
-import { ThrottleAuthGuard } from '@core/security/guards/throttle-auth.guard';
 import {
   LoginDto,
   RegisterDto,
@@ -28,6 +25,10 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { FastifyReply } from 'fastify';
+
+import { AuditService } from '@core/audit/audit.service';
+import { SecurityConfigService } from '@core/config/security.config';
+import { ThrottleAuthGuard } from '@core/security/guards/throttle-auth.guard';
 
 import { CurrentUser, AuthenticatedUser } from './decorators/current-user.decorator';
 import { DemoAuthService } from './demo-auth.service';

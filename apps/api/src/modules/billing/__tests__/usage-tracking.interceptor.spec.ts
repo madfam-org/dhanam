@@ -1,12 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, CallHandler } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
+
 import { UsageMetricType } from '@db';
 
-import { UsageTrackingInterceptor } from '../interceptors/usage-tracking.interceptor';
 import { BillingService } from '../billing.service';
 import { USAGE_METRIC_KEY } from '../decorators';
+import { UsageTrackingInterceptor } from '../interceptors/usage-tracking.interceptor';
 
 describe('UsageTrackingInterceptor', () => {
   let interceptor: UsageTrackingInterceptor;
@@ -92,7 +93,7 @@ describe('UsageTrackingInterceptor', () => {
       expect(result).toEqual({ data: 'test result' });
 
       // Wait for async tap operation to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(billingService.recordUsage).toHaveBeenCalledWith('user-123', 'esg_calculation');
     });
@@ -111,7 +112,7 @@ describe('UsageTrackingInterceptor', () => {
       }
 
       // Wait a bit to ensure recordUsage is not called
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(billingService.recordUsage).not.toHaveBeenCalled();
     });
@@ -128,7 +129,7 @@ describe('UsageTrackingInterceptor', () => {
       expect(result).toEqual({ data: 'test result' });
 
       // Wait for async tap operation to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(billingService.recordUsage).toHaveBeenCalled();
     });
@@ -151,7 +152,7 @@ describe('UsageTrackingInterceptor', () => {
         await interceptor.intercept(context, next).toPromise();
 
         // Wait for async tap operation
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
 
         expect(billingService.recordUsage).toHaveBeenCalledWith('user-123', metricType);
 
@@ -171,7 +172,7 @@ describe('UsageTrackingInterceptor', () => {
 
     it('should work with multiple concurrent requests', async () => {
       const users = ['user-1', 'user-2', 'user-3'];
-      const promises = users.map(userId => {
+      const promises = users.map((userId) => {
         const context = mockExecutionContext({ id: userId });
         const next = mockCallHandler({ userId });
         reflector.get.mockReturnValue('esg_calculation' as UsageMetricType);
@@ -184,10 +185,10 @@ describe('UsageTrackingInterceptor', () => {
       expect(results).toHaveLength(3);
 
       // Wait for all async tap operations
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       expect(billingService.recordUsage).toHaveBeenCalledTimes(3);
-      users.forEach(userId => {
+      users.forEach((userId) => {
         expect(billingService.recordUsage).toHaveBeenCalledWith(userId, 'esg_calculation');
       });
     });
@@ -208,7 +209,7 @@ describe('UsageTrackingInterceptor', () => {
       expect(result).toEqual(complexResult);
 
       // Wait for async tap operation
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(billingService.recordUsage).toHaveBeenCalledWith('user-123', 'scenario_analysis');
     });

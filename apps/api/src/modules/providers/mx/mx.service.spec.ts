@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { Currency } from '@db';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
 import { CryptoService } from '../../../core/crypto/crypto.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 
 import { MxService } from './mx.service';
 
@@ -184,13 +185,7 @@ describe('MxService', () => {
       expect(result.errorRate).toBe(0);
       expect(result.avgResponseTimeMs).toBeGreaterThanOrEqual(0); // Can be 0 in fast test environment
       expect(result.lastCheckedAt).toBeInstanceOf(Date);
-      expect(mockMxClient.listInstitutions).toHaveBeenCalledWith(
-        '1',
-        undefined,
-        undefined,
-        1,
-        1
-      );
+      expect(mockMxClient.listInstitutions).toHaveBeenCalledWith('1', undefined, undefined, 1, 1);
     });
 
     it('should return down status when MX is not configured', async () => {
@@ -261,18 +256,14 @@ describe('MxService', () => {
         },
       });
 
-      expect(mockMxClient.requestWidgetURL).toHaveBeenCalledWith(
-        '1',
-        'mx-user-guid-123',
-        {
-          widget_url: {
-            widget_type: 'connect_widget',
-            mode: 'verification',
-            ui_message_version: 4,
-            wait_for_full_aggregation: false,
-          },
-        }
-      );
+      expect(mockMxClient.requestWidgetURL).toHaveBeenCalledWith('1', 'mx-user-guid-123', {
+        widget_url: {
+          widget_type: 'connect_widget',
+          mode: 'verification',
+          ui_message_version: 4,
+          wait_for_full_aggregation: false,
+        },
+      });
     });
 
     it('should create MX link for existing MX user', async () => {
@@ -305,9 +296,9 @@ describe('MxService', () => {
         cryptoService
       );
 
-      await expect(
-        serviceWithoutClient.createLink({ userId: 'user123' })
-      ).rejects.toThrow(BadRequestException);
+      await expect(serviceWithoutClient.createLink({ userId: 'user123' })).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it('should throw error when user creation fails', async () => {

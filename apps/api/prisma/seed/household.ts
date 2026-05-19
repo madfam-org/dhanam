@@ -10,7 +10,8 @@ export async function seedHousehold(prisma: PrismaClient, ctx: SeedContext) {
       name: 'The Demo Family',
       type: 'family',
       baseCurrency: Currency.MXN,
-      description: 'Demo household showcasing family financial planning and estate management features',
+      description:
+        'Demo household showcasing family financial planning and estate management features',
     },
   });
 
@@ -63,7 +64,8 @@ export async function seedHousehold(prisma: PrismaClient, ctx: SeedContext) {
       status: 'active',
       lastReviewedAt: subDays(new Date(), 30),
       activatedAt: subDays(new Date(), 90),
-      notes: 'Primary estate plan for the Demo Family. This is a demonstration document - not legal advice.',
+      notes:
+        'Primary estate plan for the Demo Family. This is a demonstration document - not legal advice.',
       legalDisclaimer: true,
     },
   });
@@ -77,7 +79,7 @@ export async function seedHousehold(prisma: PrismaClient, ctx: SeedContext) {
         willId: demoWill.id,
         beneficiaryId: mariaMember.id,
         assetType: 'bank_account',
-        percentage: 50.00,
+        percentage: 50.0,
         notes: 'Primary beneficiary for all liquid assets',
       },
     }),
@@ -86,7 +88,7 @@ export async function seedHousehold(prisma: PrismaClient, ctx: SeedContext) {
         willId: demoWill.id,
         beneficiaryId: childMember.id,
         assetType: 'bank_account',
-        percentage: 50.00,
+        percentage: 50.0,
         conditions: { type: 'age_requirement', minAge: 25, notes: 'Full access at age 25' },
         notes: 'Secondary beneficiary - assets held in trust until age requirements met',
       },
@@ -96,7 +98,7 @@ export async function seedHousehold(prisma: PrismaClient, ctx: SeedContext) {
         willId: demoWill.id,
         beneficiaryId: childMember.id,
         assetType: 'crypto_account',
-        percentage: 100.00,
+        percentage: 100.0,
         notes: 'All cryptocurrency holdings to next generation',
       },
     }),

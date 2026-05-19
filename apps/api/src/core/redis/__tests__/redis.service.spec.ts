@@ -55,7 +55,7 @@ describe('RedisService', () => {
           maxRetriesPerRequest: 3,
           lazyConnect: true,
           connectTimeout: 10000,
-        }),
+        })
       );
     });
 
@@ -67,7 +67,7 @@ describe('RedisService', () => {
           port: 6379,
           maxRetriesPerRequest: 3,
           lazyConnect: true,
-        }),
+        })
       );
     });
 

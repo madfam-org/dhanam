@@ -35,10 +35,12 @@ export function formatCurrency(
 
   // Crypto currencies use different formatting
   if (currency === 'BTC' || currency === 'ETH') {
-    return new Intl.NumberFormat(localeString, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 8,
-    }).format(amount) + ` ${currency}`;
+    return (
+      new Intl.NumberFormat(localeString, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 8,
+      }).format(amount) + ` ${currency}`
+    );
   }
 
   return new Intl.NumberFormat(localeString, {

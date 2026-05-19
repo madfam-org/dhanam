@@ -261,7 +261,7 @@ export class MonthlyReportTask {
         return sum + Number(score);
       }, 0) / cryptoAccounts.length;
 
-    let insight = '';
+    let insight: string;
     if (avgScore >= 80) {
       insight = 'Your crypto portfolio has an excellent ESG score!';
     } else if (avgScore >= 60) {

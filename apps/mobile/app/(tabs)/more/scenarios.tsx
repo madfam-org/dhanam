@@ -170,9 +170,7 @@ export default function ScenariosScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Configuration Card */}
         <Card style={styles.card}>
@@ -350,8 +348,9 @@ export default function ScenariosScreen() {
                   <View style={styles.alertBox}>
                     <Ionicons name="alert-circle" size={20} color="#F44336" />
                     <Text variant="bodyMedium" style={styles.alertText}>
-                      Significant impact: {formatCurrency(Math.abs(result.comparison.medianDifference), currency)} loss (
-                      {Math.abs(result.comparison.medianDifferencePercent).toFixed(1)}%)
+                      Significant impact:{' '}
+                      {formatCurrency(Math.abs(result.comparison.medianDifference), currency)} loss
+                      ({Math.abs(result.comparison.medianDifferencePercent).toFixed(1)}%)
                     </Text>
                   </View>
                 )}
@@ -371,37 +370,52 @@ export default function ScenariosScreen() {
                       Baseline (Normal)
                     </Text>
                     <View style={styles.comparisonValue}>
-                      <Text variant="bodySmall" style={styles.comparisonLabel}>Median</Text>
+                      <Text variant="bodySmall" style={styles.comparisonLabel}>
+                        Median
+                      </Text>
                       <Text variant="titleMedium" style={styles.baselineValue}>
                         {formatCurrency(result.baseline.median, currency)}
                       </Text>
                     </View>
                     <View style={styles.comparisonValue}>
-                      <Text variant="bodySmall" style={styles.comparisonLabel}>P10 - P90</Text>
+                      <Text variant="bodySmall" style={styles.comparisonLabel}>
+                        P10 - P90
+                      </Text>
                       <Text variant="bodySmall" style={styles.rangeText}>
-                        {formatCurrency(result.baseline.p10, currency)} - {formatCurrency(result.baseline.p90, currency)}
+                        {formatCurrency(result.baseline.p10, currency)} -{' '}
+                        {formatCurrency(result.baseline.p90, currency)}
                       </Text>
                     </View>
                   </View>
 
                   <View style={styles.vsContainer}>
-                    <Text variant="labelMedium" style={styles.vsText}>vs</Text>
+                    <Text variant="labelMedium" style={styles.vsText}>
+                      vs
+                    </Text>
                   </View>
 
                   <View style={styles.comparisonColumn}>
-                    <Text variant="titleSmall" style={[styles.comparisonHeader, styles.stressedHeader]}>
+                    <Text
+                      variant="titleSmall"
+                      style={[styles.comparisonHeader, styles.stressedHeader]}
+                    >
                       With Scenario
                     </Text>
                     <View style={styles.comparisonValue}>
-                      <Text variant="bodySmall" style={styles.comparisonLabel}>Median</Text>
+                      <Text variant="bodySmall" style={styles.comparisonLabel}>
+                        Median
+                      </Text>
                       <Text variant="titleMedium" style={styles.stressedValue}>
                         {formatCurrency(result.scenario.median || 0, currency)}
                       </Text>
                     </View>
                     <View style={styles.comparisonValue}>
-                      <Text variant="bodySmall" style={styles.comparisonLabel}>P10 - P90</Text>
+                      <Text variant="bodySmall" style={styles.comparisonLabel}>
+                        P10 - P90
+                      </Text>
                       <Text variant="bodySmall" style={styles.rangeText}>
-                        {formatCurrency(result.scenario.p10 || 0, currency)} - {formatCurrency(result.scenario.p90 || 0, currency)}
+                        {formatCurrency(result.scenario.p10 || 0, currency)} -{' '}
+                        {formatCurrency(result.scenario.p90 || 0, currency)}
                       </Text>
                     </View>
                   </View>
@@ -449,7 +463,9 @@ export default function ScenariosScreen() {
                     Recovery Time
                   </Text>
                   <Text variant="bodyMedium" style={styles.impactValue}>
-                    {result.comparison.recoveryMonths ? `${result.comparison.recoveryMonths} months` : 'N/A'}
+                    {result.comparison.recoveryMonths
+                      ? `${result.comparison.recoveryMonths} months`
+                      : 'N/A'}
                   </Text>
                 </View>
                 <View style={styles.impactRow}>
@@ -465,10 +481,10 @@ export default function ScenariosScreen() {
                           result.comparison.impactSeverity === 'critical'
                             ? '#F44336'
                             : result.comparison.impactSeverity === 'significant'
-                            ? '#FF9800'
-                            : result.comparison.impactSeverity === 'moderate'
-                            ? '#FFC107'
-                            : '#4CAF50',
+                              ? '#FF9800'
+                              : result.comparison.impactSeverity === 'moderate'
+                                ? '#FFC107'
+                                : '#4CAF50',
                       },
                     ]}
                     textStyle={styles.severityChipText}

@@ -2,7 +2,7 @@
 
 import { useTranslation } from '@dhanam/shared';
 import { useRouter } from 'next/navigation';
-import type { ReactNode } from 'react';
+import type { ReactNode as React18Node } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { SubscriptionBanner } from '~/components/billing/SubscriptionBanner';
@@ -62,7 +62,8 @@ function isDemoModeCookie(): boolean {
   return document.cookie.includes('demo-mode=true');
 }
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const content = children as React18Node;
   const { isAuthenticated, _hasHydrated, user, refreshUser, setAuth } = useAuth();
   const router = useRouter();
   // Trigger spaces fetch early so child pages have data before rendering.
@@ -143,7 +144,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
           <main id="main-content" className="flex-1 p-6 pb-20 md:pb-6">
             <div className="mx-auto max-w-7xl">
-              <PageTransition>{children}</PageTransition>
+              <PageTransition>{content}</PageTransition>
             </div>
           </main>
         </div>

@@ -1,10 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { R2StorageService } from '../storage/r2.service';
 
 import { CsvPreviewService } from './csv-preview.service';
-
-import { createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 describe('CsvPreviewService', () => {
   let service: CsvPreviewService;
@@ -16,10 +15,7 @@ describe('CsvPreviewService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CsvPreviewService,
-        { provide: R2StorageService, useValue: r2Storage },
-      ],
+      providers: [CsvPreviewService, { provide: R2StorageService, useValue: r2Storage }],
     }).compile();
 
     service = module.get<CsvPreviewService>(CsvPreviewService);

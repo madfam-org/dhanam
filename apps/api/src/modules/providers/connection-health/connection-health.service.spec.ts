@@ -1,10 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { ConnectionHealthService } from './connection-health.service';
+import { ConnectionStatus } from '@db';
+
+import { createPrismaMock, createLoggerMock } from '../../../../test/helpers/api-mock-factory';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { CircuitBreakerService } from '../orchestrator/circuit-breaker.service';
-import { createPrismaMock, createLoggerMock } from '../../../../test/helpers/api-mock-factory';
-import { ConnectionStatus } from '@db';
+
+import { ConnectionHealthService } from './connection-health.service';
 
 describe('ConnectionHealthService', () => {
   let service: ConnectionHealthService;

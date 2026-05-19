@@ -1,11 +1,13 @@
 # ADR-002: Prisma ORM for Database Access
 
 ## Status
+
 **Accepted** - January 2025
 
 ## Context
 
 Dhanam requires a robust database access layer for:
+
 - Complex financial data models (transactions, accounts, valuations, ESG scores)
 - Type-safe queries to prevent financial calculation errors
 - Migration management across development and production
@@ -13,6 +15,7 @@ Dhanam requires a robust database access layer for:
 - Efficient bulk operations for transaction sync (100+ records/batch)
 
 Options considered:
+
 1. **Raw SQL**: Maximum control, no abstraction overhead
 2. **TypeORM**: Popular, decorator-based, Active Record + Data Mapper
 3. **Prisma**: Schema-first, generated client, excellent TypeScript support
@@ -26,6 +29,7 @@ Use **Prisma** as the primary ORM with PostgreSQL.
 ### Why Prisma
 
 1. **Schema as Source of Truth**
+
    ```prisma
    model Transaction {
      id        String   @id @default(cuid())
@@ -35,11 +39,13 @@ Use **Prisma** as the primary ORM with PostgreSQL.
      @@index([accountId, date])
    }
    ```
+
    - Single schema file defines models, relations, and indexes
    - Generates TypeScript types automatically
    - Schema changes tracked in version control
 
 2. **Type-Safe Client**
+
    ```typescript
    // Full autocomplete and type checking
    const transactions = await prisma.transaction.findMany({
@@ -68,18 +74,19 @@ Use **Prisma** as the primary ORM with PostgreSQL.
 
 ### Comparison Matrix
 
-| Feature | Prisma | TypeORM | Drizzle | Knex |
-|---------|--------|---------|---------|------|
-| Type Safety | Excellent | Good | Excellent | Limited |
-| Migrations | Built-in | Built-in | Built-in | Built-in |
-| Relations | Declarative | Decorators | Manual | Manual |
-| Raw SQL | Supported | Supported | Native | Native |
-| Learning Curve | Low | Medium | Low | Low |
-| Community | Large | Large | Growing | Large |
+| Feature        | Prisma      | TypeORM    | Drizzle   | Knex     |
+| -------------- | ----------- | ---------- | --------- | -------- |
+| Type Safety    | Excellent   | Good       | Excellent | Limited  |
+| Migrations     | Built-in    | Built-in   | Built-in  | Built-in |
+| Relations      | Declarative | Decorators | Manual    | Manual   |
+| Raw SQL        | Supported   | Supported  | Native    | Native   |
+| Learning Curve | Low         | Medium     | Low       | Low      |
+| Community      | Large       | Large      | Growing   | Large    |
 
 ## Consequences
 
 ### Positive
+
 - Zero-cost type safety for all database operations
 - Reduced risk of SQL injection via parameterized queries
 - Clear schema documentation in `schema.prisma`
@@ -87,12 +94,14 @@ Use **Prisma** as the primary ORM with PostgreSQL.
 - Built-in introspection for existing databases
 
 ### Negative
+
 - Generated client adds build step
 - Some complex queries require raw SQL (`$queryRaw`)
 - Connection pooling configuration needed for serverless
 - Schema changes require migration (no implicit sync)
 
 ### Mitigations
+
 - `PrismaService` wrapper for lifecycle management in NestJS
 - Raw SQL utilities for complex analytical queries
 - Connection pooling via PgBouncer for high-load scenarios
@@ -101,6 +110,7 @@ Use **Prisma** as the primary ORM with PostgreSQL.
 ## Implementation Details
 
 ### NestJS Integration
+
 ```typescript
 // apps/api/src/core/prisma/prisma.service.ts
 @Injectable()
@@ -112,6 +122,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 ```
 
 ### Financial Precision
+
 ```prisma
 // All monetary values use Decimal(19, 4)
 model Account {
@@ -121,6 +132,7 @@ model Account {
 ```
 
 ### Multi-Tenant Queries
+
 ```typescript
 // Always include spaceId in queries for data isolation
 await prisma.transaction.findMany({
@@ -129,10 +141,12 @@ await prisma.transaction.findMany({
 ```
 
 ## Related Decisions
+
 - [ADR-001](./001-nestjs-fastify.md): NestJS framework selection
 - [ADR-003](./003-multi-provider-strategy.md): Provider data normalization
 
 ## References
+
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Prisma Best Practices](https://www.prisma.io/docs/guides/performance-and-optimization)
 - `packages/db/prisma/schema.prisma` - Current schema

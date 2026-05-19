@@ -5,7 +5,7 @@ import { login, authHeaders } from '../helpers/auth.js';
 
 export const options = {
   stages: [
-    { duration: '10s', target: 3 },   // Low concurrency for refresh ops
+    { duration: '10s', target: 3 }, // Low concurrency for refresh ops
     { duration: '1m', target: 3 },
     { duration: '10s', target: 0 },
   ],
@@ -15,7 +15,7 @@ export const options = {
 export function setup() {
   const auth = login(
     __ENV.TEST_EMAIL || 'loadtest@example.com',
-    __ENV.TEST_PASSWORD || 'LoadTest123!',
+    __ENV.TEST_PASSWORD || 'LoadTest123!'
   );
   return { token: auth?.accessToken };
 }
@@ -30,7 +30,7 @@ export default function (data) {
   const res = http.post(
     `${BASE_URL}/v1/spaces/${spaceId}/accounts/${accountId}/refresh`,
     null,
-    authHeaders(data.token),
+    authHeaders(data.token)
   );
 
   check(res, {

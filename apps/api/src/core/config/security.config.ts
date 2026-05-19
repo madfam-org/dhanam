@@ -55,8 +55,7 @@ export class SecurityConfigService {
 
   getAccountLockoutMinutes(): number {
     return (
-      this.config.get<number>('ACCOUNT_LOCKOUT_MINUTES') ??
-      AUTH_DEFAULTS.ACCOUNT_LOCKOUT_MINUTES
+      this.config.get<number>('ACCOUNT_LOCKOUT_MINUTES') ?? AUTH_DEFAULTS.ACCOUNT_LOCKOUT_MINUTES
     );
   }
 
@@ -77,8 +76,7 @@ export class SecurityConfigService {
 
   getDemoAccessTokenExpiry(): string {
     return (
-      this.config.get<string>('DEMO_ACCESS_TOKEN_EXPIRY') ??
-      AUTH_DEFAULTS.DEMO_ACCESS_TOKEN_EXPIRY
+      this.config.get<string>('DEMO_ACCESS_TOKEN_EXPIRY') ?? AUTH_DEFAULTS.DEMO_ACCESS_TOKEN_EXPIRY
     );
   }
 
@@ -112,9 +110,7 @@ export class SecurityConfigService {
   // ── Security Headers ─────────────────────────────────────────────────────
 
   getHstsMaxAge(): number {
-    return (
-      this.config.get<number>('HSTS_MAX_AGE_SECONDS') ?? SECURITY_HEADERS.HSTS_MAX_AGE_SECONDS
-    );
+    return this.config.get<number>('HSTS_MAX_AGE_SECONDS') ?? SECURITY_HEADERS.HSTS_MAX_AGE_SECONDS;
   }
 
   // ── Shutdown ─────────────────────────────────────────────────────────────

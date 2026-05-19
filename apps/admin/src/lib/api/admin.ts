@@ -279,10 +279,10 @@ export const adminApi = {
   },
 
   async getBillingEvents(page?: number, limit?: number): Promise<PaginatedResponse<BillingEvent>> {
-    return apiClient.get<PaginatedResponse<BillingEvent>>(
-      '/admin/billing/events',
-      { page, limit } as Record<string, unknown>
-    );
+    return apiClient.get<PaginatedResponse<BillingEvent>>('/admin/billing/events', {
+      page,
+      limit,
+    } as Record<string, unknown>);
   },
 
   async gdprExport(userId: string): Promise<GdprExport> {

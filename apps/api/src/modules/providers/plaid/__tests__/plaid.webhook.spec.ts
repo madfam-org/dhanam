@@ -1,15 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
 import * as crypto from 'crypto';
 
-import { PlaidService } from '../plaid.service';
-import { PlaidWebhookHandler } from '../plaid-webhook.handler';
-import { PlaidWebhookDto } from '../dto/webhook.dto';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { CryptoService } from '@core/crypto/crypto.service';
-import { AuditService } from '@core/audit/audit.service';
-import { CircuitBreakerService } from '@modules/providers/orchestrator/circuit-breaker.service';
+import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { AuditService } from '@core/audit/audit.service';
+import { CryptoService } from '@core/crypto/crypto.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+import { CircuitBreakerService } from '@modules/providers/orchestrator/circuit-breaker.service';
+
+import { PlaidWebhookDto } from '../dto/webhook.dto';
+import { PlaidWebhookHandler } from '../plaid-webhook.handler';
+import { PlaidService } from '../plaid.service';
 
 describe('PlaidService - Webhook Contract Tests', () => {
   let service: PlaidService;
@@ -116,7 +118,9 @@ describe('PlaidService - Webhook Contract Tests', () => {
         .digest('hex');
 
       prisma.providerConnection.findFirst.mockResolvedValue(mockConnection as any);
-      jest.spyOn(service as any, 'syncTransactions').mockResolvedValue({ transactionCount: 0, accountCount: 0 });
+      jest
+        .spyOn(service as any, 'syncTransactions')
+        .mockResolvedValue({ transactionCount: 0, accountCount: 0 });
 
       // Act & Assert
       await expect(service.handleWebhook(webhookDto, validSignature)).resolves.not.toThrow();
@@ -354,7 +358,9 @@ describe('PlaidService - Webhook Contract Tests', () => {
         .digest('hex');
 
       prisma.providerConnection.findFirst.mockResolvedValue(mockConnection as any);
-      const removeTransactionSpy = jest.spyOn(service as any, 'removeTransaction').mockResolvedValue(undefined);
+      const removeTransactionSpy = jest
+        .spyOn(service as any, 'removeTransaction')
+        .mockResolvedValue(undefined);
 
       // Act
       await service.handleWebhook(webhookDto, validSignature);
@@ -409,7 +415,9 @@ describe('PlaidService - Webhook Contract Tests', () => {
       await service.handleWebhook(webhookDto, validSignature);
 
       // Assert
-      expect(loggerSpy).toHaveBeenCalledWith('Received Plaid webhook: ACCOUNTS:DEFAULT_UPDATE_ACCOUNTS for item item-123');
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Received Plaid webhook: ACCOUNTS:DEFAULT_UPDATE_ACCOUNTS for item item-123'
+      );
     });
   });
 
@@ -441,10 +449,7 @@ describe('PlaidService - Webhook Contract Tests', () => {
       await service.handleWebhook(webhookDto, validSignature);
 
       // Assert
-      expect(loggerSpy).toHaveBeenCalledWith(
-        `Plaid item error for item-123:`,
-        webhookDto.error
-      );
+      expect(loggerSpy).toHaveBeenCalledWith(`Plaid item error for item-123:`, webhookDto.error);
     });
 
     it('should log PENDING_EXPIRATION event', async () => {
@@ -511,7 +516,9 @@ describe('PlaidService - Webhook Contract Tests', () => {
         .digest('hex');
 
       prisma.providerConnection.findFirst.mockResolvedValue(mockConnection as any);
-      jest.spyOn(service as any, 'syncTransactions').mockResolvedValue({ transactionCount: 0, accountCount: 0 });
+      jest
+        .spyOn(service as any, 'syncTransactions')
+        .mockResolvedValue({ transactionCount: 0, accountCount: 0 });
       const loggerSpy = jest.spyOn((service as any).logger, 'log');
 
       // Act
@@ -621,7 +628,9 @@ describe('PlaidService - Webhook Contract Tests', () => {
       const loggerSpy = jest.spyOn((service as any).logger, 'error');
 
       // Act & Assert
-      await expect(service.handleWebhook(webhookDto, validSignature)).rejects.toThrow('Sync failed');
+      await expect(service.handleWebhook(webhookDto, validSignature)).rejects.toThrow(
+        'Sync failed'
+      );
       expect(loggerSpy).toHaveBeenCalledWith(
         'Failed to handle webhook for item item-123:',
         expect.any(Error)

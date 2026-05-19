@@ -6,8 +6,7 @@ import { cn } from '../lib/utils';
  * Input component props
  * @extends React.InputHTMLAttributes<HTMLInputElement>
  */
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 /**
  * Text input component

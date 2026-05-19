@@ -12,8 +12,8 @@
 
 import { INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 
 import { AppModule } from '../../src/app.module';
@@ -27,9 +27,7 @@ describe('Smoke Tests', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter()
-    );
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 
     configService = moduleFixture.get<ConfigService>(ConfigService);
 
@@ -142,9 +140,7 @@ describe('Smoke Tests', () => {
 
   describe('Auth Endpoints', () => {
     it('GET /v1/auth/me should return 401 for unauthenticated requests', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/auth/me')
-        .expect(401);
+      const response = await request(app.getHttpServer()).get('/v1/auth/me').expect(401);
 
       expect(response.body).toHaveProperty('message');
     });
@@ -163,9 +159,7 @@ describe('Smoke Tests', () => {
 
     it('Protected endpoints should require authentication', async () => {
       // Try accessing a protected endpoint without auth
-      const response = await request(app.getHttpServer())
-        .get('/v1/spaces')
-        .expect(401);
+      const response = await request(app.getHttpServer()).get('/v1/spaces').expect(401);
 
       expect(response.body).toHaveProperty('message');
     });
@@ -188,9 +182,7 @@ describe('Smoke Tests', () => {
     it('Liveness probe should respond quickly (under 1 second)', async () => {
       const startTime = Date.now();
 
-      await request(app.getHttpServer())
-        .get('/v1/monitoring/health/live')
-        .expect(200);
+      await request(app.getHttpServer()).get('/v1/monitoring/health/live').expect(200);
 
       const duration = Date.now() - startTime;
       expect(duration).toBeLessThan(1000);
@@ -199,8 +191,7 @@ describe('Smoke Tests', () => {
 
   describe('Critical Services Health', () => {
     it('All critical services should be operational for a healthy system', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/monitoring/health');
+      const response = await request(app.getHttpServer()).get('/v1/monitoring/health');
 
       // For a smoke test to pass, the system should be at least degraded (not unhealthy)
       expect(['healthy', 'degraded']).toContain(response.body.status);

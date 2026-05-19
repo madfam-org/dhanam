@@ -1,10 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { Decimal } from '@db';
 
-import { ManualAssetsService } from './manual-assets.service';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
+
+import { ManualAssetsService } from './manual-assets.service';
 
 describe('ManualAssetsService', () => {
   let service: ManualAssetsService;
@@ -442,9 +444,9 @@ describe('ManualAssetsService', () => {
     it('should throw NotFoundException if asset not found', async () => {
       mockPrisma.manualAsset.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.update(spaceId, userId, assetId, { name: 'New Name' })
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(spaceId, userId, assetId, { name: 'New Name' })).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 });

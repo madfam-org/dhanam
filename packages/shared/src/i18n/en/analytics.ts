@@ -84,9 +84,11 @@ export const analytics = {
     },
     longTerm: {
       netWorthProjection: 'Net Worth Projection',
-      netWorthDescription: 'Your projected net worth over time. The shaded area shows retirement years.',
+      netWorthDescription:
+        'Your projected net worth over time. The shaded area shows retirement years.',
       incomeVsExpenses: 'Income vs Expenses',
-      incomeVsExpensesDescription: 'Projected income and expenses over time. Green area shows positive cashflow.',
+      incomeVsExpensesDescription:
+        'Projected income and expenses over time. Green area shows positive cashflow.',
       totalAssets: 'Total Assets',
       netWorth: 'Net Worth',
       totalDebt: 'Total Debt',
@@ -107,7 +109,8 @@ export const analytics = {
       worst10: 'Worst 10%',
       p10: '10th Percentile',
       p90: '90th Percentile',
-      confidenceNote: 'The shaded area represents the 80% confidence interval (10th to 90th percentile). The median line shows the most likely outcome.',
+      confidenceNote:
+        'The shaded area represents the 80% confidence interval (10th to 90th percentile). The median line shows the most likely outcome.',
     },
     budget: {
       categorySpending: 'Category Spending',

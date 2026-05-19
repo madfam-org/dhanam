@@ -10,18 +10,20 @@ The Blockchain provider enables read-only tracking of cryptocurrency wallets dir
 
 ### Supported Networks
 
-| Network | Currency | Features |
-|---------|----------|----------|
-| Ethereum | ETH | Balance, transactions, ERC-20 tokens |
-| Bitcoin | BTC | Balance, transactions, xPub import |
+| Network  | Currency | Features                             |
+| -------- | -------- | ------------------------------------ |
+| Ethereum | ETH      | Balance, transactions, ERC-20 tokens |
+| Bitcoin  | BTC      | Balance, transactions, xPub import   |
 
 ### Address Types
 
 **Ethereum**:
+
 - Standard addresses (0x...)
 - All ERC-20 token balances via contract calls
 
 **Bitcoin**:
+
 - Legacy (P2PKH) addresses
 - SegWit (P2SH-P2WPKH) addresses
 - Native SegWit (Bech32) addresses
@@ -54,13 +56,13 @@ Public Address -> Validate -> Fetch Balance -> Get Price -> Calculate USD -> Syn
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/providers/blockchain/spaces/:spaceId/wallets` | Add single wallet |
-| `POST` | `/providers/blockchain/spaces/:spaceId/import` | Import from xPub |
-| `POST` | `/providers/blockchain/sync` | Sync all wallets |
-| `DELETE` | `/providers/blockchain/wallets/:accountId` | Remove wallet |
-| `GET` | `/providers/blockchain/health` | Service health check |
+| Method   | Endpoint                                        | Description          |
+| -------- | ----------------------------------------------- | -------------------- |
+| `POST`   | `/providers/blockchain/spaces/:spaceId/wallets` | Add single wallet    |
+| `POST`   | `/providers/blockchain/spaces/:spaceId/import`  | Import from xPub     |
+| `POST`   | `/providers/blockchain/sync`                    | Sync all wallets     |
+| `DELETE` | `/providers/blockchain/wallets/:accountId`      | Remove wallet        |
+| `GET`    | `/providers/blockchain/health`                  | Service health check |
 
 ### Service Methods
 
@@ -72,10 +74,10 @@ Public Address -> Validate -> Fetch Balance -> Get Price -> Calculate USD -> Syn
 
 ### Data Sources
 
-| Network | Balance Source | Transaction Source |
-|---------|----------------|-------------------|
-| Ethereum | JSON-RPC Provider (Alchemy) | Recent blocks scan |
-| Bitcoin | Blockchain.info API | Blockchain.info API |
+| Network  | Balance Source              | Transaction Source  |
+| -------- | --------------------------- | ------------------- |
+| Ethereum | JSON-RPC Provider (Alchemy) | Recent blocks scan  |
+| Bitcoin  | Blockchain.info API         | Blockchain.info API |
 
 ### Price Data
 
@@ -87,10 +89,10 @@ Public Address -> Validate -> Fetch Balance -> Get Price -> Calculate USD -> Syn
 
 ### Address Validation
 
-| Currency | Validation |
-|----------|------------|
-| ETH | `ethers.isAddress()` checksum validation |
-| BTC | `bitcoinjs-lib` address parsing |
+| Currency | Validation                               |
+| -------- | ---------------------------------------- |
+| ETH      | `ethers.isAddress()` checksum validation |
+| BTC      | `bitcoinjs-lib` address parsing          |
 
 ### Common Errors
 
@@ -109,20 +111,21 @@ Public Address -> Validate -> Fetch Balance -> Get Price -> Calculate USD -> Syn
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
+| Variable      | Description                | Default                                     |
+| ------------- | -------------------------- | ------------------------------------------- |
 | `ETH_RPC_URL` | Ethereum JSON-RPC endpoint | `https://eth-mainnet.g.alchemy.com/v2/demo` |
 
 ### Performance Thresholds
 
-| Operation | Threshold | Monitoring |
-|-----------|-----------|------------|
-| Balance fetch | 5 seconds | `@MonitorPerformance(5000)` |
+| Operation        | Threshold  | Monitoring                   |
+| ---------------- | ---------- | ---------------------------- |
+| Balance fetch    | 5 seconds  | `@MonitorPerformance(5000)`  |
 | Transaction sync | 10 seconds | `@MonitorPerformance(10000)` |
 
 ### Data Mapping
 
 **Account Metadata**:
+
 ```json
 {
   "address": "0x...",
@@ -135,6 +138,7 @@ Public Address -> Validate -> Fetch Balance -> Get Price -> Calculate USD -> Syn
 ```
 
 **Transaction Metadata**:
+
 ```json
 {
   "txHash": "0x...",
@@ -163,5 +167,6 @@ Public Address -> Validate -> Fetch Balance -> Get Price -> Calculate USD -> Syn
 - `providers/defi` - DeFi position tracking for ETH wallets
 
 ---
+
 **Provider**: `providers/blockchain`
 **Last Updated**: January 2025

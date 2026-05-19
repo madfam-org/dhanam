@@ -12,119 +12,119 @@ The Goals module enables users to define, track, and achieve financial objective
 
 Core entity representing a financial objective.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Unique identifier |
-| `spaceId` | UUID | Parent space reference |
-| `name` | string | Goal name |
-| `description` | string | Optional description |
-| `type` | enum | Goal category (see types below) |
-| `targetAmount` | Decimal | Target amount to achieve |
-| `currency` | enum | Goal currency |
-| `targetDate` | datetime | Target completion date |
-| `priority` | int (1-10) | Goal priority ranking |
-| `status` | enum | `active`, `achieved`, `paused`, `cancelled` |
-| `currentProbability` | Decimal | Latest success probability (0-100) |
-| `confidenceLow` | Decimal | P10 confidence bound |
-| `confidenceHigh` | Decimal | P90 confidence bound |
-| `currentProgress` | Decimal | Current progress percentage |
-| `projectedCompletion` | datetime | Estimated completion date |
-| `monthlyContribution` | Decimal | Expected monthly contribution |
-| `expectedReturn` | Decimal | Expected annual return rate |
-| `volatility` | Decimal | Expected volatility |
-| `probabilityHistory` | JSON | Historical probability snapshots |
-| `lastSimulationAt` | datetime | Last Monte Carlo run |
+| Field                 | Type       | Description                                 |
+| --------------------- | ---------- | ------------------------------------------- |
+| `id`                  | UUID       | Unique identifier                           |
+| `spaceId`             | UUID       | Parent space reference                      |
+| `name`                | string     | Goal name                                   |
+| `description`         | string     | Optional description                        |
+| `type`                | enum       | Goal category (see types below)             |
+| `targetAmount`        | Decimal    | Target amount to achieve                    |
+| `currency`            | enum       | Goal currency                               |
+| `targetDate`          | datetime   | Target completion date                      |
+| `priority`            | int (1-10) | Goal priority ranking                       |
+| `status`              | enum       | `active`, `achieved`, `paused`, `cancelled` |
+| `currentProbability`  | Decimal    | Latest success probability (0-100)          |
+| `confidenceLow`       | Decimal    | P10 confidence bound                        |
+| `confidenceHigh`      | Decimal    | P90 confidence bound                        |
+| `currentProgress`     | Decimal    | Current progress percentage                 |
+| `projectedCompletion` | datetime   | Estimated completion date                   |
+| `monthlyContribution` | Decimal    | Expected monthly contribution               |
+| `expectedReturn`      | Decimal    | Expected annual return rate                 |
+| `volatility`          | Decimal    | Expected volatility                         |
+| `probabilityHistory`  | JSON       | Historical probability snapshots            |
+| `lastSimulationAt`    | datetime   | Last Monte Carlo run                        |
 
 ### GoalType
 
 Supported goal categories:
 
-| Type | Description |
-|------|-------------|
-| `emergency_fund` | Emergency savings buffer |
-| `retirement` | Long-term retirement savings |
-| `home_purchase` | Down payment / home buying |
-| `education` | Education expenses |
-| `vacation` | Travel and vacation funding |
-| `debt_payoff` | Debt elimination goal |
-| `investment` | General investment target |
-| `custom` | User-defined goal type |
+| Type             | Description                  |
+| ---------------- | ---------------------------- |
+| `emergency_fund` | Emergency savings buffer     |
+| `retirement`     | Long-term retirement savings |
+| `home_purchase`  | Down payment / home buying   |
+| `education`      | Education expenses           |
+| `vacation`       | Travel and vacation funding  |
+| `debt_payoff`    | Debt elimination goal        |
+| `investment`     | General investment target    |
+| `custom`         | User-defined goal type       |
 
 ### GoalAllocation
 
 Links accounts to goals with percentage allocation.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Unique identifier |
-| `goalId` | UUID | Reference to goal |
-| `accountId` | UUID | Reference to account |
+| Field        | Type    | Description                   |
+| ------------ | ------- | ----------------------------- |
+| `id`         | UUID    | Unique identifier             |
+| `goalId`     | UUID    | Reference to goal             |
+| `accountId`  | UUID    | Reference to account          |
 | `percentage` | Decimal | Allocation percentage (0-100) |
-| `notes` | string | Optional notes |
+| `notes`      | string  | Optional notes                |
 
 ### GoalShare
 
 Collaboration records for shared goals.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Unique identifier |
-| `goalId` | UUID | Reference to goal |
-| `sharedWithUserId` | UUID | Target user |
-| `role` | enum | `viewer`, `contributor`, `co-owner` |
-| `status` | enum | `pending`, `accepted`, `declined` |
-| `message` | string | Invitation message |
+| Field              | Type   | Description                         |
+| ------------------ | ------ | ----------------------------------- |
+| `id`               | UUID   | Unique identifier                   |
+| `goalId`           | UUID   | Reference to goal                   |
+| `sharedWithUserId` | UUID   | Target user                         |
+| `role`             | enum   | `viewer`, `contributor`, `co-owner` |
+| `status`           | enum   | `pending`, `accepted`, `declined`   |
+| `message`          | string | Invitation message                  |
 
 ## API Endpoints
 
 ### Goal CRUD
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/goals` | Create a new goal |
-| `GET` | `/goals/space/:spaceId` | List goals in a space |
-| `GET` | `/goals/space/:spaceId/summary` | Get space goal summary |
-| `GET` | `/goals/:id` | Get goal details |
-| `PUT` | `/goals/:id` | Update a goal |
-| `DELETE` | `/goals/:id` | Delete a goal |
+| Method   | Endpoint                        | Description            |
+| -------- | ------------------------------- | ---------------------- |
+| `POST`   | `/goals`                        | Create a new goal      |
+| `GET`    | `/goals/space/:spaceId`         | List goals in a space  |
+| `GET`    | `/goals/space/:spaceId/summary` | Get space goal summary |
+| `GET`    | `/goals/:id`                    | Get goal details       |
+| `PUT`    | `/goals/:id`                    | Update a goal          |
+| `DELETE` | `/goals/:id`                    | Delete a goal          |
 
 ### Progress and Allocations
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/goals/:id/progress` | Get basic progress |
-| `GET` | `/goals/:id/progress/detailed` | Get detailed progress with rebalancing |
-| `POST` | `/goals/:id/allocations` | Add account allocation |
-| `DELETE` | `/goals/:id/allocations/:accountId` | Remove allocation |
+| Method   | Endpoint                            | Description                            |
+| -------- | ----------------------------------- | -------------------------------------- |
+| `GET`    | `/goals/:id/progress`               | Get basic progress                     |
+| `GET`    | `/goals/:id/progress/detailed`      | Get detailed progress with rebalancing |
+| `POST`   | `/goals/:id/allocations`            | Add account allocation                 |
+| `DELETE` | `/goals/:id/allocations/:accountId` | Remove allocation                      |
 
 ### Monte Carlo Probability
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/goals/:id/probability` | Get current probability |
-| `POST` | `/goals/:id/probability/update` | Recalculate probability |
-| `POST` | `/goals/:id/what-if` | Run what-if scenario |
-| `POST` | `/goals/space/:spaceId/probability/update-all` | Bulk update all goals |
+| Method | Endpoint                                       | Description             |
+| ------ | ---------------------------------------------- | ----------------------- |
+| `GET`  | `/goals/:id/probability`                       | Get current probability |
+| `POST` | `/goals/:id/probability/update`                | Recalculate probability |
+| `POST` | `/goals/:id/what-if`                           | Run what-if scenario    |
+| `POST` | `/goals/space/:spaceId/probability/update-all` | Bulk update all goals   |
 
 ### Rebalancing
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/goals/:id/rebalancing/suggest` | Get rebalancing suggestions |
-| `POST` | `/goals/:id/rebalancing/execute` | Execute rebalancing |
+| Method | Endpoint                         | Description                 |
+| ------ | -------------------------------- | --------------------------- |
+| `GET`  | `/goals/:id/rebalancing/suggest` | Get rebalancing suggestions |
+| `POST` | `/goals/:id/rebalancing/execute` | Execute rebalancing         |
 
 ### Collaboration
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/goals/:id/share` | Share goal with user |
-| `GET` | `/goals/:id/shares` | List goal shares |
-| `GET` | `/goals/shared/me` | Get goals shared with me |
-| `POST` | `/goals/shares/:shareId/accept` | Accept share invitation |
-| `POST` | `/goals/shares/:shareId/decline` | Decline share invitation |
-| `DELETE` | `/goals/shares/:shareId` | Revoke a share |
-| `PUT` | `/goals/shares/:shareId/role` | Update share role |
-| `GET` | `/goals/:id/activities` | Get goal activity feed |
+| Method   | Endpoint                         | Description              |
+| -------- | -------------------------------- | ------------------------ |
+| `POST`   | `/goals/:id/share`               | Share goal with user     |
+| `GET`    | `/goals/:id/shares`              | List goal shares         |
+| `GET`    | `/goals/shared/me`               | Get goals shared with me |
+| `POST`   | `/goals/shares/:shareId/accept`  | Accept share invitation  |
+| `POST`   | `/goals/shares/:shareId/decline` | Decline share invitation |
+| `DELETE` | `/goals/shares/:shareId`         | Revoke a share           |
+| `PUT`    | `/goals/shares/:shareId/role`    | Update share role        |
+| `GET`    | `/goals/:id/activities`          | Get goal activity feed   |
 
 ### Request/Response Examples
 
@@ -248,11 +248,11 @@ GoalsController
 
 ## Error Handling
 
-| Error | Status | Condition |
-|-------|--------|-----------|
-| `NotFoundException` | 404 | Goal, space, or account not found |
-| `BadRequestException` | 400 | Invalid allocation, duplicate allocation |
-| `Error` | 500 | Target date in past, simulation failure |
+| Error                 | Status | Condition                                |
+| --------------------- | ------ | ---------------------------------------- |
+| `NotFoundException`   | 404    | Goal, space, or account not found        |
+| `BadRequestException` | 400    | Invalid allocation, duplicate allocation |
+| `Error`               | 500    | Target date in past, simulation failure  |
 
 ### Error Messages
 
@@ -265,13 +265,13 @@ GoalsController
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `spaces` | Goals belong to spaces |
-| `accounts` | Accounts allocated to goals |
+| Module        | Relationship                  |
+| ------------- | ----------------------------- |
+| `spaces`      | Goals belong to spaces        |
+| `accounts`    | Accounts allocated to goals   |
 | `simulations` | Monte Carlo engine dependency |
-| `households` | Goals can be household-level |
-| `audit` | Goal actions are audited |
+| `households`  | Goals can be household-level  |
+| `audit`       | Goal actions are audited      |
 
 ## Testing
 
@@ -311,5 +311,6 @@ pnpm test:cov -- goals
 ```
 
 ---
+
 **Module**: `goals`
 **Last Updated**: January 2025

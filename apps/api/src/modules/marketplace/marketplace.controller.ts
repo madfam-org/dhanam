@@ -54,7 +54,7 @@ export class MarketplaceController {
     private readonly charges: ChargeService,
     private readonly transfers: TransferService,
     private readonly payouts: PayoutService,
-    private readonly disputes: DisputeService,
+    private readonly disputes: DisputeService
   ) {}
 
   // ---------------------------------------------------------------------------
@@ -64,10 +64,7 @@ export class MarketplaceController {
   @Post('merchants')
   @ApiOperation({ summary: 'Create a Connect merchant account for the current user' })
   @ApiCreatedResponse()
-  async createMerchant(
-    @Req() req: AuthenticatedRequest,
-    @Body() dto: CreateMerchantDto,
-  ) {
+  async createMerchant(@Req() req: AuthenticatedRequest, @Body() dto: CreateMerchantDto) {
     if (!req.user.email) {
       throw new BadRequestException('Authenticated user has no email on profile');
     }
@@ -95,10 +92,7 @@ export class MarketplaceController {
 
   @Post('merchants/:id/onboarding-link')
   @ApiOperation({ summary: 'Generate / refresh a Connect onboarding link' })
-  async onboardingLink(
-    @Param('id') id: string,
-    @Body() dto: OnboardingLinkDto,
-  ) {
+  async onboardingLink(@Param('id') id: string, @Body() dto: OnboardingLinkDto) {
     return this.merchants.getOnboardingLink(id, dto.returnUrl, dto.refreshUrl);
   }
 
@@ -164,10 +158,7 @@ export class MarketplaceController {
 
   @Post('disputes/:id/evidence')
   @ApiOperation({ summary: 'Submit evidence for a dispute' })
-  async submitEvidence(
-    @Param('id') id: string,
-    @Body() dto: SubmitDisputeEvidenceDto,
-  ) {
+  async submitEvidence(@Param('id') id: string, @Body() dto: SubmitDisputeEvidenceDto) {
     return this.disputes.submitEvidence(id, dto);
   }
 }

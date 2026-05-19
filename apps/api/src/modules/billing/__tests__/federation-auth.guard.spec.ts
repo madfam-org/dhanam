@@ -1,7 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { UnauthorizedException, ExecutionContext } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { UnauthorizedException } from '@nestjs/common';
-import { ExecutionContext } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { FederationAuthGuard } from '../guards/federation-auth.guard';
 

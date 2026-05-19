@@ -1,11 +1,13 @@
 # ADR-001: NestJS with Fastify over Express
 
 ## Status
+
 **Accepted** - January 2025
 
 ## Context
 
 Dhanam is a financial management platform requiring:
+
 - High-throughput API for real-time transaction processing
 - Low-latency responses for dashboard data fetching
 - Efficient handling of concurrent provider sync operations
@@ -32,14 +34,15 @@ Use **NestJS** as the application framework with **Fastify** as the HTTP adapter
 
 ### Why Fastify over Express
 
-| Metric | Express | Fastify | Benefit |
-|--------|---------|---------|---------|
-| JSON Serialization | 15,000 req/s | 78,000 req/s | 5x faster |
-| Payload Parsing | Manual | Schema-based | Validation + speed |
-| Routing | Pattern matching | Radix tree | O(1) lookups |
-| Async Support | Callbacks | Native promises | Cleaner code |
+| Metric             | Express          | Fastify         | Benefit            |
+| ------------------ | ---------------- | --------------- | ------------------ |
+| JSON Serialization | 15,000 req/s     | 78,000 req/s    | 5x faster          |
+| Payload Parsing    | Manual           | Schema-based    | Validation + speed |
+| Routing            | Pattern matching | Radix tree      | O(1) lookups       |
+| Async Support      | Callbacks        | Native promises | Cleaner code       |
 
 **Performance Benchmarks** (internal testing with financial data payloads):
+
 - Account sync: 40% faster response times
 - Transaction batch processing: 3x throughput improvement
 - Memory usage: 25% lower under load
@@ -57,26 +60,31 @@ Use **NestJS** as the application framework with **Fastify** as the HTTP adapter
 ## Consequences
 
 ### Positive
+
 - Significantly improved API performance for real-time financial dashboards
 - Better developer experience with TypeScript and decorators
 - Automatic OpenAPI documentation generation
 - Future-proof architecture for scaling
 
 ### Negative
+
 - Smaller ecosystem than Express (some middleware needs adaptation)
 - Learning curve for developers unfamiliar with Fastify's plugin system
 - Some NestJS examples default to Express (need Fastify-specific configuration)
 
 ### Mitigations
+
 - Created `apps/api/src/main.ts` template with Fastify configuration
 - Documented Fastify-specific patterns in module READMEs
 - Established plugin compatibility checklist
 
 ## Related Decisions
+
 - [ADR-002](./002-prisma-orm.md): Prisma ORM selection
 - [ADR-004](./004-janua-auth-integration.md): Janua authentication integration
 
 ## References
+
 - [Fastify Benchmarks](https://fastify.dev/benchmarks)
 - [NestJS Fastify Adapter](https://docs.nestjs.com/techniques/performance)
 - Internal performance testing report (Q4 2024)

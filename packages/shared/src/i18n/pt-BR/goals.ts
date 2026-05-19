@@ -98,7 +98,8 @@ export const goals = {
     timeProgress: 'Progresso do Tempo',
     onTrackMessage: 'Você está no caminho para alcançar esta meta!',
     behindSchedule: 'Você está atrasado',
-    increaseContribution: 'Aumente a contribuição mensal para ${{amount}} para se manter no caminho',
+    increaseContribution:
+      'Aumente a contribuição mensal para ${{amount}} para se manter no caminho',
     accountAllocations: 'Alocações de Conta',
     allocated: 'alocado',
     noGoalSelected: 'Nenhuma meta selecionada',
@@ -122,6 +123,7 @@ export const goals = {
     worst10: 'Pior 10%',
     best10: 'Melhor 10%',
     increaseSavings: 'Aumente a poupança para melhorar as probabilidades',
-    recommendedContribution: 'Contribuição mensal recomendada: ${{recommended}} (atual: ${{current}})',
+    recommendedContribution:
+      'Contribuição mensal recomendada: ${{recommended}} (atual: ${{current}})',
   },
 } as const;

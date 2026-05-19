@@ -149,10 +149,7 @@ export class AuthHelper {
   static generateBackupCodes(count = 10): string[] {
     const codes: string[] = [];
     for (let i = 0; i < count; i++) {
-      const code = require('crypto')
-        .randomBytes(4)
-        .toString('hex')
-        .toUpperCase();
+      const code = require('crypto').randomBytes(4).toString('hex').toUpperCase();
       codes.push(code);
     }
     return codes;
@@ -163,10 +160,7 @@ export class AuthHelper {
    * - Backup codes are stored hashed in database
    */
   static hashBackupCode(code: string): string {
-    return require('crypto')
-      .createHash('sha256')
-      .update(code)
-      .digest('hex');
+    return require('crypto').createHash('sha256').update(code).digest('hex');
   }
 
   /**
@@ -202,9 +196,7 @@ export class AuthHelper {
    * - Returns user object with token and password
    * - Useful for integration tests
    */
-  static async createAuthenticatedUser(
-    overrides: Partial<User> = {}
-  ): Promise<{
+  static async createAuthenticatedUser(overrides: Partial<User> = {}): Promise<{
     user: Partial<User>;
     password: string;
     passwordHash: string;
@@ -243,9 +235,7 @@ export class AuthHelper {
    * Create mock user with TOTP enabled
    * - Returns user with TOTP secret and current code
    */
-  static async createAuthenticatedUserWithTotp(
-    overrides: Partial<User> = {}
-  ): Promise<{
+  static async createAuthenticatedUserWithTotp(overrides: Partial<User> = {}): Promise<{
     user: Partial<User>;
     password: string;
     totpSecret: string;

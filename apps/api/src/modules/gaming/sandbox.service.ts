@@ -82,8 +82,17 @@ export class SandboxService {
   }
 
   private async fetchLandFloorPrice(): Promise<SandboxLandFloorPrice> {
-    // TODO: Integrate with The Sandbox / OpenSea API when available
-    // Using realistic mock data based on current market conditions
+    if (!this.useSandboxMockData()) {
+      this.logger.warn('Sandbox market data adapter is not configured; returning empty floor data');
+      return {
+        floorPriceUsd: 0,
+        floorPriceEth: 0,
+        change24h: 0,
+        totalListings: 0,
+        lastUpdated: new Date(),
+      };
+    }
+
     return {
       floorPriceUsd: 1450,
       floorPriceEth: 0.42,
@@ -94,7 +103,16 @@ export class SandboxService {
   }
 
   private async fetchStakingApy(): Promise<SandboxStakingApy> {
-    // TODO: Integrate with The Sandbox staking contract
+    if (!this.useSandboxMockData()) {
+      this.logger.warn('Sandbox staking adapter is not configured; returning empty staking data');
+      return {
+        currentApy: 0,
+        totalStakedSand: 0,
+        rewardsDistributed24h: 0,
+        lastUpdated: new Date(),
+      };
+    }
+
     return {
       currentApy: 8.5,
       totalStakedSand: 450_000_000,
@@ -104,8 +122,11 @@ export class SandboxService {
   }
 
   private async aggregateGamingPositions(_spaceId: string): Promise<GamingPositionSummary> {
-    // Aggregate from account metadata for gaming-type accounts
-    // In production, this would query the DB and enrich with live API data
+    if (!this.useSandboxMockData()) {
+      this.logger.warn('Sandbox position adapter is not configured; returning empty positions');
+      return this.emptyGamingSummary();
+    }
+
     const landFloor = await this.getLandFloorPrice();
     const staking = await this.getStakingApy();
 
@@ -155,6 +176,26 @@ export class SandboxService {
       nftValueUsd,
       monthlyGamingIncome,
       positions,
+    };
+  }
+
+  private useSandboxMockData(): boolean {
+    return this.config.get<string>('FEATURE_SANDBOX_MOCK_DATA', 'false') === 'true';
+  }
+
+  private emptyGamingSummary(): GamingPositionSummary {
+    return {
+      totalGamingAssetsUsd: 0,
+      sandStaked: 0,
+      sandStakingApy: 0,
+      monthlyStakingReward: 0,
+      activeLandParcels: 0,
+      landValueUsd: 0,
+      monthlyRentalIncome: 0,
+      nftCount: 0,
+      nftValueUsd: 0,
+      monthlyGamingIncome: 0,
+      positions: [],
     };
   }
 }

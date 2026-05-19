@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
-import { TransactionsService } from '../transactions.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { TestDataFactory } from '../../../../test/helpers/test-data-factory';
+import { TestDatabase } from '../../../../test/helpers/test-database';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { SpacesService } from '../../spaces/spaces.service';
-import { TestDatabase } from '../../../../test/helpers/test-database';
-import { TestDataFactory } from '../../../../test/helpers/test-data-factory';
 import { CreateTransactionDto, UpdateTransactionDto, TransactionsFilterDto } from '../dto';
+import { TransactionsService } from '../transactions.service';
 
 // Skip integration tests when no test database is available
 const describeOrSkip = process.env.TEST_DATABASE_URL ? describe : describe.skip;
@@ -192,9 +193,9 @@ describeOrSkip('TransactionsService (Integration)', () => {
       const { user, space } = await factory.createFullSetup();
 
       // Act & Assert
-      await expect(
-        service.findOne(space.id, user.id, 'non-existent-id')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(space.id, user.id, 'non-existent-id')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw NotFoundException when transaction belongs to different space', async () => {
@@ -204,9 +205,9 @@ describeOrSkip('TransactionsService (Integration)', () => {
       const transaction = await factory.createTransaction(account1.id);
 
       // Act & Assert
-      await expect(
-        service.findOne(space2.id, user2.id, transaction.id)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(space2.id, user2.id, transaction.id)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -218,7 +219,7 @@ describeOrSkip('TransactionsService (Integration)', () => {
 
       const dto: CreateTransactionDto = {
         accountId: account.id,
-        amount: -100.50,
+        amount: -100.5,
         date: new Date(),
         description: 'Test expense',
         merchant: 'Test Merchant',
@@ -228,7 +229,7 @@ describeOrSkip('TransactionsService (Integration)', () => {
       const result = await service.create(space.id, user.id, dto);
 
       // Assert
-      expect(result.amount.toNumber()).toBe(-100.50);
+      expect(result.amount.toNumber()).toBe(-100.5);
       expect(result.description).toBe('Test expense');
       expect(result.currency).toBe(account.currency);
 
@@ -236,7 +237,7 @@ describeOrSkip('TransactionsService (Integration)', () => {
       const updatedAccount = await prisma.account.findUnique({
         where: { id: account.id },
       });
-      expect(updatedAccount!.balance.toNumber()).toBe(initialBalance - 100.50);
+      expect(updatedAccount!.balance.toNumber()).toBe(initialBalance - 100.5);
     });
 
     it('should handle decimal precision correctly', async () => {
@@ -271,9 +272,7 @@ describeOrSkip('TransactionsService (Integration)', () => {
       };
 
       // Act & Assert
-      await expect(
-        service.create(space1.id, user1.id, dto)
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.create(space1.id, user1.id, dto)).rejects.toThrow(ForbiddenException);
     });
 
     it('should throw ForbiddenException when category does not belong to space', async () => {
@@ -290,9 +289,7 @@ describeOrSkip('TransactionsService (Integration)', () => {
       };
 
       // Act & Assert
-      await expect(
-        service.create(space1.id, user1.id, dto)
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.create(space1.id, user1.id, dto)).rejects.toThrow(ForbiddenException);
     });
   });
 
@@ -353,9 +350,9 @@ describeOrSkip('TransactionsService (Integration)', () => {
       };
 
       // Act & Assert
-      await expect(
-        service.update(space.id, user.id, transaction.id, dto)
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.update(space.id, user.id, transaction.id, dto)).rejects.toThrow(
+        ForbiddenException
+      );
     });
   });
 
@@ -380,10 +377,7 @@ describeOrSkip('TransactionsService (Integration)', () => {
       const updatedAccount = await prisma.account.findUnique({
         where: { id: account.id },
       });
-      expect(updatedAccount!.balance.toNumber()).toBeCloseTo(
-        initialBalance - transactionAmount,
-        2
-      );
+      expect(updatedAccount!.balance.toNumber()).toBeCloseTo(initialBalance - transactionAmount, 2);
     });
   });
 
@@ -406,7 +400,7 @@ describeOrSkip('TransactionsService (Integration)', () => {
 
       // Assert
       expect(result).toHaveLength(3);
-      expect(result.every(txn => txn.categoryId === category.id)).toBe(true);
+      expect(result.every((txn) => txn.categoryId === category.id)).toBe(true);
     });
 
     it('should complete in under 2 seconds for 100+ transactions', async () => {
@@ -444,8 +438,12 @@ describeOrSkip('TransactionsService (Integration)', () => {
 
     it('should throw ForbiddenException when some transactions do not belong to space', async () => {
       // Arrange
-      const { user: user1, space: space1, account: account1, category: category1 } =
-        await factory.createFullSetup();
+      const {
+        user: user1,
+        space: space1,
+        account: account1,
+        category: category1,
+      } = await factory.createFullSetup();
       const { account: account2 } = await factory.createFullSetup();
 
       const txn1 = await factory.createTransaction(account1.id);

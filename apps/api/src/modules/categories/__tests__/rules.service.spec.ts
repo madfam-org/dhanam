@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { PrismaService } from '@core/prisma/prisma.service';
 import { Decimal } from '@db';
 
 import { RulesService, CategoryRule, RuleCondition } from '../rules.service';
-import { PrismaService } from '@core/prisma/prisma.service';
 
 describe('RulesService - Business Logic Tests', () => {
   let service: RulesService;
@@ -28,7 +29,7 @@ describe('RulesService - Business Logic Tests', () => {
   const mockTransaction = {
     id: 'txn-123',
     accountId: 'account-123',
-    amount: new Decimal(-50.00),
+    amount: new Decimal(-50.0),
     currency: 'USD',
     description: 'WHOLE FOODS GROCERY STORE',
     merchant: 'Whole Foods',
@@ -363,7 +364,7 @@ describe('RulesService - Business Logic Tests', () => {
 
       const transaction = {
         ...mockTransaction,
-        amount: new Decimal(-150.00), // Absolute value: 150
+        amount: new Decimal(-150.0), // Absolute value: 150
       };
 
       // Act
@@ -392,7 +393,7 @@ describe('RulesService - Business Logic Tests', () => {
 
       const transaction = {
         ...mockTransaction,
-        amount: new Decimal(-5.50), // Absolute value: 5.50
+        amount: new Decimal(-5.5), // Absolute value: 5.50
       };
 
       // Act
@@ -422,7 +423,7 @@ describe('RulesService - Business Logic Tests', () => {
 
       const transaction = {
         ...mockTransaction,
-        amount: new Decimal(-50.00), // Absolute value: 50 (within range)
+        amount: new Decimal(-50.0), // Absolute value: 50 (within range)
       };
 
       // Act
@@ -452,7 +453,7 @@ describe('RulesService - Business Logic Tests', () => {
 
       const transaction = {
         ...mockTransaction,
-        amount: new Decimal(-50.00),
+        amount: new Decimal(-50.0),
       };
 
       // Act
@@ -481,12 +482,12 @@ describe('RulesService - Business Logic Tests', () => {
 
       const negativeTransaction = {
         ...mockTransaction,
-        amount: new Decimal(-50.00), // Negative (expense)
+        amount: new Decimal(-50.0), // Negative (expense)
       };
 
       const positiveTransaction = {
         ...mockTransaction,
-        amount: new Decimal(50.00), // Positive (income)
+        amount: new Decimal(50.0), // Positive (income)
       };
 
       // Act
@@ -526,7 +527,7 @@ describe('RulesService - Business Logic Tests', () => {
       const transaction = {
         ...mockTransaction,
         description: 'Whole Foods Grocery',
-        amount: new Decimal(-50.00),
+        amount: new Decimal(-50.0),
       };
 
       // Act
@@ -562,7 +563,7 @@ describe('RulesService - Business Logic Tests', () => {
       const transaction = {
         ...mockTransaction,
         description: 'Whole Foods Grocery',
-        amount: new Decimal(-50.00), // Less than 100
+        amount: new Decimal(-50.0), // Less than 100
       };
 
       // Act
@@ -699,10 +700,7 @@ describe('RulesService - Business Logic Tests', () => {
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
       // Return high priority first (as expected from getRulesForSpace)
-      prisma.transactionRule.findMany.mockResolvedValue([
-        highPriorityRule,
-        lowPriorityRule,
-      ] as any);
+      prisma.transactionRule.findMany.mockResolvedValue([highPriorityRule, lowPriorityRule] as any);
 
       const transaction = {
         ...mockTransaction,

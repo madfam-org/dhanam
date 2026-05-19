@@ -17,9 +17,17 @@ import { TextInput } from '@/lib/react-native-compat';
 import { apiClient } from '@/services/api';
 
 const budgetCategories = [
-  'Food', 'Transport', 'Shopping', 'Entertainment',
-  'Bills', 'Healthcare', 'Housing', 'Education',
-  'Savings', 'Investment', 'Other',
+  'Food',
+  'Transport',
+  'Shopping',
+  'Entertainment',
+  'Bills',
+  'Healthcare',
+  'Housing',
+  'Education',
+  'Savings',
+  'Investment',
+  'Other',
 ];
 
 export default function CreateBudgetScreen() {
@@ -32,9 +40,7 @@ export default function CreateBudgetScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const toggleCategory = (cat: string) => {
-    setCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
+    setCategories((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]));
   };
 
   const handleSubmit = async () => {
@@ -74,19 +80,26 @@ export default function CreateBudgetScreen() {
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text variant="headlineSmall" style={styles.title}>Create Budget</Text>
+          <Text variant="headlineSmall" style={styles.title}>
+            Create Budget
+          </Text>
         </View>
 
         <Card style={styles.formCard}>
           <Card.Content>
             {/* Name */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Budget Name</Text>
+              <Text variant="titleMedium" style={styles.label}>
+                Budget Name
+              </Text>
               <TextInput
                 mode="outlined"
                 placeholder="e.g., Monthly Groceries, Entertainment"
                 value={name}
-                onChangeText={(text: string) => { setName(text); setError(null); }}
+                onChangeText={(text: string) => {
+                  setName(text);
+                  setError(null);
+                }}
                 style={styles.textInput}
                 accessibilityLabel="Budget name"
               />
@@ -94,12 +107,17 @@ export default function CreateBudgetScreen() {
 
             {/* Amount */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Budget Limit</Text>
+              <Text variant="titleMedium" style={styles.label}>
+                Budget Limit
+              </Text>
               <TextInput
                 mode="outlined"
                 placeholder="0.00"
                 value={amount}
-                onChangeText={(text: string) => { setAmount(text.replace(/[^0-9.]/g, '')); setError(null); }}
+                onChangeText={(text: string) => {
+                  setAmount(text.replace(/[^0-9.]/g, ''));
+                  setError(null);
+                }}
                 keyboardType="numeric"
                 left={<TextInput.Icon icon="currency-usd" />}
                 style={styles.textInput}
@@ -109,7 +127,9 @@ export default function CreateBudgetScreen() {
 
             {/* Period */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Period</Text>
+              <Text variant="titleMedium" style={styles.label}>
+                Period
+              </Text>
               <SegmentedButtons
                 value={period}
                 onValueChange={setPeriod}
@@ -123,7 +143,9 @@ export default function CreateBudgetScreen() {
 
             {/* Categories */}
             <View style={styles.field}>
-              <Text variant="titleMedium" style={styles.label}>Categories</Text>
+              <Text variant="titleMedium" style={styles.label}>
+                Categories
+              </Text>
               <Text variant="bodySmall" style={styles.hint}>
                 Select the spending categories this budget tracks
               </Text>
@@ -132,7 +154,10 @@ export default function CreateBudgetScreen() {
                   <Chip
                     key={cat}
                     selected={categories.includes(cat)}
-                    onPress={() => { toggleCategory(cat); setError(null); }}
+                    onPress={() => {
+                      toggleCategory(cat);
+                      setError(null);
+                    }}
                     mode={categories.includes(cat) ? 'flat' : 'outlined'}
                     style={[styles.chip, categories.includes(cat) && styles.chipSelected]}
                     textStyle={categories.includes(cat) ? styles.chipTextSelected : undefined}

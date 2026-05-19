@@ -104,21 +104,13 @@ export default function SpaceSetupScreen() {
                 <TouchableOpacity
                   key={st.type}
                   onPress={() => setSpaceType(st.type)}
-                  style={[
-                    styles.typeCard,
-                    spaceType === st.type && { borderColor: st.color },
-                  ]}
+                  style={[styles.typeCard, spaceType === st.type && { borderColor: st.color }]}
                   accessible
                   accessibilityRole="radio"
                   accessibilityState={{ selected: spaceType === st.type }}
                   accessibilityLabel={st.title}
                 >
-                  <View
-                    style={[
-                      styles.typeIcon,
-                      { backgroundColor: `${st.color}20` },
-                    ]}
-                  >
+                  <View style={[styles.typeIcon, { backgroundColor: `${st.color}20` }]}>
                     <Ionicons name={st.icon} size={28} color={st.color} />
                   </View>
                   <Text style={styles.typeTitle}>{st.title}</Text>
@@ -137,7 +129,8 @@ export default function SpaceSetupScreen() {
           <View style={styles.infoBox}>
             <Ionicons name="information-circle-outline" size={20} color="#0ea5e9" />
             <Text style={styles.infoText}>
-              Podras crear mas espacios despues. Cada espacio tiene sus propias cuentas y presupuestos independientes.
+              Podras crear mas espacios despues. Cada espacio tiene sus propias cuentas y
+              presupuestos independientes.
             </Text>
           </View>
         </View>

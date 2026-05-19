@@ -19,6 +19,7 @@ We have successfully implemented comprehensive test infrastructure and critical 
 ### 1. Test Infrastructure (680+ lines)
 
 **Test Database Helper** (`apps/api/test/helpers/test-database.ts` - 196 lines)
+
 - ✅ Safe database setup with schema reset via migrations
 - ✅ Transaction-based cleanup respecting foreign keys
 - ✅ Teardown and connection management
@@ -26,6 +27,7 @@ We have successfully implemented comprehensive test infrastructure and critical 
 - ✅ Raw SQL utilities for complex scenarios
 
 **Authentication Helper** (`apps/api/test/helpers/auth-helper.ts` - 370 lines)
+
 - ✅ JWT token generation (access & refresh)
 - ✅ Argon2id password hashing (production parameters)
 - ✅ TOTP secret/code generation with Speakeasy
@@ -34,6 +36,7 @@ We have successfully implemented comprehensive test infrastructure and critical 
 - ✅ Request header creation utilities
 
 **Test Data Factory** (`apps/api/test/helpers/test-data-factory.ts` - 111 lines)
+
 - ✅ Factory pattern for users, spaces, accounts, budgets, categories, transactions
 - ✅ Consistent test data generation
 - ✅ `createFullSetup()` for complete test scenarios
@@ -43,6 +46,7 @@ We have successfully implemented comprehensive test infrastructure and critical 
 **Transactions Service Tests** (`apps/api/src/modules/transactions/__tests__/transactions.service.spec.ts` - 400 lines)
 
 Test Coverage:
+
 - ✅ Pagination with filters (page, limit, offset)
 - ✅ Date range filtering
 - ✅ Amount range filtering
@@ -57,6 +61,7 @@ Test Coverage:
 **Budgets Service Tests** (`apps/api/src/modules/budgets/__tests__/budgets.service.spec.ts` - 80 lines)
 
 Test Coverage:
+
 - ✅ Budget creation (monthly/quarterly/yearly periods)
 - ✅ Automatic end date calculation
 - ✅ Custom date ranges
@@ -69,6 +74,7 @@ Test Coverage:
 ### 3. Spanish i18n (1,300+ lines)
 
 **9 Translation Modules:**
+
 - ✅ `common.ts` (140+ keys) - Actions, status, time, confirmations
 - ✅ `auth.ts` (80+ keys) - Login, signup, 2FA, password reset
 - ✅ `transactions.ts` (80+ keys) - Transactions, categorization
@@ -80,6 +86,7 @@ Test Coverage:
 - ✅ `validations.ts` (80+ keys) - Form validation
 
 **i18n Infrastructure:**
+
 - ✅ `utils/formatters.ts` - Currency, date, number formatting
 - ✅ `hooks/useTranslation.ts` - React hook with interpolation
 - ✅ `contexts/I18nContext.tsx` - Provider with localStorage persistence
@@ -91,6 +98,7 @@ Test Coverage:
 ### Prisma Client Generation
 
 **Issue:**
+
 ```bash
 Error: Failed to fetch the engine file at https://binaries.prisma.sh/...
 403 Forbidden
@@ -100,12 +108,14 @@ Error: Failed to fetch the engine file at https://binaries.prisma.sh/...
 The CI/CD environment has restricted network access and cannot download Prisma engine binaries.
 
 **Impact:**
+
 - Tests requiring Prisma types cannot compile
 - Cannot run test suite to verify coverage percentage
 - Existing tests also affected (not just new ones)
 
 **Workaround:**
 Tests will run successfully in:
+
 - Local development environments
 - GitHub Actions with Postgres service
 - Any environment with internet access to Prisma CDN
@@ -117,24 +127,13 @@ Tests will run successfully in:
 ### Total Test Files: 26
 
 **Passing Tests (No Prisma Dependency):**
+
 1. `src/core/logger/__tests__/log-sanitizer.spec.ts` ✅
 2. `src/core/encryption/encryption.service.spec.ts` ✅
 3. `src/core/cache/cache.service.spec.ts` ✅
 4. `src/core/prisma/prisma.service.spec.ts` ✅
 
-**Blocked Tests (Require Prisma Client):**
-5. `src/modules/transactions/__tests__/transactions.service.spec.ts` (NEW)
-6. `src/modules/budgets/__tests__/budgets.service.spec.ts` (NEW)
-7. `src/modules/providers/belvo/__tests__/belvo.webhook.spec.ts`
-8. `src/modules/providers/plaid/__tests__/plaid.webhook.spec.ts`
-9. `src/modules/providers/bitso/__tests__/bitso.webhook.spec.ts`
-10. `src/modules/categories/__tests__/rules.service.spec.ts`
-11. `src/modules/accounts/accounts.service.spec.ts`
-12. `src/modules/esg/enhanced-esg.service.spec.ts`
-13. `src/modules/preferences/preferences.service.spec.ts`
-14. `src/modules/onboarding/onboarding.service.spec.ts`
-15. `src/modules/admin/admin.service.spec.ts`
-16. `src/modules/jobs/queue.service.spec.ts`
+**Blocked Tests (Require Prisma Client):** 5. `src/modules/transactions/__tests__/transactions.service.spec.ts` (NEW) 6. `src/modules/budgets/__tests__/budgets.service.spec.ts` (NEW) 7. `src/modules/providers/belvo/__tests__/belvo.webhook.spec.ts` 8. `src/modules/providers/plaid/__tests__/plaid.webhook.spec.ts` 9. `src/modules/providers/bitso/__tests__/bitso.webhook.spec.ts` 10. `src/modules/categories/__tests__/rules.service.spec.ts` 11. `src/modules/accounts/accounts.service.spec.ts` 12. `src/modules/esg/enhanced-esg.service.spec.ts` 13. `src/modules/preferences/preferences.service.spec.ts` 14. `src/modules/onboarding/onboarding.service.spec.ts` 15. `src/modules/admin/admin.service.spec.ts` 16. `src/modules/jobs/queue.service.spec.ts`
 ... (22 total requiring Prisma)
 
 ---
@@ -181,6 +180,7 @@ pnpm prisma generate
 ```
 
 **Expected Output:**
+
 ```
 ✔ Generated Prisma Client (v5.8.0) to ./node_modules/@prisma/client
 ```
@@ -200,6 +200,7 @@ pnpm jest src/modules/budgets/__tests__/budgets.service.spec.ts
 ```
 
 **Expected Results:**
+
 ```
 PASS  src/modules/transactions/__tests__/transactions.service.spec.ts (15 tests)
 PASS  src/modules/budgets/__tests__/budgets.service.spec.ts (8 tests)
@@ -216,6 +217,7 @@ open coverage/index.html  # View detailed report
 ```
 
 **Target Metrics:**
+
 - Branches: 80%+
 - Functions: 80%+
 - Lines: 80%+
@@ -224,11 +226,13 @@ open coverage/index.html  # View detailed report
 ### 4. Add Missing Tests (If Needed) ✅
 
 **High Priority Modules:**
+
 - `src/modules/auth/auth.service.ts` - Authentication flows
 - `src/modules/spaces/spaces.service.ts` - Multi-tenant logic
 - `src/modules/users/users.service.ts` - User management
 
 **Medium Priority:**
+
 - Provider integration tests (Belvo, Plaid, Bitso)
 - Webhook handler tests
 - Analytics service tests
@@ -236,6 +240,7 @@ open coverage/index.html  # View detailed report
 ### 5. Set Up CI/CD Coverage ✅
 
 **Add GitHub Actions Workflow:**
+
 ```yaml
 # .github/workflows/test-coverage.yml
 name: Test Coverage
@@ -315,6 +320,7 @@ Total:                 4,960 lines
 ### Test Coverage (Estimated)
 
 **With Our New Tests:**
+
 - Transactions module: ~85%
 - Budgets module: ~80%
 - Auth helpers: 100% (utilities)
@@ -337,6 +343,7 @@ Total:                 4,960 lines
 ## 📝 Conclusion
 
 The test infrastructure is **production-ready** and follows best practices:
+
 - ✅ Isolated test database management
 - ✅ Comprehensive auth utilities
 - ✅ Factory pattern for test data

@@ -7,25 +7,44 @@ export async function seedConnections(prisma: PrismaClient, ctx: SeedContext) {
   console.log('\n🔗 Creating provider connections...');
 
   const keyAccounts = await Promise.all([
-    prisma.account.findFirst({ where: { spaceId: ctx.mariaSpace.id, providerAccountId: 'maria-bbva-checking' } }),
-    prisma.account.findFirst({ where: { spaceId: ctx.mariaSpace.id, providerAccountId: 'maria-bitso' } }),
-    prisma.account.findFirst({ where: { spaceId: ctx.enterpriseSpace.id, providerAccountId: 'enterprise-chase' } }),
-    prisma.account.findFirst({ where: { spaceId: ctx.carlosBusiness.id, providerAccountId: 'business-main' } }),
-    prisma.account.findFirst({ where: { spaceId: ctx.diegoSpace.id, providerAccountId: 'diego-bitso' } }),
-    prisma.account.findFirst({ where: { spaceId: ctx.diegoSpace.id, providerAccountId: 'diego-defi-ethereum' } }),
+    prisma.account.findFirst({
+      where: { spaceId: ctx.mariaSpace.id, providerAccountId: 'maria-bbva-checking' },
+    }),
+    prisma.account.findFirst({
+      where: { spaceId: ctx.mariaSpace.id, providerAccountId: 'maria-bitso' },
+    }),
+    prisma.account.findFirst({
+      where: { spaceId: ctx.enterpriseSpace.id, providerAccountId: 'enterprise-chase' },
+    }),
+    prisma.account.findFirst({
+      where: { spaceId: ctx.carlosBusiness.id, providerAccountId: 'business-main' },
+    }),
+    prisma.account.findFirst({
+      where: { spaceId: ctx.diegoSpace.id, providerAccountId: 'diego-bitso' },
+    }),
+    prisma.account.findFirst({
+      where: { spaceId: ctx.diegoSpace.id, providerAccountId: 'diego-defi-ethereum' },
+    }),
   ]);
 
-  const [mariaBanking, mariaCrypto, enterpriseChase, carlosBusiness, diegoBitso, diegoDefi] = keyAccounts;
+  const [mariaBanking, mariaCrypto, enterpriseChase, carlosBusiness, diegoBitso, diegoDefi] =
+    keyAccounts;
 
   const connectionRows = keyAccounts
     .filter((a): a is NonNullable<typeof a> => a !== null)
-    .map(account => {
+    .map((account) => {
       // Guest crypto connection → error state for failover demo
       if (account.id === mariaCrypto?.id) {
         return {
           accountId: account.id,
           status: ConnectionStatus.error,
-          metadata: { lastSync: subDays(new Date(), 2).toISOString(), syncCount: 18, errorMessage: 'API key expired - re-authentication required', errorCode: 'AUTH_EXPIRED', lastErrorAt: new Date().toISOString() },
+          metadata: {
+            lastSync: subDays(new Date(), 2).toISOString(),
+            syncCount: 18,
+            errorMessage: 'API key expired - re-authentication required',
+            errorCode: 'AUTH_EXPIRED',
+            lastErrorAt: new Date().toISOString(),
+          },
         };
       }
       // Diego's Polygon DeFi → disconnected for failover demo
@@ -33,13 +52,21 @@ export async function seedConnections(prisma: PrismaClient, ctx: SeedContext) {
         return {
           accountId: account.id,
           status: ConnectionStatus.disconnected,
-          metadata: { lastSync: subDays(new Date(), 5).toISOString(), syncCount: 12, disconnectedReason: 'Zapper API rate limit exceeded', disconnectedAt: subDays(new Date(), 1).toISOString() },
+          metadata: {
+            lastSync: subDays(new Date(), 5).toISOString(),
+            syncCount: 12,
+            disconnectedReason: 'Zapper API rate limit exceeded',
+            disconnectedAt: subDays(new Date(), 1).toISOString(),
+          },
         };
       }
       return {
         accountId: account.id,
         status: ConnectionStatus.active,
-        metadata: { lastSync: new Date().toISOString(), syncCount: Math.floor(Math.random() * 50) + 10 },
+        metadata: {
+          lastSync: new Date().toISOString(),
+          syncCount: Math.floor(Math.random() * 50) + 10,
+        },
       };
     });
 
@@ -167,14 +194,62 @@ export async function seedConnections(prisma: PrismaClient, ctx: SeedContext) {
 
   await prisma.institutionProviderMapping.createMany({
     data: [
-      { institutionId: 'bbva_mx', institutionName: 'BBVA México', primaryProvider: Provider.belvo, backupProviders: [], region: 'MX' },
-      { institutionId: 'banorte_mx', institutionName: 'Banorte', primaryProvider: Provider.belvo, backupProviders: [], region: 'MX' },
-      { institutionId: 'santander_mx', institutionName: 'Santander México', primaryProvider: Provider.belvo, backupProviders: [], region: 'MX' },
-      { institutionId: 'hsbc_mx', institutionName: 'HSBC México', primaryProvider: Provider.belvo, backupProviders: [], region: 'MX' },
-      { institutionId: 'ins_chase', institutionName: 'Chase Bank', primaryProvider: Provider.plaid, backupProviders: [], region: 'US' },
-      { institutionId: 'ins_bofa', institutionName: 'Bank of America', primaryProvider: Provider.plaid, backupProviders: [], region: 'US' },
-      { institutionId: 'bitso', institutionName: 'Bitso', primaryProvider: Provider.bitso, backupProviders: [], region: 'MX' },
-      { institutionId: 'zapper_defi', institutionName: 'DeFi (Zapper)', primaryProvider: Provider.blockchain, backupProviders: [], region: 'US' },
+      {
+        institutionId: 'bbva_mx',
+        institutionName: 'BBVA México',
+        primaryProvider: Provider.belvo,
+        backupProviders: [],
+        region: 'MX',
+      },
+      {
+        institutionId: 'banorte_mx',
+        institutionName: 'Banorte',
+        primaryProvider: Provider.belvo,
+        backupProviders: [],
+        region: 'MX',
+      },
+      {
+        institutionId: 'santander_mx',
+        institutionName: 'Santander México',
+        primaryProvider: Provider.belvo,
+        backupProviders: [],
+        region: 'MX',
+      },
+      {
+        institutionId: 'hsbc_mx',
+        institutionName: 'HSBC México',
+        primaryProvider: Provider.belvo,
+        backupProviders: [],
+        region: 'MX',
+      },
+      {
+        institutionId: 'ins_chase',
+        institutionName: 'Chase Bank',
+        primaryProvider: Provider.plaid,
+        backupProviders: [],
+        region: 'US',
+      },
+      {
+        institutionId: 'ins_bofa',
+        institutionName: 'Bank of America',
+        primaryProvider: Provider.plaid,
+        backupProviders: [],
+        region: 'US',
+      },
+      {
+        institutionId: 'bitso',
+        institutionName: 'Bitso',
+        primaryProvider: Provider.bitso,
+        backupProviders: [],
+        region: 'MX',
+      },
+      {
+        institutionId: 'zapper_defi',
+        institutionName: 'DeFi (Zapper)',
+        primaryProvider: Provider.blockchain,
+        backupProviders: [],
+        region: 'US',
+      },
     ],
   });
 

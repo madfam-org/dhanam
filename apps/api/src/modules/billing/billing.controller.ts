@@ -1,4 +1,3 @@
-import { SubscriptionTier } from '@db';
 import {
   Controller,
   Post,
@@ -28,6 +27,8 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import type { FastifyReply } from 'fastify';
 import type Stripe from 'stripe';
+
+import { SubscriptionTier } from '@db';
 
 import { Roles } from '../../core/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';

@@ -11,7 +11,7 @@ describe('CollectiblesValuationProcessor', () => {
 
   beforeEach(() => {
     processor = new CollectiblesValuationProcessor(
-      mockService as unknown as CollectiblesValuationService,
+      mockService as unknown as CollectiblesValuationService
     );
     jest.clearAllMocks();
   });

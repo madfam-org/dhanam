@@ -22,7 +22,7 @@ export async function loginAsGuest(page: Page): Promise<void> {
       localStorage.setItem('auth_tokens', JSON.stringify(tokens));
       localStorage.setItem('auth_user', JSON.stringify(user));
     },
-    { tokens: data.tokens, user: data.user },
+    { tokens: data.tokens, user: data.user }
   );
 }
 
@@ -32,7 +32,7 @@ export async function loginAsGuest(page: Page): Promise<void> {
 export async function loginWithCredentials(
   page: Page,
   email: string,
-  password: string,
+  password: string
 ): Promise<void> {
   const response = await page.request.post(`${API_BASE}/auth/login`, {
     data: { email, password },
@@ -49,18 +49,14 @@ export async function loginWithCredentials(
       localStorage.setItem('auth_tokens', JSON.stringify(tokens));
       localStorage.setItem('auth_user', JSON.stringify(user));
     },
-    { tokens: data.tokens, user: data.user },
+    { tokens: data.tokens, user: data.user }
   );
 }
 
 /**
  * Login via the UI (filling form fields)
  */
-export async function loginViaUI(
-  page: Page,
-  email: string,
-  password: string,
-): Promise<void> {
+export async function loginViaUI(page: Page, email: string, password: string): Promise<void> {
   await page.goto('/login');
   await page.fill('input[name="email"], [aria-label="Email"]', email);
   await page.fill('input[name="password"], [aria-label="Password"]', password);
@@ -94,7 +90,7 @@ export async function isAuthenticated(page: Page): Promise<boolean> {
 export async function registerWithPlan(
   page: Page,
   userData: { email: string; password: string; name: string },
-  plan: string,
+  plan: string
 ): Promise<void> {
   const registerResponse = await page.request.post(`${API_BASE}/auth/register`, {
     data: {
@@ -116,7 +112,7 @@ export async function registerWithPlan(
       localStorage.setItem('auth_tokens', JSON.stringify(tokens));
       localStorage.setItem('auth_user', JSON.stringify(user));
     },
-    { tokens: registerData.tokens, user: registerData.user },
+    { tokens: registerData.tokens, user: registerData.user }
   );
 
   // Start trial for the selected plan

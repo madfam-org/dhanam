@@ -415,7 +415,7 @@ dhanam-documents/
 ```json
 [
   {
-    "AllowedOrigins": ["https://app.dhan.am", "https://admin.dhanam.com"],
+    "AllowedOrigins": ["https://app.dhan.am", "https://admin.dhan.am"],
     "AllowedMethods": ["GET", "PUT", "DELETE"],
     "AllowedHeaders": ["*"],
     "MaxAgeSeconds": 3600

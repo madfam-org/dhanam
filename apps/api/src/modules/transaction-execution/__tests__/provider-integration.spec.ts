@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../../../core/prisma/prisma.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { CryptoService } from '../../../core/crypto/crypto.service';
-import { BitsoExecutionProvider } from '../providers/bitso-execution.provider';
-import { PlaidExecutionProvider } from '../providers/plaid-execution.provider';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { BelvoExecutionProvider } from '../providers/belvo-execution.provider';
+import { BitsoExecutionProvider } from '../providers/bitso-execution.provider';
 import { ExecutionOrder } from '../providers/execution-provider.interface';
+import { PlaidExecutionProvider } from '../providers/plaid-execution.provider';
 
 /**
  * Provider Integration Tests
@@ -93,7 +94,9 @@ describe('Provider Integration Tests', () => {
       const result = await bitsoProvider.validateOrder(invalidOrder);
 
       expect(result.valid).toBe(false);
-      expect(result.errors?.some(err => err.includes('Currency GBP is not supported'))).toBe(true);
+      expect(result.errors?.some((err) => err.includes('Currency GBP is not supported'))).toBe(
+        true
+      );
     });
 
     it('should validate order amount limits', async () => {
@@ -101,7 +104,7 @@ describe('Provider Integration Tests', () => {
       const result = await bitsoProvider.validateOrder(tooSmallOrder);
 
       expect(result.valid).toBe(false);
-      expect(result.errors?.some(err => err.includes('Order amount below minimum'))).toBe(true);
+      expect(result.errors?.some((err) => err.includes('Order amount below minimum'))).toBe(true);
     });
 
     (shouldRunIntegrationTests ? it : it.skip)(
@@ -159,7 +162,9 @@ describe('Provider Integration Tests', () => {
       const result = await plaidProvider.validateOrder(invalidOrder);
 
       expect(result.valid).toBe(false);
-      expect(result.errors?.some(err => err.includes('Currency MXN is not supported'))).toBe(true);
+      expect(result.errors?.some((err) => err.includes('Currency MXN is not supported'))).toBe(
+        true
+      );
     });
 
     it('should validate transfer requires destination account', async () => {
@@ -167,7 +172,7 @@ describe('Provider Integration Tests', () => {
       const result = await plaidProvider.validateOrder(invalidOrder);
 
       expect(result.valid).toBe(false);
-      expect(result.errors?.some(err => err.includes('Destination account required'))).toBe(true);
+      expect(result.errors?.some((err) => err.includes('Destination account required'))).toBe(true);
     });
 
     it('should validate same-day ACH limits', async () => {
@@ -175,7 +180,7 @@ describe('Provider Integration Tests', () => {
       const result = await plaidProvider.validateOrder(tooLargeOrder);
 
       expect(result.valid).toBe(false);
-      expect(result.errors?.some(err => err.includes('exceeds same-day ACH maximum'))).toBe(true);
+      expect(result.errors?.some((err) => err.includes('exceeds same-day ACH maximum'))).toBe(true);
     });
 
     (shouldRunIntegrationTests ? it : it.skip)(
@@ -222,7 +227,9 @@ describe('Provider Integration Tests', () => {
       const result = await belvoProvider.validateOrder(invalidOrder);
 
       expect(result.valid).toBe(false);
-      expect(result.errors?.some(err => err.includes('Currency USD is not supported'))).toBe(true);
+      expect(result.errors?.some((err) => err.includes('Currency USD is not supported'))).toBe(
+        true
+      );
     });
 
     it('should validate transfer requires destination account', async () => {
@@ -230,7 +237,11 @@ describe('Provider Integration Tests', () => {
       const result = await belvoProvider.validateOrder(invalidOrder);
 
       expect(result.valid).toBe(false);
-      expect(result.errors?.some(err => err.includes('Destination account required for SPEI transfers'))).toBe(true);
+      expect(
+        result.errors?.some((err) =>
+          err.includes('Destination account required for SPEI transfers')
+        )
+      ).toBe(true);
     });
 
     (shouldRunIntegrationTests ? it : it.skip)(

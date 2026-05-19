@@ -26,24 +26,28 @@ SENTRY_ENVIRONMENT=production     # development, staging, or production
 ### 3. Features Enabled
 
 **Error Tracking:**
+
 - All 5xx errors automatically captured
 - Full stack traces
 - Request context (URL, method, headers)
 - User context (ID, email) when authenticated
 
 **Performance Monitoring:**
+
 - 10% of transactions sampled in production
 - 100% in development
 - HTTP request traces
 - Database query traces (via Prisma integration)
 
 **Profiling:**
+
 - CPU profiling for performance bottlenecks
 - 10% sample rate in production
 
 ### 4. Error Filtering
 
 The following errors are **not** sent to Sentry:
+
 - Validation errors (user input mistakes)
 - 401 Unauthorized (expected auth failures)
 - 404 Not Found (expected)
@@ -52,6 +56,7 @@ The following errors are **not** sent to Sentry:
 ### 5. Sensitive Data Protection
 
 Automatically removes:
+
 - `authorization` headers
 - `cookie` headers
 - `x-api-key` headers
@@ -75,17 +80,16 @@ export class MyService {
       this.sentryService.captureException(error, {
         userId: user.id,
         operation: 'riskyOperation',
-        metadata: { /* custom data */ },
+        metadata: {
+          /* custom data */
+        },
       });
       throw error;
     }
   }
 
   async trackPerformance() {
-    const transaction = this.sentryService.startTransaction(
-      'expensiveOperation',
-      'task'
-    );
+    const transaction = this.sentryService.startTransaction('expensiveOperation', 'task');
 
     try {
       // Your expensive operation
@@ -101,6 +105,7 @@ export class MyService {
 ### 1. Set Up Alerts
 
 Configure Sentry alerts for:
+
 - Any error affecting >10 users
 - Error rate >1% in last hour
 - Response time >2s p95
@@ -120,6 +125,7 @@ Configure Sentry alerts for:
 ### 3. Error Budgets
 
 Maintain error rates below:
+
 - Financial operations: 0.01% (1 in 10,000)
 - Authentication: 0.1% (1 in 1,000)
 - General API: 1% (1 in 100)
@@ -151,17 +157,20 @@ export SENTRY_RELEASE="dhanam-api@$(git rev-parse --short HEAD)"
 ## Troubleshooting
 
 **Sentry not capturing errors:**
+
 1. Check `SENTRY_DSN` is set
 2. Check network connectivity to sentry.io
 3. Verify error is 5xx (4xx are not captured by default)
 4. Check beforeSend filter isn't excluding your error
 
 **Too many errors:**
+
 1. Review beforeSend filter
 2. Increase sample rate if needed
 3. Set up proper error boundaries in frontend
 
 **Performance impact:**
+
 1. Sentry adds <5ms latency
 2. Reduce tracesSampleRate if needed
 3. Disable profiling in high-traffic scenarios

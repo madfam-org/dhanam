@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { PostHogService } from '../analytics/posthog.service';
 
 import { BudgetsAnalytics, AlertType } from './budgets.analytics';
-import { PostHogService } from '../analytics/posthog.service';
 
 describe('BudgetsAnalytics', () => {
   let service: BudgetsAnalytics;
@@ -121,9 +122,7 @@ describe('BudgetsAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackBudgetDeleted('user-123', 'budget-789')
-      ).resolves.not.toThrow();
+      await expect(service.trackBudgetDeleted('user-123', 'budget-789')).resolves.not.toThrow();
     });
   });
 
@@ -467,9 +466,7 @@ describe('BudgetsAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackBudgetDashboardViewed('user-123', 'yearly')
-      ).resolves.not.toThrow();
+      await expect(service.trackBudgetDashboardViewed('user-123', 'yearly')).resolves.not.toThrow();
     });
   });
 });

@@ -161,7 +161,10 @@ describe('ESGManager', () => {
 
       const testManager = new ESGManager({
         providers: { primary: 'dhanam', fallback: [] },
-        scoring: { weights: { environmental: 0.4, social: 0.3, governance: 0.3 }, minimumConfidence: 50 },
+        scoring: {
+          weights: { environmental: 0.4, social: 0.3, governance: 0.3 },
+          minimumConfidence: 50,
+        },
       });
       testManager.registerProvider(provider);
 
@@ -172,14 +175,12 @@ describe('ESGManager', () => {
 
   describe('getMultipleAssetESG', () => {
     it('should fetch multiple assets in batches', async () => {
-      const mockBatchData = [
-        mockESGData,
-        { ...mockESGData, symbol: 'ETH', name: 'Ethereum' },
-      ];
+      const mockBatchData = [mockESGData, { ...mockESGData, symbol: 'ETH', name: 'Ethereum' }];
 
       const provider: ESGProvider = {
         name: 'dhanam',
-        getAssetESG: jest.fn()
+        getAssetESG: jest
+          .fn()
           .mockResolvedValueOnce(mockBatchData[0])
           .mockResolvedValueOnce(mockBatchData[1]),
         getMultipleAssetESG: jest.fn(),
@@ -201,7 +202,8 @@ describe('ESGManager', () => {
     it('should handle partial failures gracefully', async () => {
       const provider: ESGProvider = {
         name: 'dhanam',
-        getAssetESG: jest.fn()
+        getAssetESG: jest
+          .fn()
           .mockResolvedValueOnce(mockESGData)
           .mockRejectedValueOnce(new Error('Failed for ETH')),
         getMultipleAssetESG: jest.fn(),
@@ -233,9 +235,7 @@ describe('ESGManager', () => {
       });
       testManager.registerProvider(provider);
 
-      const holdings = [
-        { symbol: 'BTC', quantity: 1, value: 50000 },
-      ];
+      const holdings = [{ symbol: 'BTC', quantity: 1, value: 50000 }];
 
       const analysis = await testManager.analyzePortfolio(holdings);
       expect(analysis).toBeDefined();

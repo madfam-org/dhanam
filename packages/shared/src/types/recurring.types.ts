@@ -16,10 +16,10 @@ export type RecurrenceFrequency =
   | 'yearly';
 
 export type RecurringStatus =
-  | 'detected'    // Auto-detected, awaiting user confirmation
-  | 'confirmed'   // User confirmed as recurring
-  | 'dismissed'   // User dismissed detection
-  | 'paused';     // User paused tracking
+  | 'detected' // Auto-detected, awaiting user confirmation
+  | 'confirmed' // User confirmed as recurring
+  | 'dismissed' // User dismissed detection
+  | 'paused'; // User paused tracking
 
 export interface RecurringTransaction {
   id: UUID;

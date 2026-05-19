@@ -11,16 +11,16 @@ export class PortfolioESGAnalyzer {
 
   analyzePortfolio(holdings: PortfolioHolding[]): PortfolioESGAnalysis {
     const totalValue = holdings.reduce((sum, holding) => sum + holding.value, 0);
-    
+
     if (totalValue === 0) {
       return this.getEmptyAnalysis();
     }
 
     const assetBreakdown = holdings
-      .map(holding => {
+      .map((holding) => {
         const esgData = this.esgData.get(holding.symbol.toUpperCase());
         const weight = holding.value / totalValue;
-        
+
         return {
           symbol: holding.symbol,
           weight,
@@ -28,7 +28,7 @@ export class PortfolioESGAnalyzer {
           contribution: weight * (esgData?.score.overall || 50),
         };
       })
-      .filter(asset => asset.weight > 0.001); // Filter out negligible positions
+      .filter((asset) => asset.weight > 0.001); // Filter out negligible positions
 
     const weightedScore = this.calculateWeightedScore(assetBreakdown);
     const insights = this.generateInsights(assetBreakdown);
@@ -44,28 +44,27 @@ export class PortfolioESGAnalyzer {
 
   private calculateWeightedScore(breakdown: any[]): ESGScore {
     const totalWeight = breakdown.reduce((sum, asset) => sum + asset.weight, 0);
-    
+
     if (totalWeight === 0) {
       return this.getDefaultScore();
     }
 
-    const environmental = breakdown.reduce(
-      (sum, asset) => sum + (asset.score.environmental * asset.weight), 0
-    ) / totalWeight;
+    const environmental =
+      breakdown.reduce((sum, asset) => sum + asset.score.environmental * asset.weight, 0) /
+      totalWeight;
 
-    const social = breakdown.reduce(
-      (sum, asset) => sum + (asset.score.social * asset.weight), 0
-    ) / totalWeight;
+    const social =
+      breakdown.reduce((sum, asset) => sum + asset.score.social * asset.weight, 0) / totalWeight;
 
-    const governance = breakdown.reduce(
-      (sum, asset) => sum + (asset.score.governance * asset.weight), 0
-    ) / totalWeight;
+    const governance =
+      breakdown.reduce((sum, asset) => sum + asset.score.governance * asset.weight, 0) /
+      totalWeight;
 
     const overall = (environmental + social + governance) / 3;
 
-    const confidence = breakdown.reduce(
-      (sum, asset) => sum + (asset.score.confidence * asset.weight), 0
-    ) / totalWeight;
+    const confidence =
+      breakdown.reduce((sum, asset) => sum + asset.score.confidence * asset.weight, 0) /
+      totalWeight;
 
     return {
       overall: Math.round(overall),
@@ -81,34 +80,43 @@ export class PortfolioESGAnalyzer {
 
   private generateInsights(breakdown: any[]): any {
     const sortedByScore = [...breakdown].sort((a, b) => b.score.overall - a.score.overall);
-    const topPerformers = sortedByScore.slice(0, 3).map(asset => asset.symbol);
-    
+    const topPerformers = sortedByScore.slice(0, 3).map((asset) => asset.symbol);
+
     const lowPerformers = sortedByScore
-      .filter(asset => asset.score.overall < 40)
-      .map(asset => asset.symbol);
+      .filter((asset) => asset.score.overall < 40)
+      .map((asset) => asset.symbol);
 
     const recommendations = [];
-    
+
     if (lowPerformers.length > 0) {
-      recommendations.push(`Consider reducing exposure to low ESG assets: ${lowPerformers.slice(0, 2).join(', ')}`);
-    }
-    
-    const avgEnvironmental = breakdown.reduce((sum, asset) => sum + asset.score.environmental * asset.weight, 0);
-    if (avgEnvironmental < 50) {
-      recommendations.push('Consider increasing allocation to eco-friendly cryptocurrencies like Cardano (ADA) or Algorand (ALGO)');
+      recommendations.push(
+        `Consider reducing exposure to low ESG assets: ${lowPerformers.slice(0, 2).join(', ')}`
+      );
     }
 
-    const powHeavy = breakdown.filter(asset => 
-      asset.symbol === 'BTC' && asset.weight > 0.5
-    ).length > 0;
-    
+    const avgEnvironmental = breakdown.reduce(
+      (sum, asset) => sum + asset.score.environmental * asset.weight,
+      0
+    );
+    if (avgEnvironmental < 50) {
+      recommendations.push(
+        'Consider increasing allocation to eco-friendly cryptocurrencies like Cardano (ADA) or Algorand (ALGO)'
+      );
+    }
+
+    const powHeavy =
+      breakdown.filter((asset) => asset.symbol === 'BTC' && asset.weight > 0.5).length > 0;
+
     if (powHeavy) {
-      recommendations.push('High Bitcoin allocation detected - consider diversifying to Proof-of-Stake assets for better ESG scores');
+      recommendations.push(
+        'High Bitcoin allocation detected - consider diversifying to Proof-of-Stake assets for better ESG scores'
+      );
     }
 
     return {
       topPerformers,
-      improvementAreas: lowPerformers.length > 0 ? ['Environmental impact', 'Asset diversification'] : [],
+      improvementAreas:
+        lowPerformers.length > 0 ? ['Environmental impact', 'Asset diversification'] : [],
       recommendations: recommendations.slice(0, 3),
     };
   }

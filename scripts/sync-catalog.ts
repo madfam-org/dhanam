@@ -115,7 +115,7 @@ async function findStripePrice(
   stripe: Stripe,
   productId: string,
   currency: string,
-  interval: string,
+  interval: string
 ): Promise<Stripe.Price | null> {
   const prices = await stripe.prices.list({
     product: productId,
@@ -128,7 +128,7 @@ async function findStripePrice(
     prices.data.find(
       (p) =>
         p.recurring?.interval === (interval === 'yearly' ? 'year' : 'month') &&
-        p.recurring?.interval_count === 1,
+        p.recurring?.interval_count === 1
     ) ?? null
   );
 }
@@ -241,12 +241,7 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
           const stripe = getStripeForCurrency(currency);
           const stripeProductId = stripeProductIds[currency];
           if (stripe && stripeProductId && !dbPrice.stripePriceId) {
-            let stripePrice = await findStripePrice(
-              stripe,
-              stripeProductId,
-              currency,
-              interval,
-            );
+            let stripePrice = await findStripePrice(stripe, stripeProductId, currency, interval);
 
             if (stripePrice) {
               log('Price', `Found ${slug}/${tierSlug} ${currency} ${interval}: ${stripePrice.id}`);
@@ -263,7 +258,10 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
                   madfam_interval: interval,
                 },
               });
-              log('Price', `Created ${slug}/${tierSlug} ${currency} ${interval}: ${stripePrice.id}`);
+              log(
+                'Price',
+                `Created ${slug}/${tierSlug} ${currency} ${interval}: ${stripePrice.id}`
+              );
             }
 
             // Store Stripe price ID back in DB
@@ -273,7 +271,10 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
             });
           }
         } else {
-          log('Price', `Would sync ${slug}/${tierSlug} ${currency} ${interval}: ${amount} centavos`);
+          log(
+            'Price',
+            `Would sync ${slug}/${tierSlug} ${currency} ${interval}: ${amount} centavos`
+          );
         }
       }
     }
@@ -394,7 +395,9 @@ async function main(): Promise<void> {
   }
 
   if (!stripeMx && !stripeGlobal) {
-    console.warn('WARNING: No Stripe API keys set. DB sync only (no Stripe products/prices created).');
+    console.warn(
+      'WARNING: No Stripe API keys set. DB sync only (no Stripe products/prices created).'
+    );
   }
 
   // Sync products

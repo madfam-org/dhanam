@@ -70,8 +70,7 @@ export default function NotificationsScreen() {
 
       // Navigate to deep link
       const deepLink =
-        notification.deepLink ||
-        getNotificationDeepLink(notification.type, notification.data);
+        notification.deepLink || getNotificationDeepLink(notification.type, notification.data);
       if (deepLink) {
         router.push(deepLink as never);
       }
@@ -129,18 +128,14 @@ export default function NotificationsScreen() {
 
   const unreadCount = notifications?.filter((n) => !n.read).length || 0;
   const filteredNotifications =
-    filter === 'unread'
-      ? notifications?.filter((n) => !n.read)
-      : notifications;
+    filter === 'unread' ? notifications?.filter((n) => !n.read) : notifications;
 
   return (
     <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={false} onRefresh={refetch} />
-        }
+        refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
@@ -183,14 +178,8 @@ export default function NotificationsScreen() {
               selected={filter === 'unread'}
               onPress={() => setFilter('unread')}
               mode={filter === 'unread' ? 'flat' : 'outlined'}
-              style={
-                filter === 'unread'
-                  ? styles.filterChipActive
-                  : styles.filterChip
-              }
-              textStyle={
-                filter === 'unread' ? styles.filterChipTextActive : undefined
-              }
+              style={filter === 'unread' ? styles.filterChipActive : styles.filterChip}
+              textStyle={filter === 'unread' ? styles.filterChipTextActive : undefined}
             >
               Unread ({unreadCount})
             </Chip>
@@ -204,10 +193,7 @@ export default function NotificationsScreen() {
               <View key={notification.id}>
                 <TouchableRipple
                   onPress={() => handleNotificationPress(notification)}
-                  style={[
-                    styles.notificationItem,
-                    !notification.read && styles.notificationUnread,
-                  ]}
+                  style={[styles.notificationItem, !notification.read && styles.notificationUnread]}
                   accessibilityRole="button"
                   accessibilityLabel={`${notification.title}. ${notification.body}`}
                 >
@@ -245,15 +231,9 @@ export default function NotificationsScreen() {
                         >
                           {notification.title}
                         </Text>
-                        {!notification.read && (
-                          <View style={styles.unreadDot} />
-                        )}
+                        {!notification.read && <View style={styles.unreadDot} />}
                       </View>
-                      <Text
-                        variant="bodyMedium"
-                        style={styles.notificationBody}
-                        numberOfLines={2}
-                      >
+                      <Text variant="bodyMedium" style={styles.notificationBody} numberOfLines={2}>
                         {notification.body}
                       </Text>
                       <View style={styles.notificationMeta}>
@@ -263,9 +243,7 @@ export default function NotificationsScreen() {
                           style={[
                             styles.typeChip,
                             {
-                              borderColor: getNotificationColor(
-                                notification.type
-                              ),
+                              borderColor: getNotificationColor(notification.type),
                             },
                           ]}
                         >
@@ -278,16 +256,10 @@ export default function NotificationsScreen() {
                     </View>
 
                     {/* Chevron */}
-                    <Ionicons
-                      name="chevron-forward"
-                      size={18}
-                      color="#BDBDBD"
-                    />
+                    <Ionicons name="chevron-forward" size={18} color="#BDBDBD" />
                   </View>
                 </TouchableRipple>
-                {index < filteredNotifications.length - 1 && (
-                  <Divider style={styles.divider} />
-                )}
+                {index < filteredNotifications.length - 1 && <Divider style={styles.divider} />}
               </View>
             ))}
           </View>
@@ -301,9 +273,7 @@ export default function NotificationsScreen() {
               style={styles.emptyIcon}
             />
             <Text variant="headlineSmall" style={styles.emptyTitle}>
-              {filter === 'unread'
-                ? 'All Caught Up'
-                : 'No Notifications Yet'}
+              {filter === 'unread' ? 'All Caught Up' : 'No Notifications Yet'}
             </Text>
             <Text variant="bodyLarge" style={styles.emptyMessage}>
               {filter === 'unread'
@@ -311,11 +281,7 @@ export default function NotificationsScreen() {
                 : 'Notifications about your budgets, transactions, and goals will appear here'}
             </Text>
             {filter === 'unread' && (
-              <Button
-                mode="outlined"
-                onPress={() => setFilter('all')}
-                style={styles.viewAllButton}
-              >
+              <Button mode="outlined" onPress={() => setFilter('all')} style={styles.viewAllButton}>
                 View All Notifications
               </Button>
             )}

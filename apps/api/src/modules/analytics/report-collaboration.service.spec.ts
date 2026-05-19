@@ -1,13 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuditService } from '@core/audit/audit.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 
+import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
+
 import { ReportCollaborationService } from './report-collaboration.service';
 import { SavedReportService } from './saved-report.service';
-
-import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 describe('ReportCollaborationService', () => {
   let service: ReportCollaborationService;
@@ -71,7 +71,11 @@ describe('ReportCollaborationService', () => {
 
   describe('shareReport', () => {
     it('should share a report with another user', async () => {
-      prisma.user.findUnique.mockResolvedValue({ id: 'user-2', name: 'User 2', email: 'user2@test.com' });
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-2',
+        name: 'User 2',
+        email: 'user2@test.com',
+      });
       prisma.reportShare.findUnique.mockResolvedValue(null); // no existing share
       prisma.reportShare.create.mockResolvedValue(mockShare);
       prisma.savedReport.update.mockResolvedValue({});
@@ -82,7 +86,10 @@ describe('ReportCollaborationService', () => {
         role: 'editor',
       });
 
-      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'report-1', ['manager', 'editor']);
+      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'report-1', [
+        'manager',
+        'editor',
+      ]);
       expect(result).toEqual(mockShare);
       expect(auditService.logEvent).toHaveBeenCalled();
     });
@@ -100,7 +107,11 @@ describe('ReportCollaborationService', () => {
     });
 
     it('should throw when report already shared with user', async () => {
-      prisma.user.findUnique.mockResolvedValue({ id: 'user-2', name: 'User 2', email: 'user2@test.com' });
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-2',
+        name: 'User 2',
+        email: 'user2@test.com',
+      });
       prisma.reportShare.findUnique.mockResolvedValue(mockShare);
 
       await expect(
@@ -178,7 +189,9 @@ describe('ReportCollaborationService', () => {
     it('should throw when share not found', async () => {
       prisma.reportShare.findUnique.mockResolvedValue(null);
 
-      await expect(service.declineShare('user-2', 'nonexistent')).rejects.toThrow(NotFoundException);
+      await expect(service.declineShare('user-2', 'nonexistent')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw when not the target user', async () => {
@@ -201,7 +214,9 @@ describe('ReportCollaborationService', () => {
 
       await service.revokeShare('user-1', 'share-1');
 
-      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'report-1', ['manager']);
+      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'report-1', [
+        'manager',
+      ]);
       expect(prisma.reportShare.update).toHaveBeenCalledWith({
         where: { id: 'share-1' },
         data: { status: 'revoked' },

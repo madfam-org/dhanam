@@ -9,6 +9,7 @@ The Connection Health module provides comprehensive monitoring of all financial 
 ## Supported Regions/Institutions
 
 This module monitors all configured providers:
+
 - Belvo (Mexico)
 - Plaid (US)
 - MX (US/Canada)
@@ -25,12 +26,12 @@ Not applicable - this is an internal monitoring service that tracks health of ex
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/providers/connection-health/spaces/:spaceId` | Full health dashboard |
-| `GET` | `/providers/connection-health/spaces/:spaceId/needs-attention` | Accounts requiring action |
-| `GET` | `/providers/connection-health/accounts/:accountId` | Single account health |
-| `GET` | `/providers/connection-health/spaces/:spaceId/summary` | Quick summary for widgets |
+| Method | Endpoint                                                       | Description               |
+| ------ | -------------------------------------------------------------- | ------------------------- |
+| `GET`  | `/providers/connection-health/spaces/:spaceId`                 | Full health dashboard     |
+| `GET`  | `/providers/connection-health/spaces/:spaceId/needs-attention` | Accounts requiring action |
+| `GET`  | `/providers/connection-health/accounts/:accountId`             | Single account health     |
+| `GET`  | `/providers/connection-health/spaces/:spaceId/summary`         | Quick summary for widgets |
 
 ### Service Methods
 
@@ -42,13 +43,13 @@ Not applicable - this is an internal monitoring service that tracks health of ex
 
 ### Health Status Types
 
-| Status | Description | Health Score |
-|--------|-------------|--------------|
-| `healthy` | Connection working normally | 80-100 |
-| `degraded` | Intermittent issues or stale data | 40-79 |
-| `error` | Sync failures, needs investigation | 20-39 |
-| `disconnected` | Connection lost | 0-19 |
-| `requires_reauth` | Authorization expired | 0-19 |
+| Status            | Description                        | Health Score |
+| ----------------- | ---------------------------------- | ------------ |
+| `healthy`         | Connection working normally        | 80-100       |
+| `degraded`        | Intermittent issues or stale data  | 40-79        |
+| `error`           | Sync failures, needs investigation | 20-39        |
+| `disconnected`    | Connection lost                    | 0-19         |
+| `requires_reauth` | Authorization expired              | 0-19         |
 
 ### Health Score Calculation
 
@@ -77,6 +78,7 @@ The health score (0-100) is calculated based on:
 ### Connection Attempt Tracking
 
 Each sync attempt is recorded with:
+
 ```typescript
 {
   spaceId: string;
@@ -96,6 +98,7 @@ Each sync attempt is recorded with:
 ### Circuit Breaker Integration
 
 The service integrates with `CircuitBreakerService` to:
+
 - Record successful requests with response times
 - Record failures with error messages
 - Query circuit state (closed/open/half-open)
@@ -103,20 +106,21 @@ The service integrates with `CircuitBreakerService` to:
 
 ### Action Required Messages
 
-| Condition | Action Message |
-|-----------|----------------|
-| Connection error | "Connection error. Try refreshing or reconnecting." |
-| Disconnected | "Account disconnected. Please reconnect." |
-| Auth expired | "Authorization expired. Please reconnect your account." |
-| 5+ failures | "{N} failed sync attempts in the last 24 hours." |
-| 48h stale | "Account has not synced in over 48 hours." |
-| Provider issues | "{Provider} provider is experiencing issues." |
+| Condition        | Action Message                                          |
+| ---------------- | ------------------------------------------------------- |
+| Connection error | "Connection error. Try refreshing or reconnecting."     |
+| Disconnected     | "Account disconnected. Please reconnect."               |
+| Auth expired     | "Authorization expired. Please reconnect your account." |
+| 5+ failures      | "{N} failed sync attempts in the last 24 hours."        |
+| 48h stale        | "Account has not synced in over 48 hours."              |
+| Provider issues  | "{Provider} provider is experiencing issues."           |
 
 ## Configuration
 
 ### Response Schema
 
 **Full Health Dashboard**:
+
 ```typescript
 interface ConnectionHealthSummary {
   totalConnections: number;
@@ -131,6 +135,7 @@ interface ConnectionHealthSummary {
 ```
 
 **Account Health**:
+
 ```typescript
 interface AccountConnectionHealth {
   accountId: string;
@@ -147,6 +152,7 @@ interface AccountConnectionHealth {
 ```
 
 **Quick Summary** (for dashboard widgets):
+
 ```typescript
 {
   statusBadge: 'green' | 'yellow' | 'red';
@@ -172,5 +178,6 @@ interface AccountConnectionHealth {
 - `modules/spaces/guards/space.guard` - Space access authorization
 
 ---
+
 **Provider**: `providers/connection-health`
 **Last Updated**: January 2025

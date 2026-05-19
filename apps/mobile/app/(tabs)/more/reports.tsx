@@ -42,7 +42,13 @@ function displayDate(dateString: string): string {
   });
 }
 
-type DateRangePreset = 'last7days' | 'last30days' | 'thisMonth' | 'lastMonth' | 'last3Months' | 'thisYear';
+type DateRangePreset =
+  | 'last7days'
+  | 'last30days'
+  | 'thisMonth'
+  | 'lastMonth'
+  | 'last3Months'
+  | 'thisYear';
 
 interface DateRange {
   startDate: Date;
@@ -291,10 +297,7 @@ export default function ReportsScreen() {
                   />
                   <Text
                     variant="titleLarge"
-                    style={[
-                      styles.summaryValue,
-                      summary.netCashflow < 0 && styles.expenseValue,
-                    ]}
+                    style={[styles.summaryValue, summary.netCashflow < 0 && styles.expenseValue]}
                   >
                     {formatCurrency(summary.netCashflow, summary.currency)}
                   </Text>
@@ -372,15 +375,11 @@ export default function ReportsScreen() {
                       </Text>
                     </View>
                     <View style={styles.formatBadge}>
-                      <Text style={styles.formatText}>
-                        {template.format.toUpperCase()}
-                      </Text>
+                      <Text style={styles.formatText}>{template.format.toUpperCase()}</Text>
                     </View>
                   </View>
                 </TouchableRipple>
-                {index < reportTemplates.length - 1 && (
-                  <Divider style={styles.divider} />
-                )}
+                {index < reportTemplates.length - 1 && <Divider style={styles.divider} />}
               </React.Fragment>
             ))}
           </Card.Content>

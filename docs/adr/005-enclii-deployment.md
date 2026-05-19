@@ -1,6 +1,7 @@
 # ADR-005: Enclii Deployment Platform
 
 ## Status
+
 **Accepted** - January 2025
 
 ## Context
@@ -15,6 +16,7 @@ Dhanam requires a deployment platform that supports:
 6. **MADFAM Integration**: Work with Janua auth and shared infrastructure
 
 Options considered:
+
 1. **Vercel**: Great DX, expensive at scale, limited backend support
 2. **Railway**: Simple, good pricing, limited control
 3. **AWS ECS/Fargate**: Full control, complex setup
@@ -82,7 +84,7 @@ GitHub Main Branch
 ├─────────────────────────────────────────────────────┤
 │  api.dhan.am     → NestJS API (3 replicas min)     │
 │  app.dhan.am     → Next.js Web (2 replicas min)    │
-│  admin.dhanam.com → Admin Dashboard (1 replica)    │
+│  admin.dhan.am  → Admin Dashboard (1 replica)      │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -131,7 +133,7 @@ services:
       dockerfile: apps/admin/Dockerfile
     replicas: 1
     domains:
-      - admin.dhanam.com
+      - admin.dhan.am
 ```
 
 ### Deployment Flow
@@ -153,6 +155,7 @@ services:
 ### CI/CD Integration
 
 GitHub Actions handle pre-deploy validation:
+
 - `ci.yml`: Lint, type-check, unit tests
 - `test-coverage.yml`: Coverage thresholds
 - `check-migrations.yml`: Database migration validation
@@ -169,6 +172,7 @@ enclii secrets set PLAID_SECRET=xxx --service=api
 ```
 
 Secrets are:
+
 - Encrypted at rest
 - Injected as environment variables
 - Not visible in logs or UI
@@ -177,6 +181,7 @@ Secrets are:
 ## Consequences
 
 ### Positive
+
 - **Simplicity**: Single command deploy, no complex cloud configuration
 - **Performance**: Bare-metal K8s, no cloud abstraction overhead
 - **Cost Predictability**: Fixed infrastructure cost, no surprise bills
@@ -184,12 +189,14 @@ Secrets are:
 - **Control**: Full access to underlying infrastructure if needed
 
 ### Negative
+
 - **Vendor Lock-in**: Tied to MADFAM infrastructure
 - **Limited Regions**: Currently only mx-central (expanding)
 - **Ecosystem**: Smaller than AWS/GCP (fewer integrations)
 - **Documentation**: Internal docs, smaller community
 
 ### Mitigations
+
 - Terraform configs in `infra/terraform/` for AWS fallback
 - Docker-based deployments are portable
 - Standard Kubernetes manifests exportable
@@ -198,6 +205,7 @@ Secrets are:
 ## Monitoring & Observability
 
 Enclii provides:
+
 - **Logs**: Structured JSON logs, 30-day retention
 - **Metrics**: Prometheus-compatible, Grafana dashboards
 - **Traces**: OpenTelemetry integration
@@ -215,10 +223,12 @@ this.logger.log({
 ```
 
 ## Related Decisions
+
 - [ADR-001](./001-nestjs-fastify.md): NestJS containerization
 - [ADR-004](./004-janua-auth-integration.md): Janua auth (same infrastructure)
 
 ## References
+
 - [Enclii Documentation](https://docs.enclii.com) (internal)
 - [Kubernetes Deployment Best Practices](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
 - `.enclii.yml` in project root

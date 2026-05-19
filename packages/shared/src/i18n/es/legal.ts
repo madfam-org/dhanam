@@ -18,7 +18,8 @@ export const legal = {
     'Este Aviso de Privacidad describe cómo Dhanam ("nosotros", "nuestro") recopila, usa y protege tu información personal en cumplimiento con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).',
   privacySections: {
     dataController: 'Responsable del Tratamiento',
-    dataControllerContent: '[ASESOR LEGAL DEBE PROVEER — Nombre de la empresa, RFC, domicilio, correo de contacto del oficial de privacidad]',
+    dataControllerContent:
+      '[ASESOR LEGAL DEBE PROVEER — Nombre de la empresa, RFC, domicilio, correo de contacto del oficial de privacidad]',
     dataCollected: 'Datos Personales Recopilados',
     dataCollectedContent:
       '[ASESOR LEGAL DEBE PROVEER — Categorías: datos de identidad, datos financieros, datos del dispositivo, analítica de uso]',
@@ -26,7 +27,8 @@ export const legal = {
     purposesContent:
       '[ASESOR LEGAL DEBE PROVEER — Finalidades primarias: gestión de cuenta, agregación financiera, analítica. Finalidades secundarias: marketing, mejora del producto]',
     legalBasis: 'Base Legal',
-    legalBasisContent: '[ASESOR LEGAL DEBE PROVEER — Consentimiento, ejecución contractual, interés legítimo]',
+    legalBasisContent:
+      '[ASESOR LEGAL DEBE PROVEER — Consentimiento, ejecución contractual, interés legítimo]',
     arcoRights: 'Derechos ARCO',
     arcoRightsContent:
       '[ASESOR LEGAL DEBE PROVEER — Derechos de Acceso, Rectificación, Cancelación y Oposición según los artículos 28-35 de la LFPDPPP. Proceso para ejercer derechos, plazo de respuesta (20 días hábiles)]',
@@ -40,12 +42,14 @@ export const legal = {
     securityContent:
       'Implementamos medidas de seguridad estándar de la industria incluyendo cifrado AES-256-GCM para datos sensibles en reposo, TLS 1.3 para datos en tránsito y evaluaciones de seguridad periódicas.',
     cookies: 'Cookies y Rastreo',
-    cookiesContent: 'Para detalles sobre nuestro uso de cookies y tecnologías de rastreo, consulta nuestra Política de Cookies.',
+    cookiesContent:
+      'Para detalles sobre nuestro uso de cookies y tecnologías de rastreo, consulta nuestra Política de Cookies.',
     changes: 'Cambios a Este Aviso',
     changesContent:
       '[ASESOR LEGAL DEBE PROVEER — Procedimientos de notificación para cambios materiales, requisitos de renovación de consentimiento]',
     contact: 'Información de Contacto',
-    contactContent: '[ASESOR LEGAL DEBE PROVEER — Contacto del oficial de privacidad, domicilio, correo electrónico, teléfono]',
+    contactContent:
+      '[ASESOR LEGAL DEBE PROVEER — Contacto del oficial de privacidad, domicilio, correo electrónico, teléfono]',
   },
 
   // Terms of Service
@@ -149,7 +153,8 @@ export const legal = {
       'Nos ayudan a entender cómo los visitantes usan nuestra aplicación. Usamos PostHog para analítica. Solo se activan con tu consentimiento.',
     analyticsExamples: 'Cookies de seguimiento de PostHog',
     preferences: 'Cookies de Preferencias',
-    preferencesContent: 'Recuerdan tu configuración como el tema (modo claro/oscuro) y preferencia de idioma.',
+    preferencesContent:
+      'Recuerdan tu configuración como el tema (modo claro/oscuro) y preferencia de idioma.',
     preferencesExamples: 'dhanam_locale, preferencia de tema',
     consentMechanism: 'Tus Opciones de Cookies',
     consentMechanismContent:
@@ -161,12 +166,14 @@ export const legal = {
     managingContent:
       'Puedes controlar las cookies a través de la configuración de tu navegador. Ten en cuenta que deshabilitar las cookies esenciales puede impedir que la aplicación funcione correctamente.',
     changes: 'Cambios a Esta Política',
-    changesContent: 'Podemos actualizar esta Política de Cookies periódicamente. Los cambios se publicarán en esta página.',
+    changesContent:
+      'Podemos actualizar esta Política de Cookies periódicamente. Los cambios se publicarán en esta página.',
   },
 
   // ESG Methodology
   esgTitle: 'Metodología ESG',
-  esgSubtitle: 'Cómo calificamos los criptoactivos en factores Ambientales, Sociales y de Gobernanza',
+  esgSubtitle:
+    'Cómo calificamos los criptoactivos en factores Ambientales, Sociales y de Gobernanza',
   esgIntro:
     'Dhanam proporciona calificaciones ESG (Ambiental, Social y de Gobernanza) para criptoactivos para ayudar a los usuarios a tomar decisiones de inversión informadas.',
   esgSections: {
@@ -192,18 +199,21 @@ export const legal = {
     limitationsContent:
       'Las calificaciones ESG son estimaciones basadas en datos disponibles y no deben ser la única base para decisiones de inversión. La metodología y las fuentes de datos están sujetas a cambios. Las calificaciones pueden no capturar todos los factores relevantes.',
     updates: 'Actualizaciones de Calificaciones',
-    updatesContent: 'Las calificaciones ESG se actualizan periódicamente a medida que hay nuevos datos disponibles y se refina la metodología.',
+    updatesContent:
+      'Las calificaciones ESG se actualizan periódicamente a medida que hay nuevos datos disponibles y se refina la metodología.',
   },
 
   // Status Page
   statusTitle: 'Estado del Sistema',
   statusSubtitle: 'Estado operativo actual de los servicios de Dhanam',
-  statusDescription: 'Para el estado del sistema en tiempo real y el historial de incidentes, visita nuestra página de estado.',
+  statusDescription:
+    'Para el estado del sistema en tiempo real y el historial de incidentes, visita nuestra página de estado.',
   statusRedirect: 'Ir a la Página de Estado',
 
   // Documentation
   docsTitle: 'Documentación',
   docsSubtitle: 'Documentación para desarrolladores y usuarios',
-  docsDescription: 'Explora nuestra documentación para guías, referencias de API y detalles de integración.',
+  docsDescription:
+    'Explora nuestra documentación para guías, referencias de API y detalles de integración.',
   docsRedirect: 'Ver Documentación',
 } as const;

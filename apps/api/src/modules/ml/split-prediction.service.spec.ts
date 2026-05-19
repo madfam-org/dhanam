@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { PrismaService } from '@core/prisma/prisma.service';
 
 import { SplitPredictionService } from './split-prediction.service';
-import { PrismaService } from '@core/prisma/prisma.service';
 
 describe('SplitPredictionService', () => {
   let service: SplitPredictionService;
@@ -64,13 +65,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue(mockTransactions);
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -150,
-        'Walmart',
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -150, 'Walmart', null, [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions).toHaveLength(2);
       expect(suggestions[0].userId).toBe('user-1');
@@ -101,13 +99,11 @@ describe('SplitPredictionService', () => {
       mockPrisma.user.findMany.mockResolvedValue(threeUsers);
 
       // Use a transaction amount that will cause rounding issues: 99.99
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -99.99,
-        'Test Merchant',
-        null,
-        ['user-1', 'user-2', 'user-3']
-      );
+      const suggestions = await service.suggestSplits('space-123', -99.99, 'Test Merchant', null, [
+        'user-1',
+        'user-2',
+        'user-3',
+      ]);
 
       expect(suggestions).toHaveLength(3);
 
@@ -128,13 +124,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue(mockTransactions);
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -150,
-        'New Store',
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -150, 'New Store', null, [
+        'user-1',
+        'user-2',
+      ]);
 
       // Should fall back to equal split with lower confidence
       expect(suggestions[0].confidence).toBe(0.5);
@@ -158,13 +151,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
       mockPrisma.category.findUnique.mockResolvedValue({ name: 'Groceries' });
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -200,
-        null,
-        'cat-groceries',
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -200, null, 'cat-groceries', [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions).toHaveLength(2);
       expect(suggestions[0].confidence).toBeGreaterThanOrEqual(0.5); // Should have reasonable confidence
@@ -178,13 +168,10 @@ describe('SplitPredictionService', () => {
 
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100,
-        null,
-        'cat-new',
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100, null, 'cat-new', [
+        'user-1',
+        'user-2',
+      ]);
 
       // Should fall back to equal split
       expect(suggestions[0].confidence).toBeLessThan(0.75);
@@ -208,13 +195,10 @@ describe('SplitPredictionService', () => {
 
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -300,
-        null,
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -300, null, null, [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions).toHaveLength(2);
       expect(suggestions[0].confidence).toBeGreaterThan(0); // Should have some confidence
@@ -229,13 +213,10 @@ describe('SplitPredictionService', () => {
 
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100,
-        null,
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100, null, null, [
+        'user-1',
+        'user-2',
+      ]);
 
       // Should fall back to equal split
       expect(suggestions[0].reasoning).toContain('Equal split');
@@ -247,13 +228,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue([]);
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100,
-        null,
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100, null, null, [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions).toHaveLength(2);
 
@@ -274,13 +252,11 @@ describe('SplitPredictionService', () => {
         { id: 'user-3', name: 'Charlie' },
       ]);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100,
-        null,
-        null,
-        ['user-1', 'user-2', 'user-3']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100, null, null, [
+        'user-1',
+        'user-2',
+        'user-3',
+      ]);
 
       expect(suggestions).toHaveLength(3);
 
@@ -290,13 +266,9 @@ describe('SplitPredictionService', () => {
     });
 
     it('should return empty array if only 1 household member', async () => {
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100,
-        'Walmart',
-        null,
-        ['user-1']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100, 'Walmart', null, [
+        'user-1',
+      ]);
 
       expect(suggestions).toEqual([]);
     });
@@ -373,13 +345,11 @@ describe('SplitPredictionService', () => {
       // Use $100.50 for clearer difference
       // 33.50 + 33.50 + 33.50 = 100.50 exact (won't trigger)
       // Use an odd amount like -100.13
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100.13,
-        'Walmart',
-        null,
-        ['user-1', 'user-2', 'user-3']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100.13, 'Walmart', null, [
+        'user-1',
+        'user-2',
+        'user-3',
+      ]);
 
       // Total should be close to transaction amount
       const total = suggestions.reduce((sum, s) => sum + s.suggestedAmount, 0);
@@ -402,13 +372,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
       mockPrisma.category.findUnique.mockResolvedValue({ name: 'Groceries' });
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -200,
-        null,
-        'cat-groceries',
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -200, null, 'cat-groceries', [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions).toHaveLength(2);
       expect(suggestions[0].confidence).toBe(0.75);
@@ -434,13 +401,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
       mockPrisma.category.findUnique.mockResolvedValue(null); // Category not found
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100,
-        null,
-        'cat-unknown',
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100, null, 'cat-unknown', [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions).toHaveLength(2);
       expect(suggestions[0].reasoning).toContain('Unknown');
@@ -478,13 +442,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
       mockPrisma.category.findUnique.mockResolvedValue({ name: 'Dining' });
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -150,
-        null,
-        'cat-dining',
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -150, null, 'cat-dining', [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions).toHaveLength(2);
       expect(suggestions[0].confidence).toBe(0.75); // Category pattern confidence
@@ -505,13 +466,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue([]);
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -100,
-        null,
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -100, null, null, [
+        'user-1',
+        'user-2',
+      ]);
 
       // Should normalize to 50/50 when no pattern exists
       const total = suggestions.reduce((sum, s) => sum + s.suggestedPercentage, 0);
@@ -522,13 +480,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue([]);
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -250.75,
-        null,
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -250.75, null, null, [
+        'user-1',
+        'user-2',
+      ]);
 
       expect(suggestions[0].suggestedAmount).toBeGreaterThan(0);
       expect(suggestions[1].suggestedAmount).toBeGreaterThan(0);
@@ -538,13 +493,10 @@ describe('SplitPredictionService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue([]);
       mockPrisma.user.findMany.mockResolvedValue(mockUsers);
 
-      const suggestions = await service.suggestSplits(
-        'space-123',
-        -99.99,
-        null,
-        null,
-        ['user-1', 'user-2']
-      );
+      const suggestions = await service.suggestSplits('space-123', -99.99, null, null, [
+        'user-1',
+        'user-2',
+      ]);
 
       // Total should equal transaction amount
       const total = suggestions.reduce((sum, s) => sum + s.suggestedAmount, 0);

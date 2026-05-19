@@ -24,7 +24,7 @@ describe('EnvValidationService', () => {
       delete process.env.JWT_SECRET;
 
       expect(() => new EnvValidationService().onModuleInit()).toThrow(
-        'ENVIRONMENT VALIDATION FAILED',
+        'ENVIRONMENT VALIDATION FAILED'
       );
     });
 
@@ -32,7 +32,7 @@ describe('EnvValidationService', () => {
       delete process.env.DATABASE_URL;
 
       expect(() => new EnvValidationService().onModuleInit()).toThrow(
-        'ENVIRONMENT VALIDATION FAILED',
+        'ENVIRONMENT VALIDATION FAILED'
       );
     });
 
@@ -40,7 +40,7 @@ describe('EnvValidationService', () => {
       delete process.env.REDIS_HOST;
 
       expect(() => new EnvValidationService().onModuleInit()).toThrow(
-        'ENVIRONMENT VALIDATION FAILED',
+        'ENVIRONMENT VALIDATION FAILED'
       );
     });
 
@@ -48,7 +48,7 @@ describe('EnvValidationService', () => {
       process.env.JWT_SECRET = 'short-secret';
 
       expect(() => new EnvValidationService().onModuleInit()).toThrow(
-        'Must be at least 32 characters',
+        'Must be at least 32 characters'
       );
     });
 
@@ -56,7 +56,7 @@ describe('EnvValidationService', () => {
       process.env.JWT_SECRET = '   ';
 
       expect(() => new EnvValidationService().onModuleInit()).toThrow(
-        'ENVIRONMENT VALIDATION FAILED',
+        'ENVIRONMENT VALIDATION FAILED'
       );
     });
 
@@ -87,7 +87,7 @@ describe('EnvValidationService', () => {
       delete process.env.MISSING_VAR;
 
       expect(() => EnvValidationService.requireEnvVar('MISSING_VAR')).toThrow(
-        'Missing required environment variable: MISSING_VAR',
+        'Missing required environment variable: MISSING_VAR'
       );
     });
 
@@ -95,7 +95,7 @@ describe('EnvValidationService', () => {
       delete process.env.API_KEY;
 
       expect(() => EnvValidationService.requireEnvVar('API_KEY', 'External API key')).toThrow(
-        'Missing required environment variable: API_KEY (External API key)',
+        'Missing required environment variable: API_KEY (External API key)'
       );
     });
 
@@ -103,7 +103,7 @@ describe('EnvValidationService', () => {
       process.env.EMPTY_VAR = '  ';
 
       expect(() => EnvValidationService.requireEnvVar('EMPTY_VAR')).toThrow(
-        'Missing required environment variable: EMPTY_VAR',
+        'Missing required environment variable: EMPTY_VAR'
       );
     });
   });

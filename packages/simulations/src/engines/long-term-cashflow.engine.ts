@@ -410,7 +410,7 @@ const MX_ISR_BRACKETS = [
   { min: 155229.8, max: 185852.57, rate: 0.1792 },
   { min: 185852.57, max: 374837.88, rate: 0.2136 },
   { min: 374837.88, max: 590795.99, rate: 0.2352 },
-  { min: 590795.99, max: 1127926.84, rate: 0.30 },
+  { min: 590795.99, max: 1127926.84, rate: 0.3 },
   { min: 1127926.84, max: 1503902.46, rate: 0.32 },
   { min: 1503902.46, max: 4511707.37, rate: 0.34 },
   { min: 4511707.37, max: Infinity, rate: 0.35 },
@@ -639,7 +639,9 @@ export const longTermCashflowEngine = {
       // Life events this year
       const lifeEventsThisYear = config.lifeEvents.filter((e) => e.year === year);
       for (const event of lifeEventsThisYear) {
-        const eventAmount = event.inflationAdjusted ? event.amount * inflationMultiplier : event.amount;
+        const eventAmount = event.inflationAdjusted
+          ? event.amount * inflationMultiplier
+          : event.amount;
 
         if (eventAmount < 0) {
           totalExpenses += Math.abs(eventAmount);
@@ -657,10 +659,7 @@ export const longTermCashflowEngine = {
       for (const loan of config.loans) {
         const currentBalance = loanBalances.get(loan.name) || 0;
         if (currentBalance > 0) {
-          const payment = calculateLoanPayment(
-            { ...loan, balance: currentBalance },
-            0
-          );
+          const payment = calculateLoanPayment({ ...loan, balance: currentBalance }, 0);
           loanBalances.set(loan.name, payment.balance);
           totalDebt += payment.balance;
           totalExpenses += payment.principalPaid + payment.interestPaid;
@@ -695,7 +694,11 @@ export const longTermCashflowEngine = {
         }
 
         // Handle withdrawals
-        if (asset.withdrawalStartYear && year >= asset.withdrawalStartYear && asset.annualWithdrawal) {
+        if (
+          asset.withdrawalStartYear &&
+          year >= asset.withdrawalStartYear &&
+          asset.annualWithdrawal
+        ) {
           let withdrawal = asset.annualWithdrawal;
           if (withdrawal < 0) {
             // Percentage-based withdrawal (e.g., -0.04 = 4%)
@@ -722,7 +725,8 @@ export const longTermCashflowEngine = {
       const essentialExpenses = config.expenses
         .filter((e) => e.isEssential)
         .reduce((sum, e) => sum + e.annualAmount * Math.pow(1 + e.growthRate, yearIndex), 0);
-      const fiRatio = essentialExpenses > 0 ? (passiveIncome + socialSecurityIncome) / essentialExpenses : 0;
+      const fiRatio =
+        essentialExpenses > 0 ? (passiveIncome + socialSecurityIncome) / essentialExpenses : 0;
 
       totalSavings += Math.max(0, netCashflow);
       totalIncome += grossIncome;
@@ -811,7 +815,9 @@ export const longTermCashflowEngine = {
     }
 
     if (!config.socialSecurity) {
-      warnings.push('No Social Security configured. Add expected benefits for more accurate projections.');
+      warnings.push(
+        'No Social Security configured. Add expected benefits for more accurate projections.'
+      );
     }
 
     const minNetWorthSnapshot = yearlySnapshots[minNetWorthIndex];
@@ -855,7 +861,10 @@ export const longTermCashflowEngine = {
   compareScenarios(
     baseConfig: LongTermProjectionConfig,
     scenarios: WhatIfScenario[]
-  ): { baseline: LongTermProjectionResult; scenarios: { scenario: WhatIfScenario; result: LongTermProjectionResult }[] } {
+  ): {
+    baseline: LongTermProjectionResult;
+    scenarios: { scenario: WhatIfScenario; result: LongTermProjectionResult }[];
+  } {
     const baseline = this.project(baseConfig);
 
     const scenarioResults = scenarios.map((scenario) => {

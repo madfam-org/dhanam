@@ -26,20 +26,13 @@ pnpm add @dhanam/shared
 ### Using Types
 
 ```typescript
-import {
-  Account,
-  Transaction,
-  Budget,
-  User,
-  Space,
-  Locale,
-} from '@dhanam/shared';
+import { Account, Transaction, Budget, User, Space, Locale } from '@dhanam/shared';
 
 const account: Account = {
   id: 'acc_123',
   name: 'Checking Account',
   type: 'bank',
-  balance: 1500.00,
+  balance: 1500.0,
   currency: 'USD',
   spaceId: 'space_456',
 };
@@ -92,9 +85,7 @@ function Dashboard() {
     <div>
       <h1>{t('common.welcome')}</h1>
       <p>{t('transactions.noTransactions')}</p>
-      <button onClick={() => setLocale('en')}>
-        {t('common.switchLanguage')}
-      </button>
+      <button onClick={() => setLocale('en')}>{t('common.switchLanguage')}</button>
     </div>
   );
 }
@@ -124,65 +115,65 @@ console.log(PROVIDER_TYPES); // ['belvo', 'plaid', 'bitso', ...]
 
 ### Types
 
-| Type | Description |
-|------|-------------|
-| `Account` | Bank, investment, or crypto account |
-| `Transaction` | Financial transaction record |
-| `Budget` | Budget with categories and limits |
-| `User` | User profile and preferences |
-| `Space` | Personal or business financial space |
-| `Category` | Transaction category |
-| `RecurringTransaction` | Scheduled recurring transactions |
-| `Locale` | Supported locale type (`'en'` \| `'es'`) |
+| Type                   | Description                              |
+| ---------------------- | ---------------------------------------- |
+| `Account`              | Bank, investment, or crypto account      |
+| `Transaction`          | Financial transaction record             |
+| `Budget`               | Budget with categories and limits        |
+| `User`                 | User profile and preferences             |
+| `Space`                | Personal or business financial space     |
+| `Category`             | Transaction category                     |
+| `RecurringTransaction` | Scheduled recurring transactions         |
+| `Locale`               | Supported locale type (`'en'` \| `'es'`) |
 
 ### Utilities
 
 #### Currency
 
-| Function | Description |
-|----------|-------------|
+| Function                                    | Description                      |
+| ------------------------------------------- | -------------------------------- |
 | `formatCurrency(amount, currency, locale?)` | Format number as currency string |
-| `parseCurrency(value)` | Parse currency string to number |
-| `getCurrencySymbol(currency)` | Get symbol for currency code |
-| `convertCurrency(amount, from, to, rate)` | Convert between currencies |
+| `parseCurrency(value)`                      | Parse currency string to number  |
+| `getCurrencySymbol(currency)`               | Get symbol for currency code     |
+| `convertCurrency(amount, from, to, rate)`   | Convert between currencies       |
 
 #### Date
 
-| Function | Description |
-|----------|-------------|
-| `formatDate(date, format, locale?)` | Format date with locale support |
-| `parseDate(value)` | Parse string to Date object |
-| `getRelativeTime(date, locale?)` | Get relative time string ("2 days ago") |
-| `isWithinRange(date, start, end)` | Check if date is within range |
+| Function                            | Description                             |
+| ----------------------------------- | --------------------------------------- |
+| `formatDate(date, format, locale?)` | Format date with locale support         |
+| `parseDate(value)`                  | Parse string to Date object             |
+| `getRelativeTime(date, locale?)`    | Get relative time string ("2 days ago") |
+| `isWithinRange(date, start, end)`   | Check if date is within range           |
 
 #### Validation
 
-| Function | Description |
-|----------|-------------|
-| `isValidEmail(email)` | Validate email format |
-| `isValidUUID(uuid)` | Validate UUID format |
-| `isValidCurrency(code)` | Check if currency code is supported |
-| `sanitizeInput(input)` | Sanitize user input for XSS prevention |
+| Function                | Description                            |
+| ----------------------- | -------------------------------------- |
+| `isValidEmail(email)`   | Validate email format                  |
+| `isValidUUID(uuid)`     | Validate UUID format                   |
+| `isValidCurrency(code)` | Check if currency code is supported    |
+| `sanitizeInput(input)`  | Sanitize user input for XSS prevention |
 
 ### Constants
 
-| Constant | Description |
-|----------|-------------|
-| `SUPPORTED_CURRENCIES` | Array of supported currency codes |
-| `SUPPORTED_LOCALES` | Array of supported locale codes |
-| `PROVIDER_TYPES` | Financial data provider identifiers |
-| `ERROR_CODES` | Standardized error code enum |
-| `DEFAULT_LOCALE` | Default locale (`'es'`) |
-| `DEFAULT_CURRENCY` | Default currency (`'MXN'`) |
+| Constant               | Description                         |
+| ---------------------- | ----------------------------------- |
+| `SUPPORTED_CURRENCIES` | Array of supported currency codes   |
+| `SUPPORTED_LOCALES`    | Array of supported locale codes     |
+| `PROVIDER_TYPES`       | Financial data provider identifiers |
+| `ERROR_CODES`          | Standardized error code enum        |
+| `DEFAULT_LOCALE`       | Default locale (`'es'`)             |
+| `DEFAULT_CURRENCY`     | Default currency (`'MXN'`)          |
 
 ### i18n
 
-| Export | Description |
-|--------|-------------|
-| `I18nProvider` | React context provider for translations |
-| `useTranslation()` | Hook returning `{ t, locale, setLocale }` |
-| `withI18n(Component)` | HOC for class components |
-| `translations` | Raw translation objects |
+| Export                | Description                               |
+| --------------------- | ----------------------------------------- |
+| `I18nProvider`        | React context provider for translations   |
+| `useTranslation()`    | Hook returning `{ t, locale, setLocale }` |
+| `withI18n(Component)` | HOC for class components                  |
+| `translations`        | Raw translation objects                   |
 
 ## Architecture
 
@@ -234,35 +225,37 @@ packages/shared/
 
 ## Translation Namespaces
 
-| Namespace | Description |
-|-----------|-------------|
-| `common` | General UI strings |
-| `auth` | Authentication messages |
+| Namespace      | Description              |
+| -------------- | ------------------------ |
+| `common`       | General UI strings       |
+| `auth`         | Authentication messages  |
 | `transactions` | Transaction-related text |
-| `budgets` | Budget management text |
-| `accounts` | Account management text |
-| `spaces` | Space/entity text |
-| `wealth` | Wealth tracking text |
-| `errors` | Error messages |
-| `validations` | Form validation messages |
+| `budgets`      | Budget management text   |
+| `accounts`     | Account management text  |
+| `spaces`       | Space/entity text        |
+| `wealth`       | Wealth tracking text     |
+| `errors`       | Error messages           |
+| `validations`  | Form validation messages |
 
 ## Dependencies
 
 **Runtime:**
+
 - `date-fns` - Date manipulation
 - `zod` - Schema validation
 
 **Peer:**
+
 - `react` (^18.0.0) - Required for hooks and context
 
 ## Related Packages
 
-| Package | Relationship |
-|---------|--------------|
-| [`@dhanam/esg`](../esg/README.md) | Uses shared types for asset data |
+| Package                                           | Relationship                      |
+| ------------------------------------------------- | --------------------------------- |
+| [`@dhanam/esg`](../esg/README.md)                 | Uses shared types for asset data  |
 | [`@dhanam/simulations`](../simulations/README.md) | Uses shared types for projections |
-| [`@dhanam/ui`](../ui/README.md) | Uses i18n and utility functions |
-| [`@dhanam/config`](../config/README.md) | Provides build configuration |
+| [`@dhanam/ui`](../ui/README.md)                   | Uses i18n and utility functions   |
+| [`@dhanam/config`](../config/README.md)           | Provides build configuration      |
 
 ## Testing
 

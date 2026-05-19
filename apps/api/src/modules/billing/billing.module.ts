@@ -52,26 +52,26 @@ import { CustomerFederationService } from './services/customer-federation.servic
 // Hybrid Router Services (Stripe MX + Paddle)
 import { PaddleService } from './services/paddle.service';
 import { PaymentRouterService } from './services/payment-router.service';
+import { PhyndCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
 import { PriceResolverService } from './services/price-resolver.service';
 import { PricingEngineService } from './services/pricing-engine.service';
 import { ProductCatalogService } from './services/product-catalog.service';
 import { RevenueMetricsService } from './services/revenue-metrics.service';
-import { PhyndCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
 import { StripeMxSpeiRelayService } from './services/stripe-mx-spei-relay.service';
 import { StripeMxService } from './services/stripe-mx.service';
-import { SyntheticRevenueProbeService } from './services/synthetic-revenue-probe.service';
-import { WebhookDlqService } from './services/webhook-dlq.service';
-// Extracted sub-services (usage, lifecycle, webhooks)
 import { SubscriptionLifecycleService } from './services/subscription-lifecycle.service';
+import { SyntheticRevenueProbeService } from './services/synthetic-revenue-probe.service';
 import { TrialService } from './services/trial.service';
+import { UsageAlertsService } from './services/usage-alerts.service';
 import { UsageMeteringService } from './services/usage-metering.service';
 import { UsageTrackingService } from './services/usage-tracking.service';
+import { WebhookDlqService } from './services/webhook-dlq.service';
+// Extracted sub-services (usage, lifecycle, webhooks)
 import { WebhookProcessorService } from './services/webhook-processor.service';
 import { StripeMxController } from './stripe-mx.controller';
 import { StripeService } from './stripe.service';
 // Waybill → Dhanam alert pipeline (P2.2)
 import { UsageAlertsController } from './usage-alerts.controller';
-import { UsageAlertsService } from './services/usage-alerts.service';
 
 @Module({
   imports: [

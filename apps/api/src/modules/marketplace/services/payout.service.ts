@@ -1,11 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { Prisma } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { StripeConnectService } from '../../billing/services/stripe-connect.service';
-
 import { EventDispatcherService } from '../../webhook-outbound/services/event-dispatcher.service';
-
 import type { CreatePayoutDto } from '../dto/marketplace.dto';
 
 @Injectable()
@@ -15,7 +14,7 @@ export class PayoutService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripeConnect: StripeConnectService,
-    private readonly events: EventDispatcherService,
+    private readonly events: EventDispatcherService
   ) {}
 
   async create(dto: CreatePayoutDto) {
@@ -59,7 +58,7 @@ export class PayoutService {
   async updateStatusFromWebhook(
     externalPayoutId: string,
     status: 'paid' | 'failed' | 'canceled' | 'in_transit',
-    failureCode?: string,
+    failureCode?: string
   ) {
     const p = await this.prisma.payout.findUnique({
       where: { externalPayoutId },

@@ -44,9 +44,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('/v1/monitoring/health (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/v1/monitoring/health')
-      .expect(200);
+    return request(app.getHttpServer()).get('/v1/monitoring/health').expect(200);
   });
 
   describe('/auth', () => {

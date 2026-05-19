@@ -1,3 +1,6 @@
+import { User, UserProfile } from '@dhanam/shared';
+import { Injectable } from '@nestjs/common';
+
 import {
   BusinessRuleException,
   InfrastructureException,
@@ -6,8 +9,6 @@ import {
 import { isPrismaKnownRequestError } from '@core/filters/prisma-error.guard';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
-import { User, UserProfile } from '@dhanam/shared';
-import { Injectable } from '@nestjs/common';
 
 import { UpdateUserDto } from './dto/update-user.dto';
 

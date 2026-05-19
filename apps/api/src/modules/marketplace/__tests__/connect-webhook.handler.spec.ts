@@ -47,7 +47,7 @@ describe('ConnectWebhookHandler', () => {
   });
 
   const event = (type: string, object: unknown): Stripe.Event =>
-    ({ type, data: { object } } as Stripe.Event);
+    ({ type, data: { object } }) as Stripe.Event;
 
   it('routes account.updated to MerchantService.refreshFromWebhook', async () => {
     const handled = await handler.handle(event('account.updated', { id: 'acct_1' }));
@@ -63,13 +63,13 @@ describe('ConnectWebhookHandler', () => {
 
   it('routes payout.failed with failure_code', async () => {
     const handled = await handler.handle(
-      event('payout.failed', { id: 'po_2', failure_code: 'insufficient_funds' }),
+      event('payout.failed', { id: 'po_2', failure_code: 'insufficient_funds' })
     );
     expect(handled).toBe(true);
     expect(payouts.updateStatusFromWebhook).toHaveBeenCalledWith(
       'po_2',
       'failed',
-      'insufficient_funds',
+      'insufficient_funds'
     );
   });
 

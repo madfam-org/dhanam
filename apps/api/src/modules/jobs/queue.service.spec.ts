@@ -1,7 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { QueueService } from './queue.service';
+import { Test, TestingModule } from '@nestjs/testing';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+
+import { QueueService } from './queue.service';
 
 // Create mock queue for testing
 const createMockQueue = (name: string) => ({
@@ -79,7 +80,7 @@ describe('QueueService', () => {
       };
 
       const result = await service.addSyncTransactionsJob(jobData);
-      
+
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
     });
@@ -93,7 +94,7 @@ describe('QueueService', () => {
       };
 
       const result = await service.addCategorizeTransactionsJob(jobData);
-      
+
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
     });
@@ -107,7 +108,7 @@ describe('QueueService', () => {
       };
 
       const result = await service.addESGUpdateJob(jobData);
-      
+
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
     });
@@ -121,7 +122,7 @@ describe('QueueService', () => {
       };
 
       const result = await service.addValuationSnapshotJob(jobData);
-      
+
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
     });

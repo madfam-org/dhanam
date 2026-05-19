@@ -37,9 +37,10 @@
  * =============================================================================
  */
 
-import { PrismaService } from '@core/prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
+import { PrismaService } from '@core/prisma/prisma.service';
 
 import { PaddleService } from './paddle.service';
 import { StripeMxService } from './stripe-mx.service';

@@ -149,13 +149,28 @@ export const settings = {
   },
   section: {
     usage: { title: 'Límites de Uso', description: 'Rastrea tu uso diario de funciones premium' },
-    billing: { title: 'Suscripción y Facturación', description: 'Administra tu plan de suscripción y facturación' },
-    notifications: { title: 'Notificaciones', description: 'Configura cómo y cuándo recibes notificaciones' },
-    privacy: { title: 'Privacidad', description: 'Controla tus datos y configuración de privacidad' },
+    billing: {
+      title: 'Suscripción y Facturación',
+      description: 'Administra tu plan de suscripción y facturación',
+    },
+    notifications: {
+      title: 'Notificaciones',
+      description: 'Configura cómo y cuándo recibes notificaciones',
+    },
+    privacy: {
+      title: 'Privacidad',
+      description: 'Controla tus datos y configuración de privacidad',
+    },
     display: { title: 'Apariencia', description: 'Personaliza cómo se ve y se siente Dhanam' },
     financial: { title: 'Financiero', description: 'Configura ajustes y preferencias financieras' },
-    esg: { title: 'Configuración ESG', description: 'Preferencias ambientales, sociales y de gobernanza' },
-    backup: { title: 'Respaldo y Exportación', description: 'Preferencias de respaldo y exportación de datos' },
+    esg: {
+      title: 'Configuración ESG',
+      description: 'Preferencias ambientales, sociales y de gobernanza',
+    },
+    backup: {
+      title: 'Respaldo y Exportación',
+      description: 'Preferencias de respaldo y exportación de datos',
+    },
   },
   billingPage: {
     currentPlan: 'Plan Actual',
@@ -168,33 +183,81 @@ export const settings = {
     free: 'Gratuito',
   },
   notificationsPage: {
-    email: { label: 'Notificaciones por Email', description: 'Recibe notificaciones por correo electrónico' },
-    transactions: { label: 'Alertas de Transacciones', description: 'Recibe notificaciones sobre nuevas transacciones' },
-    budget: { label: 'Alertas de Presupuesto', description: 'Alertas al acercarte a los límites de presupuesto' },
-    weeklyReports: { label: 'Reportes Semanales', description: 'Recibe resúmenes financieros semanales' },
-    security: { label: 'Alertas de Seguridad', description: 'Recibe notificaciones sobre eventos de seguridad' },
+    email: {
+      label: 'Notificaciones por Email',
+      description: 'Recibe notificaciones por correo electrónico',
+    },
+    transactions: {
+      label: 'Alertas de Transacciones',
+      description: 'Recibe notificaciones sobre nuevas transacciones',
+    },
+    budget: {
+      label: 'Alertas de Presupuesto',
+      description: 'Alertas al acercarte a los límites de presupuesto',
+    },
+    weeklyReports: {
+      label: 'Reportes Semanales',
+      description: 'Recibe resúmenes financieros semanales',
+    },
+    security: {
+      label: 'Alertas de Seguridad',
+      description: 'Recibe notificaciones sobre eventos de seguridad',
+    },
   },
   privacy: {
-    analytics: { label: 'Rastreo de Analítica', description: 'Ayuda a mejorar Dhanam con análisis de uso' },
-    hideSensitive: { label: 'Ocultar Datos Sensibles', description: 'Enmascarar saldos y montos por defecto' },
+    analytics: {
+      label: 'Rastreo de Analítica',
+      description: 'Ayuda a mejorar Dhanam con análisis de uso',
+    },
+    hideSensitive: {
+      label: 'Ocultar Datos Sensibles',
+      description: 'Enmascarar saldos y montos por defecto',
+    },
   },
   display: {
-    theme: { label: 'Tema', description: 'Elige tu tema de color preferido', light: 'Claro', dark: 'Oscuro', system: 'Sistema' },
+    theme: {
+      label: 'Tema',
+      description: 'Elige tu tema de color preferido',
+      light: 'Claro',
+      dark: 'Oscuro',
+      system: 'Sistema',
+    },
     compactView: { label: 'Vista Compacta', description: 'Usar un diseño más condensado' },
     showBalances: { label: 'Mostrar Saldos', description: 'Mostrar saldos de cuenta por defecto' },
   },
   financial: {
-    defaultCurrency: { label: 'Moneda Predeterminada', description: 'Moneda usada para visualización y cálculos' },
-    autoCategorize: { label: 'Auto-Categorizar Transacciones', description: 'Categorizar automáticamente nuevas transacciones' },
+    defaultCurrency: {
+      label: 'Moneda Predeterminada',
+      description: 'Moneda usada para visualización y cálculos',
+    },
+    autoCategorize: {
+      label: 'Auto-Categorizar Transacciones',
+      description: 'Categorizar automáticamente nuevas transacciones',
+    },
   },
   esg: {
-    showScores: { label: 'Mostrar Puntajes ESG', description: 'Mostrar puntajes ESG para holdings de cripto' },
-    sustainabilityAlerts: { label: 'Alertas de Sostenibilidad', description: 'Recibir alertas sobre cambios en puntajes ESG' },
-    impactReporting: { label: 'Reportes de Impacto', description: 'Incluir impacto ESG en reportes periódicos' },
+    showScores: {
+      label: 'Mostrar Puntajes ESG',
+      description: 'Mostrar puntajes ESG para holdings de cripto',
+    },
+    sustainabilityAlerts: {
+      label: 'Alertas de Sostenibilidad',
+      description: 'Recibir alertas sobre cambios en puntajes ESG',
+    },
+    impactReporting: {
+      label: 'Reportes de Impacto',
+      description: 'Incluir impacto ESG en reportes periódicos',
+    },
   },
   backup: {
-    autoBackup: { label: 'Respaldo Automático', description: 'Respaldar tus datos automáticamente de forma periódica' },
-    exportFormat: { label: 'Formato de Exportación', description: 'Formato predeterminado para exportaciones de datos' },
+    autoBackup: {
+      label: 'Respaldo Automático',
+      description: 'Respaldar tus datos automáticamente de forma periódica',
+    },
+    exportFormat: {
+      label: 'Formato de Exportación',
+      description: 'Formato predeterminado para exportaciones de datos',
+    },
   },
   securityPage: {
     title: 'Configuración de seguridad',
@@ -204,8 +267,10 @@ export const settings = {
     authenticatorApp: 'App de autenticación',
     twoFactorEnabled: 'La autenticación de dos factores está habilitada',
     twoFactorPrompt: 'Usa tu teléfono para generar códigos de verificación',
-    accountProtected: 'Tu cuenta está protegida con autenticación de dos factores. Tienes {{count}} códigos de respaldo restantes.',
-    accountNotProtected: 'Tu cuenta no está protegida por autenticación de dos factores. Recomendamos encarecidamente habilitarla para mayor seguridad.',
+    accountProtected:
+      'Tu cuenta está protegida con autenticación de dos factores. Tienes {{count}} códigos de respaldo restantes.',
+    accountNotProtected:
+      'Tu cuenta no está protegida por autenticación de dos factores. Recomendamos encarecidamente habilitarla para mayor seguridad.',
     generating: 'Generando...',
     newBackupCodes: 'Nuevos códigos de respaldo',
     disabling: 'Deshabilitando...',

@@ -1,7 +1,7 @@
+import { JwtService } from '@nestjs/jwt';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 
 import { createE2EApp } from './helpers/e2e-app.helper';
 import { TestHelper } from './helpers/test.helper';
@@ -507,7 +507,7 @@ describe('Estate Planning Journey', () => {
       if (response.statusCode === 404) {
         console.warn(
           'Executor read-only access endpoint not yet implemented. ' +
-            'Token was successfully created and stored in DB.',
+            'Token was successfully created and stored in DB.'
         );
 
         // Verify the token exists in the database even though the endpoint is not yet live

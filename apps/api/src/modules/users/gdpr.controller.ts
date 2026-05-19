@@ -1,9 +1,5 @@
 import * as zlib from 'zlib';
 
-import { AuditService } from '@core/audit/audit.service';
-import { CurrentUser, AuthenticatedUser } from '@core/auth/decorators/current-user.decorator';
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
-import { PrismaService } from '@core/prisma/prisma.service';
 import {
   Controller,
   Get,
@@ -17,6 +13,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Response } from 'express';
+
+import { AuditService } from '@core/audit/audit.service';
+import { CurrentUser, AuthenticatedUser } from '@core/auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
+import { PrismaService } from '@core/prisma/prisma.service';
 
 @ApiTags('GDPR')
 @Controller('users/me')

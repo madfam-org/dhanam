@@ -31,7 +31,8 @@ export const plaidWebhookFixtures = {
     error: {
       error_type: 'ITEM_ERROR',
       error_code: 'ITEM_LOGIN_REQUIRED',
-      error_message: 'The login details for this item have changed (credentials, MFA, or required user action).',
+      error_message:
+        'The login details for this item have changed (credentials, MFA, or required user action).',
     },
   }),
 };
@@ -64,7 +65,7 @@ export const belvoWebhookFixtures = {
 export function generateWebhookHmac(
   payload: string,
   secret: string,
-  algorithm: 'sha256' | 'sha512' = 'sha256',
+  algorithm: 'sha256' | 'sha512' = 'sha256'
 ): string {
   return crypto.createHmac(algorithm, secret).update(payload).digest('hex');
 }

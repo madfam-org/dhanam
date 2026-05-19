@@ -51,14 +51,14 @@ describe('KicksDbAdapter', () => {
           referenceNumber: 'CW2288-111',
           currentMarketValue: 310,
           currency: 'USD',
-        }),
+        })
       );
 
       expect(fetch).toHaveBeenCalledWith(
         expect.stringContaining('/products?query=jordan&limit=10'),
         expect.objectContaining({
           headers: expect.objectContaining({ Authorization: 'Bearer test-key' }),
-        }),
+        })
       );
     });
 

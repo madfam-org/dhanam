@@ -74,10 +74,10 @@ describe('EventDispatcherService', () => {
     // Two delivery rows created — one failed (lastStatus=0), one succeeded
     expect(prisma.webhookDelivery.create).toHaveBeenCalledTimes(2);
     const failed = prisma.webhookDelivery.create.mock.calls.find(
-      (c: any[]) => c[0].data.lastStatus === 0,
+      (c: any[]) => c[0].data.lastStatus === 0
     );
     const succeeded = prisma.webhookDelivery.create.mock.calls.find(
-      (c: any[]) => c[0].data.svixMessageId === 'msg_2',
+      (c: any[]) => c[0].data.svixMessageId === 'msg_2'
     );
     expect(failed).toBeDefined();
     expect(succeeded).toBeDefined();

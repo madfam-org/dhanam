@@ -1,18 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import {
+  RegisterDto,
+  LoginDto,
+  ResetPasswordDto,
+  RefreshTokenDto,
+  ForgotPasswordDto,
+} from '@dhanam/shared';
 import { ConflictException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as argon2 from 'argon2';
 
 import { AuditService } from '@core/audit/audit.service';
 import { SecurityConfigService } from '@core/config/security.config';
-import { PrismaService } from '@core/prisma/prisma.service';
 import { LoggerService } from '@core/logger/logger.service';
+import { PrismaService } from '@core/prisma/prisma.service';
 import { EmailService } from '@modules/email/email.service';
 
 import { AuthService } from '../auth.service';
 import { SessionService } from '../session.service';
 import { TotpService } from '../totp.service';
-import { RegisterDto, LoginDto, ResetPasswordDto, RefreshTokenDto, ForgotPasswordDto } from '@dhanam/shared';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -254,10 +260,7 @@ describe('AuthService', () => {
 
       await service.register(registerDto);
 
-      expect(emailService.sendWelcomeEmail).toHaveBeenCalledWith(
-        mockUser.email,
-        mockUser.name
-      );
+      expect(emailService.sendWelcomeEmail).toHaveBeenCalledWith(mockUser.email, mockUser.name);
     });
 
     it('should reject duplicate emails', async () => {
@@ -272,11 +275,13 @@ describe('AuthService', () => {
       // Mock fetch to return HIBP response containing the SHA1 suffix of 'SecurePassword123!'
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        text: jest.fn().mockResolvedValue('353F4B927FD953E5AF7C41084183E8CE5FB:42\nABCDEF1234567890:10'),
+        text: jest
+          .fn()
+          .mockResolvedValue('353F4B927FD953E5AF7C41084183E8CE5FB:42\nABCDEF1234567890:10'),
       });
 
       await expect(service.register(registerDto)).rejects.toThrow(
-        'This password has been found in a data breach',
+        'This password has been found in a data breach'
       );
     });
 
@@ -355,9 +360,7 @@ describe('AuthService', () => {
       redisSpy.mockReset();
       redisSpy.mockResolvedValue('locked');
 
-      await expect(service.login(loginDto)).rejects.toThrow(
-        'Account temporarily locked',
-      );
+      await expect(service.login(loginDto)).rejects.toThrow('Account temporarily locked');
     });
 
     it('should lock account after max failed login attempts', async () => {
@@ -374,12 +377,15 @@ describe('AuthService', () => {
         `lockout:${loginDto.email}`,
         'locked',
         'EX',
-        expect.any(Number),
+        expect.any(Number)
       );
     });
 
     it('should reject invalid passwords', async () => {
-      const userWithPassword = { ...mockUser, passwordHash: await argon2.hash('DifferentPassword') };
+      const userWithPassword = {
+        ...mockUser,
+        passwordHash: await argon2.hash('DifferentPassword'),
+      };
       prisma.user.findUnique.mockResolvedValue(userWithPassword as any);
 
       await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
@@ -395,7 +401,7 @@ describe('AuthService', () => {
       const inactiveUser = {
         ...mockUser,
         isActive: false,
-        passwordHash: await argon2.hash(loginDto.password)
+        passwordHash: await argon2.hash(loginDto.password),
       };
       prisma.user.findUnique.mockResolvedValue(inactiveUser as any);
 
@@ -508,7 +514,10 @@ describe('AuthService', () => {
 
       // Verify old token was revoked before creating new one
       expect(sessionService.revokeRefreshToken).toHaveBeenCalledWith('valid-refresh-token');
-      expect(sessionService.createRefreshToken).toHaveBeenCalledWith('user-123', 'test@example.com');
+      expect(sessionService.createRefreshToken).toHaveBeenCalledWith(
+        'user-123',
+        'test@example.com'
+      );
     });
   });
 
@@ -622,11 +631,13 @@ describe('AuthService', () => {
       (global.fetch as jest.Mock).mockReset();
       (global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
-        text: jest.fn().mockResolvedValue('0482E8AC51130E934F0C2F43668E433AE7A:15\nABCDEF1234567890:10'),
+        text: jest
+          .fn()
+          .mockResolvedValue('0482E8AC51130E934F0C2F43668E433AE7A:15\nABCDEF1234567890:10'),
       });
 
       await expect(service.resetPassword(resetDto)).rejects.toThrow(
-        'This password has been found in a data breach',
+        'This password has been found in a data breach'
       );
     });
   });
@@ -638,7 +649,7 @@ describe('AuthService', () => {
     it('should return user data (without password) for valid credentials', async () => {
       const userWithPassword = {
         ...mockUser,
-        passwordHash: await argon2.hash(password)
+        passwordHash: await argon2.hash(password),
       };
       prisma.user.findUnique.mockResolvedValue(userWithPassword as any);
 
@@ -738,10 +749,7 @@ describe('AuthService', () => {
 
       await service.register(registerDto);
 
-      expect(sessionService.createRefreshToken).toHaveBeenCalledWith(
-        mockUser.id,
-        mockUser.email
-      );
+      expect(sessionService.createRefreshToken).toHaveBeenCalledWith(mockUser.id, mockUser.email);
     });
   });
 });

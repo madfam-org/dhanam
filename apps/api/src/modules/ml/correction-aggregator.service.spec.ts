@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { CorrectionAggregatorService } from './correction-aggregator.service';
+import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { PrismaService } from '../../core/prisma/prisma.service';
+
+import { CorrectionAggregatorService } from './correction-aggregator.service';
 import { FuzzyMatcherService } from './fuzzy-matcher.service';
 import { MerchantNormalizerService } from './merchant-normalizer.service';
-import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 describe('CorrectionAggregatorService', () => {
   let service: CorrectionAggregatorService;
@@ -147,7 +148,11 @@ describe('CorrectionAggregatorService', () => {
       });
       merchantNormalizerMock.extractDescriptionTerms!.mockReturnValue([]);
 
-      const result = await service.findBestMatch(testSpaceId, 'Random Merchant', 'Some description');
+      const result = await service.findBestMatch(
+        testSpaceId,
+        'Random Merchant',
+        'Some description'
+      );
 
       // Should fall through to description matching or return null
       expect(result?.source).not.toBe('fuzzy');

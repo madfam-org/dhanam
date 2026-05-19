@@ -51,19 +51,27 @@ export default function TransactionDetailScreen() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'income': return '#4CAF50';
-      case 'expense': return '#F44336';
-      case 'transfer': return '#2196F3';
-      default: return '#757575';
+      case 'income':
+        return '#4CAF50';
+      case 'expense':
+        return '#F44336';
+      case 'transfer':
+        return '#2196F3';
+      default:
+        return '#757575';
     }
   };
 
   const getTypeIcon = (type: string): ComponentProps<typeof Ionicons>['name'] => {
     switch (type) {
-      case 'income': return 'arrow-down-circle';
-      case 'expense': return 'arrow-up-circle';
-      case 'transfer': return 'swap-horizontal';
-      default: return 'card';
+      case 'income':
+        return 'arrow-down-circle';
+      case 'expense':
+        return 'arrow-up-circle';
+      case 'transfer':
+        return 'swap-horizontal';
+      default:
+        return 'card';
     }
   };
 
@@ -85,8 +93,17 @@ export default function TransactionDetailScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Amount Header */}
         <View style={styles.amountSection}>
-          <View style={[styles.typeIconContainer, { backgroundColor: `${getTypeColor(transaction.type)}15` }]}>
-            <Ionicons name={getTypeIcon(transaction.type)} size={32} color={getTypeColor(transaction.type)} />
+          <View
+            style={[
+              styles.typeIconContainer,
+              { backgroundColor: `${getTypeColor(transaction.type)}15` },
+            ]}
+          >
+            <Ionicons
+              name={getTypeIcon(transaction.type)}
+              size={32}
+              color={getTypeColor(transaction.type)}
+            />
           </View>
           <Text
             variant="displaySmall"
@@ -114,7 +131,10 @@ export default function TransactionDetailScreen() {
             <Divider style={styles.divider} />
             <DetailRow label="Account" value={transaction.accountName} />
             <Divider style={styles.divider} />
-            <DetailRow label="Type" value={transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)} />
+            <DetailRow
+              label="Type"
+              value={transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+            />
             <Divider style={styles.divider} />
             <DetailRow label="Provider" value={transaction.provider.toUpperCase()} />
           </Card.Content>
@@ -124,7 +144,9 @@ export default function TransactionDetailScreen() {
         {transaction.tags && transaction.tags.length > 0 && (
           <Card style={styles.tagsCard}>
             <Card.Content>
-              <Text variant="titleMedium" style={styles.sectionTitle}>Tags</Text>
+              <Text variant="titleMedium" style={styles.sectionTitle}>
+                Tags
+              </Text>
               <View style={styles.tagRow}>
                 {transaction.tags.map((tag) => (
                   <Chip key={tag} mode="outlined" style={styles.tagChip}>
@@ -140,8 +162,12 @@ export default function TransactionDetailScreen() {
         {transaction.notes && (
           <Card style={styles.notesCard}>
             <Card.Content>
-              <Text variant="titleMedium" style={styles.sectionTitle}>Notes</Text>
-              <Text variant="bodyMedium" style={styles.notesText}>{transaction.notes}</Text>
+              <Text variant="titleMedium" style={styles.sectionTitle}>
+                Notes
+              </Text>
+              <Text variant="bodyMedium" style={styles.notesText}>
+                {transaction.notes}
+              </Text>
             </Card.Content>
           </Card>
         )}
@@ -162,8 +188,12 @@ export default function TransactionDetailScreen() {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={detailStyles.row}>
-      <Text variant="bodyMedium" style={detailStyles.label}>{label}</Text>
-      <Text variant="bodyMedium" style={detailStyles.value}>{value}</Text>
+      <Text variant="bodyMedium" style={detailStyles.label}>
+        {label}
+      </Text>
+      <Text variant="bodyMedium" style={detailStyles.value}>
+        {value}
+      </Text>
     </View>
   );
 }

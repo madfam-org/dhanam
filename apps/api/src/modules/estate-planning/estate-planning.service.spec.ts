@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { EstatePlanningService } from './estate-planning.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
-import { AuditService } from '../../core/audit/audit.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { AuditService } from '../../core/audit/audit.service';
+import { PrismaService } from '../../core/prisma/prisma.service';
+
 import {
   CreateWillDto,
   UpdateWillDto,
@@ -11,6 +12,7 @@ import {
   AddExecutorDto,
   UpdateExecutorDto,
 } from './dto';
+import { EstatePlanningService } from './estate-planning.service';
 
 // Using string literals instead of enums since Prisma client may not be generated
 const WillStatus = {
@@ -227,9 +229,7 @@ describe('EstatePlanningService', () => {
 
       mockPrismaService.householdMember.findFirst.mockResolvedValue(null);
 
-      await expect(service.createWill(dto, mockUserId)).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(service.createWill(dto, mockUserId)).rejects.toThrow(NotFoundException);
     });
 
     it('should create will with default legalDisclaimer as false', async () => {
@@ -278,9 +278,7 @@ describe('EstatePlanningService', () => {
     it('should throw NotFoundException if will not found or user has no access', async () => {
       mockPrismaService.will.findFirst.mockResolvedValue(null);
 
-      await expect(service.findById(mockWillId, mockUserId)).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(service.findById(mockWillId, mockUserId)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -307,9 +305,9 @@ describe('EstatePlanningService', () => {
     it('should throw NotFoundException if household not found', async () => {
       mockPrismaService.householdMember.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.findByHousehold(mockHouseholdId, mockUserId)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findByHousehold(mockHouseholdId, mockUserId)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -336,9 +334,9 @@ describe('EstatePlanningService', () => {
       const executedWill = { ...mockWill, status: WillStatus.executed };
       mockPrismaService.will.findFirst.mockResolvedValue(executedWill);
 
-      await expect(
-        service.updateWill(mockWillId, { name: 'Updated' }, mockUserId)
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.updateWill(mockWillId, { name: 'Updated' }, mockUserId)).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -359,9 +357,7 @@ describe('EstatePlanningService', () => {
       const activeWill = { ...mockWill, status: WillStatus.active };
       mockPrismaService.will.findFirst.mockResolvedValue(activeWill);
 
-      await expect(service.deleteWill(mockWillId, mockUserId)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(service.deleteWill(mockWillId, mockUserId)).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -379,9 +375,7 @@ describe('EstatePlanningService', () => {
       };
 
       mockPrismaService.will.findFirst.mockResolvedValue(willWithBeneficiaries);
-      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue([
-        mockBeneficiary,
-      ]);
+      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue([mockBeneficiary]);
       mockPrismaService.will.updateMany.mockResolvedValue({ count: 0 });
       mockPrismaService.will.update.mockResolvedValue(activatedWill);
 
@@ -431,9 +425,7 @@ describe('EstatePlanningService', () => {
 
     it('should throw BadRequestException if no beneficiaries', async () => {
       const willWithoutBeneficiaries = { ...mockWill, beneficiaries: [] };
-      mockPrismaService.will.findFirst.mockResolvedValue(
-        willWithoutBeneficiaries
-      );
+      mockPrismaService.will.findFirst.mockResolvedValue(willWithoutBeneficiaries);
 
       await expect(service.activateWill(mockWillId, mockUserId)).rejects.toThrow(
         BadRequestException
@@ -461,12 +453,8 @@ describe('EstatePlanningService', () => {
         executors: [mockExecutor],
       };
 
-      mockPrismaService.will.findFirst.mockResolvedValue(
-        willWithInvalidAllocations
-      );
-      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue([
-        invalidBeneficiary,
-      ]);
+      mockPrismaService.will.findFirst.mockResolvedValue(willWithInvalidAllocations);
+      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue([invalidBeneficiary]);
 
       await expect(service.activateWill(mockWillId, mockUserId)).rejects.toThrow(
         BadRequestException
@@ -481,9 +469,7 @@ describe('EstatePlanningService', () => {
       };
 
       mockPrismaService.will.findFirst.mockResolvedValue(willWithBeneficiaries);
-      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue([
-        mockBeneficiary,
-      ]);
+      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue([mockBeneficiary]);
       mockPrismaService.will.updateMany.mockResolvedValue({ count: 1 }); // One previous active will
       mockPrismaService.will.update.mockResolvedValue({
         ...willWithBeneficiaries,
@@ -534,9 +520,7 @@ describe('EstatePlanningService', () => {
     it('should throw BadRequestException when revoking non-active will', async () => {
       mockPrismaService.will.findFirst.mockResolvedValue(mockWill); // draft status
 
-      await expect(service.revokeWill(mockWillId, mockUserId)).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(service.revokeWill(mockWillId, mockUserId)).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -546,9 +530,7 @@ describe('EstatePlanningService', () => {
         { ...mockBeneficiary, percentage: 100, assetType: AssetType.bank_account },
       ];
 
-      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(
-        beneficiaries
-      );
+      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(beneficiaries);
 
       const result = await service.validateBeneficiaryAllocations(mockWillId);
 
@@ -561,9 +543,7 @@ describe('EstatePlanningService', () => {
         { ...mockBeneficiary, percentage: 50, assetType: AssetType.bank_account },
       ];
 
-      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(
-        beneficiaries
-      );
+      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(beneficiaries);
 
       const result = await service.validateBeneficiaryAllocations(mockWillId);
 
@@ -594,9 +574,7 @@ describe('EstatePlanningService', () => {
         },
       ];
 
-      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(
-        beneficiaries
-      );
+      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(beneficiaries);
 
       const result = await service.validateBeneficiaryAllocations(mockWillId);
 
@@ -611,9 +589,7 @@ describe('EstatePlanningService', () => {
         { ...mockBeneficiary, percentage: 33.34, assetType: AssetType.bank_account },
       ];
 
-      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(
-        beneficiaries
-      );
+      mockPrismaService.beneficiaryDesignation.findMany.mockResolvedValue(beneficiaries);
 
       const result = await service.validateBeneficiaryAllocations(mockWillId);
 
@@ -631,12 +607,8 @@ describe('EstatePlanningService', () => {
       };
 
       mockPrismaService.will.findFirst.mockResolvedValue(mockWill);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
-      mockPrismaService.beneficiaryDesignation.create.mockResolvedValue(
-        mockBeneficiary
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
+      mockPrismaService.beneficiaryDesignation.create.mockResolvedValue(mockBeneficiary);
 
       const result = await service.addBeneficiary(mockWillId, dto, mockUserId);
 
@@ -663,9 +635,9 @@ describe('EstatePlanningService', () => {
       mockPrismaService.will.findFirst.mockResolvedValue(mockWill);
       mockPrismaService.householdMember.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.addBeneficiary(mockWillId, dto, mockUserId)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.addBeneficiary(mockWillId, dto, mockUserId)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw BadRequestException when adding to executed will', async () => {
@@ -678,9 +650,9 @@ describe('EstatePlanningService', () => {
 
       mockPrismaService.will.findFirst.mockResolvedValue(executedWill);
 
-      await expect(
-        service.addBeneficiary(mockWillId, dto, mockUserId)
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.addBeneficiary(mockWillId, dto, mockUserId)).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -694,12 +666,8 @@ describe('EstatePlanningService', () => {
       const updatedBeneficiary = { ...mockBeneficiary, ...dto };
 
       mockPrismaService.will.findFirst.mockResolvedValue(mockWill);
-      mockPrismaService.beneficiaryDesignation.findFirst.mockResolvedValue(
-        mockBeneficiary
-      );
-      mockPrismaService.beneficiaryDesignation.update.mockResolvedValue(
-        updatedBeneficiary
-      );
+      mockPrismaService.beneficiaryDesignation.findFirst.mockResolvedValue(mockBeneficiary);
+      mockPrismaService.beneficiaryDesignation.update.mockResolvedValue(updatedBeneficiary);
 
       const result = await service.updateBeneficiary(
         mockWillId,
@@ -737,12 +705,8 @@ describe('EstatePlanningService', () => {
   describe('removeBeneficiary', () => {
     it('should remove a beneficiary from a will', async () => {
       mockPrismaService.will.findFirst.mockResolvedValue(mockWill);
-      mockPrismaService.beneficiaryDesignation.findFirst.mockResolvedValue(
-        mockBeneficiary
-      );
-      mockPrismaService.beneficiaryDesignation.delete.mockResolvedValue(
-        mockBeneficiary
-      );
+      mockPrismaService.beneficiaryDesignation.findFirst.mockResolvedValue(mockBeneficiary);
+      mockPrismaService.beneficiaryDesignation.delete.mockResolvedValue(mockBeneficiary);
 
       await service.removeBeneficiary(mockWillId, mockBeneficiaryId, mockUserId);
 
@@ -783,9 +747,7 @@ describe('EstatePlanningService', () => {
       };
 
       mockPrismaService.will.findFirst.mockResolvedValue(mockWill);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.willExecutor.create.mockResolvedValue(mockExecutor);
 
       const result = await service.addExecutor(mockWillId, dto, mockUserId);
@@ -848,12 +810,7 @@ describe('EstatePlanningService', () => {
       mockPrismaService.willExecutor.findFirst.mockResolvedValue(mockExecutor);
       mockPrismaService.willExecutor.update.mockResolvedValue(updatedExecutor);
 
-      const result = await service.updateExecutor(
-        mockWillId,
-        mockExecutorId,
-        dto,
-        mockUserId
-      );
+      const result = await service.updateExecutor(mockWillId, mockExecutorId, dto, mockUserId);
 
       expect(result.order).toBe(dto.order);
       expect(mockAuditService.log).toHaveBeenCalled();
@@ -863,9 +820,9 @@ describe('EstatePlanningService', () => {
       mockPrismaService.will.findFirst.mockResolvedValue(mockWill);
       mockPrismaService.willExecutor.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.updateExecutor(mockWillId, 'invalid', {}, mockUserId)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updateExecutor(mockWillId, 'invalid', {}, mockUserId)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw BadRequestException when updating executor on executed will', async () => {
@@ -899,9 +856,9 @@ describe('EstatePlanningService', () => {
       const executedWill = { ...mockWill, status: WillStatus.executed };
       mockPrismaService.will.findFirst.mockResolvedValue(executedWill);
 
-      await expect(
-        service.removeExecutor(mockWillId, mockExecutorId, mockUserId)
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.removeExecutor(mockWillId, mockExecutorId, mockUserId)).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it('should throw NotFoundException if executor not found', async () => {

@@ -8,12 +8,7 @@ module.exports = {
   coverageDirectory: './coverage',
   testMatch: ['<rootDir>/src/**/*.spec.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.spec.ts',
-    '!src/**/index.ts',
-    '!src/**/types.ts',
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.spec.ts', '!src/**/index.ts', '!src/**/types.ts'],
   coverageThreshold: {
     global: {
       branches: 80,

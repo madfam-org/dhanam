@@ -1,12 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException } from '@nestjs/common';
-import { Currency } from '@db';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
+import { Currency } from '@db';
+
 import { CryptoService } from '../../../core/crypto/crypto.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 
 import { FinicityService } from './finicity.service';
 
@@ -188,9 +189,7 @@ describe('FinicityService', () => {
     });
 
     it('should throw error when authentication fails', async () => {
-      mockHttpService.post.mockReturnValue(
-        throwError(() => new Error('Authentication failed'))
-      );
+      mockHttpService.post.mockReturnValue(throwError(() => new Error('Authentication failed')));
 
       await expect(service.healthCheck()).resolves.toMatchObject({
         status: 'down',
@@ -233,9 +232,7 @@ describe('FinicityService', () => {
     });
 
     it('should return down status when authentication fails', async () => {
-      mockHttpService.post.mockReturnValue(
-        throwError(() => new Error('Auth error'))
-      );
+      mockHttpService.post.mockReturnValue(throwError(() => new Error('Auth error')));
 
       const result = await service.healthCheck();
 
@@ -666,9 +663,7 @@ describe('FinicityService', () => {
         accountId: 'acc-123',
       };
 
-      mockPrisma.providerConnection.findFirst.mockRejectedValue(
-        new Error('Database error')
-      );
+      mockPrisma.providerConnection.findFirst.mockRejectedValue(new Error('Database error'));
 
       const result = await service.handleWebhook(payload);
 
@@ -780,9 +775,7 @@ describe('FinicityService', () => {
         })
       );
 
-      await expect(service.getInstitution('invalid')).rejects.toThrow(
-        'Institution not found'
-      );
+      await expect(service.getInstitution('invalid')).rejects.toThrow('Institution not found');
 
       expect(mockHttpService.post).toHaveBeenCalled();
       expect(mockHttpService.get).toHaveBeenCalled();
@@ -791,9 +784,7 @@ describe('FinicityService', () => {
 
   describe('Error Handling', () => {
     it('should handle network errors gracefully', async () => {
-      mockHttpService.post.mockReturnValue(
-        throwError(() => new Error('Network timeout'))
-      );
+      mockHttpService.post.mockReturnValue(throwError(() => new Error('Network timeout')));
 
       await expect(service.createLink({ userId: 'user123' })).rejects.toThrow();
     });

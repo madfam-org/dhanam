@@ -1,11 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { Currency } from '@db';
+import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
-import { FxRatesService } from './fx-rates.service';
+
 import { PrismaService } from '@core/prisma/prisma.service';
 import { RedisService } from '@core/redis/redis.service';
+import { Currency } from '@db';
+
+import { FxRatesService } from './fx-rates.service';
 
 describe('FxRatesService', () => {
   let service: FxRatesService;
@@ -94,9 +96,7 @@ describe('FxRatesService', () => {
       const rate = await service.getExchangeRate(Currency.USD, Currency.MXN);
 
       expect(rate).toBe(17.25);
-      expect(redisService.get).toHaveBeenCalledWith(
-        expect.stringContaining('fx:USD:MXN')
-      );
+      expect(redisService.get).toHaveBeenCalledWith(expect.stringContaining('fx:USD:MXN'));
       expect(httpService.get).not.toHaveBeenCalled();
     });
 
@@ -152,7 +152,7 @@ describe('FxRatesService', () => {
 
       const rate = await service.getExchangeRate(Currency.EUR, Currency.MXN);
 
-      expect(rate).toBe(19.50);
+      expect(rate).toBe(19.5);
       expect(httpService.get).toHaveBeenCalledWith(
         expect.stringContaining('SF46410'),
         expect.any(Object)
@@ -183,7 +183,7 @@ describe('FxRatesService', () => {
       const rate = await service.getExchangeRate(Currency.USD, Currency.EUR);
 
       // USD to EUR = USD to MXN / EUR to MXN = 17.25 / 19.50
-      expect(rate).toBeCloseTo(17.25 / 19.50, 5);
+      expect(rate).toBeCloseTo(17.25 / 19.5, 5);
     });
 
     it('should calculate inverse rate for MXN to EUR', async () => {
@@ -207,7 +207,7 @@ describe('FxRatesService', () => {
       const rate = await service.getExchangeRate(Currency.MXN, Currency.EUR);
 
       // MXN to EUR is inverse of EUR to MXN (1/19.50)
-      expect(rate).toBeCloseTo(1 / 19.50, 5);
+      expect(rate).toBeCloseTo(1 / 19.5, 5);
     });
 
     it('should calculate cross rate for EUR to USD', async () => {
@@ -234,7 +234,7 @@ describe('FxRatesService', () => {
       const rate = await service.getExchangeRate(Currency.EUR, Currency.USD);
 
       // EUR to USD = EUR to MXN / USD to MXN = 19.50 / 17.25
-      expect(rate).toBeCloseTo(19.50 / 17.25, 5);
+      expect(rate).toBeCloseTo(19.5 / 17.25, 5);
     });
 
     it('should store exchange rate in database', async () => {
@@ -268,9 +268,7 @@ describe('FxRatesService', () => {
 
     it('should use database fallback if API fails', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue({
         rate: 17.0,
         fromCurrency: Currency.USD,
@@ -293,9 +291,7 @@ describe('FxRatesService', () => {
 
     it('should use hardcoded fallback if database also fails', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       const rate = await service.getExchangeRate(Currency.USD, Currency.MXN);
@@ -360,9 +356,7 @@ describe('FxRatesService', () => {
 
       await service.convertAmount(100, Currency.USD, Currency.MXN, historicalDate);
 
-      expect(redisService.get).toHaveBeenCalledWith(
-        expect.stringContaining('2025-01-10')
-      );
+      expect(redisService.get).toHaveBeenCalledWith(expect.stringContaining('2025-01-10'));
     });
   });
 
@@ -375,7 +369,7 @@ describe('FxRatesService', () => {
         {
           fromCurrency: Currency.USD,
           toCurrency: Currency.MXN,
-          rate: 17.20,
+          rate: 17.2,
           date: new Date('2025-01-01'),
           source: 'banxico',
         },
@@ -412,7 +406,7 @@ describe('FxRatesService', () => {
       });
 
       expect(result).toHaveLength(2);
-      expect(result[0].rate).toBe(17.20);
+      expect(result[0].rate).toBe(17.2);
       expect(result[1].rate).toBe(17.25);
     });
 
@@ -461,22 +455,20 @@ describe('FxRatesService', () => {
   describe('updateExchangeRates (cron job)', () => {
     it('should update all major currency pairs', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get
-        .mockReturnValueOnce(of(mockBanxicoResponse) as any)
-        .mockReturnValueOnce(
-          of({
-            data: {
-              bmx: {
-                series: [
-                  {
-                    idSerie: 'SF46410',
-                    datos: [{ fecha: '2025-01-15', dato: '19.50' }],
-                  },
-                ],
-              },
+      httpService.get.mockReturnValueOnce(of(mockBanxicoResponse) as any).mockReturnValueOnce(
+        of({
+          data: {
+            bmx: {
+              series: [
+                {
+                  idSerie: 'SF46410',
+                  datos: [{ fecha: '2025-01-15', dato: '19.50' }],
+                },
+              ],
             },
-          }) as any
-        );
+          },
+        }) as any
+      );
 
       prisma.exchangeRate.upsert.mockResolvedValue({} as any);
 
@@ -488,9 +480,7 @@ describe('FxRatesService', () => {
 
     it('should not throw if update fails', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       // Should not throw
@@ -522,10 +512,7 @@ describe('FxRatesService', () => {
       redisService.get.mockResolvedValue(null);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
-      const rate = await serviceNoToken.getExchangeRate(
-        Currency.USD,
-        Currency.MXN
-      );
+      const rate = await serviceNoToken.getExchangeRate(Currency.USD, Currency.MXN);
 
       // Should fall back to hardcoded rate
       expect(rate).toBe(17.5);
@@ -588,16 +575,11 @@ describe('FxRatesService', () => {
 
     it('should handle unsupported currency pairs with fallback', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('Unsupported pair')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('Unsupported pair')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       // GBP is not in supported currencies
-      const rate = await service.getExchangeRate(
-        'GBP' as Currency,
-        Currency.MXN
-      );
+      const rate = await service.getExchangeRate('GBP' as Currency, Currency.MXN);
 
       // Should return fallback of 1
       expect(rate).toBe(1);
@@ -609,9 +591,7 @@ describe('FxRatesService', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('Network Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('Network Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       const rate = await service.getExchangeRate(Currency.USD, Currency.MXN);
@@ -640,7 +620,9 @@ describe('FxRatesService', () => {
       // Note: The service does not have try-catch around the initial Redis get call
       // so Redis errors will propagate. This is expected behavior for cache failures
       // that should be handled at a higher level.
-      await expect(service.getExchangeRate(Currency.USD, Currency.MXN)).rejects.toThrow('Redis connection failed');
+      await expect(service.getExchangeRate(Currency.USD, Currency.MXN)).rejects.toThrow(
+        'Redis connection failed'
+      );
     });
   });
 
@@ -692,9 +674,7 @@ describe('FxRatesService', () => {
   describe('getLatestFromDatabase edge cases', () => {
     it('should return null when rate property is undefined (line 188 branch)', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       // Return object without rate property
       prisma.exchangeRate.findFirst.mockResolvedValue({
         fromCurrency: Currency.USD,
@@ -713,16 +693,11 @@ describe('FxRatesService', () => {
   describe('getFallbackRate edge cases', () => {
     it('should return 1 for unknown currency pair (line 171 fallback)', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       // BTC is not a supported currency, so fallback key won't exist
-      const rate = await service.getExchangeRate(
-        'BTC' as Currency,
-        'ETH' as Currency
-      );
+      const rate = await service.getExchangeRate('BTC' as Currency, 'ETH' as Currency);
 
       // Should return default of 1
       expect(rate).toBe(1);
@@ -730,9 +705,7 @@ describe('FxRatesService', () => {
 
     it('should return hardcoded rate for EUR_USD', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       const rate = await service.getExchangeRate(Currency.EUR, Currency.USD);
@@ -743,9 +716,7 @@ describe('FxRatesService', () => {
 
     it('should return hardcoded rate for MXN_EUR', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       const rate = await service.getExchangeRate(Currency.MXN, Currency.EUR);
@@ -756,9 +727,7 @@ describe('FxRatesService', () => {
 
     it('should return hardcoded rate for MXN_USD', async () => {
       redisService.get.mockResolvedValue(null);
-      httpService.get.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.get.mockReturnValue(throwError(() => new Error('API Error')) as any);
       prisma.exchangeRate.findFirst.mockResolvedValue(null);
 
       const rate = await service.getExchangeRate(Currency.MXN, Currency.USD);

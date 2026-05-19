@@ -163,28 +163,29 @@ baseTest.describe('Demo Flow', () => {
 });
 
 baseTest.describe('Registration with Plan', () => {
-  baseTest('should show plan context on register page when plan query param is set', async ({
-    page,
-  }) => {
-    await page.goto(`${BASE_URL}/register?plan=pro`);
+  baseTest(
+    'should show plan context on register page when plan query param is set',
+    async ({ page }) => {
+      await page.goto(`${BASE_URL}/register?plan=pro`);
 
-    // The register page shows "Start your free trial of Pro" when selectedPlan is set
-    const pageContent = await page.textContent('body');
-    const showsPlanContext =
-      pageContent?.toLowerCase().includes('pro') ||
-      pageContent?.toLowerCase().includes('trial');
-    expect(showsPlanContext).toBeTruthy();
-  });
+      // The register page shows "Start your free trial of Pro" when selectedPlan is set
+      const pageContent = await page.textContent('body');
+      const showsPlanContext =
+        pageContent?.toLowerCase().includes('pro') || pageContent?.toLowerCase().includes('trial');
+      expect(showsPlanContext).toBeTruthy();
+    }
+  );
 
-  baseTest('should show "Start your free trial of Essentials" for essentials plan', async ({
-    page,
-  }) => {
-    await page.goto(`${BASE_URL}/register?plan=essentials`);
+  baseTest(
+    'should show "Start your free trial of Essentials" for essentials plan',
+    async ({ page }) => {
+      await page.goto(`${BASE_URL}/register?plan=essentials`);
 
-    // CardDescription renders: "Start your free trial of Essentials"
-    const trialText = page.getByText(/start your free trial of essentials/i);
-    await expect(trialText).toBeVisible();
-  });
+      // CardDescription renders: "Start your free trial of Essentials"
+      const trialText = page.getByText(/start your free trial of essentials/i);
+      await expect(trialText).toBeVisible();
+    }
+  );
 
   baseTest('should show "Start your free trial of Premium" for premium plan', async ({ page }) => {
     await page.goto(`${BASE_URL}/register?plan=premium`);
@@ -266,7 +267,7 @@ test.describe('Upgrade Page', () => {
     const pageContent = await guestPage.textContent('body');
     // Should show pricing content (subscribe buttons or current plan indicator)
     expect(
-      pageContent?.includes('Subscribe') || pageContent?.includes('Current Plan'),
+      pageContent?.includes('Subscribe') || pageContent?.includes('Current Plan')
     ).toBeTruthy();
   });
 
@@ -318,24 +319,25 @@ baseTest.describe('Billing Pricing API', () => {
     }
   });
 
-  baseTest('GET /billing/pricing defaults to US pricing when no country specified', async ({
-    request,
-  }) => {
-    const response = await request.get(`${API_BASE}/billing/pricing`);
+  baseTest(
+    'GET /billing/pricing defaults to US pricing when no country specified',
+    async ({ request }) => {
+      const response = await request.get(`${API_BASE}/billing/pricing`);
 
-    if (response.ok()) {
-      const data = await response.json();
+      if (response.ok()) {
+        const data = await response.json();
 
-      // US falls in tier1 (region 1)
-      expect(data.region).toBe(1);
-      expect(data.tiers).toHaveLength(3);
+        // US falls in tier1 (region 1)
+        expect(data.region).toBe(1);
+        expect(data.tiers).toHaveLength(3);
 
-      // No promo prices for tier-1 countries
-      expect(data.tiers[0].promoPrice).toBeNull();
-      expect(data.tiers[1].promoPrice).toBeNull();
-      expect(data.tiers[2].promoPrice).toBeNull();
+        // No promo prices for tier-1 countries
+        expect(data.tiers[0].promoPrice).toBeNull();
+        expect(data.tiers[1].promoPrice).toBeNull();
+        expect(data.tiers[2].promoPrice).toBeNull();
+      }
     }
-  });
+  );
 
   baseTest('GET /billing/pricing returns correct tiers for BR (Brazil)', async ({ request }) => {
     const response = await request.get(`${API_BASE}/billing/pricing?country=BR`);
@@ -358,36 +360,37 @@ baseTest.describe('Billing Pricing API', () => {
     }
   });
 
-  baseTest('GET /billing/pricing response shape matches PricingResponse interface', async ({
-    request,
-  }) => {
-    const response = await request.get(`${API_BASE}/billing/pricing`);
+  baseTest(
+    'GET /billing/pricing response shape matches PricingResponse interface',
+    async ({ request }) => {
+      const response = await request.get(`${API_BASE}/billing/pricing`);
 
-    if (response.ok()) {
-      const data = await response.json();
+      if (response.ok()) {
+        const data = await response.json();
 
-      // Validate top-level shape
-      expect(typeof data.region).toBe('number');
-      expect(typeof data.regionName).toBe('string');
-      expect(typeof data.currency).toBe('string');
-      expect(Array.isArray(data.tiers)).toBe(true);
-      expect(typeof data.trial).toBe('object');
+        // Validate top-level shape
+        expect(typeof data.region).toBe('number');
+        expect(typeof data.regionName).toBe('string');
+        expect(typeof data.currency).toBe('string');
+        expect(Array.isArray(data.tiers)).toBe(true);
+        expect(typeof data.trial).toBe('object');
 
-      // Validate trial shape
-      expect(typeof data.trial.daysWithoutCC).toBe('number');
-      expect(typeof data.trial.daysWithCC).toBe('number');
-      expect(typeof data.trial.promoMonths).toBe('number');
+        // Validate trial shape
+        expect(typeof data.trial.daysWithoutCC).toBe('number');
+        expect(typeof data.trial.daysWithCC).toBe('number');
+        expect(typeof data.trial.promoMonths).toBe('number');
 
-      // Validate tier shape
-      for (const tier of data.tiers) {
-        expect(typeof tier.id).toBe('string');
-        expect(typeof tier.name).toBe('string');
-        expect(typeof tier.monthlyPrice).toBe('number');
-        expect(typeof tier.currency).toBe('string');
-        expect(Array.isArray(tier.features)).toBe(true);
-        // promoPrice is number | null
-        expect(tier.promoPrice === null || typeof tier.promoPrice === 'number').toBe(true);
+        // Validate tier shape
+        for (const tier of data.tiers) {
+          expect(typeof tier.id).toBe('string');
+          expect(typeof tier.name).toBe('string');
+          expect(typeof tier.monthlyPrice).toBe('number');
+          expect(typeof tier.currency).toBe('string');
+          expect(Array.isArray(tier.features)).toBe(true);
+          // promoPrice is number | null
+          expect(tier.promoPrice === null || typeof tier.promoPrice === 'number').toBe(true);
+        }
       }
     }
-  });
+  );
 });

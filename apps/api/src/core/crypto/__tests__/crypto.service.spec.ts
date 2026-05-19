@@ -69,15 +69,11 @@ describe('CryptoService', () => {
       });
 
       it('should throw error for invalid encrypted data format - missing parts', () => {
-        expect(() => service.decrypt('invalid-data')).toThrow(
-          'Invalid encrypted data format'
-        );
+        expect(() => service.decrypt('invalid-data')).toThrow('Invalid encrypted data format');
       });
 
       it('should throw error for invalid encrypted data format - only two parts', () => {
-        expect(() => service.decrypt('part1:part2')).toThrow(
-          'Invalid encrypted data format'
-        );
+        expect(() => service.decrypt('part1:part2')).toThrow('Invalid encrypted data format');
       });
 
       it('should throw error for invalid encrypted data format - empty parts', () => {
@@ -91,15 +87,11 @@ describe('CryptoService', () => {
       });
 
       it('should throw error for invalid encrypted data format - empty authTag', () => {
-        expect(() => service.decrypt('iv::encrypted')).toThrow(
-          'Invalid encrypted data format'
-        );
+        expect(() => service.decrypt('iv::encrypted')).toThrow('Invalid encrypted data format');
       });
 
       it('should throw error for invalid encrypted data format - empty encrypted', () => {
-        expect(() => service.decrypt('iv:authTag:')).toThrow(
-          'Invalid encrypted data format'
-        );
+        expect(() => service.decrypt('iv:authTag:')).toThrow('Invalid encrypted data format');
       });
 
       it('should throw error for tampered authTag', () => {

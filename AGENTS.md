@@ -102,7 +102,7 @@ Dhanam uses **Enclii** (MADFAM's own deployment platform) for ALL production dep
 - `ci.yml`, `lint.yml`, `test-coverage.yml` - CI/CD quality gates (run on all PRs)
 - `check-migrations.yml` - Database migration validation
 - `publish-packages.yml` - Tag-triggered npm publish to npm.madfam.io (manual dispatch with dry-run)
-- `deploy-enclii.yml`, `deploy-k8s.yml`, `deploy-web-k8s.yml` - Manual/fallback deployment options
+- `deploy-enclii.yml`, `deploy-k8s.yml`, `deploy-web-k8s.yml`, `deploy-admin-k8s.yml` - Manual break-glass deployment options
 - `deploy-staging.yml` - Auto-deploy staging on push to main
 - Primary production deployment is via **Enclii auto-deploy**, not GitHub Actions
 
@@ -434,20 +434,18 @@ promotion:
 
 ### What ships on push to `main` (post PP.2b/PP.2c)
 
-| Workflow               | Trigger                    | Effect                                                                                                                      |
-| ---------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `deploy-staging.yml`   | push to main               | Builds api/web/admin, patches digests into `infra/k8s/overlays/staging/kustomization.yaml`, ArgoCD reconciles staging       |
-| `deploy-k8s.yml` (API) | push to main (api paths)   | Still ships prod the legacy way (direct prod digest commit). Phase 2 finish removes this in favour of `promote-to-prod.yml` |
-| `deploy-web-k8s.yml`   | push to main (web paths)   | Same pattern for `dhanam-web`                                                                                               |
-| `deploy-admin-k8s.yml` | push to main (admin paths) | Same pattern for `dhanam-admin`                                                                                             |
-| `deploy-enclii.yml`    | push to main               | Enclii auto-deploy (primary production path per MADFAM ecosystem)                                                           |
-| `promote-to-prod.yml`  | workflow_dispatch (manual) | Promotes a staging digest (one component or all) into `infra/k8s/production/kustomization.yaml`                             |
-| `rollback-prod.yml`    | workflow_dispatch (manual) | Restores a previous prod digest; defaults to the previous git-history entry                                                 |
+| Workflow               | Trigger                    | Effect                                                                                                                |
+| ---------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `deploy-staging.yml`   | push to main               | Builds api/web/admin, patches digests into `infra/k8s/overlays/staging/kustomization.yaml`, ArgoCD reconciles staging |
+| `promote-to-prod.yml`  | workflow_dispatch (manual) | Promotes a soaked staging digest (one component or all) into `infra/k8s/production/kustomization.yaml`                |
+| `rollback-prod.yml`    | workflow_dispatch (manual) | Restores a previous prod digest; defaults to the previous git-history entry                                           |
+| `deploy-enclii.yml`    | workflow_dispatch (manual) | Manual Enclii fallback; production routine still goes through Enclii web/API/CLI or promotion                         |
+| `deploy-k8s.yml` (API) | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                      |
+| `deploy-web-k8s.yml`   | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                      |
+| `deploy-admin-k8s.yml` | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                      |
 
-The legacy `deploy-{k8s,web-k8s,admin-k8s}.yml` workflows stay until a
-follow-up PR (Phase 4 per RFC 0001) decommissions direct-to-prod digest
-commits. During the overlap, promote-to-prod is the preferred path; the
-legacy workflows are the fallback.
+The legacy `deploy-{k8s,web-k8s,admin-k8s}.yml` workflows no longer run on
+push to `main`; they are manual break-glass paths only.
 
 ## Environment Setup
 

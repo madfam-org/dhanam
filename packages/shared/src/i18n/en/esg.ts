@@ -8,6 +8,7 @@ export const esg = {
   },
   empty: {
     title: 'No crypto holdings found',
-    description: 'Connect your crypto accounts to see ESG analysis of your portfolio. The system will automatically analyze your holdings using the Dhanam ESG Framework.',
+    description:
+      'Connect your crypto accounts to see ESG analysis of your portfolio. The system will automatically analyze your holdings using the Dhanam ESG Framework.',
   },
 } as const;

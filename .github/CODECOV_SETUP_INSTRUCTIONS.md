@@ -21,6 +21,7 @@ Follow these steps to enable Codecov coverage reporting for the Dhanam Ledger pr
 4. Click **"Setup repo"**
 
 If you don't see your repository:
+
 - Make sure you're logged in with the correct GitHub account
 - Check that you have admin access to the repository
 - Try refreshing the page
@@ -84,6 +85,7 @@ After the workflow completes:
    - Component breakdown
 
 If you see an error or no data:
+
 - Check GitHub Actions logs for upload errors
 - Verify the token was added correctly
 - Ensure the workflow completed successfully
@@ -126,6 +128,7 @@ In Codecov dashboard:
 **Error:** `Error uploading coverage reports`
 
 **Solution:**
+
 ```bash
 # Verify token is set correctly
 # Go to GitHub Settings → Secrets → Actions
@@ -137,6 +140,7 @@ In Codecov dashboard:
 **Error:** Coverage shows 0% or "No data"
 
 **Solution:**
+
 1. Check that tests are actually running in CI
 2. Verify `lcov.info` file is generated
 3. Check GitHub Actions logs for coverage step
@@ -147,6 +151,7 @@ In Codecov dashboard:
 **Error:** `HTTP 403 Forbidden`
 
 **Solution:**
+
 - Token may be incorrect or expired
 - Regenerate token in Codecov settings
 - Update GitHub secret with new token
@@ -156,11 +161,13 @@ In Codecov dashboard:
 **Warning:** "Coverage decreased by X%"
 
 **This is expected when:**
+
 - Adding new uncovered code
 - Removing tests
 - Changing coverage configuration
 
 **To fix:**
+
 - Add tests for new code
 - Ensure coverage stays above 80%
 - Review Codecov comments for specific files
@@ -215,10 +222,12 @@ After completing setup:
 ## Support
 
 **Issues with Codecov:**
+
 - Codecov Support: https://codecov.io/support
 - GitHub Discussions: https://github.com/codecov/codecov-action/discussions
 
 **Issues with GitHub Actions:**
+
 - Check workflow logs
 - Review CICD_SETUP.md
 - Contact team lead

@@ -1,6 +1,7 @@
+import { Injectable, Logger } from '@nestjs/common';
+
 import { PrismaService } from '@core/prisma/prisma.service';
 import { Transaction } from '@db';
-import { Injectable, Logger } from '@nestjs/common';
 
 export interface RuleAction {
   type: 'set_category' | 'set_tag' | 'set_merchant' | 'link_recurring';

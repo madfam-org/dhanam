@@ -123,24 +123,20 @@ export default function RecurringScreen() {
   };
 
   const handleDelete = (id: string, merchantName: string) => {
-    Alert.alert(
-      'Delete Recurring',
-      `Are you sure you want to delete "${merchantName}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteMutation.mutateAsync(id);
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete pattern');
-            }
-          },
+    Alert.alert('Delete Recurring', `Are you sure you want to delete "${merchantName}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteMutation.mutateAsync(id);
+          } catch (error) {
+            Alert.alert('Error', 'Failed to delete pattern');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const getActiveData = () => {
@@ -232,8 +228,7 @@ export default function RecurringScreen() {
           {isDetected ? (
             <View style={styles.detectedActions}>
               <Text variant="bodySmall" style={styles.confidenceText}>
-                {item.occurrenceCount} occurrences • {Math.round(item.confidence * 100)}%
-                confidence
+                {item.occurrenceCount} occurrences • {Math.round(item.confidence * 100)}% confidence
               </Text>
               <View style={styles.actionButtons}>
                 <Button
@@ -287,9 +282,7 @@ export default function RecurringScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Summary Cards */}
         {summary && (

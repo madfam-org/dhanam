@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
-import { AccountType } from '@db';
-import { Decimal } from '@db';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
+import { AccountType, Decimal } from '@db';
+
 import { AuditService } from '../../../core/audit/audit.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 
 import { BlockchainService } from './blockchain.service';
 
@@ -517,9 +517,7 @@ describe('BlockchainService', () => {
     it('should throw error when wallet not found', async () => {
       mockPrisma.account.findUnique.mockResolvedValue(null);
 
-      await expect(service.removeWallet('acc123', 'user123')).rejects.toThrow(
-        'Wallet not found'
-      );
+      await expect(service.removeWallet('acc123', 'user123')).rejects.toThrow('Wallet not found');
     });
 
     it('should throw error when user does not have access', async () => {

@@ -1,4 +1,9 @@
-import { ESGProvider, AssetESGData, PortfolioESGAnalysis, ESGConfiguration } from '../types/esg.types';
+import {
+  ESGProvider,
+  AssetESGData,
+  PortfolioESGAnalysis,
+  ESGConfiguration,
+} from '../types/esg.types';
 import { PortfolioESGAnalyzer, PortfolioHolding } from './portfolio-analyzer';
 import { DhanamESGProvider } from '../providers/dhanam-provider';
 
@@ -42,12 +47,12 @@ export class ESGManager {
 
   async getAssetESG(symbol: string): Promise<AssetESGData | null> {
     const cacheKey = symbol.toUpperCase();
-    
+
     // Check cache first
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey)!;
       const age = Date.now() - cached.score.lastUpdated.getTime();
-      
+
       if (age < this.config.caching.ttl * 1000) {
         return cached;
       }
@@ -78,7 +83,11 @@ export class ESGManager {
             return data;
           }
         } catch (error) {
-          console.warn('Fallback ESG provider failed', { provider: fallbackName, symbol, error: (error as Error).message });
+          console.warn('Fallback ESG provider failed', {
+            provider: fallbackName,
+            symbol,
+            error: (error as Error).message,
+          });
         }
       }
     }
@@ -93,23 +102,24 @@ export class ESGManager {
     for (let i = 0; i < symbols.length; i += batchSize) {
       const batch = symbols.slice(i, i + batchSize);
       const batchResults = await Promise.allSettled(
-        batch.map(symbol => this.getAssetESG(symbol))
+        batch.map((symbol) => this.getAssetESG(symbol))
       );
 
       const validResults = batchResults
-        .filter((result): result is PromiseFulfilledResult<AssetESGData> =>
-          result.status === 'fulfilled' &&
-          result.value != null &&
-          typeof result.value === 'object' &&
-          'score' in result.value
+        .filter(
+          (result): result is PromiseFulfilledResult<AssetESGData> =>
+            result.status === 'fulfilled' &&
+            result.value != null &&
+            typeof result.value === 'object' &&
+            'score' in result.value
         )
-        .map(result => result.value);
+        .map((result) => result.value);
 
       results.push(...validResults);
 
       // Add small delay between batches to avoid rate limiting
       if (i + batchSize < symbols.length) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 
@@ -117,11 +127,11 @@ export class ESGManager {
   }
 
   async analyzePortfolio(holdings: PortfolioHolding[]): Promise<PortfolioESGAnalysis> {
-    const symbols = [...new Set(holdings.map(h => h.symbol.toUpperCase()))];
+    const symbols = [...new Set(holdings.map((h) => h.symbol.toUpperCase()))];
     const esgData = await this.getMultipleAssetESG(symbols);
-    
+
     const esgMap = new Map<string, AssetESGData>();
-    esgData.forEach(data => {
+    esgData.forEach((data) => {
       esgMap.set(data.symbol, data);
     });
 
@@ -131,7 +141,7 @@ export class ESGManager {
 
   async refreshAssetData(symbols: string[]): Promise<void> {
     // Clear cache for specified symbols
-    symbols.forEach(symbol => {
+    symbols.forEach((symbol) => {
       this.cache.delete(symbol.toUpperCase());
     });
 

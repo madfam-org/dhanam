@@ -37,7 +37,7 @@ const StripeSubscriptionSchema = z.object({
         price: z.object({
           id: z.string().startsWith('price_'),
         }),
-      }),
+      })
     ),
   }),
 });
@@ -180,7 +180,7 @@ describe('Stripe Webhook Schema Contracts', () => {
   describe('checkout.session.completed payload', () => {
     it('session object matches CheckoutSession schema', () => {
       expect(() =>
-        StripeCheckoutSessionSchema.parse(fixtures.checkoutCompleted.data.object),
+        StripeCheckoutSessionSchema.parse(fixtures.checkoutCompleted.data.object)
       ).not.toThrow();
     });
 
@@ -194,28 +194,24 @@ describe('Stripe Webhook Schema Contracts', () => {
   describe('subscription event payloads', () => {
     it('subscription.updated matches Subscription schema', () => {
       expect(() =>
-        StripeSubscriptionSchema.parse(fixtures.subscriptionUpdated.data.object),
+        StripeSubscriptionSchema.parse(fixtures.subscriptionUpdated.data.object)
       ).not.toThrow();
     });
 
     it('subscription.deleted matches Subscription schema', () => {
       expect(() =>
-        StripeSubscriptionSchema.parse(fixtures.subscriptionDeleted.data.object),
+        StripeSubscriptionSchema.parse(fixtures.subscriptionDeleted.data.object)
       ).not.toThrow();
     });
   });
 
   describe('invoice event payloads', () => {
     it('invoice.paid matches Invoice schema', () => {
-      expect(() =>
-        StripeInvoiceSchema.parse(fixtures.invoicePaid.data.object),
-      ).not.toThrow();
+      expect(() => StripeInvoiceSchema.parse(fixtures.invoicePaid.data.object)).not.toThrow();
     });
 
     it('invoice.payment_failed matches Invoice schema', () => {
-      expect(() =>
-        StripeInvoiceSchema.parse(fixtures.paymentFailed.data.object),
-      ).not.toThrow();
+      expect(() => StripeInvoiceSchema.parse(fixtures.paymentFailed.data.object)).not.toThrow();
     });
   });
 });

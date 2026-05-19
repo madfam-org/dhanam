@@ -1,9 +1,10 @@
-import { PrismaService } from '@core/prisma/prisma.service';
-import { TIMEOUT_PRESETS } from '@core/utils/timeout.util';
-import { QueueService } from '@modules/jobs/queue.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
+
+import { PrismaService } from '@core/prisma/prisma.service';
+import { TIMEOUT_PRESETS } from '@core/utils/timeout.util';
+import { QueueService } from '@modules/jobs/queue.service';
 
 export interface HealthStatus {
   status: 'healthy' | 'degraded' | 'unhealthy';

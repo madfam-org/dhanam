@@ -1,7 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { UnauthorizedException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '@core/prisma/prisma.service';
+
 import { JanuaStrategy, JanuaJwtPayload } from '../strategies/janua.strategy';
 
 // JanuaStrategy constructor calls `super()` which needs JWKS env vars.
@@ -52,10 +53,7 @@ describe('JanuaStrategy', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        JanuaStrategy,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [JanuaStrategy, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     strategy = module.get<JanuaStrategy>(JanuaStrategy);
@@ -76,17 +74,13 @@ describe('JanuaStrategy', () => {
     it('should throw UnauthorizedException for suspended users', async () => {
       const payload = { ...basePayload, sub_status: 'suspended' as const };
 
-      await expect(strategy.validate(payload)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException for inactive local users', async () => {
       prisma.user.findFirst.mockResolvedValue({ ...existingUser, isActive: false });
 
-      await expect(strategy.validate(basePayload)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(strategy.validate(basePayload)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException if token is missing sub or email', async () => {

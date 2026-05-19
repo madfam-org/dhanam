@@ -1,4 +1,3 @@
-import { KycStatus, Prisma } from '@db';
 import {
   BadRequestException,
   ConflictException,
@@ -6,6 +5,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+
+import { KycStatus, Prisma } from '@db';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
 

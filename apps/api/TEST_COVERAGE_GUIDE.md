@@ -5,16 +5,19 @@
 ### ✅ Completed Test Infrastructure
 
 **Test Helpers (3 files):**
+
 - `test/helpers/test-database.ts` (196 lines) - Database setup/cleanup/teardown
 - `test/helpers/auth-helper.ts` (370+ lines) - JWT, TOTP, password utilities
 - `test/helpers/test-data-factory.ts` (111 lines) - Factory pattern for test data
 
 **Test Files (26 total):**
+
 - `src/modules/transactions/__tests__/transactions.service.spec.ts` (NEW - 400+ lines)
 - `src/modules/budgets/__tests__/budgets.service.spec.ts` (NEW - 80+ lines)
 - 24 existing test files
 
 **Jest Configuration:**
+
 ```javascript
 coverageThreshold: {
   global: {
@@ -33,6 +36,7 @@ coverageThreshold: {
 **Issue:** Prisma client generation requires downloading binary engines which is restricted in some CI/CD environments.
 
 **Error:**
+
 ```
 Error: Failed to fetch the engine file at https://binaries.prisma.sh/...
 403 Forbidden
@@ -47,11 +51,13 @@ Error: Failed to fetch the engine file at https://binaries.prisma.sh/...
 ### Prerequisites
 
 1. **Install Dependencies:**
+
 ```bash
 pnpm install
 ```
 
 2. **Setup Test Database:**
+
 ```bash
 # Use docker-compose for local Postgres
 pnpm dev:infra
@@ -61,12 +67,14 @@ export DATABASE_URL="postgresql://user:password@localhost:5432/dhanam_test"
 ```
 
 3. **Generate Prisma Client:**
+
 ```bash
 cd apps/api
 pnpm prisma generate
 ```
 
 4. **Run Migrations:**
+
 ```bash
 pnpm prisma migrate deploy
 ```
@@ -74,26 +82,31 @@ pnpm prisma migrate deploy
 ### Running Tests
 
 **All Tests:**
+
 ```bash
 pnpm test
 ```
 
 **With Coverage:**
+
 ```bash
 pnpm test:cov
 ```
 
 **Watch Mode:**
+
 ```bash
 pnpm test:watch
 ```
 
 **Specific Test File:**
+
 ```bash
 pnpm test src/modules/transactions/__tests__/transactions.service.spec.ts
 ```
 
 **E2E Tests:**
+
 ```bash
 pnpm test:e2e
 ```
@@ -105,6 +118,7 @@ pnpm test:e2e
 ### ✅ High Coverage Modules
 
 **Core Infrastructure:**
+
 - `src/core/logger/__tests__/log-sanitizer.spec.ts` ✅ PASSING
 - `src/core/encryption/encryption.service.spec.ts` ✅ PASSING
 - `src/core/prisma/prisma.service.spec.ts` ✅ PASSING
@@ -113,6 +127,7 @@ pnpm test:e2e
 ### 🆕 New Critical Path Tests
 
 **Transactions Module:**
+
 - `src/modules/transactions/__tests__/transactions.service.spec.ts` (400+ lines)
   - ✅ Pagination and filtering
   - ✅ Date range queries
@@ -124,6 +139,7 @@ pnpm test:e2e
   - ✅ Authorization checks
 
 **Budgets Module:**
+
 - `src/modules/budgets/__tests__/budgets.service.spec.ts` (80+ lines)
   - ✅ Budget creation (monthly/quarterly/yearly)
   - ✅ Overlap detection
@@ -134,11 +150,13 @@ pnpm test:e2e
 ### 🔄 Existing Tests (Require Prisma Client)
 
 **Provider Integration:**
+
 - `src/modules/providers/belvo/__tests__/belvo.webhook.spec.ts`
 - `src/modules/providers/plaid/__tests__/plaid.webhook.spec.ts`
 - `src/modules/providers/bitso/__tests__/bitso.webhook.spec.ts`
 
 **Business Logic:**
+
 - `src/modules/categories/__tests__/rules.service.spec.ts`
 - `src/modules/accounts/accounts.service.spec.ts`
 - `src/modules/esg/enhanced-esg.service.spec.ts`
@@ -146,11 +164,13 @@ pnpm test:e2e
 ### ⚠️ Modules Needing Tests
 
 **High Priority:**
+
 - `src/modules/auth/auth.service.ts` - Authentication flows
 - `src/modules/spaces/spaces.service.ts` - Multi-tenant logic
 - `src/modules/users/users.service.ts` - User management
 
 **Medium Priority:**
+
 - `src/modules/webhooks/webhook-handler.service.ts` - Webhook processing
 - `src/modules/analytics/analytics.service.ts` - Event tracking
 - `src/modules/notifications/notifications.service.ts` - Alert system
@@ -169,6 +189,7 @@ statements: 80%    // Statements executed
 ```
 
 **How to Check Coverage:**
+
 ```bash
 pnpm test:cov
 
@@ -178,6 +199,7 @@ xdg-open coverage/index.html  # Linux
 ```
 
 **Coverage Report Location:**
+
 ```
 apps/api/coverage/
 ├── index.html           # Main coverage report
@@ -317,11 +339,13 @@ it('should handle decimal precision correctly', async () => {
 ### Prisma Client Not Generated
 
 **Symptom:**
+
 ```
 Module '"@prisma/client"' has no exported member 'Transaction'
 ```
 
 **Solution:**
+
 ```bash
 cd apps/api
 pnpm prisma generate
@@ -330,11 +354,13 @@ pnpm prisma generate
 ### Test Database Connection Failed
 
 **Symptom:**
+
 ```
 Error: DATABASE_URL must contain "test"
 ```
 
 **Solution:**
+
 ```bash
 export DATABASE_URL="postgresql://user:pass@localhost:5432/dhanam_test"
 ```
@@ -342,11 +368,13 @@ export DATABASE_URL="postgresql://user:pass@localhost:5432/dhanam_test"
 ### Tests Timing Out
 
 **Symptom:**
+
 ```
 Timeout - Async callback was not invoked within the 5000 ms timeout
 ```
 
 **Solution:**
+
 ```typescript
 jest.setTimeout(30000); // In test/setup.ts
 
@@ -359,11 +387,13 @@ it('should do something', async () => {
 ### Mock Data Conflicts
 
 **Symptom:**
+
 ```
 Unique constraint failed
 ```
 
 **Solution:**
+
 ```typescript
 afterEach(async () => {
   await TestDatabase.cleanup(); // Clean between tests
@@ -375,11 +405,13 @@ afterEach(async () => {
 ## Next Steps
 
 1. **Generate Prisma Client in Local Environment:**
+
    ```bash
    pnpm prisma generate
    ```
 
 2. **Run Full Test Suite:**
+
    ```bash
    pnpm test:cov
    ```

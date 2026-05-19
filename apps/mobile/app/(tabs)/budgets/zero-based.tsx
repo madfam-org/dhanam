@@ -183,18 +183,12 @@ export default function ZeroBasedBudgetScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Month Selector */}
         <Card style={styles.monthCard}>
           <Card.Content style={styles.monthContent}>
-            <IconButton
-              icon="chevron-back"
-              size={24}
-              onPress={handlePreviousMonth}
-            />
+            <IconButton icon="chevron-back" size={24} onPress={handlePreviousMonth} />
             <Text variant="titleMedium" style={styles.monthText}>
               {formatMonthDisplay(currentMonth)}
             </Text>
@@ -224,13 +218,17 @@ export default function ZeroBasedBudgetScreen() {
               </View>
               <View style={styles.bannerStats}>
                 <View style={styles.bannerStat}>
-                  <Text variant="bodySmall" style={styles.statLabel}>Income</Text>
+                  <Text variant="bodySmall" style={styles.statLabel}>
+                    Income
+                  </Text>
                   <Text variant="bodyMedium" style={styles.statValue}>
                     {formatCurrency(allocationStatus?.totalIncome || 0, currency)}
                   </Text>
                 </View>
                 <View style={styles.bannerStat}>
-                  <Text variant="bodySmall" style={styles.statLabel}>Allocated</Text>
+                  <Text variant="bodySmall" style={styles.statLabel}>
+                    Allocated
+                  </Text>
                   <Text variant="bodyMedium" style={styles.statValue}>
                     {formatCurrency(allocationStatus?.totalAllocated || 0, currency)}
                   </Text>
@@ -358,10 +356,7 @@ export default function ZeroBasedBudgetScreen() {
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setShowAddIncomeDialog(false)}>Cancel</Button>
-            <Button
-              onPress={handleAddIncome}
-              loading={createIncomeMutation.isPending}
-            >
+            <Button onPress={handleAddIncome} loading={createIncomeMutation.isPending}>
               Add
             </Button>
           </Dialog.Actions>
@@ -385,10 +380,7 @@ export default function ZeroBasedBudgetScreen() {
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setShowAllocateDialog(false)}>Cancel</Button>
-            <Button
-              onPress={handleAllocate}
-              loading={allocateMutation.isPending}
-            >
+            <Button onPress={handleAllocate} loading={allocateMutation.isPending}>
               Allocate
             </Button>
           </Dialog.Actions>

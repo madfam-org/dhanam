@@ -43,14 +43,12 @@ const PRODUCT_METADATA = { app: 'dhanam', ecosystem: 'madfam' };
 const PRODUCTS = [
   {
     name: 'Dhanam Essentials',
-    description:
-      'AI-powered categorization, bank sync (Belvo + Bitso), 2 spaces, 500 MB storage',
+    description: 'AI-powered categorization, bank sync (Belvo + Bitso), 2 spaces, 500 MB storage',
     priceAmountCents: 499, // $4.99
   },
   {
     name: 'Dhanam Pro',
-    description:
-      'All features, all providers, 5 spaces, 5 GB storage, Life Beat, household views',
+    description: 'All features, all providers, 5 spaces, 5 GB storage, Life Beat, household views',
     priceAmountCents: 1199, // $11.99
   },
   {
@@ -116,7 +114,7 @@ async function findMonthlyPrice(productId: string): Promise<Stripe.Price | null>
   });
   return (
     prices.data.find(
-      (p) => p.recurring?.interval === 'month' && p.recurring?.interval_count === 1,
+      (p) => p.recurring?.interval === 'month' && p.recurring?.interval_count === 1
     ) ?? null
   );
 }
@@ -166,7 +164,10 @@ async function setupProduct(cfg: (typeof PRODUCTS)[number]): Promise<ProductResu
   // 2. Price
   let price = await findMonthlyPrice(product.id);
   if (price && price.unit_amount === cfg.priceAmountCents) {
-    log('Price', `Found existing price for ${label}: $${(price.unit_amount! / 100).toFixed(2)}/mo (${price.id})`);
+    log(
+      'Price',
+      `Found existing price for ${label}: $${(price.unit_amount! / 100).toFixed(2)}/mo (${price.id})`
+    );
   } else {
     price = await stripe.prices.create({
       product: product.id,
@@ -175,7 +176,10 @@ async function setupProduct(cfg: (typeof PRODUCTS)[number]): Promise<ProductResu
       recurring: { interval: 'month' },
       metadata: PRODUCT_METADATA,
     });
-    log('Price', `Created price for ${label}: $${(cfg.priceAmountCents / 100).toFixed(2)}/mo -> ${price.id}`);
+    log(
+      'Price',
+      `Created price for ${label}: $${(cfg.priceAmountCents / 100).toFixed(2)}/mo -> ${price.id}`
+    );
   }
 
   return { product, price, label };
@@ -233,7 +237,10 @@ async function setupIntroCoupon(): Promise<Stripe.Coupon> {
       note: '$4.00 off for 3 months. Essentials=$0.99/mo, Pro=$7.99/mo, Premium=$15.99/mo',
     },
   });
-  log('Coupon', `Created "${INTRO_COUPON_NAME}" -> ${coupon.id} ($4.00 off for ${INTRO_COUPON_MONTHS} months)`);
+  log(
+    'Coupon',
+    `Created "${INTRO_COUPON_NAME}" -> ${coupon.id} ($4.00 off for ${INTRO_COUPON_MONTHS} months)`
+  );
   return coupon;
 }
 
@@ -249,7 +256,10 @@ async function main(): Promise<void> {
   // Verify connectivity
   try {
     const account = await stripe.accounts.retrieve();
-    log('Init', `Connected to Stripe account: ${account.id} (${account.business_profile?.name || 'unnamed'})`);
+    log(
+      'Init',
+      `Connected to Stripe account: ${account.id} (${account.business_profile?.name || 'unnamed'})`
+    );
   } catch (err) {
     logError('Init', 'Failed to connect to Stripe. Check your secret key.', err);
     process.exit(1);
@@ -298,13 +308,7 @@ async function main(): Promise<void> {
         mode: 'at_period_end',
         cancellation_reason: {
           enabled: true,
-          options: [
-            'too_expensive',
-            'missing_features',
-            'switched_service',
-            'unused',
-            'other',
-          ],
+          options: ['too_expensive', 'missing_features', 'switched_service', 'unused', 'other'],
         },
       },
       subscription_update: {
@@ -377,7 +381,9 @@ async function main(): Promise<void> {
   // Don't echo the operator's Stripe secret key back into stdout / CI logs;
   // it's already in their environment. The webhook secret is only available
   // at creation time and can't be retrieved later, so we still print it.
-  console.log(`STRIPE_MX_PUBLISHABLE_KEY=${process.env.STRIPE_MX_PUBLISHABLE_KEY || '<get-from-stripe-dashboard>'}`);
+  console.log(
+    `STRIPE_MX_PUBLISHABLE_KEY=${process.env.STRIPE_MX_PUBLISHABLE_KEY || '<get-from-stripe-dashboard>'}`
+  );
   console.log(`STRIPE_MX_SECRET_KEY=<set-from-your-STRIPE_MX_SECRET_KEY-env>`);
   console.log(`STRIPE_MX_WEBHOOK_SECRET=${webhookSecret}`);
   console.log(`STRIPE_ESSENTIALS_PRICE_ID=${essentials.price.id}`);
@@ -386,7 +392,9 @@ async function main(): Promise<void> {
   console.log(`STRIPE_INTRO_COUPON_ID=${coupon.id}`);
   console.log('');
   console.log('# Frontend');
-  console.log(`NEXT_PUBLIC_STRIPE_MX_PUBLISHABLE_KEY=${process.env.STRIPE_MX_PUBLISHABLE_KEY || '<get-from-stripe-dashboard>'}`);
+  console.log(
+    `NEXT_PUBLIC_STRIPE_MX_PUBLISHABLE_KEY=${process.env.STRIPE_MX_PUBLISHABLE_KEY || '<get-from-stripe-dashboard>'}`
+  );
   console.log('');
   console.log('# --- Product IDs (for reference) ---');
   for (const r of results) {

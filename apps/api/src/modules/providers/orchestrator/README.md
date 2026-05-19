@@ -14,14 +14,14 @@ The Provider Orchestrator is the central coordination layer for all financial da
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| `ProviderOrchestratorService` | Main orchestration service |
-| `CircuitBreakerService` | Circuit breaker state management |
-| `RateLimiterService` | API rate limit enforcement |
-| `IFinancialProvider` | Interface all providers must implement |
-| `ConnectionAttempt` | Database entity logging all attempts |
-| `ProviderHealthStatus` | Real-time provider health tracking |
+| Entity                        | Description                            |
+| ----------------------------- | -------------------------------------- |
+| `ProviderOrchestratorService` | Main orchestration service             |
+| `CircuitBreakerService`       | Circuit breaker state management       |
+| `RateLimiterService`          | API rate limit enforcement             |
+| `IFinancialProvider`          | Interface all providers must implement |
+| `ConnectionAttempt`           | Database entity logging all attempts   |
+| `ProviderHealthStatus`        | Real-time provider health tracking     |
 
 ## Service Architecture
 
@@ -59,23 +59,25 @@ The Provider Orchestrator is the central coordination layer for all financial da
 
 The orchestrator supports four main operations:
 
-| Operation | Description |
-|-----------|-------------|
-| `createLink` | Initialize account linking session |
-| `exchangeToken` | Exchange temporary token for access token |
-| `getAccounts` | Fetch accounts from linked institution |
-| `syncTransactions` | Sync transaction history |
+| Operation          | Description                               |
+| ------------------ | ----------------------------------------- |
+| `createLink`       | Initialize account linking session        |
+| `exchangeToken`    | Exchange temporary token for access token |
+| `getAccounts`      | Fetch accounts from linked institution    |
+| `syncTransactions` | Sync transaction history                  |
 
 ## Failover Strategy
 
 ### Provider Priority by Region
 
 **US Region:**
+
 1. Plaid (primary)
 2. MX (backup)
 3. Finicity (backup)
 
 **MX Region:**
+
 1. Belvo (primary)
 2. MX (backup)
 
@@ -101,11 +103,11 @@ for (const provider of providersToTry) {
 
 The circuit breaker has three states:
 
-| State | Description | Behavior |
-|-------|-------------|----------|
-| **CLOSED** | Normal operation | All requests go through |
-| **OPEN** | Provider failing | Requests fail fast, skip provider |
-| **HALF_OPEN** | Testing recovery | Limited requests allowed |
+| State         | Description      | Behavior                          |
+| ------------- | ---------------- | --------------------------------- |
+| **CLOSED**    | Normal operation | All requests go through           |
+| **OPEN**      | Provider failing | Requests fail fast, skip provider |
+| **HALF_OPEN** | Testing recovery | Limited requests allowed          |
 
 ### Configuration
 
@@ -121,24 +123,24 @@ The circuit breaker has three states:
 
 Errors are classified by type and retryability:
 
-| Error Type | Retryable | Description |
-|------------|-----------|-------------|
-| `auth` | No | Authentication/credential issues |
-| `rate_limit` | Yes | API rate limit exceeded |
-| `network` | Yes | Network timeout/connectivity |
-| `provider_down` | Yes | Provider unavailable |
-| `validation` | No | Invalid request parameters |
+| Error Type      | Retryable | Description                      |
+| --------------- | --------- | -------------------------------- |
+| `auth`          | No        | Authentication/credential issues |
+| `rate_limit`    | Yes       | API rate limit exceeded          |
+| `network`       | Yes       | Network timeout/connectivity     |
+| `provider_down` | Yes       | Provider unavailable             |
+| `validation`    | No        | Invalid request parameters       |
 
 ## Configuration
 
 ```typescript
 // Environment variables
-PLAID_CLIENT_ID=xxx
-PLAID_SECRET=xxx
-BELVO_SECRET_KEY_ID=xxx
-BELVO_SECRET_KEY_PASSWORD=xxx
-MX_CLIENT_ID=xxx
-MX_API_KEY=xxx
+PLAID_CLIENT_ID = xxx;
+PLAID_SECRET = xxx;
+BELVO_SECRET_KEY_ID = xxx;
+BELVO_SECRET_KEY_PASSWORD = xxx;
+MX_CLIENT_ID = xxx;
+MX_API_KEY = xxx;
 ```
 
 ## Monitoring
@@ -157,6 +159,7 @@ GET /admin/stats
 ```
 
 Returns provider health status including:
+
 - Current circuit breaker state
 - Success rate (24h rolling)
 - Average response time
@@ -176,7 +179,7 @@ const result = await orchestrator.executeWithFailover(
     endDate: new Date('2025-01-31'),
   },
   Provider.plaid, // Optional preferred provider
-  'US'           // Region
+  'US' // Region
 );
 
 if (result.success) {
@@ -190,13 +193,13 @@ if (result.success) {
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| [`providers/belvo`](../belvo/README.md) | Belvo provider implementation |
-| [`providers/plaid`](../plaid/README.md) | Plaid provider implementation |
-| [`providers/bitso`](../bitso/README.md) | Bitso provider implementation |
-| [`ml`](../../ml/README.md) | ML-based provider selection |
-| [`accounts`](../../accounts/README.md) | Uses orchestrator for account sync |
+| Module                                         | Relationship                           |
+| ---------------------------------------------- | -------------------------------------- |
+| [`providers/belvo`](../belvo/README.md)        | Belvo provider implementation          |
+| [`providers/plaid`](../plaid/README.md)        | Plaid provider implementation          |
+| [`providers/bitso`](../bitso/README.md)        | Bitso provider implementation          |
+| [`ml`](../../ml/README.md)                     | ML-based provider selection            |
+| [`accounts`](../../accounts/README.md)         | Uses orchestrator for account sync     |
 | [`transactions`](../../transactions/README.md) | Uses orchestrator for transaction sync |
 
 ## Testing

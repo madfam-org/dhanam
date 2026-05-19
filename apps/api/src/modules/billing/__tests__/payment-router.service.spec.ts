@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
-import { PaymentRouterService, PaymentProvider } from '../services/payment-router.service';
 import { PaddleService } from '../services/paddle.service';
+import { PaymentRouterService, PaymentProvider } from '../services/payment-router.service';
 import { StripeMxService } from '../services/stripe-mx.service';
 
 describe('PaymentRouterService', () => {

@@ -1,6 +1,7 @@
 # ADR-003: Multi-Provider Financial Data Strategy
 
 ## Status
+
 **Accepted** - January 2025
 
 ## Context
@@ -21,16 +22,16 @@ Implement a **multi-provider orchestration strategy** with intelligent failover 
 
 ### Provider Matrix
 
-| Provider | Region | Asset Types | Use Case |
-|----------|--------|-------------|----------|
-| **Belvo** | LATAM (MX) | Banks, Cards | Primary for Mexico |
-| **Plaid** | US/Canada | Banks, Cards, Investments | Primary for US |
-| **MX** | US/Canada | Banks, Cards | Backup for US |
-| **Finicity** | US | Banks, Investments | Enterprise backup |
-| **Bitso** | Global | Crypto exchange | Direct integration |
-| **Blockchain** | Global | On-chain wallets | Non-custodial tracking |
-| **Zapper** | Global | DeFi positions | Protocol aggregation |
-| **Zillow** | US | Real estate | Property valuations |
+| Provider       | Region     | Asset Types               | Use Case               |
+| -------------- | ---------- | ------------------------- | ---------------------- |
+| **Belvo**      | LATAM (MX) | Banks, Cards              | Primary for Mexico     |
+| **Plaid**      | US/Canada  | Banks, Cards, Investments | Primary for US         |
+| **MX**         | US/Canada  | Banks, Cards              | Backup for US          |
+| **Finicity**   | US         | Banks, Investments        | Enterprise backup      |
+| **Bitso**      | Global     | Crypto exchange           | Direct integration     |
+| **Blockchain** | Global     | On-chain wallets          | Non-custodial tracking |
+| **Zapper**     | Global     | DeFi positions            | Protocol aggregation   |
+| **Zillow**     | US         | Real estate               | Property valuations    |
 
 ### Orchestration Architecture
 
@@ -119,16 +120,17 @@ CLOSED ──[5 failures in 5min]──► OPEN
 ### Rate Limiting
 
 | Provider | Requests/Min | Requests/Hour | Max Backoff |
-|----------|-------------|---------------|-------------|
-| Plaid | 100 | 3,000 | 5 min |
-| Belvo | 60 | 1,000 | 5 min |
-| MX | 60 | 1,000 | 5 min |
-| Finicity | 50 | 1,000 | 5 min |
-| Bitso | 30 | 500 | 10 min |
+| -------- | ------------ | ------------- | ----------- |
+| Plaid    | 100          | 3,000         | 5 min       |
+| Belvo    | 60           | 1,000         | 5 min       |
+| MX       | 60           | 1,000         | 5 min       |
+| Finicity | 50           | 1,000         | 5 min       |
+| Bitso    | 30           | 500           | 10 min      |
 
 ## Consequences
 
 ### Positive
+
 - **High Availability**: Provider outages don't affect user experience
 - **Geographic Optimization**: Best provider per region
 - **Cost Efficiency**: Route to cheapest provider when quality is equal
@@ -136,12 +138,14 @@ CLOSED ──[5 failures in 5min]──► OPEN
 - **Compliance**: Provider-specific compliance requirements isolated
 
 ### Negative
+
 - **Complexity**: More code to maintain
 - **Data Consistency**: Same account may have slightly different data across providers
 - **Cost**: Multiple provider contracts
 - **Testing**: Complex integration testing matrix
 
 ### Mitigations
+
 - Comprehensive provider adapters with common interface
 - Normalization layer ensures consistent data model
 - Synthetic monitoring for each provider
@@ -150,12 +154,14 @@ CLOSED ──[5 failures in 5min]──► OPEN
 ## Implementation
 
 ### Key Files
+
 - `apps/api/src/modules/providers/orchestrator/provider-orchestrator.service.ts`
 - `apps/api/src/modules/providers/orchestrator/circuit-breaker.service.ts`
 - `apps/api/src/modules/providers/orchestrator/rate-limiter.service.ts`
 - `apps/api/src/modules/providers/*/` - Individual provider adapters
 
 ### Provider Interface
+
 ```typescript
 interface FinancialDataProvider {
   name: Provider;
@@ -170,11 +176,13 @@ interface FinancialDataProvider {
 ```
 
 ## Related Decisions
+
 - [ADR-001](./001-nestjs-fastify.md): NestJS for provider module architecture
 - [ADR-002](./002-prisma-orm.md): Prisma for normalized data storage
 - [ADR-004](./004-janua-auth-integration.md): Janua for user authentication
 
 ## References
+
 - [Plaid API Documentation](https://plaid.com/docs/)
 - [Belvo API Documentation](https://developers.belvo.com/)
 - Circuit Breaker Pattern (Release It! by Michael Nygard)

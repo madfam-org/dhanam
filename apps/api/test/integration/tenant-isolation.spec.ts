@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { PrismaService } from '@core/prisma/prisma.service';
 
 /**
@@ -157,9 +158,7 @@ describe('Tenant Isolation', () => {
       },
     });
 
-    const userBTransactions = transactions.filter(
-      (t) => t.accountId === userB.accountId
-    );
+    const userBTransactions = transactions.filter((t) => t.accountId === userB.accountId);
     expect(userBTransactions).toHaveLength(0);
   });
 });

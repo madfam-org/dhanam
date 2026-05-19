@@ -146,7 +146,6 @@ export class SubscriptionLifecycleService {
     options: UpgradeOptions = {}
   ): Promise<{ checkoutUrl: string; provider: BillingProvider }> {
     let customerId = user.januaCustomerId;
-    let provider: BillingProvider = this.januaBilling.getProviderForCountry(countryCode);
 
     if (!customerId) {
       const result = await this.januaBilling.createCustomer({
@@ -158,7 +157,7 @@ export class SubscriptionLifecycleService {
       });
 
       customerId = result.customerId;
-      provider = result.provider;
+      const provider = result.provider;
 
       await this.prisma.user.update({
         where: { id: user.id },

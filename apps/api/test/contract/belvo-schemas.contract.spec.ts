@@ -36,11 +36,13 @@ const BelvoTransactionSchema = z.object({
   currency: z.string().length(3),
   value_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   description: z.string(),
-  merchant: z.object({
-    name: z.string().nullable(),
-    website: z.string().nullable(),
-    logo: z.string().nullable(),
-  }).nullable(),
+  merchant: z
+    .object({
+      name: z.string().nullable(),
+      website: z.string().nullable(),
+      logo: z.string().nullable(),
+    })
+    .nullable(),
   category: z.string().nullable(),
   type: z.enum(['INFLOW', 'OUTFLOW']),
   status: z.enum(['PENDING', 'PROCESSED', 'UNCATEGORIZED']),

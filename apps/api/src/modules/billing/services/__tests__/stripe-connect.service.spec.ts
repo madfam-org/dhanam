@@ -96,7 +96,7 @@ describe('StripeConnectService', () => {
           email: 'merchant@example.com',
           business_type: 'company',
           metadata: expect.objectContaining({ dhanam_user_id: 'user-1' }),
-        }),
+        })
       );
     });
   });
@@ -111,7 +111,7 @@ describe('StripeConnectService', () => {
       const link = await service.createMerchantOnboardingLink(
         'acct_123',
         'https://forj.design/connect/return',
-        'https://forj.design/connect/refresh',
+        'https://forj.design/connect/refresh'
       );
 
       expect(link.url).toContain('connect.stripe.com');
@@ -144,7 +144,7 @@ describe('StripeConnectService', () => {
           transfer_data: { destination: 'acct_123' },
           on_behalf_of: 'acct_123',
           application_fee_amount: 250,
-        }),
+        })
       );
     });
   });

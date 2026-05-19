@@ -154,7 +154,8 @@ describe('DhanamESGProvider', () => {
   describe('getMultipleAssetESG', () => {
     it('should fetch multiple assets', async () => {
       const mockClient = {
-        get: jest.fn()
+        get: jest
+          .fn()
           .mockResolvedValueOnce({ data: mockApiResponse })
           .mockResolvedValueOnce({ data: { ...mockApiResponse, symbol: 'eth', name: 'Ethereum' } }),
       };
@@ -170,7 +171,8 @@ describe('DhanamESGProvider', () => {
 
     it('should filter out null results', async () => {
       const mockClient = {
-        get: jest.fn()
+        get: jest
+          .fn()
           .mockResolvedValueOnce({ data: mockApiResponse })
           .mockRejectedValueOnce(new Error('Not found')),
       };
@@ -242,7 +244,7 @@ describe('DhanamESGProvider', () => {
     it('should uppercase symbol', async () => {
       const mockClient = {
         get: jest.fn().mockResolvedValue({
-          data: { ...mockApiResponse, symbol: 'btc' }
+          data: { ...mockApiResponse, symbol: 'btc' },
         }),
       };
       mockedAxios.create.mockReturnValue(mockClient as any);

@@ -102,9 +102,7 @@ export function I18nProvider({
  * @example
  * export default withI18n(MyComponent);
  */
-export function withI18n<P extends object>(
-  Component: React.ComponentType<P & I18nContextValue>
-) {
+export function withI18n<P extends object>(Component: React.ComponentType<P & I18nContextValue>) {
   return function WithI18nComponent(props: P) {
     return (
       <I18nContext.Consumer>

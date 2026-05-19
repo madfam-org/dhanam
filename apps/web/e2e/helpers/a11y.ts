@@ -21,14 +21,9 @@ export async function checkA11y(
     include?: string;
     /** Axe rule IDs to skip (e.g. known false positives) */
     disableRules?: string[];
-  },
+  }
 ): Promise<void> {
-  let builder = new AxeBuilder({ page }).withTags([
-    'wcag2a',
-    'wcag2aa',
-    'wcag21a',
-    'wcag21aa',
-  ]);
+  let builder = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
 
   if (options?.include) {
     builder = builder.include(options.include);
@@ -51,6 +46,6 @@ export async function checkA11y(
 
   expect(
     results.violations,
-    `Accessibility violations found:\n\n${violationMessages.join('\n\n')}`,
+    `Accessibility violations found:\n\n${violationMessages.join('\n\n')}`
   ).toHaveLength(0);
 }

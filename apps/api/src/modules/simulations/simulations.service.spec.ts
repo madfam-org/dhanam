@@ -1,9 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { SimulationsService } from './simulations.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { BillingService } from '../billing/billing.service';
+
 import { ScenarioTypeDto } from './dto/analyze-scenario.dto';
+import { SimulationsService } from './simulations.service';
 
 // Mock Prisma SimulationType enum
 jest.mock('@prisma/client', () => ({
@@ -17,25 +19,29 @@ jest.mock('@prisma/client', () => ({
 }));
 
 // Mock the @dhanam/simulations package (virtual mock for planned package)
-jest.mock('@dhanam/simulations', () => ({
-  monteCarloEngine: {
-    simulate: jest.fn(),
-    simulateRetirement: jest.fn(),
-    calculateSafeWithdrawalRate: jest.fn(),
-  },
-  scenarioAnalysisEngine: {
-    analyzeScenario: jest.fn(),
-  },
-  ScenarioType: {
-    JOB_LOSS: 'job_loss',
-    MARKET_CRASH: 'market_crash',
-    RECESSION: 'recession',
-    MEDICAL_EMERGENCY: 'medical_emergency',
-    INFLATION_SPIKE: 'inflation_spike',
-    DISABILITY: 'disability',
-    MARKET_CORRECTION: 'market_correction',
-  },
-}), { virtual: true });
+jest.mock(
+  '@dhanam/simulations',
+  () => ({
+    monteCarloEngine: {
+      simulate: jest.fn(),
+      simulateRetirement: jest.fn(),
+      calculateSafeWithdrawalRate: jest.fn(),
+    },
+    scenarioAnalysisEngine: {
+      analyzeScenario: jest.fn(),
+    },
+    ScenarioType: {
+      JOB_LOSS: 'job_loss',
+      MARKET_CRASH: 'market_crash',
+      RECESSION: 'recession',
+      MEDICAL_EMERGENCY: 'medical_emergency',
+      INFLATION_SPIKE: 'inflation_spike',
+      DISABILITY: 'disability',
+      MARKET_CORRECTION: 'market_correction',
+    },
+  }),
+  { virtual: true }
+);
 
 describe('SimulationsService', () => {
   let service: SimulationsService;
@@ -274,9 +280,7 @@ describe('SimulationsService', () => {
       });
       mockPrismaService.simulation.update.mockResolvedValue({});
 
-      await expect(
-        service.runSimulation('user-123', mockDto)
-      ).rejects.toThrow();
+      await expect(service.runSimulation('user-123', mockDto)).rejects.toThrow();
 
       expect(mockBillingService.recordUsage).not.toHaveBeenCalled();
     });
@@ -361,9 +365,7 @@ describe('SimulationsService', () => {
       };
 
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.simulateRetirement as jest.Mock).mockReturnValue(
-        mockResult
-      );
+      (monteCarloEngine.simulateRetirement as jest.Mock).mockReturnValue(mockResult);
       mockPrismaService.simulation.update.mockResolvedValue({});
 
       await service.runRetirementSimulation('user-123', mockDto);
@@ -395,16 +397,14 @@ describe('SimulationsService', () => {
 
     it('should handle retirement simulation failure', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.simulateRetirement as jest.Mock).mockImplementation(
-        () => {
-          throw new Error('Invalid retirement parameters');
-        }
-      );
+      (monteCarloEngine.simulateRetirement as jest.Mock).mockImplementation(() => {
+        throw new Error('Invalid retirement parameters');
+      });
       mockPrismaService.simulation.update.mockResolvedValue({});
 
-      await expect(
-        service.runRetirementSimulation('user-123', mockDto)
-      ).rejects.toThrow('Invalid retirement parameters');
+      await expect(service.runRetirementSimulation('user-123', mockDto)).rejects.toThrow(
+        'Invalid retirement parameters'
+      );
 
       expect(mockPrismaService.simulation.update).toHaveBeenCalledWith({
         where: { id: 'sim-retirement-123' },
@@ -436,9 +436,7 @@ describe('SimulationsService', () => {
 
     it('should create safe withdrawal rate simulation record', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(
-        0.04
-      );
+      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(0.04);
       mockPrismaService.simulation.update.mockResolvedValue({});
 
       await service.calculateSafeWithdrawalRate('user-123', mockDto);
@@ -456,9 +454,7 @@ describe('SimulationsService', () => {
 
     it('should calculate safe withdrawal rate with correct params', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(
-        0.04
-      );
+      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(0.04);
       mockPrismaService.simulation.update.mockResolvedValue({});
 
       await service.calculateSafeWithdrawalRate('user-123', mockDto);
@@ -475,9 +471,7 @@ describe('SimulationsService', () => {
 
     it('should calculate annual and monthly withdrawal amounts', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(
-        0.04
-      ); // 4% safe withdrawal rate
+      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(0.04); // 4% safe withdrawal rate
       mockPrismaService.simulation.update.mockResolvedValue({});
 
       const result = await service.calculateSafeWithdrawalRate('user-123', mockDto);
@@ -491,9 +485,7 @@ describe('SimulationsService', () => {
 
     it('should update simulation with calculated results', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(
-        0.04
-      );
+      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(0.04);
       mockPrismaService.simulation.update.mockResolvedValue({});
 
       await service.calculateSafeWithdrawalRate('user-123', mockDto);
@@ -516,9 +508,7 @@ describe('SimulationsService', () => {
 
     it('should record billing usage for safe withdrawal calculation', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(
-        0.04
-      );
+      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockReturnValue(0.04);
       mockPrismaService.simulation.update.mockResolvedValue({});
 
       await service.calculateSafeWithdrawalRate('user-123', mockDto);
@@ -531,16 +521,14 @@ describe('SimulationsService', () => {
 
     it('should handle calculation failure', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockImplementation(
-        () => {
-          throw new Error('Invalid parameters');
-        }
-      );
+      (monteCarloEngine.calculateSafeWithdrawalRate as jest.Mock).mockImplementation(() => {
+        throw new Error('Invalid parameters');
+      });
       mockPrismaService.simulation.update.mockResolvedValue({});
 
-      await expect(
-        service.calculateSafeWithdrawalRate('user-123', mockDto)
-      ).rejects.toThrow('Invalid parameters');
+      await expect(service.calculateSafeWithdrawalRate('user-123', mockDto)).rejects.toThrow(
+        'Invalid parameters'
+      );
 
       expect(mockPrismaService.simulation.update).toHaveBeenCalledWith({
         where: { id: 'sim-swr-123' },
@@ -661,9 +649,7 @@ describe('SimulationsService', () => {
       };
 
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (scenarioAnalysisEngine.analyzeScenario as jest.Mock).mockReturnValue(
-        mockResult
-      );
+      (scenarioAnalysisEngine.analyzeScenario as jest.Mock).mockReturnValue(mockResult);
       mockPrismaService.simulation.update.mockResolvedValue({});
 
       await service.analyzeScenario('user-123', mockDto);
@@ -704,16 +690,14 @@ describe('SimulationsService', () => {
 
     it('should handle scenario analysis failure', async () => {
       mockPrismaService.simulation.create.mockResolvedValue(mockSimulation);
-      (scenarioAnalysisEngine.analyzeScenario as jest.Mock).mockImplementation(
-        () => {
-          throw new Error('Scenario analysis failed');
-        }
-      );
+      (scenarioAnalysisEngine.analyzeScenario as jest.Mock).mockImplementation(() => {
+        throw new Error('Scenario analysis failed');
+      });
       mockPrismaService.simulation.update.mockResolvedValue({});
 
-      await expect(
-        service.analyzeScenario('user-123', mockDto)
-      ).rejects.toThrow('Scenario analysis failed');
+      await expect(service.analyzeScenario('user-123', mockDto)).rejects.toThrow(
+        'Scenario analysis failed'
+      );
 
       expect(mockPrismaService.simulation.update).toHaveBeenCalledWith({
         where: { id: 'sim-scenario-123' },
@@ -773,20 +757,16 @@ describe('SimulationsService', () => {
     it('should throw NotFoundException if simulation not found', async () => {
       mockPrismaService.simulation.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.getSimulation('user-123', 'sim-nonexistent')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getSimulation('user-123', 'sim-nonexistent')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw NotFoundException if user does not own simulation', async () => {
       const otherUserSimulation = { ...mockSimulation, userId: 'user-456' };
-      mockPrismaService.simulation.findUnique.mockResolvedValue(
-        otherUserSimulation
-      );
+      mockPrismaService.simulation.findUnique.mockResolvedValue(otherUserSimulation);
 
-      await expect(
-        service.getSimulation('user-123', 'sim-123')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getSimulation('user-123', 'sim-123')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -836,9 +816,7 @@ describe('SimulationsService', () => {
     });
 
     it('should filter simulations by spaceId', async () => {
-      mockPrismaService.simulation.findMany.mockResolvedValue([
-        mockSimulations[0],
-      ]);
+      mockPrismaService.simulation.findMany.mockResolvedValue([mockSimulations[0]]);
 
       await service.listSimulations('user-123', { spaceId: 'space-123' });
 
@@ -850,9 +828,7 @@ describe('SimulationsService', () => {
     });
 
     it('should filter simulations by goalId', async () => {
-      mockPrismaService.simulation.findMany.mockResolvedValue([
-        mockSimulations[0],
-      ]);
+      mockPrismaService.simulation.findMany.mockResolvedValue([mockSimulations[0]]);
 
       await service.listSimulations('user-123', { goalId: 'goal-1' });
 
@@ -864,9 +840,7 @@ describe('SimulationsService', () => {
     });
 
     it('should filter simulations by type', async () => {
-      mockPrismaService.simulation.findMany.mockResolvedValue([
-        mockSimulations[1],
-      ]);
+      mockPrismaService.simulation.findMany.mockResolvedValue([mockSimulations[1]]);
 
       await service.listSimulations('user-123', { type: 'retirement' });
 
@@ -925,22 +899,20 @@ describe('SimulationsService', () => {
     it('should throw NotFoundException if simulation not found', async () => {
       mockPrismaService.simulation.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.deleteSimulation('user-123', 'sim-nonexistent')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deleteSimulation('user-123', 'sim-nonexistent')).rejects.toThrow(
+        NotFoundException
+      );
 
       expect(mockPrismaService.simulation.delete).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException if user does not own simulation', async () => {
       const otherUserSimulation = { ...mockSimulation, userId: 'user-456' };
-      mockPrismaService.simulation.findUnique.mockResolvedValue(
-        otherUserSimulation
-      );
+      mockPrismaService.simulation.findUnique.mockResolvedValue(otherUserSimulation);
 
-      await expect(
-        service.deleteSimulation('user-123', 'sim-123')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deleteSimulation('user-123', 'sim-123')).rejects.toThrow(
+        NotFoundException
+      );
 
       expect(mockPrismaService.simulation.delete).not.toHaveBeenCalled();
     });

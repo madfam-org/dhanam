@@ -1,13 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
-import { PlaidService } from './plaid.service';
-import { PlaidWebhookHandler } from './plaid-webhook.handler';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { CryptoService } from '@core/crypto/crypto.service';
-import { CircuitBreakerService } from '../orchestrator/circuit-breaker.service';
-import { AuditService } from '@core/audit/audit.service';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+
+import { AuditService } from '@core/audit/audit.service';
+import { CryptoService } from '@core/crypto/crypto.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+
+import { CircuitBreakerService } from '../orchestrator/circuit-breaker.service';
+
+import { PlaidWebhookHandler } from './plaid-webhook.handler';
+import { PlaidService } from './plaid.service';
 
 // Mock Plaid
 jest.mock('plaid', () => ({
@@ -136,9 +139,7 @@ describe('PlaidService', () => {
     it('should throw error when Plaid not configured', async () => {
       (service as any).plaidClient = null;
 
-      await expect(service.createLinkToken('user1')).rejects.toThrow(
-        BadRequestException
-      );
+      await expect(service.createLinkToken('user1')).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -173,11 +174,10 @@ describe('PlaidService', () => {
       prisma.providerConnection.updateMany.mockResolvedValue({ count: 1 });
 
       const result = await service.syncTransactions('access-token', 'item-id');
-      
+
       expect(result).toBeDefined();
       expect(result.transactionCount).toBe(1);
       expect(result.nextCursor).toBe('cursor-123');
     });
   });
-
 });

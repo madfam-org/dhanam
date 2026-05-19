@@ -38,8 +38,7 @@ describe('Billing Exceptions', () => {
       expect(exception.getResponse()).toEqual({
         statusCode: HttpStatus.PAYMENT_REQUIRED,
         error: 'Subscription Expired',
-        message:
-          'Your subscription has expired. Please renew to continue using premium features',
+        message: 'Your subscription has expired. Please renew to continue using premium features',
       });
     });
 

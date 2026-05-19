@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import type Stripe from 'stripe';
 
 import { AuditService } from '../../../core/audit/audit.service';

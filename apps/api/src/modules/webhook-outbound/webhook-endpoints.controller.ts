@@ -9,10 +9,10 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
-import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../core/prisma/prisma.service';
 
 import { RegisterEndpointDto, UpdateEndpointDto } from './dto/webhook-endpoint.dto';
@@ -36,7 +36,7 @@ export class WebhookEndpointsController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly svix: SvixClient,
-    private readonly config: ConfigService,
+    private readonly config: ConfigService
   ) {}
 
   @Post()
@@ -129,7 +129,7 @@ export class WebhookEndpointsController {
     await this.svix.replayFailedMessages(
       row.consumerAppId,
       row.svixEndpointId,
-      body.sinceSeconds ?? 3600,
+      body.sinceSeconds ?? 3600
     );
     return { id, replayed: true };
   }
@@ -143,7 +143,7 @@ export class WebhookEndpointsController {
     if (allowed.length === 0) {
       // Fail closed if no allowlist is configured — safer default.
       throw new BadRequestException(
-        'WEBHOOK_ENDPOINT_HOST_ALLOWLIST not configured; refusing to register any endpoint',
+        'WEBHOOK_ENDPOINT_HOST_ALLOWLIST not configured; refusing to register any endpoint'
       );
     }
     let host: string;
@@ -153,9 +153,7 @@ export class WebhookEndpointsController {
       throw new BadRequestException('Invalid URL');
     }
     if (!allowed.some((entry) => host === entry || host.endsWith(`.${entry}`))) {
-      throw new BadRequestException(
-        `Host ${host} is not on WEBHOOK_ENDPOINT_HOST_ALLOWLIST`,
-      );
+      throw new BadRequestException(`Host ${host} is not on WEBHOOK_ENDPOINT_HOST_ALLOWLIST`);
     }
   }
 }

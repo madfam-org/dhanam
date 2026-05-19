@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { TransactionCategorizationService } from './transaction-categorization.service';
 import { PrismaService } from '@core/prisma/prisma.service';
+
+import { CorrectionAggregatorService } from './correction-aggregator.service';
 import { FuzzyMatcherService } from './fuzzy-matcher.service';
 import { MerchantNormalizerService } from './merchant-normalizer.service';
-import { CorrectionAggregatorService } from './correction-aggregator.service';
+import { TransactionCategorizationService } from './transaction-categorization.service';
 
 describe('TransactionCategorizationService', () => {
   let service: TransactionCategorizationService;
@@ -31,7 +32,9 @@ describe('TransactionCategorizationService', () => {
 
   const mockMerchantNormalizer = {
     normalize: jest.fn().mockImplementation((name: string) => name?.toLowerCase() || ''),
-    extractPatternKey: jest.fn().mockImplementation((name: string) => name?.toLowerCase().replace(/\s+/g, '_') || ''),
+    extractPatternKey: jest
+      .fn()
+      .mockImplementation((name: string) => name?.toLowerCase().replace(/\s+/g, '_') || ''),
   };
 
   const mockCorrectionAggregator = {
@@ -380,12 +383,7 @@ describe('TransactionCategorizationService', () => {
         },
       ]);
 
-      const prediction = await service.predictCategory(
-        'space-123',
-        'Some transaction',
-        null,
-        -100
-      );
+      const prediction = await service.predictCategory('space-123', 'Some transaction', null, -100);
 
       expect(prediction).toBeNull(); // Not enough data
     });
@@ -556,7 +554,7 @@ describe('TransactionCategorizationService', () => {
         {
           id: 'txn-1',
           categoryId: 'cat-1',
-          metadata: { autoCategorized: true, mlConfidence: 0.90 },
+          metadata: { autoCategorized: true, mlConfidence: 0.9 },
         },
       ] as any);
 
@@ -644,12 +642,7 @@ describe('TransactionCategorizationService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue(transactions);
       mockPrisma.category.findUnique.mockResolvedValue({ name: 'Only Category' });
 
-      const prediction = await service.predictCategory(
-        'space-123',
-        'Purchase',
-        'Known Store',
-        -50
-      );
+      const prediction = await service.predictCategory('space-123', 'Purchase', 'Known Store', -50);
 
       expect(prediction?.categoryId).toBe('cat-only');
       expect(prediction?.source).toBe('merchant');
@@ -667,12 +660,7 @@ describe('TransactionCategorizationService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue(transactions);
       mockPrisma.category.findUnique.mockResolvedValue({ name: 'Category A' });
 
-      const prediction = await service.predictCategory(
-        'space-123',
-        'Purchase',
-        'Mixed Store',
-        -50
-      );
+      const prediction = await service.predictCategory('space-123', 'Purchase', 'Mixed Store', -50);
 
       expect(prediction?.categoryId).toBe('cat-a'); // Most common (3 times)
     });
@@ -686,10 +674,10 @@ describe('TransactionCategorizationService', () => {
           id: 'cat-coffee',
           name: 'Coffee',
           transactions: [
-            { description: 'Coffee shop', amount: 4.50 },
-            { description: 'Coffee', amount: 5.00 },
-            { description: 'Latte', amount: 5.50 },
-            { description: 'Espresso', amount: 4.00 },
+            { description: 'Coffee shop', amount: 4.5 },
+            { description: 'Coffee', amount: 5.0 },
+            { description: 'Latte', amount: 5.5 },
+            { description: 'Espresso', amount: 4.0 },
             { description: 'Mocha', amount: 5.25 },
           ],
         },
@@ -699,7 +687,7 @@ describe('TransactionCategorizationService', () => {
         'space-123',
         'Unknown small purchase',
         null,
-        -4.80 // Within 1 std dev of average ~4.85
+        -4.8 // Within 1 std dev of average ~4.85
       );
 
       // Should match via amount pattern
@@ -759,12 +747,7 @@ describe('TransactionCategorizationService', () => {
         .mockResolvedValue([]);
       mockPrisma.category.findMany.mockResolvedValue([]);
 
-      const prediction = await service.predictCategory(
-        'space-123',
-        'Purchase',
-        'Some Store',
-        -50
-      );
+      const prediction = await service.predictCategory('space-123', 'Purchase', 'Some Store', -50);
 
       // findMerchantPattern should return null because no valid categoryIds
       expect(prediction).toBeNull();
@@ -854,12 +837,7 @@ describe('TransactionCategorizationService', () => {
       mockPrisma.transaction.findMany.mockResolvedValue([]);
       mockPrisma.category.findMany.mockResolvedValue([]);
 
-      const prediction = await service.predictCategory(
-        'space-123',
-        'Cash withdrawal',
-        null,
-        -100
-      );
+      const prediction = await service.predictCategory('space-123', 'Cash withdrawal', null, -100);
 
       // Should skip merchant strategies and try keyword/amount matching
       expect(prediction).toBeNull();
@@ -888,12 +866,7 @@ describe('TransactionCategorizationService', () => {
         },
       ]);
 
-      const prediction = await service.predictCategory(
-        'space-123',
-        'Big purchase',
-        null,
-        -5100
-      );
+      const prediction = await service.predictCategory('space-123', 'Big purchase', null, -5100);
 
       expect(prediction?.categoryId).toBe('cat-large');
     });
@@ -1056,12 +1029,7 @@ describe('TransactionCategorizationService', () => {
       ]);
 
       // Amount exactly matching the average
-      const prediction = await service.predictCategory(
-        'space-123',
-        'Streaming service',
-        null,
-        -15
-      );
+      const prediction = await service.predictCategory('space-123', 'Streaming service', null, -15);
 
       // With stdDev 0, zScore = (15 - 15) / 0 = NaN, should not match
       // This tests the edge case of division by zero

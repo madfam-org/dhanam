@@ -119,7 +119,11 @@ export default function EmailVerificationScreen() {
           {code.map((digit, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.codeInput, digit ? styles.codeInputFilled : null, error ? styles.codeInputError : null]}
+              style={[
+                styles.codeInput,
+                digit ? styles.codeInputFilled : null,
+                error ? styles.codeInputError : null,
+              ]}
               onPress={() => inputRefs.current[index]?.focus()}
               accessible
               accessibilityLabel={`Digit ${index + 1} of verification code`}
@@ -138,11 +142,7 @@ export default function EmailVerificationScreen() {
           </View>
         )}
 
-        <TouchableOpacity
-          onPress={handleResend}
-          disabled={isResending}
-          style={styles.resendButton}
-        >
+        <TouchableOpacity onPress={handleResend} disabled={isResending} style={styles.resendButton}>
           {isResending ? (
             <ActivityIndicator size="small" color="#6366f1" />
           ) : (

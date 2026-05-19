@@ -8,6 +8,7 @@ export const esg = {
   },
   empty: {
     title: 'No se encontraron activos cripto',
-    description: 'Conecta tus cuentas cripto para ver el análisis ESG de tu portafolio. El sistema analizará automáticamente tus activos usando el Marco ESG de Dhanam.',
+    description:
+      'Conecta tus cuentas cripto para ver el análisis ESG de tu portafolio. El sistema analizará automáticamente tus activos usando el Marco ESG de Dhanam.',
   },
 } as const;

@@ -30,9 +30,13 @@ jest.mock('@dhanam/shared', () => {
     }),
     I18nContext,
     I18nProvider: ({ children }: { children: React.ReactNode }) =>
-      React.createElement(I18nContext.Provider, {
-        value: { locale: 'en', translations: { en: { landing } }, changeLanguage: jest.fn() },
-      }, children),
+      React.createElement(
+        I18nContext.Provider,
+        {
+          value: { locale: 'en', translations: { en: { landing } }, changeLanguage: jest.fn() },
+        },
+        children
+      ),
   };
 });
 
@@ -309,5 +313,4 @@ describe('Landing Page Demo Flow', () => {
       });
     });
   });
-
 });

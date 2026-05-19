@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MonteCarloEngine } from './monte-carlo.engine';
+
 import { MonteCarloConfig, MarketShock } from '../types/simulation.types';
+
+import { MonteCarloEngine } from './monte-carlo.engine';
 
 describe('MonteCarloEngine', () => {
   let engine: MonteCarloEngine;
@@ -89,7 +91,7 @@ describe('MonteCarloEngine', () => {
       const result = engine.simulate(config);
 
       // All final values should be non-negative
-      result.finalValues.forEach(value => {
+      result.finalValues.forEach((value) => {
         expect(value).toBeGreaterThanOrEqual(0);
       });
 
@@ -206,7 +208,7 @@ describe('MonteCarloEngine', () => {
       const shocks: MarketShock[] = [
         {
           type: 'crash',
-          magnitude: -0.30,
+          magnitude: -0.3,
           startMonth: 24,
           durationMonths: 6,
           recoveryMonths: 12,
@@ -234,7 +236,7 @@ describe('MonteCarloEngine', () => {
       const shocks: MarketShock[] = [
         {
           type: 'crash',
-          magnitude: -0.30,
+          magnitude: -0.3,
           startMonth: 12,
           durationMonths: 6,
           recoveryMonths: 12,
@@ -300,7 +302,7 @@ describe('MonteCarloEngine', () => {
       const shocks: MarketShock[] = [
         {
           type: 'crash',
-          magnitude: -0.30,
+          magnitude: -0.3,
           startMonth: 24,
           durationMonths: 6,
           recoveryMonths: 12,
@@ -415,8 +417,8 @@ describe('MonteCarloEngine', () => {
 
       const targetAmount = 100000;
 
-      const contribution50 = engine.findRequiredContribution(config, targetAmount, 0.50);
-      const contribution90 = engine.findRequiredContribution(config, targetAmount, 0.90);
+      const contribution50 = engine.findRequiredContribution(config, targetAmount, 0.5);
+      const contribution90 = engine.findRequiredContribution(config, targetAmount, 0.9);
 
       expect(contribution90).toBeGreaterThan(contribution50);
     });
@@ -481,7 +483,7 @@ describe('MonteCarloEngine', () => {
       });
 
       expect(modifiedConfig.expectedReturn).toBeCloseTo(0.04, 10);
-      expect(modifiedConfig.volatility).toBeCloseTo(0.30, 10);
+      expect(modifiedConfig.volatility).toBeCloseTo(0.3, 10);
     });
   });
 
@@ -489,13 +491,13 @@ describe('MonteCarloEngine', () => {
     it('should have BEAR_MARKET scenario defined', () => {
       expect(MonteCarloEngine.SCENARIOS.BEAR_MARKET).toBeDefined();
       expect(MonteCarloEngine.SCENARIOS.BEAR_MARKET.shocks).toHaveLength(1);
-      expect(MonteCarloEngine.SCENARIOS.BEAR_MARKET.shocks[0].magnitude).toBe(-0.30);
+      expect(MonteCarloEngine.SCENARIOS.BEAR_MARKET.shocks[0].magnitude).toBe(-0.3);
     });
 
     it('should have GREAT_RECESSION scenario defined', () => {
       expect(MonteCarloEngine.SCENARIOS.GREAT_RECESSION).toBeDefined();
       expect(MonteCarloEngine.SCENARIOS.GREAT_RECESSION.shocks).toHaveLength(1);
-      expect(MonteCarloEngine.SCENARIOS.GREAT_RECESSION.shocks[0].magnitude).toBe(-0.50);
+      expect(MonteCarloEngine.SCENARIOS.GREAT_RECESSION.shocks[0].magnitude).toBe(-0.5);
     });
 
     it('should have DOT_COM_BUST scenario defined', () => {
@@ -513,7 +515,7 @@ describe('MonteCarloEngine', () => {
     it('should have MARKET_CORRECTION scenario defined', () => {
       expect(MonteCarloEngine.SCENARIOS.MARKET_CORRECTION).toBeDefined();
       expect(MonteCarloEngine.SCENARIOS.MARKET_CORRECTION.shocks).toHaveLength(1);
-      expect(MonteCarloEngine.SCENARIOS.MARKET_CORRECTION.shocks[0].magnitude).toBe(-0.10);
+      expect(MonteCarloEngine.SCENARIOS.MARKET_CORRECTION.shocks[0].magnitude).toBe(-0.1);
     });
   });
 
@@ -593,7 +595,7 @@ describe('MonteCarloEngine', () => {
         months: 60,
         iterations: 1000,
         expectedReturn: 0.07,
-        volatility: 0.80, // 80% volatility
+        volatility: 0.8, // 80% volatility
       };
 
       const result = engine.simulate(config);

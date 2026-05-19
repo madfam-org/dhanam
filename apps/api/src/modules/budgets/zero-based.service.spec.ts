@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { ZeroBasedService } from './zero-based.service';
+import { createPrismaMock } from '../../../test/helpers/api-mock-factory';
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { SpacesService } from '../spaces/spaces.service';
-import { createPrismaMock } from '../../../test/helpers/api-mock-factory';
+
+import { ZeroBasedService } from './zero-based.service';
 
 describe('ZeroBasedService', () => {
   let service: ZeroBasedService;

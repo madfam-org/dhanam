@@ -1,16 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
 import { RedisService } from '../../core/redis/redis.service';
-import { CollectiblesValuationService } from './collectibles-valuation.service';
+
 import { ArtsyAdapter } from './adapters/artsy.adapter';
-import { WatchChartsAdapter } from './adapters/watchcharts.adapter';
-import { WineSearcherAdapter } from './adapters/wine-searcher.adapter';
-import { PcgsAdapter } from './adapters/pcgs.adapter';
-import { PsaAdapter } from './adapters/psa.adapter';
 import { HagertyAdapter } from './adapters/hagerty.adapter';
 import { KicksDbAdapter } from './adapters/kicksdb.adapter';
+import { PcgsAdapter } from './adapters/pcgs.adapter';
+import { PsaAdapter } from './adapters/psa.adapter';
+import { WatchChartsAdapter } from './adapters/watchcharts.adapter';
+import { WineSearcherAdapter } from './adapters/wine-searcher.adapter';
+import { CollectiblesValuationService } from './collectibles-valuation.service';
 import type { CatalogItem, ValuationResult } from './interfaces/collectible-provider.interface';
 
 describe('CollectiblesValuationService', () => {
@@ -102,9 +103,9 @@ describe('CollectiblesValuationService', () => {
     });
 
     it('should throw NotFoundException for unknown category', async () => {
-      await expect(
-        service.search('unknown_category' as any, 'query', 10),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.search('unknown_category' as any, 'query', 10)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -163,7 +164,7 @@ describe('CollectiblesValuationService', () => {
               }),
             }),
           }),
-        }),
+        })
       );
     });
 
@@ -171,7 +172,7 @@ describe('CollectiblesValuationService', () => {
       mockPrisma.manualAsset.findFirst.mockResolvedValue(null);
 
       await expect(
-        service.linkAsset(spaceId, assetId, 'CW2288-111', 'kicksdb', 'sneaker'),
+        service.linkAsset(spaceId, assetId, 'CW2288-111', 'kicksdb', 'sneaker')
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -185,7 +186,12 @@ describe('CollectiblesValuationService', () => {
         id: assetId,
         spaceId,
         metadata: {
-          collectible: { category: 'sneaker', provider: 'kicksdb', externalId: 'X', valuationEnabled: true },
+          collectible: {
+            category: 'sneaker',
+            provider: 'kicksdb',
+            externalId: 'X',
+            valuationEnabled: true,
+          },
           otherField: 'keep',
         },
       });
@@ -199,7 +205,7 @@ describe('CollectiblesValuationService', () => {
           data: expect.objectContaining({
             metadata: expect.objectContaining({ otherField: 'keep' }),
           }),
-        }),
+        })
       );
       // Ensure collectible key is removed
       const callData = mockPrisma.manualAsset.update.mock.calls[0][0].data.metadata;
@@ -253,7 +259,7 @@ describe('CollectiblesValuationService', () => {
       expect(mockPrisma.manualAsset.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ currentValue: 350 }),
-        }),
+        })
       );
     });
 
@@ -320,9 +326,17 @@ describe('CollectiblesValuationService', () => {
   describe('getAllLinkedAssets', () => {
     it('should filter to only assets with collectible.valuationEnabled', async () => {
       mockPrisma.manualAsset.findMany.mockResolvedValue([
-        { id: 'a1', spaceId: 's1', metadata: { collectible: { valuationEnabled: true, externalId: 'X' } } },
+        {
+          id: 'a1',
+          spaceId: 's1',
+          metadata: { collectible: { valuationEnabled: true, externalId: 'X' } },
+        },
         { id: 'a2', spaceId: 's1', metadata: {} },
-        { id: 'a3', spaceId: 's2', metadata: { collectible: { valuationEnabled: false, externalId: 'Y' } } },
+        {
+          id: 'a3',
+          spaceId: 's2',
+          metadata: { collectible: { valuationEnabled: false, externalId: 'Y' } },
+        },
         { id: 'a4', spaceId: 's2', metadata: null },
       ]);
 

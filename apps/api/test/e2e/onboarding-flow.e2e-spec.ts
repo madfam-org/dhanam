@@ -1,13 +1,14 @@
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
+import { JwtService } from '@nestjs/jwt';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import request from 'supertest';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { TestHelper } from './helpers/test.helper';
-import { createE2EApp } from './helpers/e2e-app.helper';
-import { OnboardingTestData } from './fixtures/onboarding.fixtures';
 import { OnboardingStep } from '../../src/modules/onboarding/dto';
+
+import { OnboardingTestData } from './fixtures/onboarding.fixtures';
+import { createE2EApp } from './helpers/e2e-app.helper';
+import { TestHelper } from './helpers/test.helper';
 
 describe('Onboarding Flow E2E', () => {
   let app: INestApplication<NestFastifyApplication>;
@@ -101,7 +102,7 @@ describe('Onboarding Flow E2E', () => {
       // Step 4: Verify email (simulate token verification)
       const verificationToken = jwtService.sign(
         { userId, email: testUserEmail, type: 'email_verification' },
-        { expiresIn: '24h' },
+        { expiresIn: '24h' }
       );
 
       const verifyResponse = await request(app.getHttpServer())
@@ -196,7 +197,14 @@ describe('Onboarding Flow E2E', () => {
           skipOptional: false,
           metadata: {
             timeSpent: 300000,
-            completedSteps: ['welcome', 'email_verification', 'preferences', 'space_setup', 'first_budget', 'feature_tour'],
+            completedSteps: [
+              'welcome',
+              'email_verification',
+              'preferences',
+              'space_setup',
+              'first_budget',
+              'feature_tour',
+            ],
           },
         });
 
@@ -432,7 +440,7 @@ describe('Onboarding Flow E2E', () => {
     it('should handle expired email verification token', async () => {
       const expiredToken = jwtService.sign(
         { userId, email: 'test@example.com', type: 'email_verification' },
-        { expiresIn: '-1s' },
+        { expiresIn: '-1s' }
       );
 
       await request(app.getHttpServer())
@@ -444,7 +452,7 @@ describe('Onboarding Flow E2E', () => {
     it('should handle invalid verification token type', async () => {
       const wrongTypeToken = jwtService.sign(
         { userId, email: 'test@example.com', type: 'password_reset' },
-        { expiresIn: '24h' },
+        { expiresIn: '24h' }
       );
 
       await request(app.getHttpServer())
@@ -456,7 +464,7 @@ describe('Onboarding Flow E2E', () => {
     it('should handle already verified email', async () => {
       const verificationToken = jwtService.sign(
         { userId, email: testUserEmail, type: 'email_verification' },
-        { expiresIn: '24h' },
+        { expiresIn: '24h' }
       );
 
       const response = await request(app.getHttpServer())
@@ -501,9 +509,7 @@ describe('Onboarding Flow E2E', () => {
 
   describe('Service Health', () => {
     it('should return onboarding service health status', async () => {
-      const response = await request(app.getHttpServer())
-        .get('/v1/onboarding/health')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/v1/onboarding/health').expect(200);
 
       expect(response.body).toMatchObject({
         service: 'onboarding',

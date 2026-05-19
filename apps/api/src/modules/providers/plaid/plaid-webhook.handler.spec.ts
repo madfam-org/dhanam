@@ -5,9 +5,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CryptoService } from '@core/crypto/crypto.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 
-import { PlaidWebhookHandler } from './plaid-webhook.handler';
-
 import { createLoggerMock } from '../../../../test/helpers/api-mock-factory';
+
+import { PlaidWebhookHandler } from './plaid-webhook.handler';
 
 describe('PlaidWebhookHandler', () => {
   let handler: PlaidWebhookHandler;
@@ -58,16 +58,16 @@ describe('PlaidWebhookHandler', () => {
     const payload = '{"test": "data"}';
 
     it('should return true for valid HMAC signature', () => {
-      const expectedSig = crypto
-        .createHmac('sha256', secret)
-        .update(payload, 'utf8')
-        .digest('hex');
+      const expectedSig = crypto.createHmac('sha256', secret).update(payload, 'utf8').digest('hex');
 
       expect(handler.verifySignature(payload, expectedSig, secret)).toBe(true);
     });
 
     it('should return false for invalid signature', () => {
-      const invalidSig = crypto.createHmac('sha256', 'wrong-secret').update(payload, 'utf8').digest('hex');
+      const invalidSig = crypto
+        .createHmac('sha256', 'wrong-secret')
+        .update(payload, 'utf8')
+        .digest('hex');
 
       expect(handler.verifySignature(payload, invalidSig, secret)).toBe(false);
     });
@@ -250,7 +250,11 @@ describe('PlaidWebhookHandler', () => {
       await handler.handleItemWebhook({
         item_id: 'item-123',
         webhook_code: 'ERROR',
-        error: { error_type: 'ITEM_ERROR', error_code: 'ITEM_LOGIN_REQUIRED', error_message: 'Login required' },
+        error: {
+          error_type: 'ITEM_ERROR',
+          error_code: 'ITEM_LOGIN_REQUIRED',
+          error_message: 'Login required',
+        },
       } as any);
 
       expect(prisma.providerConnection.updateMany).toHaveBeenCalledWith({

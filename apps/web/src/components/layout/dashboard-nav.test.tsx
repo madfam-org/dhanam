@@ -22,6 +22,7 @@ jest.mock('@dhanam/shared', () => {
     retirement: 'Retirement',
     scenarios: 'Scenarios',
     reports: 'Reports',
+    statements: 'Statements',
     billing: 'Billing',
     settings: 'Settings',
     wealth: 'Wealth',
@@ -101,6 +102,7 @@ jest.mock('lucide-react', () => {
     ChevronDown: icon('ChevronDown'),
     ChevronRight: icon('ChevronRight'),
     ArrowLeftRight: icon('ArrowLeftRight'),
+    Archive: icon('Archive'),
   };
 });
 
@@ -131,6 +133,7 @@ const expectedLinks = [
   { name: 'Retirement', href: '/retirement' },
   { name: 'Scenarios', href: '/scenarios' },
   { name: 'Reports', href: '/reports' },
+  { name: 'Statements', href: '/statements' },
   { name: 'Billing', href: '/billing' },
   { name: 'Settings', href: '/settings' },
 ];

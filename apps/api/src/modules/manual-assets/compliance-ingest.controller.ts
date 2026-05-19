@@ -10,11 +10,13 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
+
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
-import { R2StorageService } from '../storage/r2.service';
-import { DocumentExtractionService } from './document-extraction.service';
-import { KarafielService } from '../integrations/karafiel.service';
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { KarafielService } from '../integrations/karafiel.service';
+import { R2StorageService } from '../storage/r2.service';
+
+import { DocumentExtractionService } from './document-extraction.service';
 
 // Retention policy: maps subscription tier → R2 prefix and label
 const RETENTION_POLICY_MAP: Record<string, { prefix: string; label: string }> = {

@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { LoggerService } from '@core/logger/logger.service';
+import { PrismaService } from '@core/prisma/prisma.service';
 
 import { AdminGuard } from '../admin.guard';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { LoggerService } from '@core/logger/logger.service';
 
 describe('AdminGuard', () => {
   let guard: AdminGuard;

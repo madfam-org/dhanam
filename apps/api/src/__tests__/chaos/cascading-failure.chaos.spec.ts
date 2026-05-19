@@ -1,7 +1,8 @@
 import { CircuitBreakerService } from '../../modules/providers/orchestrator/circuit-breaker.service';
 import { ProviderOrchestratorService } from '../../modules/providers/orchestrator/provider-orchestrator.service';
-import { MockFinancialProvider } from './helpers/mock-provider';
+
 import { createMockPrismaService } from './helpers/mock-prisma';
+import { MockFinancialProvider } from './helpers/mock-provider';
 
 const Provider = {
   plaid: 'plaid',
@@ -33,9 +34,21 @@ describe('Cascading Failure Chaos Tests', () => {
   });
 
   it('provider down → circuit opens → failover fails → all fail', async () => {
-    const plaid = new MockFinancialProvider({ name: Provider.plaid as any, behavior: 'fail', errorMessage: 'network error' });
-    const mx = new MockFinancialProvider({ name: Provider.mx as any, behavior: 'fail', errorMessage: 'network error' });
-    const finicity = new MockFinancialProvider({ name: Provider.finicity as any, behavior: 'fail', errorMessage: 'unavailable' });
+    const plaid = new MockFinancialProvider({
+      name: Provider.plaid as any,
+      behavior: 'fail',
+      errorMessage: 'network error',
+    });
+    const mx = new MockFinancialProvider({
+      name: Provider.mx as any,
+      behavior: 'fail',
+      errorMessage: 'network error',
+    });
+    const finicity = new MockFinancialProvider({
+      name: Provider.finicity as any,
+      behavior: 'fail',
+      errorMessage: 'unavailable',
+    });
 
     orchestrator.registerProvider(plaid);
     orchestrator.registerProvider(mx);
@@ -57,7 +70,11 @@ describe('Cascading Failure Chaos Tests', () => {
   });
 
   it('DB down during circuit breaker record → original error surfaces', async () => {
-    const plaid = new MockFinancialProvider({ name: Provider.plaid as any, behavior: 'fail', errorMessage: 'network error' });
+    const plaid = new MockFinancialProvider({
+      name: Provider.plaid as any,
+      behavior: 'fail',
+      errorMessage: 'network error',
+    });
     orchestrator.registerProvider(plaid);
 
     // Make prisma fail after the provider call (during recordFailure)
@@ -86,7 +103,11 @@ describe('Cascading Failure Chaos Tests', () => {
   });
 
   it('retry exhaustion triggers circuit breaker failure count', async () => {
-    const plaid = new MockFinancialProvider({ name: Provider.plaid as any, behavior: 'fail', errorMessage: 'network error' });
+    const plaid = new MockFinancialProvider({
+      name: Provider.plaid as any,
+      behavior: 'fail',
+      errorMessage: 'network error',
+    });
     orchestrator.registerProvider(plaid);
 
     // Execute 5 times to trigger circuit breaker

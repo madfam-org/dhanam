@@ -59,8 +59,10 @@ const analysis = await esgManager.analyzePortfolio(portfolio);
 
 console.log(`Portfolio ESG Score: ${analysis.weightedScore.overall}/100`);
 console.log('\nAsset Breakdown:');
-analysis.assetBreakdown.forEach(asset => {
-  console.log(`  ${asset.symbol}: ${asset.score.overall} (${(asset.weight * 100).toFixed(1)}% weight)`);
+analysis.assetBreakdown.forEach((asset) => {
+  console.log(
+    `  ${asset.symbol}: ${asset.score.overall} (${(asset.weight * 100).toFixed(1)}% weight)`
+  );
 });
 
 console.log('\nTop Performers:', analysis.insights.topPerformers.join(', '));
@@ -77,7 +79,7 @@ const esgManager = new ESGManager();
 const symbols = ['BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'AVAX'];
 const esgData = await esgManager.getMultipleAssetESG(symbols);
 
-esgData.forEach(asset => {
+esgData.forEach((asset) => {
   console.log(`${asset.symbol}: ${asset.score.overall}/100 (${asset.metrics.consensusMechanism})`);
 });
 ```
@@ -89,16 +91,16 @@ import { ESGManager, ESGConfiguration } from '@dhanam/esg';
 
 const config: Partial<ESGConfiguration> = {
   caching: {
-    ttl: 7200,       // 2 hour cache
-    maxSize: 500,    // Max 500 cached assets
+    ttl: 7200, // 2 hour cache
+    maxSize: 500, // Max 500 cached assets
   },
   scoring: {
     weights: {
-      environmental: 0.5,  // Weight environmental more heavily
+      environmental: 0.5, // Weight environmental more heavily
       social: 0.25,
       governance: 0.25,
     },
-    minimumConfidence: 60,  // Require higher confidence scores
+    minimumConfidence: 60, // Require higher confidence scores
   },
   updates: {
     refreshInterval: 3600,
@@ -123,17 +125,17 @@ new ESGManager(config?: Partial<ESGConfiguration>)
 
 #### Methods
 
-| Method | Description |
-|--------|-------------|
-| `getAssetESG(symbol)` | Get ESG data for a single asset |
+| Method                         | Description                                |
+| ------------------------------ | ------------------------------------------ |
+| `getAssetESG(symbol)`          | Get ESG data for a single asset            |
 | `getMultipleAssetESG(symbols)` | Get ESG data for multiple assets (batched) |
-| `analyzePortfolio(holdings)` | Analyze portfolio ESG with weighted scores |
-| `refreshAssetData(symbols)` | Force refresh data for specified assets |
-| `registerProvider(provider)` | Register a custom ESG data provider |
-| `getCacheStats()` | Get cache size and hit rate statistics |
-| `clearCache()` | Clear all cached ESG data |
-| `getConfiguration()` | Get current configuration |
-| `updateConfiguration(config)` | Update configuration at runtime |
+| `analyzePortfolio(holdings)`   | Analyze portfolio ESG with weighted scores |
+| `refreshAssetData(symbols)`    | Force refresh data for specified assets    |
+| `registerProvider(provider)`   | Register a custom ESG data provider        |
+| `getCacheStats()`              | Get cache size and hit rate statistics     |
+| `clearCache()`                 | Clear all cached ESG data                  |
+| `getConfiguration()`           | Get current configuration                  |
+| `updateConfiguration(config)`  | Update configuration at runtime            |
 
 ### Types
 
@@ -141,11 +143,11 @@ new ESGManager(config?: Partial<ESGConfiguration>)
 
 ```typescript
 interface ESGScore {
-  overall: number;        // 0-100 composite score
-  environmental: number;  // 0-100 E score
-  social: number;         // 0-100 S score
-  governance: number;     // 0-100 G score
-  confidence: number;     // 0-100 data confidence
+  overall: number; // 0-100 composite score
+  environmental: number; // 0-100 E score
+  social: number; // 0-100 S score
+  governance: number; // 0-100 G score
+  confidence: number; // 0-100 data confidence
   lastUpdated: Date;
   methodology: string;
   sources: string[];
@@ -156,8 +158,8 @@ interface ESGScore {
 
 ```typescript
 interface ESGMetrics {
-  energyIntensity?: number;       // kWh per transaction
-  carbonIntensity?: number;       // gCO2 per transaction
+  energyIntensity?: number; // kWh per transaction
+  carbonIntensity?: number; // gCO2 per transaction
   consensusMechanism: 'pow' | 'pos' | 'dpos' | 'hybrid' | 'other';
   decentralizationScore?: number;
   developerActivity?: number;
@@ -186,7 +188,7 @@ interface AssetESGData {
 ```typescript
 interface PortfolioHolding {
   symbol: string;
-  value: number;  // USD value of holding
+  value: number; // USD value of holding
 }
 ```
 
@@ -218,13 +220,14 @@ interface PortfolioESGAnalysis {
 
 ### Environmental (E) - 40% Default Weight
 
-| Factor | Weight | Description |
-|--------|--------|-------------|
-| Consensus Mechanism | 50% | PoS/DPoS scores higher than PoW |
-| Energy Intensity | 30% | kWh per transaction |
-| Carbon Footprint | 20% | gCO2 emissions per transaction |
+| Factor              | Weight | Description                     |
+| ------------------- | ------ | ------------------------------- |
+| Consensus Mechanism | 50%    | PoS/DPoS scores higher than PoW |
+| Energy Intensity    | 30%    | kWh per transaction             |
+| Carbon Footprint    | 20%    | gCO2 emissions per transaction  |
 
 **Consensus Scoring:**
+
 - Proof of Stake (PoS): 85-100
 - Delegated PoS (DPoS): 80-95
 - Hybrid: 50-70
@@ -232,21 +235,21 @@ interface PortfolioESGAnalysis {
 
 ### Social (S) - 30% Default Weight
 
-| Factor | Weight | Description |
-|--------|--------|-------------|
-| Community Size | 30% | Active users and developers |
-| Developer Activity | 30% | GitHub commits, contributors |
-| Accessibility | 20% | Ease of use, wallet availability |
-| Inclusion | 20% | Geographic distribution, adoption |
+| Factor             | Weight | Description                       |
+| ------------------ | ------ | --------------------------------- |
+| Community Size     | 30%    | Active users and developers       |
+| Developer Activity | 30%    | GitHub commits, contributors      |
+| Accessibility      | 20%    | Ease of use, wallet availability  |
+| Inclusion          | 20%    | Geographic distribution, adoption |
 
 ### Governance (G) - 30% Default Weight
 
-| Factor | Weight | Description |
-|--------|--------|-------------|
-| Decentralization | 40% | Node distribution, Nakamoto coefficient |
-| Transparency | 30% | Open-source code, public roadmap |
-| Voting Rights | 20% | Token holder governance |
-| Regulatory Stance | 10% | Compliance with regulations |
+| Factor            | Weight | Description                             |
+| ----------------- | ------ | --------------------------------------- |
+| Decentralization  | 40%    | Node distribution, Nakamoto coefficient |
+| Transparency      | 30%    | Open-source code, public roadmap        |
+| Voting Rights     | 20%    | Token holder governance                 |
+| Regulatory Stance | 10%    | Compliance with regulations             |
 
 ## Architecture
 
@@ -291,11 +294,13 @@ class MyESGProvider implements ESGProvider {
 
   async getAssetESG(symbol: string): Promise<AssetESGData | null> {
     // Fetch from your data source
-    return { /* ESG data */ };
+    return {
+      /* ESG data */
+    };
   }
 
   async getMultipleAssetESG(symbols: string[]): Promise<AssetESGData[]> {
-    return Promise.all(symbols.map(s => this.getAssetESG(s)));
+    return Promise.all(symbols.map((s) => this.getAssetESG(s)));
   }
 
   async refreshAssetData(symbol: string): Promise<void> {
@@ -335,6 +340,7 @@ manager.clearCache();
 ## Dependencies
 
 **Runtime:**
+
 - `@dhanam/shared` - Shared types and utilities
 - `axios` - HTTP client for external APIs
 - `date-fns` - Date manipulation
@@ -342,11 +348,11 @@ manager.clearCache();
 
 ## Related Packages
 
-| Package | Relationship |
-|---------|--------------|
-| [`@dhanam/shared`](../shared/README.md) | Provides base types |
+| Package                                           | Relationship                         |
+| ------------------------------------------------- | ------------------------------------ |
+| [`@dhanam/shared`](../shared/README.md)           | Provides base types                  |
 | [`@dhanam/simulations`](../simulations/README.md) | Can incorporate ESG into projections |
-| [`@dhanam/config`](../config/README.md) | Provides build configuration |
+| [`@dhanam/config`](../config/README.md)           | Provides build configuration         |
 
 ## Usage in Dhanam
 

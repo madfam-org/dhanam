@@ -15,12 +15,12 @@ Dhanam's estate planning module allows users to create, manage, and maintain dig
 
 ### Will Management
 
-| Status | Description | Allowed Actions |
-|--------|-------------|-----------------|
-| `draft` | Initial creation, editable | Update, delete, activate |
-| `active` | Currently in effect | Revoke only |
-| `revoked` | No longer in effect | View only |
-| `executed` | Finalized (post-death) | View only |
+| Status     | Description                | Allowed Actions          |
+| ---------- | -------------------------- | ------------------------ |
+| `draft`    | Initial creation, editable | Update, delete, activate |
+| `active`   | Currently in effect        | Revoke only              |
+| `revoked`  | No longer in effect        | View only                |
+| `executed` | Finalized (post-death)     | View only                |
 
 ### Beneficiary Designations
 
@@ -29,16 +29,17 @@ Beneficiaries are designated per asset type with percentage allocations:
 ```typescript
 interface BeneficiaryDesignation {
   willId: string;
-  beneficiaryId: string;      // Household member ID
-  assetType: AssetType;       // CASH, INVESTMENTS, REAL_ESTATE, etc.
-  assetId?: string;           // Specific asset (optional)
-  percentage: number;         // Must sum to 100% per asset type
-  conditions?: string;        // Conditional inheritance
+  beneficiaryId: string; // Household member ID
+  assetType: AssetType; // CASH, INVESTMENTS, REAL_ESTATE, etc.
+  assetId?: string; // Specific asset (optional)
+  percentage: number; // Must sum to 100% per asset type
+  conditions?: string; // Conditional inheritance
   notes?: string;
 }
 ```
 
 **Asset Types:**
+
 - `CASH` - Bank accounts, liquid assets
 - `INVESTMENTS` - Stocks, bonds, mutual funds
 - `REAL_ESTATE` - Property, land
@@ -52,9 +53,9 @@ interface BeneficiaryDesignation {
 ```typescript
 interface WillExecutor {
   willId: string;
-  executorId: string;         // Household member ID
-  isPrimary: boolean;         // Primary executor flag
-  order: number;              // Backup order (1, 2, 3...)
+  executorId: string; // Household member ID
+  isPrimary: boolean; // Primary executor flag
+  order: number; // Backup order (1, 2, 3...)
   notes?: string;
 }
 ```
@@ -63,30 +64,30 @@ interface WillExecutor {
 
 ### Wills
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/estate-planning/wills` | Create new will |
-| `GET` | `/estate-planning/wills/:id` | Get will details |
-| `GET` | `/estate-planning/households/:id/wills` | List household wills |
-| `PATCH` | `/estate-planning/wills/:id` | Update will |
-| `DELETE` | `/estate-planning/wills/:id` | Delete draft will |
-| `POST` | `/estate-planning/wills/:id/activate` | Activate will |
-| `POST` | `/estate-planning/wills/:id/revoke` | Revoke active will |
+| Method   | Endpoint                                | Description          |
+| -------- | --------------------------------------- | -------------------- |
+| `POST`   | `/estate-planning/wills`                | Create new will      |
+| `GET`    | `/estate-planning/wills/:id`            | Get will details     |
+| `GET`    | `/estate-planning/households/:id/wills` | List household wills |
+| `PATCH`  | `/estate-planning/wills/:id`            | Update will          |
+| `DELETE` | `/estate-planning/wills/:id`            | Delete draft will    |
+| `POST`   | `/estate-planning/wills/:id/activate`   | Activate will        |
+| `POST`   | `/estate-planning/wills/:id/revoke`     | Revoke active will   |
 
 ### Beneficiaries
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/estate-planning/wills/:id/beneficiaries` | Add beneficiary |
-| `PATCH` | `/estate-planning/wills/:willId/beneficiaries/:id` | Update beneficiary |
+| Method   | Endpoint                                           | Description        |
+| -------- | -------------------------------------------------- | ------------------ |
+| `POST`   | `/estate-planning/wills/:id/beneficiaries`         | Add beneficiary    |
+| `PATCH`  | `/estate-planning/wills/:willId/beneficiaries/:id` | Update beneficiary |
 | `DELETE` | `/estate-planning/wills/:willId/beneficiaries/:id` | Remove beneficiary |
 
 ### Executors
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/estate-planning/wills/:id/executors` | Add executor |
-| `PATCH` | `/estate-planning/wills/:willId/executors/:id` | Update executor |
+| Method   | Endpoint                                       | Description     |
+| -------- | ---------------------------------------------- | --------------- |
+| `POST`   | `/estate-planning/wills/:id/executors`         | Add executor    |
+| `PATCH`  | `/estate-planning/wills/:willId/executors/:id` | Update executor |
 | `DELETE` | `/estate-planning/wills/:willId/executors/:id` | Remove executor |
 
 ## Usage Examples
@@ -100,7 +101,7 @@ const will = await fetch('/api/estate-planning/wills', {
     householdId: 'hh_123',
     name: 'Primary Will 2025',
     notes: 'Updated after property purchase',
-    legalDisclaimer: false,  // Must be true before activation
+    legalDisclaimer: false, // Must be true before activation
   }),
 });
 ```
@@ -155,30 +156,30 @@ await fetch(`/api/estate-planning/wills/${willId}/activate`, {
 
 ### Modification Restrictions
 
-| Status | Can Modify | Can Delete |
-|--------|-----------|------------|
-| draft | Yes | Yes |
-| active | No (revoke first) | No |
-| revoked | No | No |
-| executed | No | No |
+| Status   | Can Modify        | Can Delete |
+| -------- | ----------------- | ---------- |
+| draft    | Yes               | Yes        |
+| active   | No (revoke first) | No         |
+| revoked  | No                | No         |
+| executed | No                | No         |
 
 ## Audit Logging
 
 All estate planning operations are logged for compliance:
 
-| Action | Severity | Details Logged |
-|--------|----------|----------------|
-| `WILL_CREATED` | Medium | Will name, household ID |
-| `WILL_UPDATED` | Low | Changed fields |
-| `WILL_ACTIVATED` | High | Will name, household ID |
-| `WILL_REVOKED` | High | Will name |
-| `WILL_DELETED` | Medium | Will name |
-| `BENEFICIARY_ADDED` | Medium | Beneficiary ID, asset type, percentage |
-| `BENEFICIARY_UPDATED` | Medium | Changed fields |
-| `BENEFICIARY_REMOVED` | Medium | Beneficiary designation ID |
-| `EXECUTOR_ADDED` | Medium | Executor ID, primary flag |
-| `EXECUTOR_UPDATED` | Medium | Changed fields |
-| `EXECUTOR_REMOVED` | Medium | Executor ID |
+| Action                | Severity | Details Logged                         |
+| --------------------- | -------- | -------------------------------------- |
+| `WILL_CREATED`        | Medium   | Will name, household ID                |
+| `WILL_UPDATED`        | Low      | Changed fields                         |
+| `WILL_ACTIVATED`      | High     | Will name, household ID                |
+| `WILL_REVOKED`        | High     | Will name                              |
+| `WILL_DELETED`        | Medium   | Will name                              |
+| `BENEFICIARY_ADDED`   | Medium   | Beneficiary ID, asset type, percentage |
+| `BENEFICIARY_UPDATED` | Medium   | Changed fields                         |
+| `BENEFICIARY_REMOVED` | Medium   | Beneficiary designation ID             |
+| `EXECUTOR_ADDED`      | Medium   | Executor ID, primary flag              |
+| `EXECUTOR_UPDATED`    | Medium   | Changed fields                         |
+| `EXECUTOR_REMOVED`    | Medium   | Executor ID                            |
 
 ## Life Beat - Dead Man's Switch
 
@@ -192,12 +193,12 @@ Life Beat is an automated check-in system that ensures designated executors gain
 
 ### Escalation Levels
 
-| Level | Days | Action |
-|-------|------|--------|
-| 0 | 0 | Normal operation, check-in reminders sent |
-| 1 | 30 | Warning: Urgent check-in request + executor notified |
-| 2 | 60 | Alert: Final warning + executor receives limited access |
-| 3 | 90 | Critical: Full executor access granted |
+| Level | Days | Action                                                  |
+| ----- | ---- | ------------------------------------------------------- |
+| 0     | 0    | Normal operation, check-in reminders sent               |
+| 1     | 30   | Warning: Urgent check-in request + executor notified    |
+| 2     | 60   | Alert: Final warning + executor receives limited access |
+| 3     | 90   | Critical: Full executor access granted                  |
 
 ### Configuration
 
@@ -213,12 +214,12 @@ interface LifeBeatConfig {
 
 ### API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/estate-planning/life-beat/config` | Get current configuration |
-| `PUT` | `/estate-planning/life-beat/config` | Update configuration |
-| `POST` | `/estate-planning/life-beat/check-in` | Record a check-in |
-| `POST` | `/estate-planning/life-beat/emergency-access` | Grant emergency access |
+| Method | Endpoint                                      | Description               |
+| ------ | --------------------------------------------- | ------------------------- |
+| `GET`  | `/estate-planning/life-beat/config`           | Get current configuration |
+| `PUT`  | `/estate-planning/life-beat/config`           | Update configuration      |
+| `POST` | `/estate-planning/life-beat/check-in`         | Record a check-in         |
+| `POST` | `/estate-planning/life-beat/emergency-access` | Grant emergency access    |
 
 ### Check-In Flow
 
@@ -227,17 +228,17 @@ interface LifeBeatConfig {
 await fetch('/api/estate-planning/life-beat/check-in', {
   method: 'POST',
   body: JSON.stringify({
-    householdId: 'hh_123'
+    householdId: 'hh_123',
   }),
 });
 ```
 
 ### Executor Access Levels
 
-| Level | Permissions |
-|-------|-------------|
-| `read-only` | View accounts, balances, transactions |
-| `full` | All read-only + download documents, export data |
+| Level       | Permissions                                     |
+| ----------- | ----------------------------------------------- |
+| `read-only` | View accounts, balances, transactions           |
+| `full`      | All read-only + download documents, export data |
 
 ### Important Considerations
 

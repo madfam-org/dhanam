@@ -1,15 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException, GoneException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuditService } from '@core/audit/audit.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 
+import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { R2StorageService } from '../storage/r2.service';
 
 import { ReportShareTokenService } from './report-share-token.service';
 import { SavedReportService } from './saved-report.service';
-
-import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 describe('ReportShareTokenService', () => {
   let service: ReportShareTokenService;
@@ -88,7 +87,10 @@ describe('ReportShareTokenService', () => {
 
       const result = await service.createToken('user-1', 'report-1');
 
-      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'report-1', ['editor', 'manager']);
+      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'report-1', [
+        'editor',
+        'manager',
+      ]);
       expect(prisma.reportShareToken.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           reportId: 'report-1',
@@ -166,7 +168,9 @@ describe('ReportShareTokenService', () => {
         report: { name: 'Test', generatedReports: [] },
       });
 
-      await expect(service.validateAndGetReport('abc123def456')).rejects.toThrow(ForbiddenException);
+      await expect(service.validateAndGetReport('abc123def456')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should throw GoneException for expired token', async () => {

@@ -1,10 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { Currency, Prisma } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { StripeConnectService } from '../../billing/services/stripe-connect.service';
-
-import type { EventDispatcherService } from '../../webhook-outbound/services/event-dispatcher.service';
+import { EventDispatcherService } from '../../webhook-outbound/services/event-dispatcher.service';
 
 @Injectable()
 export class MerchantService {
@@ -13,7 +13,7 @@ export class MerchantService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripeConnect: StripeConnectService,
-    private readonly events: EventDispatcherService,
+    private readonly events: EventDispatcherService
   ) {}
 
   async createForUser(
@@ -24,7 +24,7 @@ export class MerchantService {
       defaultCurrency: Currency;
       businessType?: 'individual' | 'company';
       metadata?: Record<string, string>;
-    },
+    }
   ) {
     const handle = await this.stripeConnect.createMerchantAccount({
       userId,
@@ -60,7 +60,7 @@ export class MerchantService {
     return this.stripeConnect.createMerchantOnboardingLink(
       merchant.externalAccountId,
       returnUrl,
-      refreshUrl,
+      refreshUrl
     );
   }
 

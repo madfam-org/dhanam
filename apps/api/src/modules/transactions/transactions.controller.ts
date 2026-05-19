@@ -1,4 +1,3 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import {
   Controller,
   Get,
@@ -23,6 +22,8 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 
 import { CreateTransactionDto, UpdateTransactionDto, TransactionsFilterDto } from './dto';
 import { TransactionsService } from './transactions.service';

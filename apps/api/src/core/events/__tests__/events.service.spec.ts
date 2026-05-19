@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-
 import { firstValueFrom, take, toArray } from 'rxjs';
 
 import { EventsService, RealtimeEventType, SseMessage } from '../events.service';

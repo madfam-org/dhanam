@@ -67,9 +67,7 @@ describe('PortfolioESGAnalyzer', () => {
       const esgData = new Map<string, AssetESGData>([['BTC', mockBTCData]]);
       const analyzer = new PortfolioESGAnalyzer(esgData);
 
-      const holdings: PortfolioHolding[] = [
-        { symbol: 'BTC', quantity: 1, value: 50000 },
-      ];
+      const holdings: PortfolioHolding[] = [{ symbol: 'BTC', quantity: 1, value: 50000 }];
 
       const analysis = analyzer.analyzePortfolio(holdings);
 
@@ -109,16 +107,16 @@ describe('PortfolioESGAnalyzer', () => {
 
       expect(analysis.weightedScore.overall).toBe(50); // Default score
       expect(analysis.assetBreakdown).toHaveLength(0);
-      expect(analysis.insights.recommendations).toContain('Add cryptocurrency holdings to view ESG analysis');
+      expect(analysis.insights.recommendations).toContain(
+        'Add cryptocurrency holdings to view ESG analysis'
+      );
     });
 
     it('should handle zero value portfolio', () => {
       const esgData = new Map<string, AssetESGData>([['BTC', mockBTCData]]);
       const analyzer = new PortfolioESGAnalyzer(esgData);
 
-      const holdings: PortfolioHolding[] = [
-        { symbol: 'BTC', quantity: 0, value: 0 },
-      ];
+      const holdings: PortfolioHolding[] = [{ symbol: 'BTC', quantity: 0, value: 0 }];
 
       const analysis = analyzer.analyzePortfolio(holdings);
 
@@ -129,9 +127,7 @@ describe('PortfolioESGAnalyzer', () => {
       const esgData = new Map<string, AssetESGData>([['BTC', mockBTCData]]);
       const analyzer = new PortfolioESGAnalyzer(esgData);
 
-      const holdings: PortfolioHolding[] = [
-        { symbol: 'UNKNOWN', quantity: 1, value: 1000 },
-      ];
+      const holdings: PortfolioHolding[] = [{ symbol: 'UNKNOWN', quantity: 1, value: 1000 }];
 
       const analysis = analyzer.analyzePortfolio(holdings);
 
@@ -172,8 +168,8 @@ describe('PortfolioESGAnalyzer', () => {
 
       const analysis = analyzer.analyzePortfolio(holdings);
 
-      const btcAsset = analysis.assetBreakdown.find(a => a.symbol === 'BTC');
-      const ethAsset = analysis.assetBreakdown.find(a => a.symbol === 'ETH');
+      const btcAsset = analysis.assetBreakdown.find((a) => a.symbol === 'BTC');
+      const ethAsset = analysis.assetBreakdown.find((a) => a.symbol === 'ETH');
 
       expect(btcAsset?.weight).toBeCloseTo(0.75, 2);
       expect(ethAsset?.weight).toBeCloseTo(0.25, 2);
@@ -251,9 +247,7 @@ describe('PortfolioESGAnalyzer', () => {
       const esgData = new Map<string, AssetESGData>([['BTC', mockBTCData]]);
       const analyzer = new PortfolioESGAnalyzer(esgData);
 
-      const holdings: PortfolioHolding[] = [
-        { symbol: 'BTC', quantity: 1, value: 50000 },
-      ];
+      const holdings: PortfolioHolding[] = [{ symbol: 'BTC', quantity: 1, value: 50000 }];
 
       const analysis = analyzer.analyzePortfolio(holdings);
 

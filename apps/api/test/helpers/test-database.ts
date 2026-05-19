@@ -1,5 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import { execSync } from 'child_process';
+
+import { PrismaClient } from '@prisma/client';
 
 /**
  * Test Database Helper
@@ -177,9 +178,7 @@ export class TestDatabase {
    * - Useful for asserting data was created/deleted
    */
   static async getCount(tableName: string): Promise<number> {
-    const result = await this.queryRaw(
-      `SELECT COUNT(*) as count FROM "${tableName}"`
-    );
+    const result = await this.queryRaw(`SELECT COUNT(*) as count FROM "${tableName}"`);
     return parseInt(result[0].count, 10);
   }
 

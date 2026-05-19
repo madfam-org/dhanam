@@ -1,14 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
 import * as crypto from 'crypto';
+
+import { BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { AuditService } from '@core/audit/audit.service';
+import { CryptoService } from '@core/crypto/crypto.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+import { CircuitBreakerService } from '@modules/providers/orchestrator/circuit-breaker.service';
 
 import { BelvoService } from '../belvo.service';
 import { BelvoWebhookDto, BelvoWebhookEvent } from '../dto/webhook.dto';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { CryptoService } from '@core/crypto/crypto.service';
-import { AuditService } from '@core/audit/audit.service';
-import { CircuitBreakerService } from '@modules/providers/orchestrator/circuit-breaker.service';
-import { ConfigService } from '@nestjs/config';
 
 describe('BelvoService - Webhook Contract Tests', () => {
   let service: BelvoService;
@@ -347,10 +349,7 @@ describe('BelvoService - Webhook Contract Tests', () => {
       await service.handleWebhook(webhookDto, validSignature);
 
       // Assert
-      expect(loggerSpy).toHaveBeenCalledWith(
-        `Link failed: ${webhookDto.link_id}`,
-        webhookDto.data
-      );
+      expect(loggerSpy).toHaveBeenCalledWith(`Link failed: ${webhookDto.link_id}`, webhookDto.data);
     });
   });
 

@@ -4,9 +4,9 @@ import { Platform } from 'react-native';
 // API Configuration
 const API_BASE_URL = __DEV__
   ? Platform.OS === 'ios'
-    ? 'http://localhost:4010/api'
-    : 'http://10.0.2.2:4000/api'
-  : 'https://api.dhan.am';
+    ? 'http://localhost:4010/v1'
+    : 'http://10.0.2.2:4010/v1'
+  : 'https://api.dhan.am/v1';
 
 // Create axios instance
 export const apiClient = axios.create({
@@ -48,10 +48,9 @@ apiClient.interceptors.response.use(
       console.log('🔴 Response Error:', error.response?.status, error.response?.data);
     }
 
-    // Handle 401 errors (token refresh)
+    // AuthContext owns refresh/logout so the interceptor only normalizes errors.
     if (error.response?.status === 401) {
-      // Token refresh logic would be handled by the AuthContext
-      // This is just a placeholder for the interceptor structure
+      delete apiClient.defaults.headers.common['Authorization'];
     }
 
     // Transform error for better error handling

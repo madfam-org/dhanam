@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
+import { PrismaService } from '../../core/prisma/prisma.service';
 
 import { CategoryCorrectionService } from './correction.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
 import { MerchantNormalizerService } from './merchant-normalizer.service';
-import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 describe('CategoryCorrectionService', () => {
   let service: CategoryCorrectionService;
@@ -335,10 +336,12 @@ describe('CategoryCorrectionService', () => {
   describe('findCategoryFromCorrections', () => {
     it('should find category with high confidence for consistent corrections', async () => {
       const now = new Date();
-      const corrections = Array(10).fill(null).map((_, i) => ({
-        correctedCategoryId: 'cat-1',
-        createdAt: new Date(now.getTime() - i * 24 * 60 * 60 * 1000), // Past 10 days
-      }));
+      const corrections = Array(10)
+        .fill(null)
+        .map((_, i) => ({
+          correctedCategoryId: 'cat-1',
+          createdAt: new Date(now.getTime() - i * 24 * 60 * 60 * 1000), // Past 10 days
+        }));
 
       prismaMock.categoryCorrection.findMany.mockResolvedValue(corrections);
       merchantNormalizerMock.extractPatternKey!.mockReturnValue('netflix');
@@ -373,9 +376,18 @@ describe('CategoryCorrectionService', () => {
         { correctedCategoryId: 'cat-2', createdAt: new Date(now.getTime() - 1000) },
         { correctedCategoryId: 'cat-2', createdAt: new Date(now.getTime() - 2000) },
         // Old corrections to cat-1
-        { correctedCategoryId: 'cat-1', createdAt: new Date(now.getTime() - 300 * 24 * 60 * 60 * 1000) },
-        { correctedCategoryId: 'cat-1', createdAt: new Date(now.getTime() - 350 * 24 * 60 * 60 * 1000) },
-        { correctedCategoryId: 'cat-1', createdAt: new Date(now.getTime() - 360 * 24 * 60 * 60 * 1000) },
+        {
+          correctedCategoryId: 'cat-1',
+          createdAt: new Date(now.getTime() - 300 * 24 * 60 * 60 * 1000),
+        },
+        {
+          correctedCategoryId: 'cat-1',
+          createdAt: new Date(now.getTime() - 350 * 24 * 60 * 60 * 1000),
+        },
+        {
+          correctedCategoryId: 'cat-1',
+          createdAt: new Date(now.getTime() - 360 * 24 * 60 * 60 * 1000),
+        },
       ];
 
       prismaMock.categoryCorrection.findMany.mockResolvedValue(corrections);
@@ -390,10 +402,12 @@ describe('CategoryCorrectionService', () => {
     it('should cap confidence at 0.95', async () => {
       const now = new Date();
       // Many recent consistent corrections
-      const corrections = Array(20).fill(null).map(() => ({
-        correctedCategoryId: 'cat-1',
-        createdAt: new Date(now.getTime() - 1000),
-      }));
+      const corrections = Array(20)
+        .fill(null)
+        .map(() => ({
+          correctedCategoryId: 'cat-1',
+          createdAt: new Date(now.getTime() - 1000),
+        }));
 
       prismaMock.categoryCorrection.findMany.mockResolvedValue(corrections);
       merchantNormalizerMock.extractPatternKey!.mockReturnValue('merchant');
@@ -461,10 +475,12 @@ describe('CategoryCorrectionService', () => {
     });
 
     it('should limit top categories to 5', async () => {
-      const corrections = Array(10).fill(null).map((_, i) => ({
-        merchantPattern: `m${i}`,
-        correctedCategoryId: `cat-${i}`,
-      }));
+      const corrections = Array(10)
+        .fill(null)
+        .map((_, i) => ({
+          merchantPattern: `m${i}`,
+          correctedCategoryId: `cat-${i}`,
+        }));
 
       prismaMock.categoryCorrection.findMany.mockResolvedValue(corrections);
       prismaMock.transaction.count.mockResolvedValue(100);
@@ -504,9 +520,7 @@ describe('CategoryCorrectionService', () => {
 
       await service.cleanupOldCorrections(180);
 
-      expect(logger.log).toHaveBeenCalledWith(
-        expect.stringContaining('25 corrections')
-      );
+      expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('25 corrections'));
     });
   });
 });

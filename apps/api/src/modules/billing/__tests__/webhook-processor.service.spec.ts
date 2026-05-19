@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import Stripe from 'stripe';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
 import { AuditService } from '../../../core/audit/audit.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { PostHogService } from '../../analytics/posthog.service';
-import { StripeService } from '../stripe.service';
 import { SubscriptionLifecycleService } from '../services/subscription-lifecycle.service';
 import { WebhookProcessorService } from '../services/webhook-processor.service';
+import { StripeService } from '../stripe.service';
 
 describe('WebhookProcessorService', () => {
   let service: WebhookProcessorService;
@@ -65,6 +65,7 @@ describe('WebhookProcessorService', () => {
           useValue: {
             dispatchJanuaRoleUpgrade: jest.fn().mockResolvedValue(undefined),
             notifyJanuaOfTierChange: jest.fn().mockResolvedValue(undefined),
+            notifyProductWebhooks: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
@@ -228,6 +229,8 @@ describe('WebhookProcessorService', () => {
           subscriptionTier: 'community',
           subscriptionExpiresAt: null,
           stripeSubscriptionId: null,
+          cancelledAt: expect.any(Date),
+          cancellationReason: null,
         },
       });
       expect(prisma.billingEvent.create).toHaveBeenCalledWith({

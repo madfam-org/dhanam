@@ -96,7 +96,7 @@ export async function seedGoals(prisma: PrismaClient, ctx: SeedContext) {
           status: 'active',
           monthlyContribution: 4000,
           expectedReturn: 0.05,
-          volatility: 0.10,
+          volatility: 0.1,
           currentProbability: 58.3,
           confidenceLow: 220000,
           confidenceHigh: 340000,
@@ -253,7 +253,8 @@ export async function seedGoals(prisma: PrismaClient, ctx: SeedContext) {
       data: {
         createdBy: ctx.mariaUser.id,
         isShared: true,
-        sharedWithMessage: "Let's track our children's education fund together! Feel free to view progress and suggest adjustments.",
+        sharedWithMessage:
+          "Let's track our children's education fund together! Feel free to view progress and suggest adjustments.",
       },
     });
 
@@ -264,7 +265,8 @@ export async function seedGoals(prisma: PrismaClient, ctx: SeedContext) {
         role: 'viewer',
         invitedBy: ctx.mariaUser.id,
         status: 'accepted',
-        message: "Let's track our children's education fund together! Feel free to view progress and suggest adjustments.",
+        message:
+          "Let's track our children's education fund together! Feel free to view progress and suggest adjustments.",
         acceptedAt: subDays(new Date(), 5),
         createdAt: subDays(new Date(), 7),
       },

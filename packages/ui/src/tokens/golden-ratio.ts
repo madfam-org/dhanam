@@ -29,19 +29,19 @@ export const PHI_INVERSE = 1 / PHI; // ≈ 0.618
  */
 export const goldenSpacing = {
   // Smaller than base (dividing by φ)
-  'phi-3xs': `${1 / PHI / PHI / PHI}rem`,  // 0.236rem (~4px)
-  'phi-2xs': `${1 / PHI / PHI}rem`,         // 0.382rem (~6px)
-  'phi-xs': `${1 / PHI}rem`,                // 0.618rem (~10px)
+  'phi-3xs': `${1 / PHI / PHI / PHI}rem`, // 0.236rem (~4px)
+  'phi-2xs': `${1 / PHI / PHI}rem`, // 0.382rem (~6px)
+  'phi-xs': `${1 / PHI}rem`, // 0.618rem (~10px)
 
   // Base
-  'phi-sm': '0.75rem',                      // 12px (bridge value)
-  'phi-md': '1rem',                         // 16px - base unit
-  'phi-base': '1rem',                       // alias
+  'phi-sm': '0.75rem', // 12px (bridge value)
+  'phi-md': '1rem', // 16px - base unit
+  'phi-base': '1rem', // alias
 
   // Larger than base (multiplying by φ)
-  'phi-lg': `${PHI}rem`,                    // 1.618rem (~26px)
-  'phi-xl': `${PHI * PHI}rem`,              // 2.618rem (~42px)
-  'phi-2xl': `${PHI * PHI * PHI}rem`,       // 4.236rem (~68px)
+  'phi-lg': `${PHI}rem`, // 1.618rem (~26px)
+  'phi-xl': `${PHI * PHI}rem`, // 2.618rem (~42px)
+  'phi-2xl': `${PHI * PHI * PHI}rem`, // 4.236rem (~68px)
   'phi-3xl': `${PHI * PHI * PHI * PHI}rem`, // 6.854rem (~110px)
 } as const;
 
@@ -54,15 +54,15 @@ export const goldenSpacing = {
  * Usage in Tailwind: text-phi-base, text-phi-lg, etc.
  */
 export const goldenTypography = {
-  'phi-3xs': ['0.512rem', { lineHeight: '0.75rem' }],      // ~8px
-  'phi-2xs': ['0.618rem', { lineHeight: '1rem' }],         // ~10px
-  'phi-xs': ['0.75rem', { lineHeight: '1.125rem' }],       // 12px
-  'phi-sm': ['0.875rem', { lineHeight: '1.25rem' }],       // 14px
-  'phi-base': ['1rem', { lineHeight: `${PHI}rem` }],       // 16px / 26px
-  'phi-lg': ['1.125rem', { lineHeight: '1.75rem' }],       // 18px
-  'phi-xl': [`${PHI}rem`, { lineHeight: '2.25rem' }],      // ~26px
-  'phi-2xl': ['2rem', { lineHeight: '2.5rem' }],           // 32px
-  'phi-3xl': [`${PHI * PHI}rem`, { lineHeight: '3rem' }],  // ~42px
+  'phi-3xs': ['0.512rem', { lineHeight: '0.75rem' }], // ~8px
+  'phi-2xs': ['0.618rem', { lineHeight: '1rem' }], // ~10px
+  'phi-xs': ['0.75rem', { lineHeight: '1.125rem' }], // 12px
+  'phi-sm': ['0.875rem', { lineHeight: '1.25rem' }], // 14px
+  'phi-base': ['1rem', { lineHeight: `${PHI}rem` }], // 16px / 26px
+  'phi-lg': ['1.125rem', { lineHeight: '1.75rem' }], // 18px
+  'phi-xl': [`${PHI}rem`, { lineHeight: '2.25rem' }], // ~26px
+  'phi-2xl': ['2rem', { lineHeight: '2.5rem' }], // 32px
+  'phi-3xl': [`${PHI * PHI}rem`, { lineHeight: '3rem' }], // ~42px
   'phi-4xl': [`${PHI * PHI * PHI}rem`, { lineHeight: '1' }], // ~68px
 } as const;
 
@@ -75,12 +75,12 @@ export const goldenTypography = {
  */
 export const goldenBorderRadius = {
   'phi-none': '0',
-  'phi-sm': `${1 / PHI / PHI}rem`,   // 0.382rem (~6px)
-  'phi': `${1 / PHI}rem`,            // 0.618rem (~10px)
-  'phi-md': '0.75rem',               // 12px (bridge)
-  'phi-lg': '1rem',                  // 16px
-  'phi-xl': `${PHI}rem`,             // 1.618rem (~26px)
-  'phi-2xl': `${PHI * PHI}rem`,      // 2.618rem (~42px)
+  'phi-sm': `${1 / PHI / PHI}rem`, // 0.382rem (~6px)
+  phi: `${1 / PHI}rem`, // 0.618rem (~10px)
+  'phi-md': '0.75rem', // 12px (bridge)
+  'phi-lg': '1rem', // 16px
+  'phi-xl': `${PHI}rem`, // 1.618rem (~26px)
+  'phi-2xl': `${PHI * PHI}rem`, // 2.618rem (~42px)
   'phi-full': '9999px',
 } as const;
 
@@ -94,14 +94,14 @@ export const goldenBorderRadius = {
  */
 export const goldenSizing = {
   // Common golden rectangles (width)
-  'phi-card-sm': '16rem',                        // 256px
-  'phi-card': `${16 * PHI}rem`,                  // ~410px
-  'phi-card-lg': `${16 * PHI * PHI}rem`,         // ~664px
+  'phi-card-sm': '16rem', // 256px
+  'phi-card': `${16 * PHI}rem`, // ~410px
+  'phi-card-lg': `${16 * PHI * PHI}rem`, // ~664px
 
   // Container widths
-  'phi-container-sm': '32rem',                   // 512px
-  'phi-container': `${32 * PHI}rem`,             // ~830px
-  'phi-container-lg': `${32 * PHI * PHI}rem`,    // ~1340px
+  'phi-container-sm': '32rem', // 512px
+  'phi-container': `${32 * PHI}rem`, // ~830px
+  'phi-container-lg': `${32 * PHI * PHI}rem`, // ~1340px
 
   // Aspect ratio helpers (for height calculation)
   'phi-ratio': `${PHI}`,
@@ -114,11 +114,11 @@ export const goldenSizing = {
  * Box shadows with golden-proportioned blur and spread.
  */
 export const goldenShadows = {
-  'phi-sm': `0 ${1/PHI/PHI}rem ${1/PHI}rem rgba(0, 0, 0, 0.05)`,
-  'phi': `0 ${1/PHI}rem ${1}rem rgba(0, 0, 0, 0.1)`,
+  'phi-sm': `0 ${1 / PHI / PHI}rem ${1 / PHI}rem rgba(0, 0, 0, 0.05)`,
+  phi: `0 ${1 / PHI}rem ${1}rem rgba(0, 0, 0, 0.1)`,
   'phi-md': `0 ${1}rem ${PHI}rem rgba(0, 0, 0, 0.1)`,
-  'phi-lg': `0 ${PHI}rem ${PHI*PHI}rem rgba(0, 0, 0, 0.1)`,
-  'phi-xl': `0 ${PHI*PHI}rem ${PHI*PHI*PHI}rem rgba(0, 0, 0, 0.1)`,
+  'phi-lg': `0 ${PHI}rem ${PHI * PHI}rem rgba(0, 0, 0, 0.1)`,
+  'phi-xl': `0 ${PHI * PHI}rem ${PHI * PHI * PHI}rem rgba(0, 0, 0, 0.1)`,
 } as const;
 
 /**
@@ -129,9 +129,9 @@ export const goldenShadows = {
  */
 export const goldenDurations = {
   'phi-instant': '100ms',
-  'phi-fast': `${200 / PHI}ms`,      // ~124ms
+  'phi-fast': `${200 / PHI}ms`, // ~124ms
   'phi-base': '200ms',
-  'phi-normal': `${200 * PHI}ms`,    // ~324ms
+  'phi-normal': `${200 * PHI}ms`, // ~324ms
   'phi-slow': `${200 * PHI * PHI}ms`, // ~524ms
   'phi-slower': `${200 * PHI * PHI * PHI}ms`, // ~847ms
 } as const;
@@ -179,7 +179,7 @@ export const goldenRatioTailwindExtend = {
   width: goldenSizing,
   maxWidth: {
     'phi-sm': goldenSizing['phi-container-sm'],
-    'phi': goldenSizing['phi-container'],
+    phi: goldenSizing['phi-container'],
     'phi-lg': goldenSizing['phi-container-lg'],
   },
 } as const;

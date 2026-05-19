@@ -1,13 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { PrismaService } from '@core/prisma/prisma.service';
 import { LoggerService } from '@core/logger/logger.service';
-import { SpacesService } from '../spaces.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+
 import { CreateSpaceDto } from '../dto/create-space.dto';
 import { InviteMemberDto } from '../dto/invite-member.dto';
 import { UpdateMemberRoleDto } from '../dto/update-member-role.dto';
 import { UpdateSpaceDto } from '../dto/update-space.dto';
+import { SpacesService } from '../spaces.service';
 
 describe('SpacesService', () => {
   let service: SpacesService;
@@ -810,9 +811,9 @@ describe('SpacesService', () => {
         role: 'viewer',
       } as any);
 
-      await expect(
-        service.verifyUserAccess('user-viewer', 'space-123', 'member')
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.verifyUserAccess('user-viewer', 'space-123', 'member')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should ensure multi-tenant isolation (cannot access other spaces)', async () => {

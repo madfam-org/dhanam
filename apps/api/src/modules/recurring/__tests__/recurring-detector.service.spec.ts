@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { RecurrenceFrequency, Currency } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
@@ -240,7 +241,9 @@ describe('RecurringDetectorService', () => {
       const next = service.calculateNextExpected(lastOccurrence, 'monthly');
 
       expect(next.getTime()).toBeGreaterThan(lastOccurrence.getTime());
-      const daysDiff = Math.round((next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.round(
+        (next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24)
+      );
       expect(daysDiff).toBe(30);
     });
 
@@ -248,7 +251,9 @@ describe('RecurringDetectorService', () => {
       const lastOccurrence = new Date('2025-01-15');
       const next = service.calculateNextExpected(lastOccurrence, 'weekly');
 
-      const daysDiff = Math.round((next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.round(
+        (next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24)
+      );
       expect(daysDiff).toBe(7);
     });
 
@@ -256,7 +261,9 @@ describe('RecurringDetectorService', () => {
       const lastOccurrence = new Date('2025-01-15');
       const next = service.calculateNextExpected(lastOccurrence, 'yearly');
 
-      const daysDiff = Math.round((next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.round(
+        (next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24)
+      );
       expect(daysDiff).toBe(365);
     });
 
@@ -264,7 +271,9 @@ describe('RecurringDetectorService', () => {
       const lastOccurrence = new Date('2025-01-15');
       const next = service.calculateNextExpected(lastOccurrence, 'biweekly');
 
-      const daysDiff = Math.round((next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.round(
+        (next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24)
+      );
       expect(daysDiff).toBe(14);
     });
 
@@ -272,7 +281,9 @@ describe('RecurringDetectorService', () => {
       const lastOccurrence = new Date('2025-01-15');
       const next = service.calculateNextExpected(lastOccurrence, 'quarterly');
 
-      const daysDiff = Math.round((next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.round(
+        (next.getTime() - lastOccurrence.getTime()) / (1000 * 60 * 60 * 24)
+      );
       expect(daysDiff).toBe(90);
     });
   });
@@ -545,7 +556,9 @@ describe('RecurringDetectorService', () => {
         status: 'confirmed',
       };
 
-      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([existingPattern]);
+      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([
+        existingPattern,
+      ]);
       (prismaService.transaction.update as jest.Mock).mockResolvedValue({});
       (prismaService.recurringTransaction.update as jest.Mock).mockResolvedValue({});
 
@@ -607,7 +620,9 @@ describe('RecurringDetectorService', () => {
         status: 'confirmed',
       };
 
-      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([existingPattern]);
+      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([
+        existingPattern,
+      ]);
 
       const transaction = {
         id: 'txn-1',
@@ -632,7 +647,9 @@ describe('RecurringDetectorService', () => {
         status: 'confirmed',
       };
 
-      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([existingPattern]);
+      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([
+        existingPattern,
+      ]);
 
       const transaction = {
         id: 'txn-1',
@@ -657,7 +674,9 @@ describe('RecurringDetectorService', () => {
         status: 'confirmed',
       };
 
-      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([existingPattern]);
+      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([
+        existingPattern,
+      ]);
       (prismaService.transaction.update as jest.Mock).mockResolvedValue({});
       (prismaService.recurringTransaction.update as jest.Mock).mockResolvedValue({});
 
@@ -684,7 +703,9 @@ describe('RecurringDetectorService', () => {
         status: 'confirmed',
       };
 
-      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([existingPattern]);
+      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([
+        existingPattern,
+      ]);
       (prismaService.transaction.update as jest.Mock).mockResolvedValue({});
       (prismaService.recurringTransaction.update as jest.Mock).mockResolvedValue({});
 
@@ -711,7 +732,9 @@ describe('RecurringDetectorService', () => {
         status: 'confirmed',
       };
 
-      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([existingPattern]);
+      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([
+        existingPattern,
+      ]);
       (prismaService.transaction.update as jest.Mock).mockResolvedValue({});
       (prismaService.recurringTransaction.update as jest.Mock).mockResolvedValue({});
 
@@ -745,7 +768,9 @@ describe('RecurringDetectorService', () => {
         status: 'confirmed',
       };
 
-      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([existingPattern]);
+      (prismaService.recurringTransaction.findMany as jest.Mock).mockResolvedValue([
+        existingPattern,
+      ]);
       (prismaService.transaction.update as jest.Mock).mockResolvedValue({});
       (prismaService.recurringTransaction.update as jest.Mock).mockResolvedValue({});
 

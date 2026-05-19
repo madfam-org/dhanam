@@ -1,11 +1,12 @@
 import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
+import { JwtService } from '@nestjs/jwt';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
+import request from 'supertest';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { TestHelper } from './helpers/test.helper';
+
 import { createE2EApp } from './helpers/e2e-app.helper';
+import { TestHelper } from './helpers/test.helper';
 
 /**
  * Admin Operations Journey E2E Test
@@ -298,8 +299,7 @@ describe('Admin Operations Journey', () => {
 
     it('should return 401 for all admin endpoints without auth', async () => {
       for (const endpoint of adminEndpoints) {
-        const response = await request(app.getHttpServer())
-          [endpoint.method](endpoint.url);
+        const response = await request(app.getHttpServer())[endpoint.method](endpoint.url);
 
         expect(response.status).toBe(401);
       }

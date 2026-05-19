@@ -1,12 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { BadRequestException } from '@nestjs/common';
-import { BelvoService } from './belvo.service';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { CryptoService } from '@core/crypto/crypto.service';
-import { AuditService } from '@core/audit/audit.service';
-import { CircuitBreakerService } from '../orchestrator/circuit-breaker.service';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+
+import { AuditService } from '@core/audit/audit.service';
+import { CryptoService } from '@core/crypto/crypto.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+
+import { CircuitBreakerService } from '../orchestrator/circuit-breaker.service';
+
+import { BelvoService } from './belvo.service';
 
 // Mock Belvo
 jest.mock('belvo', () => ({
@@ -107,13 +110,8 @@ describe('BelvoService', () => {
     it('should throw error when Belvo not configured', async () => {
       // Create service without credentials
       configService.get.mockReturnValue(undefined);
-      
-      const testService = new BelvoService(
-        configService,
-        prisma,
-        cryptoService,
-        auditService,
-      );
+
+      const testService = new BelvoService(configService, prisma, cryptoService, auditService);
 
       await expect(
         testService.createLink('space1', 'user1', {
@@ -132,16 +130,18 @@ describe('BelvoService', () => {
         id: 'conn1',
         userId: 'user1',
         user: {
-          userSpaces: [{
-            space: { id: 'space1' }
-          }]
-        }
+          userSpaces: [
+            {
+              space: { id: 'space1' },
+            },
+          ],
+        },
       };
 
       prisma.providerConnection.findFirst.mockResolvedValue(mockConnection as any);
 
       const result = await service.syncTransactions('access-token', 'link-id', '2024-01-01');
-      
+
       expect(result).toHaveProperty('transactionCount');
       expect(result).toHaveProperty('accountCount');
       expect(result).toHaveProperty('nextCursor');
@@ -152,10 +152,12 @@ describe('BelvoService', () => {
         id: 'conn1',
         userId: 'user1',
         user: {
-          userSpaces: [{
-            space: { id: 'space1' }
-          }]
-        }
+          userSpaces: [
+            {
+              space: { id: 'space1' },
+            },
+          ],
+        },
       };
 
       prisma.providerConnection.findFirst.mockResolvedValue(mockConnection as any);
@@ -170,12 +172,7 @@ describe('BelvoService', () => {
 
   describe('mapBelvoAccountType', () => {
     it('should map account types correctly', () => {
-      const service = new BelvoService(
-        configService,
-        prisma,
-        cryptoService,
-        auditService,
-      );
+      const service = new BelvoService(configService, prisma, cryptoService, auditService);
 
       expect((service as any).mapBelvoAccountType('CHECKING_ACCOUNT')).toBe('checking');
       expect((service as any).mapBelvoAccountType('CREDIT_CARD')).toBe('credit');
@@ -186,12 +183,7 @@ describe('BelvoService', () => {
 
   describe('mapCurrency', () => {
     it('should map currencies correctly', () => {
-      const service = new BelvoService(
-        configService,
-        prisma,
-        cryptoService,
-        auditService,
-      );
+      const service = new BelvoService(configService, prisma, cryptoService, auditService);
 
       expect((service as any).mapCurrency('MXN')).toBe('MXN');
       expect((service as any).mapCurrency('USD')).toBe('USD');

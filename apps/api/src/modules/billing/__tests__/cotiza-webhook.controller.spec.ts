@@ -1,10 +1,11 @@
 import * as crypto from 'crypto';
 
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuditService } from '../../../core/audit/audit.service';
+import { PostHogService } from '../../analytics/posthog.service';
 import {
   CotizaWebhookController,
   CotizaWebhookEventType,
@@ -64,6 +65,12 @@ describe('CotizaWebhookController', () => {
           provide: AuditService,
           useValue: {
             log: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: PostHogService,
+          useValue: {
+            capture: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
@@ -129,6 +136,10 @@ describe('CotizaWebhookController', () => {
           {
             provide: AuditService,
             useValue: { log: jest.fn() },
+          },
+          {
+            provide: PostHogService,
+            useValue: { capture: jest.fn().mockResolvedValue(undefined) },
           },
         ],
       }).compile();

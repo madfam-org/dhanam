@@ -3,9 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import request from 'supertest';
 
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { TestHelper } from './helpers/test.helper';
-import { createE2EApp } from './helpers/e2e-app.helper';
+
 import { PreferencesTestData } from './fixtures/preferences.fixtures';
+import { createE2EApp } from './helpers/e2e-app.helper';
+import { TestHelper } from './helpers/test.helper';
 
 // Skipped: Tests expect unimplemented endpoints (/preferences/user, /preferences/space/:id,
 // /preferences/notifications, /preferences/templates, /preferences/export, /preferences/history).
@@ -359,7 +360,7 @@ describe.skip('Preferences Management E2E', () => {
             name: 'Power User',
             description: expect.any(String),
           }),
-        ]),
+        ])
       );
     });
   });

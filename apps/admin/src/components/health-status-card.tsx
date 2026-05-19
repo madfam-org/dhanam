@@ -92,9 +92,7 @@ export function HealthStatusCard({ services, uptime }: HealthStatusCardProps) {
 
       {uptime !== undefined && (
         <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Uptime: {formatUptime(uptime)}
-          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Uptime: {formatUptime(uptime)}</p>
         </div>
       )}
     </Card>

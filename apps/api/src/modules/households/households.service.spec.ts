@@ -1,9 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { HouseholdsService } from './households.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
-import { AuditService } from '../../core/audit/audit.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { AuditService } from '../../core/audit/audit.service';
+import { PrismaService } from '../../core/prisma/prisma.service';
+
 import { CreateHouseholdDto, UpdateHouseholdDto, AddMemberDto, UpdateMemberDto } from './dto';
+import { HouseholdsService } from './households.service';
 
 // Using string literals instead of enums since Prisma client may not be generated
 const HouseholdType = {
@@ -249,9 +251,9 @@ describe('HouseholdsService', () => {
     it('should throw NotFoundException if household not found', async () => {
       mockPrismaService.household.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.update(mockHouseholdId, {}, mockUserId)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(mockHouseholdId, {}, mockUserId)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should update household type', async () => {
@@ -514,17 +516,10 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue(mockUpdatedMember);
 
-      const result = await service.updateMember(
-        mockHouseholdId,
-        mockMemberId,
-        dto,
-        mockUserId
-      );
+      const result = await service.updateMember(mockHouseholdId, mockMemberId, dto, mockUserId);
 
       expect(result).toEqual(mockUpdatedMember);
       expect(mockPrismaService.householdMember.update).toHaveBeenCalledWith({
@@ -565,9 +560,7 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue({
         ...mockHousehold.members[0],
         relationship: RelationshipType.child,
@@ -590,9 +583,7 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue({
         ...mockHousehold.members[0],
         isMinor: true,
@@ -615,9 +606,7 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue({
         ...mockHousehold.members[0],
         accessStartDate: new Date('2024-12-01'),
@@ -640,9 +629,7 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue({
         ...mockHousehold.members[0],
         accessStartDate: null,
@@ -665,9 +652,7 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue({
         ...mockHousehold.members[0],
         notes: 'Special family member',
@@ -690,9 +675,7 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue({
         ...mockHousehold.members[0],
         notes: '',
@@ -766,9 +749,7 @@ describe('HouseholdsService', () => {
       };
 
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.update.mockResolvedValue({
         ...mockHousehold.members[0],
         relationship: RelationshipType.sibling,
@@ -786,13 +767,9 @@ describe('HouseholdsService', () => {
   describe('removeMember', () => {
     it('should remove a member from household', async () => {
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.count.mockResolvedValue(2);
-      mockPrismaService.householdMember.delete.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.delete.mockResolvedValue(mockHousehold.members[0]);
 
       await service.removeMember(mockHouseholdId, mockMemberId, mockUserId);
 
@@ -804,23 +781,21 @@ describe('HouseholdsService', () => {
 
     it('should throw BadRequestException if last member', async () => {
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
-      mockPrismaService.householdMember.findFirst.mockResolvedValue(
-        mockHousehold.members[0]
-      );
+      mockPrismaService.householdMember.findFirst.mockResolvedValue(mockHousehold.members[0]);
       mockPrismaService.householdMember.count.mockResolvedValue(1);
 
-      await expect(
-        service.removeMember(mockHouseholdId, mockMemberId, mockUserId)
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.removeMember(mockHouseholdId, mockMemberId, mockUserId)).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it('should throw NotFoundException if member not found', async () => {
       mockPrismaService.household.findFirst.mockResolvedValue(mockHousehold);
       mockPrismaService.householdMember.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.removeMember(mockHouseholdId, mockMemberId, mockUserId)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.removeMember(mockHouseholdId, mockMemberId, mockUserId)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 

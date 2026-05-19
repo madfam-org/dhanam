@@ -1,22 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuditService } from '@core/audit/audit.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 
+import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { R2StorageService } from '../storage/r2.service';
 
 import { ReportArchiveService } from './report-archive.service';
 import { ReportService } from './report.service';
 import { SavedReportService } from './saved-report.service';
 
-import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
-
 describe('ReportArchiveService', () => {
   let service: ReportArchiveService;
   let prisma: any;
   let reportService: jest.Mocked<
-    Pick<ReportService, 'generatePdfReport' | 'generateCsvExport' | 'generateExcelExport' | 'generateJsonExport'>
+    Pick<
+      ReportService,
+      'generatePdfReport' | 'generateCsvExport' | 'generateExcelExport' | 'generateJsonExport'
+    >
   >;
   let savedReportService: jest.Mocked<Pick<SavedReportService, 'verifyAccess'>>;
   let r2Storage: any;
@@ -270,11 +272,11 @@ describe('ReportArchiveService', () => {
 
       await service.getDownloadUrl('gen-1', 'user-1');
 
-      expect(savedReportService.verifyAccess).toHaveBeenCalledWith(
-        'user-1',
-        'saved-1',
-        ['viewer', 'editor', 'manager']
-      );
+      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'saved-1', [
+        'viewer',
+        'editor',
+        'manager',
+      ]);
     });
   });
 
@@ -304,7 +306,9 @@ describe('ReportArchiveService', () => {
 
       await service.deleteGenerated('gen-1', 'user-1');
 
-      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'saved-1', ['manager']);
+      expect(savedReportService.verifyAccess).toHaveBeenCalledWith('user-1', 'saved-1', [
+        'manager',
+      ]);
     });
   });
 });

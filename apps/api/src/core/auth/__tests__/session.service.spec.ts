@@ -1,5 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { randomBytes, createHash } from 'crypto';
+
+import { Test, TestingModule } from '@nestjs/testing';
 import Redis from 'ioredis';
 
 import { LoggerService } from '@core/logger/logger.service';
@@ -25,10 +26,7 @@ describe('SessionService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        SessionService,
-        { provide: LoggerService, useValue: mockLogger },
-      ],
+      providers: [SessionService, { provide: LoggerService, useValue: mockLogger }],
     }).compile();
 
     service = module.get<SessionService>(SessionService);
@@ -74,7 +72,7 @@ describe('SessionService', () => {
       expect(redis.setex).toHaveBeenCalledWith(
         expect.stringContaining('refresh_token:'),
         30 * 24 * 60 * 60,
-        expect.any(String),
+        expect.any(String)
       );
 
       const sessionData = JSON.parse((redis.setex as jest.Mock).mock.calls[0][2]);
@@ -101,15 +99,9 @@ describe('SessionService', () => {
     it('should track user active sessions', async () => {
       await service.createRefreshToken(mockUserId, mockEmail);
 
-      expect(redis.sadd).toHaveBeenCalledWith(
-        `user_sessions:${mockUserId}`,
-        expect.any(String),
-      );
+      expect(redis.sadd).toHaveBeenCalledWith(`user_sessions:${mockUserId}`, expect.any(String));
 
-      expect(redis.expire).toHaveBeenCalledWith(
-        `user_sessions:${mockUserId}`,
-        30 * 24 * 60 * 60,
-      );
+      expect(redis.expire).toHaveBeenCalledWith(`user_sessions:${mockUserId}`, 30 * 24 * 60 * 60);
     });
   });
 
@@ -197,10 +189,7 @@ describe('SessionService', () => {
 
       await service.revokeRefreshToken(token);
 
-      expect(redis.srem).toHaveBeenCalledWith(
-        `user_sessions:${mockUserId}`,
-        hashedToken,
-      );
+      expect(redis.srem).toHaveBeenCalledWith(`user_sessions:${mockUserId}`, hashedToken);
     });
 
     it('should handle non-existent token gracefully', async () => {
@@ -256,7 +245,7 @@ describe('SessionService', () => {
         expect(redis.setex).toHaveBeenCalledWith(
           expect.stringContaining('password_reset:'),
           60 * 60, // 1 hour in seconds
-          expect.any(String),
+          expect.any(String)
         );
       });
 
@@ -341,7 +330,10 @@ describe('SessionService', () => {
       const module2 = await Test.createTestingModule({
         providers: [
           SessionService,
-          { provide: LoggerService, useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() } },
+          {
+            provide: LoggerService,
+            useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() },
+          },
         ],
       }).compile();
 
@@ -357,7 +349,10 @@ describe('SessionService', () => {
       const module2 = await Test.createTestingModule({
         providers: [
           SessionService,
-          { provide: LoggerService, useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() } },
+          {
+            provide: LoggerService,
+            useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() },
+          },
         ],
       }).compile();
 
@@ -512,9 +507,7 @@ describe('SessionService', () => {
     it('should handle cleanup failure for corrupted token', async () => {
       redis.get = jest.fn().mockResolvedValue('invalid-json');
       // First del succeeds (from cleanup after parse error), but second one is the cleanup inside catch
-      redis.del = jest.fn()
-        .mockRejectedValueOnce(new Error('Redis down'))
-        .mockResolvedValue(1);
+      redis.del = jest.fn().mockRejectedValueOnce(new Error('Redis down')).mockResolvedValue(1);
 
       const result = await service.validatePasswordResetToken('some-token');
 

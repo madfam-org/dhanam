@@ -15,6 +15,7 @@ ArgoCD provides GitOps-based continuous delivery for Dhanam's Kubernetes deploym
 ## Application CRD
 
 `application.yaml` defines the ArgoCD Application resource with:
+
 - **Source**: `infra/k8s/production/` on `main` branch
 - **Destination**: `dhanam` namespace on the local cluster
 - **Sync policy**: Auto-sync with prune and self-heal enabled

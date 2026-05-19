@@ -1,12 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
-import { TransactionExecutionService } from '../transaction-execution.service';
-import { PrismaService } from '../../../core/prisma/prisma.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { AuditService } from '../../../core/audit/audit.service';
 import { MFA_PROVIDER } from '../../../core/auth/providers';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { SpacesService } from '../../spaces/spaces.service';
+import {
+  CreateOrderDto,
+  OrderType,
+  OrderPriority,
+  ExecutionProvider,
+} from '../dto/create-order.dto';
 import { ProviderFactoryService } from '../providers/provider-factory.service';
-import { CreateOrderDto, OrderType, OrderPriority, ExecutionProvider } from '../dto/create-order.dto';
+import { TransactionExecutionService } from '../transaction-execution.service';
 
 describe('TransactionExecutionService', () => {
   let service: TransactionExecutionService;
@@ -174,11 +180,7 @@ describe('TransactionExecutionService', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe(mockOrder.id);
-      expect(spaces.verifyUserAccess).toHaveBeenCalledWith(
-        mockUser.id,
-        mockSpace.id,
-        'member'
-      );
+      expect(spaces.verifyUserAccess).toHaveBeenCalledWith(mockUser.id, mockSpace.id, 'member');
       expect(audit.log).toHaveBeenCalled();
     });
 
@@ -198,9 +200,7 @@ describe('TransactionExecutionService', () => {
       };
 
       (spaces.verifyUserAccess as jest.Mock).mockResolvedValue(undefined);
-      (prisma.idempotencyKey.findUnique as jest.Mock).mockResolvedValue(
-        existingIdempotencyKey
-      );
+      (prisma.idempotencyKey.findUnique as jest.Mock).mockResolvedValue(existingIdempotencyKey);
       (prisma.transactionOrder.findUnique as jest.Mock).mockResolvedValue(mockOrder);
 
       const result = await service.createOrder(
@@ -224,9 +224,7 @@ describe('TransactionExecutionService', () => {
       };
 
       (spaces.verifyUserAccess as jest.Mock).mockResolvedValue(undefined);
-      (prisma.idempotencyKey.findUnique as jest.Mock).mockResolvedValue(
-        existingIdempotencyKey
-      );
+      (prisma.idempotencyKey.findUnique as jest.Mock).mockResolvedValue(existingIdempotencyKey);
 
       await expect(
         service.createOrder(
@@ -413,9 +411,9 @@ describe('TransactionExecutionService', () => {
 
       (prisma.transactionOrder.findFirst as jest.Mock).mockResolvedValue(completedOrder);
 
-      await expect(
-        service.executeOrder(mockOrder.id, mockUser.id)
-      ).rejects.toThrow('Order cannot be executed in status: completed');
+      await expect(service.executeOrder(mockOrder.id, mockUser.id)).rejects.toThrow(
+        'Order cannot be executed in status: completed'
+      );
     });
 
     it('should throw BadRequestException for expired order', async () => {
@@ -431,9 +429,9 @@ describe('TransactionExecutionService', () => {
         status: 'rejected',
       });
 
-      await expect(
-        service.executeOrder(mockOrder.id, mockUser.id)
-      ).rejects.toThrow('Order has expired');
+      await expect(service.executeOrder(mockOrder.id, mockUser.id)).rejects.toThrow(
+        'Order has expired'
+      );
     });
   });
 
@@ -467,9 +465,9 @@ describe('TransactionExecutionService', () => {
 
       (prisma.transactionOrder.findFirst as jest.Mock).mockResolvedValue(executingOrder);
 
-      await expect(
-        service.cancelOrder(mockOrder.id, mockUser.id)
-      ).rejects.toThrow('Cannot cancel order in status: executing');
+      await expect(service.cancelOrder(mockOrder.id, mockUser.id)).rejects.toThrow(
+        'Cannot cancel order in status: executing'
+      );
     });
   });
 
@@ -533,9 +531,9 @@ describe('TransactionExecutionService', () => {
     it('should throw NotFoundException for non-existent order', async () => {
       (prisma.transactionOrder.findFirst as jest.Mock).mockResolvedValue(null);
 
-      await expect(
-        service.findOne('non-existent-id', mockUser.id)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('non-existent-id', mockUser.id)).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 

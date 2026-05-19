@@ -89,10 +89,7 @@ const config = [
       ...importPlugin.configs.typescript.rules,
 
       // File size discipline — hard limit at 800 lines
-      'max-lines': [
-        'error',
-        { max: 800, skipBlankLines: true, skipComments: true },
-      ],
+      'max-lines': ['error', { max: 800, skipBlankLines: true, skipComments: true }],
 
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-unused-vars': 'off',
@@ -107,6 +104,8 @@ const config = [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-non-null-assertion': 'warn',
+      'no-redeclare': 'off',
+      'no-undef': 'off',
 
       'import/order': [
         'error',

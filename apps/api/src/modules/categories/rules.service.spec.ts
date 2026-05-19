@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RulesService } from './rules.service';
-import { PrismaService } from '@core/prisma/prisma.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
-import { Transaction, Category } from '@db';
-import { Decimal } from '@db';
+
+import { PrismaService } from '@core/prisma/prisma.service';
+import { Transaction, Category, Decimal } from '@db';
+
+import { RulesService } from './rules.service';
 
 describe('RulesService', () => {
   let service: RulesService;
@@ -13,7 +14,7 @@ describe('RulesService', () => {
     id: 'tx1',
     accountId: 'acc1',
     providerTransactionId: 'provider-tx1',
-    amount: new Decimal(-50.00),
+    amount: new Decimal(-50.0),
     currency: 'USD',
     description: 'Starbucks Coffee',
     merchant: 'Starbucks',
@@ -151,7 +152,7 @@ describe('RulesService', () => {
 
       const expensiveTransaction = {
         ...mockTransaction,
-        amount: new Decimal(-150.00),
+        amount: new Decimal(-150.0),
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -222,10 +223,12 @@ describe('RulesService', () => {
 
     it('should skip patterns with no matching category (line 330 branch)', async () => {
       // Return categories that don't match any common pattern
-      const nonMatchingCategories = [{
-        ...mockCategories[0],
-        name: 'Uncategorized',
-      }];
+      const nonMatchingCategories = [
+        {
+          ...mockCategories[0],
+          name: 'Uncategorized',
+        },
+      ];
       prisma.category.findMany.mockResolvedValue(nonMatchingCategories);
 
       const result = await service.createCommonRules('space1');
@@ -289,11 +292,13 @@ describe('RulesService', () => {
     it('should return false for unknown field type (line 219-220)', async () => {
       const ruleWithUnknownField = {
         ...mockRules[0],
-        conditions: [{
-          field: 'unknownField', // Invalid field
-          operator: 'contains',
-          value: 'test',
-        }],
+        conditions: [
+          {
+            field: 'unknownField', // Invalid field
+            operator: 'contains',
+            value: 'test',
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -307,11 +312,13 @@ describe('RulesService', () => {
     it('should return false for unknown string operator (line 252-253)', async () => {
       const ruleWithUnknownOperator = {
         ...mockRules[0],
-        conditions: [{
-          field: 'merchant',
-          operator: 'unknownOperator', // Invalid operator
-          value: 'test',
-        }],
+        conditions: [
+          {
+            field: 'merchant',
+            operator: 'unknownOperator', // Invalid operator
+            value: 'test',
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -325,11 +332,13 @@ describe('RulesService', () => {
     it('should return false for unknown numeric operator (line 269-270)', async () => {
       const ruleWithUnknownNumericOperator = {
         ...mockRules[0],
-        conditions: [{
-          field: 'amount',
-          operator: 'unknownNumericOp', // Invalid operator
-          value: 100,
-        }],
+        conditions: [
+          {
+            field: 'amount',
+            operator: 'unknownNumericOp', // Invalid operator
+            value: 100,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -343,12 +352,14 @@ describe('RulesService', () => {
     it('should handle between operator with valueEnd (line 266-268)', async () => {
       const betweenRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'amount',
-          operator: 'between',
-          value: 40,
-          valueEnd: 60,
-        }],
+        conditions: [
+          {
+            field: 'amount',
+            operator: 'between',
+            value: 40,
+            valueEnd: 60,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -362,12 +373,14 @@ describe('RulesService', () => {
     it('should return false for between operator without valueEnd (line 266-268 else branch)', async () => {
       const betweenRuleNoEnd = {
         ...mockRules[0],
-        conditions: [{
-          field: 'amount',
-          operator: 'between',
-          value: 40,
-          // valueEnd is undefined
-        }],
+        conditions: [
+          {
+            field: 'amount',
+            operator: 'between',
+            value: 40,
+            // valueEnd is undefined
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -381,12 +394,14 @@ describe('RulesService', () => {
     it('should handle description field', async () => {
       const descriptionRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'description',
-          operator: 'contains',
-          value: 'coffee',
-          caseInsensitive: true,
-        }],
+        conditions: [
+          {
+            field: 'description',
+            operator: 'contains',
+            value: 'coffee',
+            caseInsensitive: true,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -400,11 +415,13 @@ describe('RulesService', () => {
     it('should handle account field', async () => {
       const accountRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'account',
-          operator: 'equals',
-          value: 'acc1',
-        }],
+        conditions: [
+          {
+            field: 'account',
+            operator: 'equals',
+            value: 'acc1',
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -418,12 +435,14 @@ describe('RulesService', () => {
     it('should handle startsWith operator', async () => {
       const startsWithRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'merchant',
-          operator: 'startsWith',
-          value: 'star',
-          caseInsensitive: true,
-        }],
+        conditions: [
+          {
+            field: 'merchant',
+            operator: 'startsWith',
+            value: 'star',
+            caseInsensitive: true,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -437,12 +456,14 @@ describe('RulesService', () => {
     it('should handle endsWith operator', async () => {
       const endsWithRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'merchant',
-          operator: 'endsWith',
-          value: 'bucks',
-          caseInsensitive: true,
-        }],
+        conditions: [
+          {
+            field: 'merchant',
+            operator: 'endsWith',
+            value: 'bucks',
+            caseInsensitive: true,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -456,12 +477,14 @@ describe('RulesService', () => {
     it('should handle equals operator for strings', async () => {
       const equalsRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'merchant',
-          operator: 'equals',
-          value: 'starbucks',
-          caseInsensitive: true,
-        }],
+        conditions: [
+          {
+            field: 'merchant',
+            operator: 'equals',
+            value: 'starbucks',
+            caseInsensitive: true,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -475,11 +498,13 @@ describe('RulesService', () => {
     it('should handle lessThan operator for amounts', async () => {
       const lessThanRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'amount',
-          operator: 'lessThan',
-          value: 100,
-        }],
+        conditions: [
+          {
+            field: 'amount',
+            operator: 'lessThan',
+            value: 100,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -493,11 +518,13 @@ describe('RulesService', () => {
     it('should handle equals operator for amounts', async () => {
       const equalsAmountRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'amount',
-          operator: 'equals',
-          value: 50,
-        }],
+        conditions: [
+          {
+            field: 'amount',
+            operator: 'equals',
+            value: 50,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -511,12 +538,14 @@ describe('RulesService', () => {
     it('should handle case-sensitive matching', async () => {
       const caseSensitiveRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'merchant',
-          operator: 'contains',
-          value: 'STARBUCKS', // Wrong case
-          caseInsensitive: false,
-        }],
+        conditions: [
+          {
+            field: 'merchant',
+            operator: 'contains',
+            value: 'STARBUCKS', // Wrong case
+            caseInsensitive: false,
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -534,11 +563,13 @@ describe('RulesService', () => {
       };
       const descRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'description',
-          operator: 'contains',
-          value: 'test',
-        }],
+        conditions: [
+          {
+            field: 'description',
+            operator: 'contains',
+            value: 'test',
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);
@@ -556,11 +587,13 @@ describe('RulesService', () => {
       };
       const merchantRule = {
         ...mockRules[0],
-        conditions: [{
-          field: 'merchant',
-          operator: 'contains',
-          value: 'test',
-        }],
+        conditions: [
+          {
+            field: 'merchant',
+            operator: 'contains',
+            value: 'test',
+          },
+        ],
       };
 
       prisma.account.findUnique.mockResolvedValue(mockAccount as any);

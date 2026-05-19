@@ -8,37 +8,37 @@ The Transactions module handles all financial transaction operations including m
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
+| Entity      | Description                                                     |
+| ----------- | --------------------------------------------------------------- |
 | Transaction | Financial transaction with amount, date, merchant, and metadata |
-| Account | Parent account holding the transaction |
-| Category | Optional budget category for expense tracking |
+| Account     | Parent account holding the transaction                          |
+| Category    | Optional budget category for expense tracking                   |
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/spaces/:spaceId/transactions` | GET | List transactions with filtering and pagination |
-| `/spaces/:spaceId/transactions/:id` | GET | Get transaction details |
-| `/spaces/:spaceId/transactions` | POST | Create manual transaction |
-| `/spaces/:spaceId/transactions/:id` | PATCH | Update transaction |
-| `/spaces/:spaceId/transactions/:id` | DELETE | Delete transaction |
-| `/spaces/:spaceId/transactions/bulk-categorize` | POST | Bulk categorize multiple transactions |
+| Endpoint                                        | Method | Description                                     |
+| ----------------------------------------------- | ------ | ----------------------------------------------- |
+| `/spaces/:spaceId/transactions`                 | GET    | List transactions with filtering and pagination |
+| `/spaces/:spaceId/transactions/:id`             | GET    | Get transaction details                         |
+| `/spaces/:spaceId/transactions`                 | POST   | Create manual transaction                       |
+| `/spaces/:spaceId/transactions/:id`             | PATCH  | Update transaction                              |
+| `/spaces/:spaceId/transactions/:id`             | DELETE | Delete transaction                              |
+| `/spaces/:spaceId/transactions/bulk-categorize` | POST   | Bulk categorize multiple transactions           |
 
 ## Filter Options
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `accountId` | UUID | Filter by specific account |
-| `categoryId` | UUID | Filter by category |
-| `startDate` | Date | Transactions on or after date |
-| `endDate` | Date | Transactions on or before date |
-| `minAmount` | number | Minimum transaction amount |
-| `maxAmount` | number | Maximum transaction amount |
-| `sortBy` | enum | Sort field: `amount`, `date`, `createdAt` |
-| `sortOrder` | enum | Sort direction: `asc`, `desc` |
-| `page` | number | Page number (default: 1) |
-| `limit` | number | Items per page (default: 20, max: 100) |
+| Parameter    | Type   | Description                               |
+| ------------ | ------ | ----------------------------------------- |
+| `accountId`  | UUID   | Filter by specific account                |
+| `categoryId` | UUID   | Filter by category                        |
+| `startDate`  | Date   | Transactions on or after date             |
+| `endDate`    | Date   | Transactions on or before date            |
+| `minAmount`  | number | Minimum transaction amount                |
+| `maxAmount`  | number | Maximum transaction amount                |
+| `sortBy`     | enum   | Sort field: `amount`, `date`, `createdAt` |
+| `sortOrder`  | enum   | Sort direction: `asc`, `desc`             |
+| `page`       | number | Page number (default: 1)                  |
+| `limit`      | number | Items per page (default: 20, max: 100)    |
 
 ## Service Architecture
 
@@ -55,6 +55,7 @@ TransactionsService
 ## Data Flow
 
 **Transaction Creation:**
+
 1. User submits transaction details (account, amount, date, description)
 2. Service verifies account belongs to space
 3. If categoryId provided, verify category belongs to space
@@ -63,17 +64,20 @@ TransactionsService
 6. Negative amounts represent outflows (expenses)
 
 **Transaction Update:**
+
 1. Service retrieves existing transaction
 2. If categoryId changed, verify new category belongs to space
 3. If amount changed, calculate difference and adjust account balance
 4. Transaction updated with new values
 
 **Transaction Deletion:**
+
 1. Service retrieves transaction
 2. Account balance decremented by transaction amount
 3. Transaction deleted from database
 
 **Bulk Categorization:**
+
 1. User provides list of transaction IDs and target category
 2. Service verifies all transactions belong to space
 3. Service verifies category belongs to space
@@ -82,6 +86,7 @@ TransactionsService
 ## Response Format
 
 **List Response:**
+
 ```json
 {
   "data": [Transaction],
@@ -92,6 +97,7 @@ TransactionsService
 ```
 
 **Transaction Object:**
+
 ```json
 {
   "id": "uuid",
@@ -110,21 +116,21 @@ TransactionsService
 
 ## Error Handling
 
-| Error | HTTP Status | Description |
-|-------|-------------|-------------|
-| Transaction not found | 404 | Transaction does not exist in space |
-| Account not found | 403 | Account not found or not in space |
-| Category not found | 403 | Category not found or not in space |
-| Partial transaction match | 403 | Some bulk transactions not in space |
+| Error                     | HTTP Status | Description                         |
+| ------------------------- | ----------- | ----------------------------------- |
+| Transaction not found     | 404         | Transaction does not exist in space |
+| Account not found         | 403         | Account not found or not in space   |
+| Category not found        | 403         | Category not found or not in space  |
+| Partial transaction match | 403         | Some bulk transactions not in space |
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| Accounts | Transactions belong to accounts |
-| Categories | Transactions optionally linked to categories |
-| Budgets | Category spending tracked within budget periods |
-| Spaces | Transactions scoped via account to spaces |
+| Module     | Relationship                                    |
+| ---------- | ----------------------------------------------- |
+| Accounts   | Transactions belong to accounts                 |
+| Categories | Transactions optionally linked to categories    |
+| Budgets    | Category spending tracked within budget periods |
+| Spaces     | Transactions scoped via account to spaces       |
 
 ## Testing
 
@@ -137,5 +143,6 @@ pnpm test:cov -- transactions
 ```
 
 ---
+
 **Module**: `transactions`
 **Last Updated**: January 2025

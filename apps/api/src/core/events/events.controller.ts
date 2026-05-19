@@ -1,7 +1,8 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
-import { AuthenticatedRequest } from '@core/types/authenticated-request';
 import { Controller, Logger, Req, Sse, UseGuards } from '@nestjs/common';
 import { Observable } from 'rxjs';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
+import { AuthenticatedRequest } from '@core/types/authenticated-request';
 
 import { EventsService, SseMessage } from './events.service';
 

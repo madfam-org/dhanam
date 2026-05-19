@@ -11,12 +11,12 @@ This runbook covers every step required to take Dhanam from development to produ
 
 **Production URLs:**
 
-| Surface      | URL                        |
-| ------------ | -------------------------- |
-| Web app      | `https://app.dhan.am`      |
-| API          | `https://api.dhan.am`      |
-| Admin        | `https://admin.dhanam.com` |
-| Auth (Janua) | `https://auth.madfam.io`   |
+| Surface      | URL                      |
+| ------------ | ------------------------ |
+| Web app      | `https://app.dhan.am`    |
+| API          | `https://api.dhan.am`    |
+| Admin        | `https://admin.dhan.am`  |
+| Auth (Janua) | `https://auth.madfam.io` |
 
 **Deployment:** Push to `main` triggers Enclii auto-deploy to bare-metal Kubernetes.
 
@@ -304,7 +304,7 @@ Mexico's Ley para Regular las Instituciones de Tecnologia Financiera (Ley Fintec
 - [ ] Provide redirect URIs:
   ```
   https://app.dhan.am/api/auth/callback/janua
-  https://admin.dhanam.com/api/auth/callback/janua
+  https://admin.dhan.am/api/auth/callback/janua
   ```
 - [ ] Receive `OIDC_CLIENT_ID` and `OIDC_CLIENT_SECRET`.
 - [ ] Request API keys: `JANUA_API_KEY` (user operations), `JANUA_ADMIN_KEY` (admin operations).
@@ -633,7 +633,7 @@ Configure the following CNAME records in Cloudflare, all proxied (orange cloud):
 | CNAME | `www`      | `dhan.am`                                | Proxied |
 | CNAME | `@` (apex) | Enclii tunnel endpoint                   | Proxied |
 
-**Note:** `admin.dhanam.com` is on a separate domain. Configure its CNAME in the `dhanam.com` Cloudflare zone.
+**Note:** `admin.dhan.am` is served from the canonical `dhan.am` Cloudflare zone.
 
 **Email DNS records** (in the `dhan.am` zone):
 

@@ -1,14 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuditService } from '@core/audit/audit.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 
+import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 import { SpacesService } from '../spaces/spaces.service';
 
 import { SavedReportService } from './saved-report.service';
-
-import { createAuditMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 describe('SavedReportService', () => {
   let service: SavedReportService;
@@ -161,7 +160,10 @@ describe('SavedReportService', () => {
       };
       prisma.savedReport.findUnique
         .mockResolvedValueOnce(reportWithIncludes) // findOne call
-        .mockResolvedValueOnce({ ...reportWithIncludes, space: { userSpaces: [{ userId: 'user-1' }] } }); // verifyAccess call
+        .mockResolvedValueOnce({
+          ...reportWithIncludes,
+          space: { userSpaces: [{ userId: 'user-1' }] },
+        }); // verifyAccess call
 
       const result = await service.findOne('user-1', 'report-1');
 
@@ -250,9 +252,9 @@ describe('SavedReportService', () => {
       });
       prisma.reportShare.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.update('user-3', 'report-1', { name: 'Nope' } as any)
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.update('user-3', 'report-1', { name: 'Nope' } as any)).rejects.toThrow(
+        ForbiddenException
+      );
     });
   });
 
@@ -295,9 +297,7 @@ describe('SavedReportService', () => {
         space: { userSpaces: [{ userId: 'user-1' }] },
       });
 
-      await expect(
-        service.verifyAccess('user-1', 'report-1', ['viewer'])
-      ).resolves.toBeUndefined();
+      await expect(service.verifyAccess('user-1', 'report-1', ['viewer'])).resolves.toBeUndefined();
     });
 
     it('should allow access for shared user with accepted status', async () => {
@@ -315,9 +315,9 @@ describe('SavedReportService', () => {
     it('should throw NotFoundException for non-existent report', async () => {
       prisma.savedReport.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.verifyAccess('user-1', 'nonexistent', ['viewer'])
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.verifyAccess('user-1', 'nonexistent', ['viewer'])).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw ForbiddenException when no space membership and no share', async () => {
@@ -327,9 +327,9 @@ describe('SavedReportService', () => {
       });
       prisma.reportShare.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.verifyAccess('user-3', 'report-1', ['viewer'])
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.verifyAccess('user-3', 'report-1', ['viewer'])).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should throw ForbiddenException when share role insufficient', async () => {
@@ -339,9 +339,9 @@ describe('SavedReportService', () => {
       });
       prisma.reportShare.findFirst.mockResolvedValue({ role: 'viewer' });
 
-      await expect(
-        service.verifyAccess('user-2', 'report-1', ['manager'])
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.verifyAccess('user-2', 'report-1', ['manager'])).rejects.toThrow(
+        ForbiddenException
+      );
     });
   });
 });

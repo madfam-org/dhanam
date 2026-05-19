@@ -14,23 +14,23 @@ The Simulations module exposes financial simulation capabilities as REST endpoin
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| `SimulationsService` | Core service wrapping simulation engines |
-| `SimulationsController` | REST endpoint handlers |
-| `Simulation` | Database record of simulation runs |
+| Entity                  | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `SimulationsService`    | Core service wrapping simulation engines |
+| `SimulationsController` | REST endpoint handlers                   |
+| `Simulation`            | Database record of simulation runs       |
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/simulations/monte-carlo` | POST | Run Monte Carlo simulation |
-| `/simulations/retirement` | POST | Run retirement simulation |
-| `/simulations/safe-withdrawal-rate` | POST | Calculate safe withdrawal rate |
-| `/simulations/scenario-analysis` | POST | Run scenario stress test |
-| `/simulations/:id` | GET | Get simulation result by ID |
-| `/simulations` | GET | List user's simulations |
-| `/simulations/:id` | DELETE | Delete simulation |
+| Endpoint                            | Method | Description                    |
+| ----------------------------------- | ------ | ------------------------------ |
+| `/simulations/monte-carlo`          | POST   | Run Monte Carlo simulation     |
+| `/simulations/retirement`           | POST   | Run retirement simulation      |
+| `/simulations/safe-withdrawal-rate` | POST   | Calculate safe withdrawal rate |
+| `/simulations/scenario-analysis`    | POST   | Run scenario stress test       |
+| `/simulations/:id`                  | GET    | Get simulation result by ID    |
+| `/simulations`                      | GET    | List user's simulations        |
+| `/simulations/:id`                  | DELETE | Delete simulation              |
 
 ## Service Architecture
 
@@ -90,6 +90,7 @@ The Simulations module exposes financial simulation capabilities as REST endpoin
 ### Monte Carlo Simulation
 
 **Input:**
+
 ```typescript
 interface RunSimulationDto {
   spaceId?: string;
@@ -98,15 +99,16 @@ interface RunSimulationDto {
   initialBalance: number;
   monthlyContribution: number;
   years: number;
-  iterations?: number;          // Default: 10,000
-  expectedReturn: number;       // e.g., 0.07 for 7%
-  returnVolatility: number;     // e.g., 0.15 for 15%
+  iterations?: number; // Default: 10,000
+  expectedReturn: number; // e.g., 0.07 for 7%
+  returnVolatility: number; // e.g., 0.15 for 15%
   inflationRate?: number;
   inflationAdjustedContributions?: boolean;
 }
 ```
 
 **Output:**
+
 ```typescript
 interface SimulationResult {
   simulationId: string;
@@ -133,6 +135,7 @@ interface SimulationResult {
 ### Retirement Simulation
 
 **Input:**
+
 ```typescript
 interface RunRetirementSimulationDto {
   currentAge: number;
@@ -152,11 +155,12 @@ interface RunRetirementSimulationDto {
 ### Safe Withdrawal Rate
 
 **Input:**
+
 ```typescript
 interface CalculateSafeWithdrawalRateDto {
   portfolioValue: number;
   yearsInRetirement: number;
-  successProbability: number;   // e.g., 0.95 for 95%
+  successProbability: number; // e.g., 0.95 for 95%
   expectedReturn: number;
   returnVolatility: number;
   inflationRate?: number;
@@ -164,9 +168,10 @@ interface CalculateSafeWithdrawalRateDto {
 ```
 
 **Output:**
+
 ```typescript
 interface SafeWithdrawalResult {
-  safeWithdrawalRate: number;       // e.g., 0.04 for 4%
+  safeWithdrawalRate: number; // e.g., 0.04 for 4%
   annualWithdrawalAmount: number;
   monthlyWithdrawalAmount: number;
   successProbability: number;
@@ -191,27 +196,27 @@ interface SafeWithdrawalResult {
 
 Simulations are subject to tier-based usage limits:
 
-| Tier | Monte Carlo | Scenario Analysis |
-|------|-------------|-------------------|
-| Free | 3/day | 1/day |
-| Premium | Unlimited | Unlimited |
+| Tier    | Monte Carlo | Scenario Analysis |
+| ------- | ----------- | ----------------- |
+| Free    | 3/day       | 1/day             |
+| Premium | Unlimited   | Unlimited         |
 
 Usage is tracked via `BillingService.recordUsage()`.
 
 ## Error Handling
 
-| Error | HTTP Status | Description |
-|-------|-------------|-------------|
-| Simulation not found | 404 | Invalid simulation ID |
-| Access denied | 404 | User doesn't own simulation |
-| Usage limit exceeded | 403 | Free tier limit reached |
-| Invalid parameters | 400 | Validation failure |
+| Error                | HTTP Status | Description                 |
+| -------------------- | ----------- | --------------------------- |
+| Simulation not found | 404         | Invalid simulation ID       |
+| Access denied        | 404         | User doesn't own simulation |
+| Usage limit exceeded | 403         | Free tier limit reached     |
+| Invalid parameters   | 400         | Validation failure          |
 
 ## Configuration
 
 ```typescript
 // Default iterations
-DEFAULT_ITERATIONS = 10000
+DEFAULT_ITERATIONS = 10000;
 
 // Performance guidelines
 // 10,000 iterations: ~50-100ms
@@ -221,12 +226,12 @@ DEFAULT_ITERATIONS = 10000
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| [`@dhanam/simulations`](../../../../../packages/simulations/README.md) | Core simulation engines |
-| [`billing`](../billing/README.md) | Usage tracking and limits |
-| [`goals`](../goals/README.md) | Links simulations to financial goals |
-| [`analytics`](../analytics/README.md) | Uses simulation data for forecasts |
+| Module                                                                 | Relationship                         |
+| ---------------------------------------------------------------------- | ------------------------------------ |
+| [`@dhanam/simulations`](../../../../../packages/simulations/README.md) | Core simulation engines              |
+| [`billing`](../billing/README.md)                                      | Usage tracking and limits            |
+| [`goals`](../goals/README.md)                                          | Links simulations to financial goals |
+| [`analytics`](../analytics/README.md)                                  | Uses simulation data for forecasts   |
 
 ## Testing
 

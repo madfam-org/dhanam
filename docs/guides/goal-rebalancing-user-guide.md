@@ -35,6 +35,7 @@ Dhanam's autonomous rebalancing system automatically maintains your target asset
 4. Repeat until 100% allocated
 
 **Example:**
+
 ```
 Goal: Retirement Fund ($100,000)
 Allocations:
@@ -46,6 +47,7 @@ Allocations:
 ### Step 3: Review Rebalancing Settings
 
 The system will:
+
 - ✅ Check allocations daily at 2 AM
 - ✅ Generate rebalancing actions if drift > 5%
 - ✅ Create high-priority orders automatically
@@ -58,6 +60,7 @@ The system will:
 **Drift** = How far current allocation is from target
 
 **Example:**
+
 ```
 Target: 60% Stocks ($60,000)
 Current: 55% Stocks ($55,000)
@@ -120,12 +123,14 @@ View pending rebalancing recommendations:
 ### 2. Choose Appropriate Drift Threshold
 
 Default: 5%
+
 - **Lower (2-3%)** - More frequent rebalancing, higher fees
 - **Higher (7-10%)** - Less frequent, larger adjustments
 
 ### 3. Monitor Execution Costs
 
 Track fees from rebalancing:
+
 - Provider fees
 - Slippage
 - Tax implications (if applicable)
@@ -133,6 +138,7 @@ Track fees from rebalancing:
 ### 4. Review Progress Regularly
 
 Check monthly:
+
 - Goal progress percentage
 - On-track status
 - Required monthly contribution
@@ -155,6 +161,7 @@ Check monthly:
 ### Allocation Breakdown
 
 For each account:
+
 - Current value
 - Target value
 - Drift percentage
@@ -175,6 +182,7 @@ For each account:
 ### Q: What if I don't have enough cash?
 
 **A:** System will:
+
 1. Sell over-allocated assets first
 2. Use proceeds to buy under-allocated assets
 3. Skip rebalancing if insufficient balance

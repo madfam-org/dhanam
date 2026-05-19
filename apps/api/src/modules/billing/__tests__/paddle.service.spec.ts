@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
-import { of, throwError } from 'rxjs';
 import * as crypto from 'crypto';
+
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+import { of, throwError } from 'rxjs';
 
 import { PaddleService } from '../services/paddle.service';
 
@@ -223,13 +224,11 @@ describe('PaddleService', () => {
     });
 
     it('should handle API errors', async () => {
-      httpService.post.mockReturnValue(
-        throwError(() => new Error('API Error')) as any
-      );
+      httpService.post.mockReturnValue(throwError(() => new Error('API Error')) as any);
 
-      await expect(
-        service.createCustomer({ email: 'test@example.com' })
-      ).rejects.toThrow('API Error');
+      await expect(service.createCustomer({ email: 'test@example.com' })).rejects.toThrow(
+        'API Error'
+      );
     });
 
     it('should use correct locale for different countries', async () => {
@@ -502,9 +501,7 @@ describe('PaddleService', () => {
     });
 
     it('should handle API errors', async () => {
-      httpService.post.mockReturnValue(
-        throwError(() => new Error('Cancellation failed')) as any
-      );
+      httpService.post.mockReturnValue(throwError(() => new Error('Cancellation failed')) as any);
 
       await expect(service.cancelSubscription('sub_123', false)).rejects.toThrow(
         'Cancellation failed'

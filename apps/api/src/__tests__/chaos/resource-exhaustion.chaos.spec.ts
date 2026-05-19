@@ -1,9 +1,6 @@
-import {
-  withTimeout,
-  withParallelTimeouts,
-  TimeoutError,
-} from '../../core/utils/timeout.util';
 import { withBatchRetry } from '../../core/utils/retry.util';
+import { withTimeout, withParallelTimeouts, TimeoutError } from '../../core/utils/timeout.util';
+
 import { createSlowOperation } from './helpers/chaos-utils';
 
 describe('Resource Exhaustion Chaos Tests', () => {
@@ -60,10 +57,10 @@ describe('Resource Exhaustion Chaos Tests', () => {
     it('clears timeout timer on successful completion', async () => {
       // This tests that timeouts don't leak. If they leaked,
       // the test would hang or show a warning about open handles.
-      const result = await withTimeout(
-        () => Promise.resolve('done'),
-        { timeoutMs: 10000, operationName: 'cleanup_test' }
-      );
+      const result = await withTimeout(() => Promise.resolve('done'), {
+        timeoutMs: 10000,
+        operationName: 'cleanup_test',
+      });
       expect(result).toBe('done');
     });
   });

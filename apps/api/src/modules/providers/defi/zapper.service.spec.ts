@@ -1,8 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { ZapperService } from './zapper.service';
-import { RedisService } from '../../../core/redis/redis.service';
 import {
   createRedisMock,
   createConfigMock,
@@ -11,8 +9,10 @@ import {
   createFetchErrorResponse,
 } from '../../../../test/helpers/api-mock-factory';
 import { TimeTestHelper } from '../../../../test/helpers/time-testing';
+import { RedisService } from '../../../core/redis/redis.service';
 
 import type { DeFiNetwork, DeFiPortfolio } from './defi-position.interface';
+import { ZapperService } from './zapper.service';
 
 describe('ZapperService', () => {
   let service: ZapperService;
@@ -242,9 +242,7 @@ describe('ZapperService', () => {
       await serviceWithKey.getPortfolio(testAddress);
 
       // Second request should throw
-      await expect(
-        serviceWithKey.getPortfolio('0xabcdef')
-      ).rejects.toThrow('Rate limit exceeded');
+      await expect(serviceWithKey.getPortfolio('0xabcdef')).rejects.toThrow('Rate limit exceeded');
     });
 
     it('should reset rate limit counter after one minute', async () => {
@@ -284,9 +282,9 @@ describe('ZapperService', () => {
     it('should throw error on API failure', async () => {
       configMock = createConfigMock({ ZAPPER_API_KEY: 'test-api-key' });
 
-      global.fetch = jest.fn().mockResolvedValue(
-        createFetchErrorResponse(500, 'Internal Server Error')
-      );
+      global.fetch = jest
+        .fn()
+        .mockResolvedValue(createFetchErrorResponse(500, 'Internal Server Error'));
 
       const module = await Test.createTestingModule({
         providers: [
@@ -624,13 +622,10 @@ describe('ZapperService', () => {
       ['Random Label', 'random', 'liquidity-pool'],
     ];
 
-    it.each(testCases)(
-      'should infer %s with appId %s as %s',
-      (label, appId, expectedType) => {
-        const result = (service as any).inferPositionType(label, appId);
-        expect(result).toBe(expectedType);
-      }
-    );
+    it.each(testCases)('should infer %s with appId %s as %s', (label, appId, expectedType) => {
+      const result = (service as any).inferPositionType(label, appId);
+      expect(result).toBe(expectedType);
+    });
 
     it('should detect Lido staking by appId', () => {
       const result = (service as any).inferPositionType('ETH Position', 'lido-staking');
@@ -732,7 +727,16 @@ describe('ZapperService', () => {
           products: [
             {
               label: 'Lending',
-              assets: [{ symbol: 'ETH', address: '0x', decimals: 18, supply: 1, price: 3000, balanceUSD: 3000 }],
+              assets: [
+                {
+                  symbol: 'ETH',
+                  address: '0x',
+                  decimals: 18,
+                  supply: 1,
+                  price: 3000,
+                  balanceUSD: 3000,
+                },
+              ],
               meta: [{ label: 'Health Factor', value: 1.85, type: 'number' }],
             },
           ],
@@ -788,9 +792,9 @@ describe('ZapperService', () => {
     it('should handle cache write errors gracefully', async () => {
       configMock = createConfigMock({ ZAPPER_API_KEY: 'test-api-key' });
 
-      global.fetch = jest.fn().mockResolvedValue(
-        createFetchResponse({ [testAddress.toLowerCase()]: [] })
-      );
+      global.fetch = jest
+        .fn()
+        .mockResolvedValue(createFetchResponse({ [testAddress.toLowerCase()]: [] }));
       redisMock.set.mockRejectedValue(new Error('Redis write failed'));
 
       const module = await Test.createTestingModule({
@@ -828,18 +832,14 @@ describe('ZapperService', () => {
 
     it('should include Aave lending position for some addresses', async () => {
       // Address hash % 3 === 1 gets Aave position
-      const result = await service.getPortfolio(
-        '0x1234567890abcdef1234567890abcdef12345678'
-      );
+      const result = await service.getPortfolio('0x1234567890abcdef1234567890abcdef12345678');
       // Check if any position exists - mock data is deterministic
       expect(result.positions).toBeDefined();
     });
 
     it('should include Lido staking position for some addresses', async () => {
       // Address hash % 4 === 2 gets Lido position
-      const result = await service.getPortfolio(
-        '0x2222222222222222222222222222222222222222'
-      );
+      const result = await service.getPortfolio('0x2222222222222222222222222222222222222222');
       expect(result.positions).toBeDefined();
     });
 

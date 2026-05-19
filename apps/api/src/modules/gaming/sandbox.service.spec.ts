@@ -1,15 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-
-import { RedisService } from '../../core/redis/redis.service';
-
-import { SandboxService } from './sandbox.service';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import {
   createRedisMock,
   createConfigMock,
   createLoggerMock,
 } from '../../../test/helpers/api-mock-factory';
+import { RedisService } from '../../core/redis/redis.service';
+
+import { SandboxService } from './sandbox.service';
 
 describe('SandboxService', () => {
   let service: SandboxService;
@@ -18,7 +17,7 @@ describe('SandboxService', () => {
 
   beforeEach(async () => {
     redisMock = createRedisMock();
-    configMock = createConfigMock();
+    configMock = createConfigMock({ FEATURE_SANDBOX_MOCK_DATA: 'true' });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -74,11 +73,7 @@ describe('SandboxService', () => {
 
       await service.getLandFloorPrice();
 
-      expect(redisMock.set).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.any(String),
-        900
-      );
+      expect(redisMock.set).toHaveBeenCalledWith(expect.any(String), expect.any(String), 900);
     });
   });
 
@@ -158,6 +153,18 @@ describe('SandboxService', () => {
         expect.any(String),
         900
       );
+    });
+
+    it('should return empty positions when mock data is disabled', async () => {
+      configMock.get.mockImplementation((key: string, defaultValue?: string) =>
+        key === 'FEATURE_SANDBOX_MOCK_DATA' ? 'false' : defaultValue
+      );
+      redisMock.get.mockResolvedValue(null);
+
+      const result = await service.getGamingPositions('space-1');
+
+      expect(result.totalGamingAssetsUsd).toBe(0);
+      expect(result.positions).toEqual([]);
     });
 
     it('should compute total gaming assets as sum of positions', async () => {

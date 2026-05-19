@@ -5,12 +5,14 @@ This module provides administrative functionality for the Dhanam Ledger API, inc
 ## Features
 
 ### User Management
+
 - Search and list users with advanced filtering
 - View detailed user information (read-only)
 - Filter by status, verification, onboarding completion
 - Sort by various fields with pagination
 
 ### System Statistics
+
 - Real-time system health monitoring
 - User metrics (total, active, new)
 - Space and account statistics
@@ -19,12 +21,14 @@ This module provides administrative functionality for the Dhanam Ledger API, inc
 - Database and Redis health checks
 
 ### Audit Logs
+
 - Search and filter audit logs
 - Filter by user, action, resource, severity
 - Date range filtering
 - Full audit trail visibility
 
 ### Onboarding Analytics
+
 - Funnel conversion rates
 - Step-by-step breakdown
 - Abandonment rate analysis
@@ -32,6 +36,7 @@ This module provides administrative functionality for the Dhanam Ledger API, inc
 - Provider adoption tracking
 
 ### Feature Flags
+
 - Runtime feature toggle management
 - Percentage-based rollouts
 - User-specific feature access
@@ -40,29 +45,36 @@ This module provides administrative functionality for the Dhanam Ledger API, inc
 ## Authorization
 
 All admin endpoints require:
+
 1. Valid JWT authentication (`JwtAuthGuard`)
 2. Admin privileges (`AdminGuard`)
 
 Admin privileges are granted to users who:
+
 - Have `admin` role in any space
 - Are `owner` of any space
 
 ## API Endpoints
 
 ### Users
+
 - `GET /admin/users` - Search and list users
 - `GET /admin/users/:userId` - Get user details
 
 ### System
+
 - `GET /admin/stats` - Get system statistics
 
 ### Audit
+
 - `GET /admin/audit-logs` - Search audit logs
 
 ### Analytics
+
 - `GET /admin/analytics/onboarding-funnel` - Get onboarding funnel metrics
 
 ### Feature Flags
+
 - `GET /admin/feature-flags` - List all feature flags
 - `GET /admin/feature-flags/:key` - Get specific feature flag
 - `POST /admin/feature-flags/:key` - Update feature flag

@@ -90,7 +90,7 @@ describe('DripCampaignTask', () => {
           to: 'test@example.com',
           template: 'drip-day-1-connect',
           priority: 'low',
-        }),
+        })
       );
       expect(prisma.dripEvent.create).toHaveBeenCalledWith({
         data: { userId: 'user-1', campaign: 'activation', step: 'day-1-connect' },
@@ -152,7 +152,7 @@ describe('DripCampaignTask', () => {
       expect(emailService.sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           template: 'drip-day-3-budget',
-        }),
+        })
       );
     });
 
@@ -186,7 +186,7 @@ describe('DripCampaignTask', () => {
       expect(emailService.sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           template: 'drip-day-14-trial',
-        }),
+        })
       );
     });
 
@@ -212,7 +212,7 @@ describe('DripCampaignTask', () => {
       await task.processActivationDrips();
 
       expect(emailService.sendEmail).not.toHaveBeenCalledWith(
-        expect.objectContaining({ template: 'drip-day-14-trial' }),
+        expect.objectContaining({ template: 'drip-day-14-trial' })
       );
     });
 
@@ -249,7 +249,7 @@ describe('DripCampaignTask', () => {
             budgetCount: 1,
             hasGoals: true,
           }),
-        }),
+        })
       );
     });
   });
@@ -275,7 +275,7 @@ describe('DripCampaignTask', () => {
       expect(emailService.sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           template: 'drip-reengagement-day-7',
-        }),
+        })
       );
     });
 
@@ -297,9 +297,7 @@ describe('DripCampaignTask', () => {
             role: 'owner',
             space: {
               id: 'space-1',
-              accounts: [
-                { transactions: [{ id: 't1' }, { id: 't2' }, { id: 't3' }] },
-              ],
+              accounts: [{ transactions: [{ id: 't1' }, { id: 't2' }, { id: 't3' }] }],
             },
           },
         ],
@@ -318,7 +316,7 @@ describe('DripCampaignTask', () => {
             unreviewedCount: 3,
             totalBalance: '15000.50',
           }),
-        }),
+        })
       );
     });
   });
@@ -349,7 +347,7 @@ describe('DripCampaignTask', () => {
       expect(emailService.sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           context: expect.objectContaining({ name: 'María García' }),
-        }),
+        })
       );
     });
   });

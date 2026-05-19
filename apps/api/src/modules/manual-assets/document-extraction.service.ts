@@ -1,8 +1,9 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import OpenAI from 'openai';
+import { firstValueFrom } from 'rxjs';
+
 import type { ExtractedTransactionData } from '../integrations/karafiel.service';
 
 const NATIVE_EXTRACTION_SYSTEM_PROMPT = `You are a financial document parser for Dhanam, MADFAM's financial platform.

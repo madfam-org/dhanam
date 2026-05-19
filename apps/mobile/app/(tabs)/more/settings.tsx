@@ -249,17 +249,8 @@ export default function SettingsScreen() {
         titleStyle={isDestructive ? styles.destructiveTitle : undefined}
         description={item.description}
         left={() => (
-          <View
-            style={[
-              styles.iconContainer,
-              isDestructive && styles.destructiveIconContainer,
-            ]}
-          >
-            <Ionicons
-              name={item.icon}
-              size={22}
-              color={isDestructive ? '#F44336' : '#4CAF50'}
-            />
+          <View style={[styles.iconContainer, isDestructive && styles.destructiveIconContainer]}>
+            <Ionicons name={item.icon} size={22} color={isDestructive ? '#F44336' : '#4CAF50'} />
           </View>
         )}
         right={rightElement}
@@ -299,9 +290,7 @@ export default function SettingsScreen() {
               {section.items.map((item, index) => (
                 <React.Fragment key={item.id}>
                   {renderSettingsItem(item)}
-                  {index < section.items.length - 1 && (
-                    <Divider style={styles.divider} />
-                  )}
+                  {index < section.items.length - 1 && <Divider style={styles.divider} />}
                 </React.Fragment>
               ))}
             </Card.Content>

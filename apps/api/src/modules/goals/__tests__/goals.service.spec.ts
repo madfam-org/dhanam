@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { Goal, GoalType, GoalStatus, Currency } from '@db';
 
-import { PrismaService } from '../../../core/prisma/prisma.service';
 import { AuditService } from '../../../core/audit/audit.service';
-import { GoalsService } from '../goals.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { CreateGoalDto, UpdateGoalDto, AddAllocationDto } from '../dto';
+import { GoalsService } from '../goals.service';
 
 describe('GoalsService', () => {
   let service: GoalsService;
@@ -114,7 +115,10 @@ describe('GoalsService', () => {
     };
 
     it('should create a new goal successfully', async () => {
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.create.mockResolvedValue(mockGoal as any);
 
       const result = await service.create(createDto, 'user-123');
@@ -149,7 +153,10 @@ describe('GoalsService', () => {
     });
 
     it('should use USD as default currency', async () => {
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.create.mockResolvedValue(mockGoal as any);
 
       const dtoWithoutCurrency = { ...createDto, currency: undefined };
@@ -161,7 +168,10 @@ describe('GoalsService', () => {
     });
 
     it('should use priority 1 as default', async () => {
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.create.mockResolvedValue(mockGoal as any);
 
       const dtoWithoutPriority = { ...createDto, priority: undefined };
@@ -361,7 +371,9 @@ describe('GoalsService', () => {
     });
 
     it('should throw NotFoundException when goal does not exist', async () => {
-      jest.spyOn(service as any, 'findByIdWithAccess').mockRejectedValue(new NotFoundException('Goal not found'));
+      jest
+        .spyOn(service as any, 'findByIdWithAccess')
+        .mockRejectedValue(new NotFoundException('Goal not found'));
 
       await expect(service.findById('nonexistent', 'user-123')).rejects.toThrow(NotFoundException);
     });
@@ -380,7 +392,10 @@ describe('GoalsService', () => {
     it('should return all goals for a space', async () => {
       const goals = [mockGoal, { ...mockGoal, id: 'goal-456', name: 'Education Fund' }];
 
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.findMany.mockResolvedValue(goals as any);
 
       const result = await service.findBySpace('space-123', 'user-123');
@@ -390,7 +405,10 @@ describe('GoalsService', () => {
     });
 
     it('should order goals by priority and target date', async () => {
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.findMany.mockResolvedValue([mockGoal] as any);
 
       await service.findBySpace('space-123', 'user-123');
@@ -641,7 +659,10 @@ describe('GoalsService', () => {
         },
       ];
 
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.findMany.mockResolvedValue(goals as any);
 
       const result = await service.getSummary('space-123', 'user-123');
@@ -655,7 +676,10 @@ describe('GoalsService', () => {
     });
 
     it('should return zero values for empty goal list', async () => {
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.findMany.mockResolvedValue([]);
 
       const result = await service.getSummary('space-123', 'user-123');
@@ -697,7 +721,10 @@ describe('GoalsService', () => {
 
     it('should succeed when goal exists and user has access', async () => {
       prisma.goal.findUnique.mockResolvedValue(mockGoal as any);
-      prisma.userSpace.findFirst.mockResolvedValue({ userId: 'user-123', spaceId: 'space-123' } as any);
+      prisma.userSpace.findFirst.mockResolvedValue({
+        userId: 'user-123',
+        spaceId: 'space-123',
+      } as any);
       prisma.goal.update.mockResolvedValue({ ...mockGoal, name: 'Updated' } as any);
 
       const result = await service.update('goal-123', { name: 'Updated' }, 'user-123');

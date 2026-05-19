@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { of, throwError } from 'rxjs';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { of, throwError } from 'rxjs';
 
 import { JanuaEmailService, JANUA_TEMPLATES } from '../janua-email.service';
 
@@ -72,9 +72,7 @@ describe('JanuaEmailService', () => {
 
   describe('checkHealth', () => {
     it('should return true when service is healthy', async () => {
-      httpService.get.mockReturnValue(
-        of(mockAxiosResponse({ status: 'healthy' }))
-      );
+      httpService.get.mockReturnValue(of(mockAxiosResponse({ status: 'healthy' })));
 
       const result = await service.checkHealth();
 
@@ -89,9 +87,7 @@ describe('JanuaEmailService', () => {
     });
 
     it('should return false when service is unhealthy', async () => {
-      httpService.get.mockReturnValue(
-        of(mockAxiosResponse({ status: 'unhealthy' }))
-      );
+      httpService.get.mockReturnValue(of(mockAxiosResponse({ status: 'unhealthy' })));
 
       const result = await service.checkHealth();
 
@@ -184,9 +180,7 @@ describe('JanuaEmailService', () => {
     });
 
     it('should include optional fields', async () => {
-      httpService.post.mockReturnValue(
-        of(mockAxiosResponse({ success: true }))
-      );
+      httpService.post.mockReturnValue(of(mockAxiosResponse({ success: true })));
 
       await service.sendEmail({
         to: 'user@example.com',
@@ -233,9 +227,7 @@ describe('JanuaEmailService', () => {
     });
 
     it('should use custom source type', async () => {
-      httpService.post.mockReturnValue(
-        of(mockAxiosResponse({ success: true }))
-      );
+      httpService.post.mockReturnValue(of(mockAxiosResponse({ success: true })));
 
       await service.sendEmail(
         { to: 'user@example.com', subject: 'Test', html: '<p>Test</p>' },
@@ -336,7 +328,12 @@ describe('JanuaEmailService', () => {
   describe('listTemplates', () => {
     it('should list available templates', async () => {
       const templates = [
-        { name: 'auth/welcome', description: 'Welcome email', required_variables: ['user_name'], optional_variables: [] },
+        {
+          name: 'auth/welcome',
+          description: 'Welcome email',
+          required_variables: ['user_name'],
+          optional_variables: [],
+        },
       ];
       httpService.get.mockReturnValue(of(mockAxiosResponse(templates)));
 

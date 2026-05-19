@@ -1,11 +1,14 @@
 import { Currency } from '../types';
 
-export const CURRENCIES: Record<Currency, {
-  code: Currency;
-  symbol: string;
-  name: string;
-  decimals: number;
-}> = {
+export const CURRENCIES: Record<
+  Currency,
+  {
+    code: Currency;
+    symbol: string;
+    name: string;
+    decimals: number;
+  }
+> = {
   [Currency.MXN]: {
     code: Currency.MXN,
     symbol: '$',

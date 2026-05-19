@@ -1,4 +1,3 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { Controller, Get, Query, UseGuards, Param, Req, BadRequestException } from '@nestjs/common';
 import {
   ApiTags,
@@ -12,6 +11,8 @@ import {
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 
 import { NaturalLanguageService } from './natural-language.service';
 

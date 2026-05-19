@@ -8,12 +8,12 @@ Install k6: https://grafana.com/docs/k6/latest/set-up/install-k6/
 
 ## Thresholds
 
-| Scenario | Threshold | Source |
-|----------|-----------|--------|
-| Page loads | p95 < 1,500ms | CLAUDE.md |
-| Bulk transactions (100+ items) | p95 < 2,000ms | CLAUDE.md |
-| Manual account refresh | p95 < 15,000ms | CLAUDE.md |
-| Error rate | < 1% | SLA target |
+| Scenario                       | Threshold      | Source     |
+| ------------------------------ | -------------- | ---------- |
+| Page loads                     | p95 < 1,500ms  | CLAUDE.md  |
+| Bulk transactions (100+ items) | p95 < 2,000ms  | CLAUDE.md  |
+| Manual account refresh         | p95 < 15,000ms | CLAUDE.md  |
+| Error rate                     | < 1%           | SLA target |
 
 ## Running
 

@@ -1,11 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+
 import { Currency, Prisma } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { StripeConnectService } from '../../billing/services/stripe-connect.service';
-
 import { EventDispatcherService } from '../../webhook-outbound/services/event-dispatcher.service';
-
 import type { CreateDestinationChargeDto } from '../dto/marketplace.dto';
 
 @Injectable()
@@ -15,7 +14,7 @@ export class ChargeService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripeConnect: StripeConnectService,
-    private readonly events: EventDispatcherService,
+    private readonly events: EventDispatcherService
   ) {}
 
   async createDestination(dto: CreateDestinationChargeDto) {
@@ -37,7 +36,7 @@ export class ChargeService {
     });
 
     this.logger.log(
-      `Destination charge ${charge.externalId} amount=${dto.amount} ${dto.currency} merchant=${merchant.id}`,
+      `Destination charge ${charge.externalId} amount=${dto.amount} ${dto.currency} merchant=${merchant.id}`
     );
 
     // We don't persist a Charge row in dhanam today — a charge is Stripe's
@@ -68,9 +67,7 @@ export class ChargeService {
       where: { externalAccountId: input.merchantExternalId, processorId: 'stripe' },
     });
     if (!merchant) {
-      this.logger.warn(
-        `application_fee.created for unknown merchant ${input.merchantExternalId}`,
-      );
+      this.logger.warn(`application_fee.created for unknown merchant ${input.merchantExternalId}`);
       return;
     }
     await this.prisma.applicationFee.upsert({

@@ -22,12 +22,12 @@ The Subscriptions module helps users manage their recurring service payments:
 interface Subscription {
   id: string;
   spaceId: string;
-  serviceName: string;          // e.g., "Netflix"
-  serviceUrl?: string;          // e.g., "https://netflix.com"
-  serviceIcon?: string;         // Icon identifier
+  serviceName: string; // e.g., "Netflix"
+  serviceUrl?: string; // e.g., "https://netflix.com"
+  serviceIcon?: string; // Icon identifier
   category: SubscriptionCategory;
   description?: string;
-  amount: number;               // Per-cycle cost
+  amount: number; // Per-cycle cost
   currency: Currency;
   billingCycle: RecurrenceFrequency;
   nextBillingDate?: Date;
@@ -38,59 +38,59 @@ interface Subscription {
   trialEndDate?: Date;
   cancelledAt?: Date;
   cancellationReason?: string;
-  annualCost: number;           // Calculated yearly cost
-  usageFrequency?: string;      // 'high' | 'medium' | 'low' | 'unknown'
+  annualCost: number; // Calculated yearly cost
+  usageFrequency?: string; // 'high' | 'medium' | 'low' | 'unknown'
   savingsRecommendation?: string;
-  alertBeforeDays: number;      // Days before billing to alert
+  alertBeforeDays: number; // Days before billing to alert
   alertEnabled: boolean;
   notes?: string;
-  recurringId?: string;         // Link to detected pattern
+  recurringId?: string; // Link to detected pattern
 }
 ```
 
 ### Subscription Categories
 
-| Category | Examples |
-|----------|----------|
-| `streaming` | Netflix, Disney+, HBO Max |
-| `music` | Spotify, Apple Music |
-| `software` | Adobe, Microsoft 365, GitHub |
-| `gaming` | Xbox Game Pass, PlayStation Plus |
-| `news` | NYT, WSJ |
-| `fitness` | Peloton, Headspace |
-| `food_delivery` | DoorDash, Uber Eats, Rappi |
-| `cloud_storage` | Dropbox, Google One |
-| `productivity` | Notion, Slack, Zoom |
-| `education` | Duolingo, Coursera |
-| `finance` | Investment apps |
-| `other` | Uncategorized |
+| Category        | Examples                         |
+| --------------- | -------------------------------- |
+| `streaming`     | Netflix, Disney+, HBO Max        |
+| `music`         | Spotify, Apple Music             |
+| `software`      | Adobe, Microsoft 365, GitHub     |
+| `gaming`        | Xbox Game Pass, PlayStation Plus |
+| `news`          | NYT, WSJ                         |
+| `fitness`       | Peloton, Headspace               |
+| `food_delivery` | DoorDash, Uber Eats, Rappi       |
+| `cloud_storage` | Dropbox, Google One              |
+| `productivity`  | Notion, Slack, Zoom              |
+| `education`     | Duolingo, Coursera               |
+| `finance`       | Investment apps                  |
+| `other`         | Uncategorized                    |
 
 ### Subscription Status
 
-| Status | Description |
-|--------|-------------|
-| `active` | Currently active subscription |
-| `trial` | In free trial period |
-| `paused` | Temporarily suspended |
-| `cancelled` | User cancelled |
-| `expired` | Past end date |
+| Status      | Description                   |
+| ----------- | ----------------------------- |
+| `active`    | Currently active subscription |
+| `trial`     | In free trial period          |
+| `paused`    | Temporarily suspended         |
+| `cancelled` | User cancelled                |
+| `expired`   | Past end date                 |
 
 ## API Endpoints
 
 All endpoints are scoped to a space: `/spaces/:spaceId/subscriptions`
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/` | JWT | List all subscriptions (filterable) |
-| `GET` | `/summary` | JWT | Get spending summary and analytics |
-| `GET` | `/:id` | JWT | Get subscription details with transactions |
-| `POST` | `/` | JWT | Create manual subscription |
-| `POST` | `/detect` | JWT | Auto-detect from recurring patterns |
-| `PATCH` | `/:id` | JWT | Update subscription |
-| `POST` | `/:id/cancel` | JWT | Cancel subscription |
-| `POST` | `/:id/pause` | JWT | Pause active subscription |
-| `POST` | `/:id/resume` | JWT | Resume paused subscription |
-| `DELETE` | `/:id` | JWT | Delete subscription |
+| Method   | Endpoint      | Auth | Description                                |
+| -------- | ------------- | ---- | ------------------------------------------ |
+| `GET`    | `/`           | JWT  | List all subscriptions (filterable)        |
+| `GET`    | `/summary`    | JWT  | Get spending summary and analytics         |
+| `GET`    | `/:id`        | JWT  | Get subscription details with transactions |
+| `POST`   | `/`           | JWT  | Create manual subscription                 |
+| `POST`   | `/detect`     | JWT  | Auto-detect from recurring patterns        |
+| `PATCH`  | `/:id`        | JWT  | Update subscription                        |
+| `POST`   | `/:id/cancel` | JWT  | Cancel subscription                        |
+| `POST`   | `/:id/pause`  | JWT  | Pause active subscription                  |
+| `POST`   | `/:id/resume` | JWT  | Resume paused subscription                 |
+| `DELETE` | `/:id`        | JWT  | Delete subscription                        |
 
 ### Example: List Subscriptions
 
@@ -100,6 +100,7 @@ curl "https://api.dhan.am/spaces/space_123/subscriptions?status=active" \
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -127,10 +128,11 @@ curl "https://api.dhan.am/spaces/space_123/subscriptions/summary" \
 ```
 
 **Response:**
+
 ```json
 {
   "totalMonthly": 127.45,
-  "totalAnnual": 1529.40,
+  "totalAnnual": 1529.4,
   "activeCount": 8,
   "trialCount": 1,
   "pausedCount": 0,
@@ -169,6 +171,7 @@ curl -X POST "https://api.dhan.am/spaces/space_123/subscriptions/detect" \
 ```
 
 **Response:**
+
 ```json
 {
   "detected": [
@@ -215,13 +218,13 @@ const KNOWN_SERVICES = {
     category: 'streaming',
     icon: 'netflix',
     url: 'https://netflix.com',
-    aliases: ['netflix.com', 'netflix inc']
+    aliases: ['netflix.com', 'netflix inc'],
   },
   spotify: {
     category: 'music',
     icon: 'spotify',
     url: 'https://spotify.com',
-    aliases: ['spotify.com', 'spotify ab', 'spotify usa']
+    aliases: ['spotify.com', 'spotify ab', 'spotify usa'],
   },
   // ... 23+ more services
 };
@@ -247,7 +250,7 @@ const multipliers = {
   biweekly: 26,
   monthly: 12,
   quarterly: 4,
-  yearly: 1
+  yearly: 1,
 };
 
 annualCost = amount * multipliers[billingCycle];
@@ -257,29 +260,29 @@ annualCost = amount * multipliers[billingCycle];
 
 ### Usage Frequency Levels
 
-| Level | Description | Savings Action |
-|-------|-------------|----------------|
-| `high` | Regular use | No recommendation |
-| `medium` | Occasional use | Suggest annual billing |
-| `low` | Rarely used | Suggest cancellation |
-| `unknown` | Not tracked | No recommendation |
+| Level     | Description    | Savings Action         |
+| --------- | -------------- | ---------------------- |
+| `high`    | Regular use    | No recommendation      |
+| `medium`  | Occasional use | Suggest annual billing |
+| `low`     | Rarely used    | Suggest cancellation   |
+| `unknown` | Not tracked    | No recommendation      |
 
 ### Alert Settings
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `alertBeforeDays` | 3 | Days before billing to notify |
-| `alertEnabled` | true | Whether to send notifications |
+| Setting           | Default | Description                   |
+| ----------------- | ------- | ----------------------------- |
+| `alertBeforeDays` | 3       | Days before billing to notify |
+| `alertEnabled`    | true    | Whether to send notifications |
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `recurring` | Provides transaction patterns for detection |
-| `transactions` | Source data for pattern analysis |
-| `spaces` | Ownership and access control |
-| `billing` | Platform subscription (different concern) |
-| `budgets` | Subscription costs in budget tracking |
+| Module         | Relationship                                |
+| -------------- | ------------------------------------------- |
+| `recurring`    | Provides transaction patterns for detection |
+| `transactions` | Source data for pattern analysis            |
+| `spaces`       | Ownership and access control                |
+| `billing`      | Platform subscription (different concern)   |
+| `budgets`      | Subscription costs in budget tracking       |
 
 ## Testing
 
@@ -318,5 +321,6 @@ Located in `subscriptions.service.spec.ts` and `subscription-detector.service.sp
 6. Test pause/resume/cancel flows
 
 ---
+
 **Module**: `subscriptions`
 **Last Updated**: January 2025

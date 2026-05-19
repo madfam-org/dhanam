@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EnhancedEsgService } from './enhanced-esg.service';
-import { PrismaService } from '@core/prisma/prisma.service';
 import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+
+import { PrismaService } from '@core/prisma/prisma.service';
+
+import { EnhancedEsgService } from './enhanced-esg.service';
 
 describe('EnhancedEsgService', () => {
   let service: EnhancedEsgService;
@@ -32,7 +34,7 @@ describe('EnhancedEsgService', () => {
   describe('getAssetESG', () => {
     it('should return ESG data for Bitcoin', async () => {
       const result = await service.getAssetESG('BTC');
-      
+
       expect(result).toBeDefined();
       expect(result?.symbol).toBe('BTC');
       expect(result?.score.environmental).toBeDefined();
@@ -44,7 +46,7 @@ describe('EnhancedEsgService', () => {
     it('should return cached data on subsequent calls', async () => {
       const firstCall = await service.getAssetESG('ETH');
       const secondCall = await service.getAssetESG('ETH');
-      
+
       expect(firstCall).toEqual(secondCall);
     });
 
@@ -96,7 +98,7 @@ describe('EnhancedEsgService', () => {
     it('should compare multiple crypto assets', async () => {
       const symbols = ['BTC', 'ETH', 'ADA'];
       const result = await service.compareAssets(symbols);
-      
+
       expect(result).toBeDefined();
       expect(result.comparison).toHaveLength(3);
       expect(result.bestPerformer).toBeDefined();
@@ -105,7 +107,7 @@ describe('EnhancedEsgService', () => {
 
     it('should handle single asset comparison', async () => {
       const result = await service.compareAssets(['BTC']);
-      
+
       expect(result.comparison).toHaveLength(1);
       expect(result.comparison?.[0]?.symbol).toBe('BTC');
     });
@@ -114,7 +116,7 @@ describe('EnhancedEsgService', () => {
   describe('refreshESGData', () => {
     it('should refresh ESG data for given symbols', async () => {
       const symbols = ['BTC', 'ETH'];
-      
+
       await expect(service.refreshESGData(symbols)).resolves.not.toThrow();
     });
   });

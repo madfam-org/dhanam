@@ -46,7 +46,8 @@ export const projections = {
     adjustSavings: 'Adjust Savings',
     pageDescription: 'Use Monte Carlo simulation to plan for a secure retirement',
     howItWorks: 'How it works',
-    howItWorksBody: 'This calculator runs 10,000 simulations of your financial future using Monte Carlo methods. It models two phases: accumulation (saving until retirement) and withdrawal (spending during retirement). The results show the probability of your money lasting through your expected lifespan.',
+    howItWorksBody:
+      'This calculator runs 10,000 simulations of your financial future using Monte Carlo methods. It models two phases: accumulation (saving until retirement) and withdrawal (spending during retirement). The results show the probability of your money lasting through your expected lifespan.',
     tabs: {
       summary: 'Summary',
       projections: 'Projections',
@@ -60,14 +61,18 @@ export const projections = {
     '10thPercentile': '10th Percentile',
     '90thPercentile': '90th Percentile',
     noProjectionYet: 'No retirement projection yet',
-    enterDetailsPrompt: 'Enter your details in the form and click "Calculate Retirement Plan" to see your projected timeline',
+    enterDetailsPrompt:
+      'Enter your details in the form and click "Calculate Retirement Plan" to see your projected timeline',
     understandingResults: 'Understanding Your Results',
     successRate: 'Success Rate',
-    successRateDescription: 'The probability that your retirement savings will last through your expected lifespan. 75% or higher is generally considered good.',
+    successRateDescription:
+      'The probability that your retirement savings will last through your expected lifespan. 75% or higher is generally considered good.',
     percentiles: 'Percentiles',
-    percentilesDescription: 'The 10th percentile shows the "worst 10%" outcome, while 90th shows the "best 10%". The median (50th percentile) is the most likely outcome.',
+    percentilesDescription:
+      'The 10th percentile shows the "worst 10%" outcome, while 90th shows the "best 10%". The median (50th percentile) is the most likely outcome.',
     safeWithdrawalRate: 'Safe Withdrawal Rate',
-    safeWithdrawalRateDescription: 'The monthly amount you can safely withdraw during retirement with 75% confidence of not running out of money.',
+    safeWithdrawalRateDescription:
+      'The monthly amount you can safely withdraw during retirement with 75% confidence of not running out of money.',
   },
   scenarios: {
     bestCase: 'Best Case',
@@ -87,7 +92,8 @@ export const projections = {
       title: 'Scenario Analysis',
       description: 'Stress test your portfolio against historical market events',
       howItWorksTitle: 'How Scenario Analysis Works',
-      howItWorksDescription: 'This tool compares your baseline portfolio projection against historical market scenarios. It runs two simulations: one under normal conditions and one with the selected market shock, then shows the impact on your portfolio value.',
+      howItWorksDescription:
+        'This tool compares your baseline portfolio projection against historical market scenarios. It runs two simulations: one under normal conditions and one with the selected market shock, then shows the impact on your portfolio value.',
       portfolioConfiguration: 'Portfolio Configuration',
       configureDescription: 'Set your baseline portfolio parameters',
       initialBalance: 'Initial Balance',
@@ -112,7 +118,8 @@ export const projections = {
       baselineProjectionDescription: 'Portfolio growth under normal market conditions',
       projection: 'Projection',
       noAnalysisYet: 'No scenario analysis yet',
-      noAnalysisDescription: 'Configure your portfolio parameters and select a scenario to stress test your investments against historical market events.',
+      noAnalysisDescription:
+        'Configure your portfolio parameters and select a scenario to stress test your investments against historical market events.',
       getStarted: 'Get Started',
       with: 'With',
     },
@@ -181,7 +188,8 @@ export const projections = {
     includeLinkedAccounts: 'Include linked accounts',
     includeRecurringTransactions: 'Include recurring transactions',
     noProjection: 'No Projection Yet',
-    noProjectionDescription: 'Configure your settings and click "Generate Projection" to see your financial future',
+    noProjectionDescription:
+      'Configure your settings and click "Generate Projection" to see your financial future',
     attentionRequired: 'Attention Required',
   },
   summary: {

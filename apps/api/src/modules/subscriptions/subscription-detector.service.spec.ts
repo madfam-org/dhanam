@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { SubscriptionDetectorService } from './subscription-detector.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
 import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
+import { PrismaService } from '../../core/prisma/prisma.service';
+
+import { SubscriptionDetectorService } from './subscription-detector.service';
 
 describe('SubscriptionDetectorService', () => {
   let service: SubscriptionDetectorService;
@@ -16,10 +17,7 @@ describe('SubscriptionDetectorService', () => {
     prismaMock = createPrismaMock();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        SubscriptionDetectorService,
-        { provide: PrismaService, useValue: prismaMock },
-      ],
+      providers: [SubscriptionDetectorService, { provide: PrismaService, useValue: prismaMock }],
     }).compile();
 
     service = module.get<SubscriptionDetectorService>(SubscriptionDetectorService);
@@ -192,13 +190,10 @@ describe('SubscriptionDetectorService', () => {
       { input: 'restaurant bill', expected: false },
     ];
 
-    it.each(testCases)(
-      'should return $expected for "$input"',
-      ({ input, expected }) => {
-        const result = (service as any).looksLikeSubscription(input);
-        expect(result).toBe(expected);
-      }
-    );
+    it.each(testCases)('should return $expected for "$input"', ({ input, expected }) => {
+      const result = (service as any).looksLikeSubscription(input);
+      expect(result).toBe(expected);
+    });
   });
 
   describe('guessCategory', () => {
@@ -225,13 +220,10 @@ describe('SubscriptionDetectorService', () => {
       { input: 'random unknown service', expected: 'other' },
     ];
 
-    it.each(testCases)(
-      'should categorize "$input" as "$expected"',
-      ({ input, expected }) => {
-        const result = (service as any).guessCategory(input);
-        expect(result).toBe(expected);
-      }
-    );
+    it.each(testCases)('should categorize "$input" as "$expected"', ({ input, expected }) => {
+      const result = (service as any).guessCategory(input);
+      expect(result).toBe(expected);
+    });
   });
 
   describe('formatServiceName', () => {
@@ -244,13 +236,10 @@ describe('SubscriptionDetectorService', () => {
       { input: 'GITHUB INC', expected: 'Github Inc' },
     ];
 
-    it.each(testCases)(
-      'should format "$input" as "$expected"',
-      ({ input, expected }) => {
-        const result = (service as any).formatServiceName(input);
-        expect(result).toBe(expected);
-      }
-    );
+    it.each(testCases)('should format "$input" as "$expected"', ({ input, expected }) => {
+      const result = (service as any).formatServiceName(input);
+      expect(result).toBe(expected);
+    });
   });
 
   describe('calculateAnnualCost', () => {

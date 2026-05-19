@@ -70,14 +70,10 @@ export default function PreferencesScreen() {
         >
           {item.flag && <Text style={styles.optionFlag}>{item.flag}</Text>}
           {item.symbol && <Text style={styles.optionSymbol}>{item.symbol}</Text>}
-          <Text
-            style={[styles.optionLabel, selected === item.code && styles.optionLabelSelected]}
-          >
+          <Text style={[styles.optionLabel, selected === item.code && styles.optionLabelSelected]}>
             {item.label}
           </Text>
-          {selected === item.code && (
-            <Ionicons name="checkmark-circle" size={20} color="#6366f1" />
-          )}
+          {selected === item.code && <Ionicons name="checkmark-circle" size={20} color="#6366f1" />}
         </TouchableOpacity>
       ))}
     </View>
@@ -92,9 +88,7 @@ export default function PreferencesScreen() {
             <Ionicons name="settings-outline" size={36} color="white" />
           </View>
           <Text style={styles.headerTitle}>Tus preferencias</Text>
-          <Text style={styles.headerSubtitle}>
-            Personaliza tu experiencia en Dhanam
-          </Text>
+          <Text style={styles.headerSubtitle}>Personaliza tu experiencia en Dhanam</Text>
         </LinearGradient>
 
         <View style={styles.content}>
@@ -108,9 +102,7 @@ export default function PreferencesScreen() {
           {/* Currency */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Moneda principal</Text>
-            <Text style={styles.sectionDescription}>
-              La moneda por defecto para tus cuentas
-            </Text>
+            <Text style={styles.sectionDescription}>La moneda por defecto para tus cuentas</Text>
             {renderOption(currencies, currency, setCurrency)}
           </View>
 

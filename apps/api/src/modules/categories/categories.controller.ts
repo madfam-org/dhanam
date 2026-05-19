@@ -1,5 +1,3 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
-import { AuthenticatedRequest } from '@core/types/authenticated-request';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import {
   ApiTags,
@@ -12,6 +10,9 @@ import {
   ApiBadRequestResponse,
   ApiParam,
 } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
+import { AuthenticatedRequest } from '@core/types/authenticated-request';
 
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';

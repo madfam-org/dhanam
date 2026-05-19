@@ -1,5 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { BillingService } from '../../billing/billing.service';
 
 // Mock Prisma client enums before importing anything that uses them
@@ -28,11 +29,11 @@ jest.mock('@prisma/client', () => ({
   },
 }));
 
+import { GoalCollaborationService } from '../goal-collaboration.service';
+import { GoalProbabilityService } from '../goal-probability.service';
+import { GoalsExecutionService } from '../goals-execution.service';
 import { GoalsController } from '../goals.controller';
 import { GoalsService } from '../goals.service';
-import { GoalsExecutionService } from '../goals-execution.service';
-import { GoalProbabilityService } from '../goal-probability.service';
-import { GoalCollaborationService } from '../goal-collaboration.service';
 
 // Define DTO types inline to avoid import issues with decorators
 type CreateGoalDto = {
@@ -313,7 +314,11 @@ describe('GoalsController', () => {
 
       const result = await controller.addAllocation('goal-123', addAllocationDto, mockRequest);
 
-      expect(goalsService.addAllocation).toHaveBeenCalledWith('goal-123', addAllocationDto, 'user-123');
+      expect(goalsService.addAllocation).toHaveBeenCalledWith(
+        'goal-123',
+        addAllocationDto,
+        'user-123'
+      );
       expect(result).toEqual(mockAllocation);
     });
   });
@@ -326,7 +331,11 @@ describe('GoalsController', () => {
 
       await controller.removeAllocation('goal-123', 'account-123', mockRequest);
 
-      expect(goalsService.removeAllocation).toHaveBeenCalledWith('goal-123', 'account-123', 'user-123');
+      expect(goalsService.removeAllocation).toHaveBeenCalledWith(
+        'goal-123',
+        'account-123',
+        'user-123'
+      );
     });
   });
 
@@ -428,7 +437,10 @@ describe('GoalsController', () => {
 
       const result = await controller.executeRebalancing('goal-123', mockRequest);
 
-      expect(goalsExecutionService.executeGoalRebalancing).toHaveBeenCalledWith('goal-123', 'user-123');
+      expect(goalsExecutionService.executeGoalRebalancing).toHaveBeenCalledWith(
+        'goal-123',
+        'user-123'
+      );
       expect(result).toEqual(mockExecutionResult);
     });
 

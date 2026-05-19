@@ -18,15 +18,15 @@ The Onboarding module manages the complete new user experience, from initial reg
 
 The module defines 7 ordered steps with dependencies:
 
-| Step | Order | Required | Dependencies |
-|------|-------|----------|--------------|
-| `welcome` | 1 | Yes | None |
-| `email_verification` | 2 | Yes | None |
-| `preferences` | 3 | Yes | None |
-| `space_setup` | 4 | Yes | `preferences` |
-| `connect_accounts` | 5 | No | `space_setup` |
-| `first_budget` | 6 | No | `space_setup` |
-| `feature_tour` | 7 | No | None |
+| Step                 | Order | Required | Dependencies  |
+| -------------------- | ----- | -------- | ------------- |
+| `welcome`            | 1     | Yes      | None          |
+| `email_verification` | 2     | Yes      | None          |
+| `preferences`        | 3     | Yes      | None          |
+| `space_setup`        | 4     | Yes      | `preferences` |
+| `connect_accounts`   | 5     | No       | `space_setup` |
+| `first_budget`       | 6     | No       | `space_setup` |
+| `feature_tour`       | 7     | No       | None          |
 
 ### DTOs
 
@@ -38,17 +38,17 @@ The module defines 7 ordered steps with dependencies:
 
 ## API Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/onboarding/status` | JWT | Get current onboarding progress and step status |
-| `PUT` | `/onboarding/step` | JWT | Update/advance current step |
-| `POST` | `/onboarding/complete` | JWT | Mark onboarding as completed |
-| `PUT` | `/onboarding/preferences` | JWT | Update user preferences during onboarding |
-| `POST` | `/onboarding/verify-email` | Public | Verify email with JWT token |
-| `POST` | `/onboarding/resend-verification` | JWT | Request new verification email |
-| `POST` | `/onboarding/skip/:step` | JWT | Skip optional step (only non-required steps) |
-| `POST` | `/onboarding/reset` | JWT | Reset onboarding progress (support/testing) |
-| `GET` | `/onboarding/health` | Public | Service health check |
+| Method | Endpoint                          | Auth   | Description                                     |
+| ------ | --------------------------------- | ------ | ----------------------------------------------- |
+| `GET`  | `/onboarding/status`              | JWT    | Get current onboarding progress and step status |
+| `PUT`  | `/onboarding/step`                | JWT    | Update/advance current step                     |
+| `POST` | `/onboarding/complete`            | JWT    | Mark onboarding as completed                    |
+| `PUT`  | `/onboarding/preferences`         | JWT    | Update user preferences during onboarding       |
+| `POST` | `/onboarding/verify-email`        | Public | Verify email with JWT token                     |
+| `POST` | `/onboarding/resend-verification` | JWT    | Request new verification email                  |
+| `POST` | `/onboarding/skip/:step`          | JWT    | Skip optional step (only non-required steps)    |
+| `POST` | `/onboarding/reset`               | JWT    | Reset onboarding progress (support/testing)     |
+| `GET`  | `/onboarding/health`              | Public | Service health check                            |
 
 ### Example: Get Onboarding Status
 
@@ -58,6 +58,7 @@ curl -X GET "https://api.dhan.am/onboarding/status" \
 ```
 
 **Response:**
+
 ```json
 {
   "completed": false,
@@ -117,10 +118,10 @@ The module tracks these PostHog events:
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `JWT_SECRET` | Secret for verification tokens | Required |
-| `WEB_URL` | Frontend URL for verification links | Required |
+| Variable     | Description                         | Default  |
+| ------------ | ----------------------------------- | -------- |
+| `JWT_SECRET` | Secret for verification tokens      | Required |
+| `WEB_URL`    | Frontend URL for verification links | Required |
 
 ### Email Templates
 
@@ -131,15 +132,15 @@ The module triggers these email templates via EmailService:
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `email` | Sends verification and completion emails |
-| `preferences` | Stores and retrieves user settings |
-| `spaces` | Creates initial personal space during setup |
-| `providers` | Handles financial account connections |
-| `auth` | JWT authentication and user context |
-| `analytics` | PostHog event tracking |
-| `audit` | Logs all onboarding actions |
+| Module        | Relationship                                |
+| ------------- | ------------------------------------------- |
+| `email`       | Sends verification and completion emails    |
+| `preferences` | Stores and retrieves user settings          |
+| `spaces`      | Creates initial personal space during setup |
+| `providers`   | Handles financial account connections       |
+| `auth`        | JWT authentication and user context         |
+| `analytics`   | PostHog event tracking                      |
+| `audit`       | Logs all onboarding actions                 |
 
 ## Testing
 
@@ -174,5 +175,6 @@ The module includes comprehensive tests in `onboarding.service.spec.ts`:
 6. Confirm completion at `/onboarding/complete`
 
 ---
+
 **Module**: `onboarding`
 **Last Updated**: January 2025

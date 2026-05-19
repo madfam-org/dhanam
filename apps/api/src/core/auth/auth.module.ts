@@ -1,15 +1,16 @@
+import { AUTH_DEFAULTS } from '@dhanam/shared';
+import { Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+
 import { AuditModule } from '@core/audit/audit.module';
 import { SecurityConfigService } from '@core/config/security.config';
 import { CryptoModule } from '@core/crypto/crypto.module';
 import { LoggerModule } from '@core/logger/logger.module';
 import { PrismaModule } from '@core/prisma/prisma.module';
 import { RedisModule } from '@core/redis/redis.module';
-import { AUTH_DEFAULTS } from '@dhanam/shared';
 import { EmailModule } from '@modules/email/email.module';
-import { Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';

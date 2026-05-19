@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
+import { PrismaService } from '../../core/prisma/prisma.service';
+import { FxRatesService } from '../fx-rates/fx-rates.service';
+import { SpacesService } from '../spaces/spaces.service';
 
 import { LongTermForecastService, CreateProjectionDto } from './long-term-forecast.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
-import { SpacesService } from '../spaces/spaces.service';
-import { FxRatesService } from '../fx-rates/fx-rates.service';
-import { createPrismaMock, createLoggerMock } from '../../../test/helpers/api-mock-factory';
 
 // Mock the simulation engine
 jest.mock('@dhanam/simulations', () => ({
@@ -238,9 +239,7 @@ describe('LongTermForecastService', () => {
     it('should include life events', async () => {
       const dto: CreateProjectionDto = {
         ...validDto,
-        lifeEvents: [
-          { name: 'Buy House', year: 2030, impact: -50000, type: 'one_time' as const },
-        ],
+        lifeEvents: [{ name: 'Buy House', year: 2030, impact: -50000, type: 'one_time' as const }],
       };
 
       await service.generateProjection(testUserId, testSpaceId, dto);
@@ -849,7 +848,10 @@ describe('LongTermForecastService', () => {
         scenarios: [
           {
             scenario: validDto.scenarios[0],
-            result: { ...mockProjectionResult, summary: { ...mockProjectionResult.summary, riskScore: 0.5 } },
+            result: {
+              ...mockProjectionResult,
+              summary: { ...mockProjectionResult.summary, riskScore: 0.5 },
+            },
           },
         ],
       };
@@ -920,7 +922,12 @@ describe('LongTermForecastService', () => {
     it('should call generateProjection with appropriate years', async () => {
       const generateSpy = jest.spyOn(service, 'generateProjection');
 
-      await service.getQuickProjection(testUserId, testSpaceId, quickCurrentAge, quickRetirementAge);
+      await service.getQuickProjection(
+        testUserId,
+        testSpaceId,
+        quickCurrentAge,
+        quickRetirementAge
+      );
 
       expect(generateSpy).toHaveBeenCalledWith(
         testUserId,
@@ -935,31 +942,56 @@ describe('LongTermForecastService', () => {
     });
 
     it('should return summary with net worth at retirement', async () => {
-      const result = await service.getQuickProjection(testUserId, testSpaceId, quickCurrentAge, quickRetirementAge);
+      const result = await service.getQuickProjection(
+        testUserId,
+        testSpaceId,
+        quickCurrentAge,
+        quickRetirementAge
+      );
 
       expect(result).toHaveProperty('netWorthAtRetirement');
     });
 
     it('should return summary with monthly retirement income', async () => {
-      const result = await service.getQuickProjection(testUserId, testSpaceId, quickCurrentAge, quickRetirementAge);
+      const result = await service.getQuickProjection(
+        testUserId,
+        testSpaceId,
+        quickCurrentAge,
+        quickRetirementAge
+      );
 
       expect(result).toHaveProperty('monthlyRetirementIncome');
     });
 
     it('should return summary with years until retirement', async () => {
-      const result = await service.getQuickProjection(testUserId, testSpaceId, quickCurrentAge, quickRetirementAge);
+      const result = await service.getQuickProjection(
+        testUserId,
+        testSpaceId,
+        quickCurrentAge,
+        quickRetirementAge
+      );
 
       expect(result.yearsUntilRetirement).toBe(30); // From mocked summary
     });
 
     it('should return summary with risk score', async () => {
-      const result = await service.getQuickProjection(testUserId, testSpaceId, quickCurrentAge, quickRetirementAge);
+      const result = await service.getQuickProjection(
+        testUserId,
+        testSpaceId,
+        quickCurrentAge,
+        quickRetirementAge
+      );
 
       expect(result.riskScore).toBe(0.3);
     });
 
     it('should return summary with income replacement ratio', async () => {
-      const result = await service.getQuickProjection(testUserId, testSpaceId, quickCurrentAge, quickRetirementAge);
+      const result = await service.getQuickProjection(
+        testUserId,
+        testSpaceId,
+        quickCurrentAge,
+        quickRetirementAge
+      );
 
       expect(result.incomeReplacementRatio).toBe(0.65);
     });
@@ -970,7 +1002,12 @@ describe('LongTermForecastService', () => {
         summary: mockProjectionResult.summary,
       });
 
-      const result = await service.getQuickProjection(testUserId, testSpaceId, quickCurrentAge, quickRetirementAge);
+      const result = await service.getQuickProjection(
+        testUserId,
+        testSpaceId,
+        quickCurrentAge,
+        quickRetirementAge
+      );
 
       expect(result.netWorthAtRetirement).toBe(0);
       expect(result.monthlyRetirementIncome).toBe(0);

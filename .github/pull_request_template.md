@@ -45,15 +45,14 @@ Closes #
 - [ ] Tested on staging environment (if applicable)
 
 **Test Steps:**
+
 1.
 2.
 3.
 
 **Expected Behavior:**
 
-
 **Actual Behavior:**
-
 
 ## Screenshots (if applicable)
 
@@ -126,6 +125,7 @@ Closes #
 - [ ] Requires service restart
 
 **Environment Variables:**
+
 ```env
 # Add any new environment variables here
 ```

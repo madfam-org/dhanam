@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import axios from 'axios';
 import Belvo from 'belvo';
 import { PlaidApi } from 'plaid';

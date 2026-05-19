@@ -33,6 +33,7 @@ Backup Provider #2 (e.g., Finicity)
 ## Database Schema
 
 ### New Enums
+
 ```prisma
 enum Provider {
   belvo      // Mexico primary
@@ -48,6 +49,7 @@ enum Provider {
 ### New Models
 
 #### InstitutionProviderMapping
+
 Maps financial institutions to their supported providers with backup options.
 
 ```prisma
@@ -66,6 +68,7 @@ model InstitutionProviderMapping {
 ```
 
 **Example:**
+
 ```json
 {
   "institutionId": "ins_3",
@@ -77,6 +80,7 @@ model InstitutionProviderMapping {
 ```
 
 #### ProviderHealthStatus
+
 Tracks real-time provider health and circuit breaker state.
 
 ```prisma
@@ -100,6 +104,7 @@ model ProviderHealthStatus {
 ```
 
 #### ConnectionAttempt
+
 Audit log of all connection attempts with failover tracking.
 
 ```prisma
@@ -179,11 +184,11 @@ CLOSED
 
 ### Circuit Breaker States
 
-| State | Description | Behavior |
-|-------|-------------|----------|
-| **CLOSED** | Provider is healthy | All requests allowed |
-| **OPEN** | Provider is failing | Requests fail immediately, try backup |
-| **HALF-OPEN** | Testing recovery | Allow one request to test |
+| State         | Description         | Behavior                              |
+| ------------- | ------------------- | ------------------------------------- |
+| **CLOSED**    | Provider is healthy | All requests allowed                  |
+| **OPEN**      | Provider is failing | Requests fail immediately, try backup |
+| **HALF-OPEN** | Testing recovery    | Allow one request to test             |
 
 ## Failover Logic
 
@@ -205,6 +210,7 @@ CLOSED
 ### Provider Selection Strategy
 
 **For US Institutions:**
+
 ```
 Primary: Plaid
 Backup 1: MX
@@ -212,12 +218,14 @@ Backup 2: Finicity
 ```
 
 **For Mexico Institutions:**
+
 ```
 Primary: Belvo
 Backup 1: MX
 ```
 
 **For Crypto:**
+
 ```
 Primary: Bitso (exchange)
 Backup: Blockchain (non-custodial)
@@ -235,8 +243,8 @@ const accounts = await plaidService.getAccounts(accessToken);
 const result = await providerOrchestrator.executeWithFailover(
   'getAccounts',
   { accessToken, spaceId },
-  Provider.plaid,  // Preferred provider
-  'US'             // Region
+  Provider.plaid, // Preferred provider
+  'US' // Region
 );
 
 if (result.success) {
@@ -258,7 +266,7 @@ const result = await providerOrchestrator.executeWithFailover(
   {
     accountId: 'acc_123',
     accessToken: 'encrypted_token',
-    spaceId: 'space_456'
+    spaceId: 'space_456',
   },
   Provider.plaid,
   'US'
@@ -274,6 +282,7 @@ if (result.success) {
 ### Health Check Dashboard
 
 Get provider health status:
+
 ```typescript
 const health = await providerOrchestrator.getProviderHealth('US');
 
@@ -287,7 +296,7 @@ const health = await providerOrchestrator.getProviderHealth('US');
     avgResponseTimeMs: 450,
     successfulCalls: 195,
     failedCalls: 5,
-    circuitBreakerOpen: false
+    circuitBreakerOpen: false,
   },
   {
     provider: 'mx',
@@ -297,14 +306,15 @@ const health = await providerOrchestrator.getProviderHealth('US');
     avgResponseTimeMs: 1200,
     successfulCalls: 85,
     failedCalls: 15,
-    circuitBreakerOpen: false
-  }
-]
+    circuitBreakerOpen: false,
+  },
+];
 ```
 
 ### Connection History
 
 View connection attempts for debugging:
+
 ```typescript
 const history = await providerOrchestrator.getConnectionHistory('acc_123', 10);
 
@@ -316,30 +326,30 @@ const history = await providerOrchestrator.getConnectionHistory('acc_123', 10);
     errorCode: 'RATE_LIMIT_EXCEEDED',
     failoverUsed: true,
     failoverProvider: 'mx',
-    attemptedAt: '2025-11-20T10:30:00Z'
+    attemptedAt: '2025-11-20T10:30:00Z',
   },
   {
     provider: 'mx',
     status: 'success',
     responseTimeMs: 850,
     failoverUsed: false,
-    attemptedAt: '2025-11-20T10:30:02Z'
-  }
-]
+    attemptedAt: '2025-11-20T10:30:02Z',
+  },
+];
 ```
 
 ## Error Handling
 
 ### Error Types
 
-| Type | Retryable? | Action |
-|------|-----------|--------|
-| `auth` | ❌ No | Require user re-authentication |
-| `rate_limit` | ✅ Yes | Try backup provider |
-| `network` | ✅ Yes | Try backup provider |
-| `provider_down` | ✅ Yes | Try backup provider |
-| `validation` | ❌ No | Return error to user |
-| `unknown` | ⚠️ Maybe | Log and try backup |
+| Type            | Retryable? | Action                         |
+| --------------- | ---------- | ------------------------------ |
+| `auth`          | ❌ No      | Require user re-authentication |
+| `rate_limit`    | ✅ Yes     | Try backup provider            |
+| `network`       | ✅ Yes     | Try backup provider            |
+| `provider_down` | ✅ Yes     | Try backup provider            |
+| `validation`    | ❌ No      | Return error to user           |
+| `unknown`       | ⚠️ Maybe   | Log and try backup             |
 
 ### Error Response Format
 
@@ -401,6 +411,7 @@ const history = await providerOrchestrator.getConnectionHistory('acc_123', 10);
 ## Migration Instructions
 
 ### Development
+
 ```bash
 cd apps/api
 npx prisma db push
@@ -499,32 +510,33 @@ CREATE INDEX "connection_attempts_space_id_attempted_at_idx"
 
 ### Latency
 
-| Scenario | Before | After | Impact |
-|----------|--------|-------|--------|
-| **Success (no failover)** | 450ms | 455ms | +5ms (health check overhead) |
-| **Primary fails, backup succeeds** | N/A (user sees error) | 1200ms | ✅ User gets working sync |
-| **All providers fail** | 450ms | 2500ms | Fails faster with clear error |
+| Scenario                           | Before                | After  | Impact                        |
+| ---------------------------------- | --------------------- | ------ | ----------------------------- |
+| **Success (no failover)**          | 450ms                 | 455ms  | +5ms (health check overhead)  |
+| **Primary fails, backup succeeds** | N/A (user sees error) | 1200ms | ✅ User gets working sync     |
+| **All providers fail**             | 450ms                 | 2500ms | Fails faster with clear error |
 
 ### Success Rate
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Connection Success Rate** | 65-70% | 92-95% | **+25-30%** |
-| **User Churn from Broken Sync** | 30% | 5% | **-25%** |
-| **Support Tickets** | 100/week | 20/week | **-80%** |
+| Metric                          | Before   | After   | Improvement |
+| ------------------------------- | -------- | ------- | ----------- |
+| **Connection Success Rate**     | 65-70%   | 92-95%  | **+25-30%** |
+| **User Churn from Broken Sync** | 30%      | 5%      | **-25%**    |
+| **Support Tickets**             | 100/week | 20/week | **-80%**    |
 
 ## Cost Impact
 
 ### Provider Costs
 
-| Provider | Cost per API Call | When to Use |
-|----------|------------------|-------------|
-| **Plaid** | $0.001 | Primary for US |
-| **MX** | $0.0008 | Backup, or primary if cheaper |
-| **Finicity** | $0.0012 | Last resort backup |
-| **Belvo** | $0.0009 | Primary for MX |
+| Provider     | Cost per API Call | When to Use                   |
+| ------------ | ----------------- | ----------------------------- |
+| **Plaid**    | $0.001            | Primary for US                |
+| **MX**       | $0.0008           | Backup, or primary if cheaper |
+| **Finicity** | $0.0012           | Last resort backup            |
+| **Belvo**    | $0.0009           | Primary for MX                |
 
 **Failover Cost Example:**
+
 - Primary attempt (Plaid): $0.001
 - Failover (MX): $0.0008
 - **Total:** $0.0018 vs user churning = **infinitely cheaper**
@@ -533,12 +545,12 @@ CREATE INDEX "connection_attempts_space_id_attempted_at_idx"
 
 ### Market Position After Implementation
 
-| Competitor | Has Multi-Provider? | Our Advantage |
-|------------|-------------------|---------------|
-| **Monarch** | ✅ Yes (Plaid + Finicity) | 🟰 Parity |
-| **YNAB** | ❌ No (Plaid only) | ✅ **Superior** |
-| **Kubera** | ⚠️ Partial (manual fallback) | ✅ **Superior** |
-| **Masttro** | ❌ No | ✅ **Superior** |
+| Competitor  | Has Multi-Provider?          | Our Advantage   |
+| ----------- | ---------------------------- | --------------- |
+| **Monarch** | ✅ Yes (Plaid + Finicity)    | 🟰 Parity       |
+| **YNAB**    | ❌ No (Plaid only)           | ✅ **Superior** |
+| **Kubera**  | ⚠️ Partial (manual fallback) | ✅ **Superior** |
+| **Masttro** | ❌ No                        | ✅ **Superior** |
 
 **Result:** Closes the reliability gap with Monarch, exceeds all other competitors.
 
@@ -569,6 +581,7 @@ CREATE INDEX "connection_attempts_space_id_attempted_at_idx"
 ### Smart Provider Selection
 
 Use ML to select optimal provider based on:
+
 - Historical success rate for institution
 - Current provider health
 - Cost optimization
@@ -577,6 +590,7 @@ Use ML to select optimal provider based on:
 ### Auto-Recovery
 
 When a provider recovers from downtime:
+
 1. Detect consistent successful attempts
 2. Gradually shift traffic back to primary
 3. Update institution mappings

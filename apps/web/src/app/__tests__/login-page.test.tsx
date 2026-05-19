@@ -113,15 +113,16 @@ describe('LoginPage', () => {
     expect(screen.getByText('tryDemo')).toBeInTheDocument();
   });
 
-  it('should render sign up link', () => {
+  it('should render login heading copy', () => {
     render(<LoginPage />);
 
-    expect(screen.getByText('signUp')).toBeInTheDocument();
+    expect(screen.getByText('loginTitle')).toBeInTheDocument();
+    expect(screen.getByText('loginSubtitle')).toBeInTheDocument();
   });
 
-  it('should render forgot password link', () => {
+  it('should render Janua/demo separator', () => {
     render(<LoginPage />);
 
-    expect(screen.getByText('forgotPassword')).toBeInTheDocument();
+    expect(screen.getByText('orContinueWith')).toBeInTheDocument();
   });
 });

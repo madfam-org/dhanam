@@ -1,9 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
-import { TransactionSplitsService } from './transaction-splits.service';
-import { PrismaService } from '@core/prisma/prisma.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { LoggerService } from '@core/logger/logger.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+
 import { SplitTransactionDto, UpdateSplitDto } from './dto/split-transaction.dto';
+import { TransactionSplitsService } from './transaction-splits.service';
 
 describe('TransactionSplitsService', () => {
   let service: TransactionSplitsService;
@@ -195,12 +197,7 @@ describe('TransactionSplitsService', () => {
         ],
       };
 
-      await service.splitTransaction(
-        mockSpace.id,
-        mockTransaction.id,
-        mockUser1.id,
-        evenSplitDto
-      );
+      await service.splitTransaction(mockSpace.id, mockTransaction.id, mockUser1.id, evenSplitDto);
 
       expect(prisma.transaction.update).toHaveBeenCalledWith({
         where: { id: mockTransaction.id },
@@ -262,15 +259,11 @@ describe('TransactionSplitsService', () => {
       (prisma.$transaction as jest.Mock).mockResolvedValue([]);
       prisma.transaction.update.mockResolvedValue({ ...mockTransaction, isSplit: true } as any);
 
-      await service.splitTransaction(
-        mockSpace.id,
-        mockTransaction.id,
-        mockUser1.id,
-        splitDto
-      );
+      await service.splitTransaction(mockSpace.id, mockTransaction.id, mockUser1.id, splitDto);
 
       // Verify deleteMany was called before $transaction by checking invocation order
-      const deleteManyCallOrder = (prisma.transactionSplit.deleteMany as jest.Mock).mock.invocationCallOrder[0];
+      const deleteManyCallOrder = (prisma.transactionSplit.deleteMany as jest.Mock).mock
+        .invocationCallOrder[0];
       const transactionCallOrder = (prisma.$transaction as jest.Mock).mock.invocationCallOrder[0];
       expect(deleteManyCallOrder).toBeLessThan(transactionCallOrder);
     });
@@ -311,9 +304,9 @@ describe('TransactionSplitsService', () => {
     it('should throw NotFoundException if transaction does not exist', async () => {
       prisma.transaction.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.getTransactionSplits(mockSpace.id, 'wrong-id')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getTransactionSplits(mockSpace.id, 'wrong-id')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should return empty array if no splits exist', async () => {
@@ -471,9 +464,9 @@ describe('TransactionSplitsService', () => {
     it('should throw NotFoundException if transaction does not exist', async () => {
       prisma.transaction.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.removeSplit(mockSpace.id, 'wrong-id', mockUser1.id)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.removeSplit(mockSpace.id, 'wrong-id', mockUser1.id)).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should succeed even if no splits existed', async () => {
@@ -655,8 +648,8 @@ describe('TransactionSplitsService', () => {
 
       const smallSplitDto: SplitTransactionDto = {
         splits: [
-          { userId: 'user-1', amount: 0.50, percentage: 50 },
-          { userId: 'user-2', amount: 0.50, percentage: 50 },
+          { userId: 'user-1', amount: 0.5, percentage: 50 },
+          { userId: 'user-2', amount: 0.5, percentage: 50 },
         ],
       };
 

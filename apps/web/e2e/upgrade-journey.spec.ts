@@ -37,9 +37,7 @@ test.describe('Upgrade Journey', () => {
     // should see either the gate upsell or the page content (if gate is bypassed in demo)
     await guestPage.goto('/projections');
 
-    const hasUpgradeText = await guestPage
-      .locator('text=/upgrade|premium|unlock/i')
-      .count();
+    const hasUpgradeText = await guestPage.locator('text=/upgrade|premium|unlock/i').count();
     const hasPageHeading = await guestPage.locator('h1').count();
     expect(hasUpgradeText + hasPageHeading).toBeGreaterThan(0);
   });

@@ -9,7 +9,9 @@ async function main() {
   // Require password from environment — no fallbacks
   const demoPassword = process.env.DEMO_USER_PASSWORD;
   if (!demoPassword) {
-    throw new Error('DEMO_USER_PASSWORD env var required for seeding. Generate with: openssl rand -base64 24');
+    throw new Error(
+      'DEMO_USER_PASSWORD env var required for seeding. Generate with: openssl rand -base64 24'
+    );
   }
 
   // Create demo user
@@ -288,7 +290,22 @@ async function main() {
       name: 'tier1',
       label: 'US/CA/UK/AU/DE',
       discount: 0.0,
-      countries: ['US', 'CA', 'GB', 'DE', 'AU', 'NZ', 'CH', 'AT', 'NL', 'IE', 'SE', 'DK', 'NO', 'FI'],
+      countries: [
+        'US',
+        'CA',
+        'GB',
+        'DE',
+        'AU',
+        'NZ',
+        'CH',
+        'AT',
+        'NL',
+        'IE',
+        'SE',
+        'DK',
+        'NO',
+        'FI',
+      ],
       currency: 'USD',
     },
     {

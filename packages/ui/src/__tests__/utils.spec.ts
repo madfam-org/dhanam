@@ -143,10 +143,7 @@ describe('cn utility', () => {
 
     it('should handle conditional disabled states', () => {
       const isDisabled = true;
-      const result = cn(
-        'button-base',
-        isDisabled && 'opacity-50 cursor-not-allowed'
-      );
+      const result = cn('button-base', isDisabled && 'opacity-50 cursor-not-allowed');
       expect(result).toBe('button-base opacity-50 cursor-not-allowed');
     });
   });

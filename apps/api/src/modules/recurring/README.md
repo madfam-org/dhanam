@@ -12,76 +12,76 @@ The Recurring module enables users to track, manage, and forecast recurring fina
 
 Represents a detected or manually created recurring payment pattern.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Unique identifier |
-| `spaceId` | UUID | Parent space reference |
-| `merchantName` | string | Display name (e.g., "Netflix") |
-| `merchantPattern` | string | Regex pattern for matching |
-| `expectedAmount` | Decimal | Expected transaction amount |
-| `amountVariance` | Decimal | Allowed variance (0.0-1.0) |
-| `currency` | enum | Transaction currency |
-| `frequency` | enum | Recurrence frequency |
-| `status` | enum | Pattern status |
-| `categoryId` | UUID | Auto-assign category |
-| `lastOccurrence` | datetime | Last matched transaction date |
-| `nextExpected` | datetime | Predicted next occurrence |
-| `occurrenceCount` | int | Total matched occurrences |
-| `confidence` | Decimal | Detection confidence (0-1) |
-| `alertBeforeDays` | int | Days before to send alert |
-| `alertEnabled` | boolean | Alert toggle |
-| `notes` | string | User notes |
-| `firstDetectedAt` | datetime | Initial detection timestamp |
-| `confirmedAt` | datetime | User confirmation timestamp |
-| `dismissedAt` | datetime | Dismissal timestamp |
+| Field             | Type     | Description                    |
+| ----------------- | -------- | ------------------------------ |
+| `id`              | UUID     | Unique identifier              |
+| `spaceId`         | UUID     | Parent space reference         |
+| `merchantName`    | string   | Display name (e.g., "Netflix") |
+| `merchantPattern` | string   | Regex pattern for matching     |
+| `expectedAmount`  | Decimal  | Expected transaction amount    |
+| `amountVariance`  | Decimal  | Allowed variance (0.0-1.0)     |
+| `currency`        | enum     | Transaction currency           |
+| `frequency`       | enum     | Recurrence frequency           |
+| `status`          | enum     | Pattern status                 |
+| `categoryId`      | UUID     | Auto-assign category           |
+| `lastOccurrence`  | datetime | Last matched transaction date  |
+| `nextExpected`    | datetime | Predicted next occurrence      |
+| `occurrenceCount` | int      | Total matched occurrences      |
+| `confidence`      | Decimal  | Detection confidence (0-1)     |
+| `alertBeforeDays` | int      | Days before to send alert      |
+| `alertEnabled`    | boolean  | Alert toggle                   |
+| `notes`           | string   | User notes                     |
+| `firstDetectedAt` | datetime | Initial detection timestamp    |
+| `confirmedAt`     | datetime | User confirmation timestamp    |
+| `dismissedAt`     | datetime | Dismissal timestamp            |
 
 ### RecurringStatus
 
-| Status | Description |
-|--------|-------------|
-| `detected` | Auto-detected, awaiting user action |
-| `confirmed` | User verified, actively tracking |
-| `paused` | Temporarily suspended tracking |
-| `dismissed` | User rejected pattern |
+| Status      | Description                         |
+| ----------- | ----------------------------------- |
+| `detected`  | Auto-detected, awaiting user action |
+| `confirmed` | User verified, actively tracking    |
+| `paused`    | Temporarily suspended tracking      |
+| `dismissed` | User rejected pattern               |
 
 ### RecurrenceFrequency
 
-| Frequency | Days Between |
-|-----------|--------------|
-| `daily` | 1 |
-| `weekly` | 7 |
-| `biweekly` | 14 |
-| `monthly` | 30 |
-| `quarterly` | 90 |
-| `yearly` | 365 |
+| Frequency   | Days Between |
+| ----------- | ------------ |
+| `daily`     | 1            |
+| `weekly`    | 7            |
+| `biweekly`  | 14           |
+| `monthly`   | 30           |
+| `quarterly` | 90           |
+| `yearly`    | 365          |
 
 ## API Endpoints
 
 ### Pattern Management
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/spaces/:spaceId/recurring` | List recurring patterns |
-| `GET` | `/spaces/:spaceId/recurring/summary` | Get recurring summary |
-| `GET` | `/spaces/:spaceId/recurring/:id` | Get pattern details |
-| `POST` | `/spaces/:spaceId/recurring` | Create manual pattern |
-| `PATCH` | `/spaces/:spaceId/recurring/:id` | Update pattern |
-| `DELETE` | `/spaces/:spaceId/recurring/:id` | Delete pattern |
+| Method   | Endpoint                             | Description             |
+| -------- | ------------------------------------ | ----------------------- |
+| `GET`    | `/spaces/:spaceId/recurring`         | List recurring patterns |
+| `GET`    | `/spaces/:spaceId/recurring/summary` | Get recurring summary   |
+| `GET`    | `/spaces/:spaceId/recurring/:id`     | Get pattern details     |
+| `POST`   | `/spaces/:spaceId/recurring`         | Create manual pattern   |
+| `PATCH`  | `/spaces/:spaceId/recurring/:id`     | Update pattern          |
+| `DELETE` | `/spaces/:spaceId/recurring/:id`     | Delete pattern          |
 
 ### Detection and Status
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/spaces/:spaceId/recurring/detect` | Run pattern detection |
-| `POST` | `/spaces/:spaceId/recurring/:id/confirm` | Confirm detected pattern |
-| `POST` | `/spaces/:spaceId/recurring/:id/dismiss` | Dismiss detected pattern |
-| `POST` | `/spaces/:spaceId/recurring/:id/toggle-pause` | Pause/resume tracking |
+| Method | Endpoint                                      | Description              |
+| ------ | --------------------------------------------- | ------------------------ |
+| `POST` | `/spaces/:spaceId/recurring/detect`           | Run pattern detection    |
+| `POST` | `/spaces/:spaceId/recurring/:id/confirm`      | Confirm detected pattern |
+| `POST` | `/spaces/:spaceId/recurring/:id/dismiss`      | Dismiss detected pattern |
+| `POST` | `/spaces/:spaceId/recurring/:id/toggle-pause` | Pause/resume tracking    |
 
 ### Query Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `status` | enum | Filter by status |
+| Parameter         | Type    | Description                  |
+| ----------------- | ------- | ---------------------------- |
+| `status`          | enum    | Filter by status             |
 | `includeDetected` | boolean | Include unconfirmed patterns |
 
 ### Request/Response Examples
@@ -93,7 +93,7 @@ Represents a detected or manually created recurring payment pattern.
 {
   "merchantName": "Netflix",
   "merchantPattern": "netflix",
-  "expectedAmount": 199.00,
+  "expectedAmount": 199.0,
   "amountVariance": 0.1,
   "currency": "MXN",
   "frequency": "monthly",
@@ -108,15 +108,15 @@ Represents a detected or manually created recurring payment pattern.
 
 ```json
 {
-  "totalMonthly": 2450.00,
-  "totalAnnual": 29400.00,
+  "totalMonthly": 2450.0,
+  "totalAnnual": 29400.0,
   "activeCount": 8,
   "detectedCount": 3,
   "upcomingThisMonth": [
     {
       "id": "uuid",
       "merchantName": "Netflix",
-      "expectedAmount": 199.00,
+      "expectedAmount": 199.0,
       "currency": "MXN",
       "expectedDate": "2025-01-28T00:00:00Z",
       "daysUntil": 3
@@ -133,7 +133,7 @@ Represents a detected or manually created recurring payment pattern.
     {
       "id": "uuid",
       "merchantName": "Spotify",
-      "expectedAmount": 115.00,
+      "expectedAmount": 115.0,
       "frequency": "monthly",
       "confidence": 0.85,
       "occurrenceCount": 8
@@ -194,6 +194,7 @@ confidence =
 ```
 
 Factors:
+
 - **Frequency Score (50%)**: How well intervals match expected frequency
 - **Amount Consistency (30%)**: Lower variance increases confidence
 - **Occurrence Count (20%)**: More occurrences boost confidence
@@ -242,11 +243,11 @@ For each confirmed pattern:
 
 ## Error Handling
 
-| Error | Status | Condition |
-|-------|--------|-----------|
-| `NotFoundException` | 404 | Pattern not found |
-| `ConflictException` | 409 | Duplicate pattern, wrong status transition |
-| `ForbiddenException` | 403 | Insufficient space access |
+| Error                | Status | Condition                                  |
+| -------------------- | ------ | ------------------------------------------ |
+| `NotFoundException`  | 404    | Pattern not found                          |
+| `ConflictException`  | 409    | Duplicate pattern, wrong status transition |
+| `ForbiddenException` | 403    | Insufficient space access                  |
 
 ### Error Messages
 
@@ -257,13 +258,13 @@ For each confirmed pattern:
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `spaces` | Recurring patterns belong to spaces |
-| `transactions` | Transactions linked to recurring patterns |
-| `categories` | Patterns can auto-assign categories |
-| `alerts` | Patterns can trigger upcoming payment alerts |
-| `forecasts` | Recurring amounts used in cashflow projections |
+| Module         | Relationship                                   |
+| -------------- | ---------------------------------------------- |
+| `spaces`       | Recurring patterns belong to spaces            |
+| `transactions` | Transactions linked to recurring patterns      |
+| `categories`   | Patterns can auto-assign categories            |
+| `alerts`       | Patterns can trigger upcoming payment alerts   |
+| `forecasts`    | Recurring amounts used in cashflow projections |
 
 ## Testing
 
@@ -304,5 +305,6 @@ pnpm test:cov -- recurring
 - Edge cases (missed payments, amount changes)
 
 ---
+
 **Module**: `recurring`
 **Last Updated**: January 2025

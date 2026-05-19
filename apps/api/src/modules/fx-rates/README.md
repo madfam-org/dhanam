@@ -8,11 +8,11 @@ The FX Rates module provides real-time and historical exchange rate data, primar
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| `ExchangeRate` | Stored exchange rate with date and source |
-| `Currency` | Supported currency enum (MXN, USD, EUR) |
-| `BanxicoApiResponse` | Banxico API response structure |
+| Entity               | Description                               |
+| -------------------- | ----------------------------------------- |
+| `ExchangeRate`       | Stored exchange rate with date and source |
+| `Currency`           | Supported currency enum (MXN, USD, EUR)   |
+| `BanxicoApiResponse` | Banxico API response structure            |
 
 ### Exchange Rate Structure
 
@@ -22,47 +22,47 @@ interface ExchangeRate {
   toCurrency: Currency;
   rate: number;
   date: Date;
-  source: string;        // 'banxico' or 'fallback'
+  source: string; // 'banxico' or 'fallback'
 }
 ```
 
 ## API Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `GET` | `/fx-rates/rate` | JWT | Get exchange rate between currencies |
-| `GET` | `/fx-rates/convert` | JWT | Convert amount between currencies |
-| `GET` | `/fx-rates/historical` | JWT | Get historical rates for date range |
-| `GET` | `/fx-rates/currencies` | No | List supported currencies |
-| `GET` | `/fx-rates/health` | No | Service health check |
+| Method | Endpoint               | Auth | Description                          |
+| ------ | ---------------------- | ---- | ------------------------------------ |
+| `GET`  | `/fx-rates/rate`       | JWT  | Get exchange rate between currencies |
+| `GET`  | `/fx-rates/convert`    | JWT  | Convert amount between currencies    |
+| `GET`  | `/fx-rates/historical` | JWT  | Get historical rates for date range  |
+| `GET`  | `/fx-rates/currencies` | No   | List supported currencies            |
+| `GET`  | `/fx-rates/health`     | No   | Service health check                 |
 
 ### Query Parameters
 
 #### GET /fx-rates/rate
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `from` | Currency | Yes | Source currency (MXN, USD, EUR) |
-| `to` | Currency | Yes | Target currency |
-| `date` | ISO 8601 | No | Historical rate date |
+| Parameter | Type     | Required | Description                     |
+| --------- | -------- | -------- | ------------------------------- |
+| `from`    | Currency | Yes      | Source currency (MXN, USD, EUR) |
+| `to`      | Currency | Yes      | Target currency                 |
+| `date`    | ISO 8601 | No       | Historical rate date            |
 
 #### GET /fx-rates/convert
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `amount` | number | Yes | Amount to convert |
-| `from` | Currency | Yes | Source currency |
-| `to` | Currency | Yes | Target currency |
-| `date` | ISO 8601 | No | Historical rate date |
+| Parameter | Type     | Required | Description          |
+| --------- | -------- | -------- | -------------------- |
+| `amount`  | number   | Yes      | Amount to convert    |
+| `from`    | Currency | Yes      | Source currency      |
+| `to`      | Currency | Yes      | Target currency      |
+| `date`    | ISO 8601 | No       | Historical rate date |
 
 #### GET /fx-rates/historical
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `from` | Currency | Yes | Source currency |
-| `to` | Currency | Yes | Target currency |
-| `startDate` | ISO 8601 | Yes | Range start date |
-| `endDate` | ISO 8601 | Yes | Range end date |
+| Parameter   | Type     | Required | Description      |
+| ----------- | -------- | -------- | ---------------- |
+| `from`      | Currency | Yes      | Source currency  |
+| `to`        | Currency | Yes      | Target currency  |
+| `startDate` | ISO 8601 | Yes      | Range start date |
+| `endDate`   | ISO 8601 | Yes      | Range end date   |
 
 ### Example Requests
 
@@ -170,10 +170,10 @@ Cron: Every hour (@Cron(CronExpression.EVERY_HOUR))
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `BANXICO_API_TOKEN` | Banxico SIE API token | Yes |
-| `REDIS_URL` | Redis connection URL | Yes |
+| Variable            | Description           | Required |
+| ------------------- | --------------------- | -------- |
+| `BANXICO_API_TOKEN` | Banxico SIE API token | Yes      |
+| `REDIS_URL`         | Redis connection URL  | Yes      |
 
 ### Banxico API Configuration
 
@@ -181,8 +181,8 @@ Cron: Every hour (@Cron(CronExpression.EVERY_HOUR))
 const BANXICO_CONFIG = {
   BASE_URL: 'https://www.banxico.org.mx/SieAPIRest/service/v1/series',
   SERIES_IDS: {
-    USD_MXN: 'SF43718',  // Dollar FIX rate
-    EUR_MXN: 'SF46410',  // Euro rate
+    USD_MXN: 'SF43718', // Dollar FIX rate
+    EUR_MXN: 'SF46410', // Euro rate
   },
 };
 ```
@@ -191,7 +191,7 @@ const BANXICO_CONFIG = {
 
 ```typescript
 const CACHE_CONFIG = {
-  TTL: 3600,              // 1 hour in seconds
+  TTL: 3600, // 1 hour in seconds
   KEY_PREFIX: 'fx:',
   KEY_FORMAT: 'fx:{from}:{to}:{date|latest}',
 };
@@ -214,20 +214,20 @@ const FALLBACK_RATES = {
 
 ## Supported Currencies
 
-| Currency | Code | Description |
-|----------|------|-------------|
-| Mexican Peso | MXN | Base currency for Banxico rates |
-| US Dollar | USD | Primary foreign currency |
-| Euro | EUR | Secondary foreign currency |
+| Currency     | Code | Description                     |
+| ------------ | ---- | ------------------------------- |
+| Mexican Peso | MXN  | Base currency for Banxico rates |
+| US Dollar    | USD  | Primary foreign currency        |
+| Euro         | EUR  | Secondary foreign currency      |
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `transactions` | Currency conversion for multi-currency transactions |
-| `accounts` | Balance conversion for reporting |
-| `wealth` | Net worth in preferred currency |
-| `manual-assets` | Asset values in different currencies |
+| Module          | Relationship                                        |
+| --------------- | --------------------------------------------------- |
+| `transactions`  | Currency conversion for multi-currency transactions |
+| `accounts`      | Balance conversion for reporting                    |
+| `wealth`        | Net worth in preferred currency                     |
+| `manual-assets` | Asset values in different currencies                |
 
 ## Testing
 
@@ -263,12 +263,12 @@ pnpm test:cov -- fx-rates
 
 ## Error Handling
 
-| Scenario | Behavior |
-|----------|----------|
-| Banxico API timeout | Return cached/fallback rate |
+| Scenario              | Behavior                             |
+| --------------------- | ------------------------------------ |
+| Banxico API timeout   | Return cached/fallback rate          |
 | Invalid currency pair | Return fallback rate (1 for unknown) |
-| Cache unavailable | Proceed to API/database |
-| All sources fail | Return hardcoded fallback rates |
+| Cache unavailable     | Proceed to API/database              |
+| All sources fail      | Return hardcoded fallback rates      |
 
 ---
 

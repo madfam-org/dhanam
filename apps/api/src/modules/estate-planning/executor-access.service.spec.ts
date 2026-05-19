@@ -1,16 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { ExecutorAccessService } from './executor-access.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
-import { AuditService } from '../../core/audit/audit.service';
-import { JanuaEmailService } from '../email/janua-email.service';
 import {
   createPrismaMock,
   createLoggerMock,
   createAuditMock,
 } from '../../../test/helpers/api-mock-factory';
+import { AuditService } from '../../core/audit/audit.service';
+import { PrismaService } from '../../core/prisma/prisma.service';
+import { JanuaEmailService } from '../email/janua-email.service';
+
+import { ExecutorAccessService } from './executor-access.service';
 
 describe('ExecutorAccessService', () => {
   let service: ExecutorAccessService;
@@ -216,9 +217,9 @@ describe('ExecutorAccessService', () => {
     });
 
     it('should throw ForbiddenException for email mismatch', async () => {
-      await expect(
-        service.verifyExecutor(testAssignmentId, 'wrong@example.com')
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.verifyExecutor(testAssignmentId, 'wrong@example.com')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should return verified=true if already verified', async () => {
@@ -337,9 +338,9 @@ describe('ExecutorAccessService', () => {
     });
 
     it('should throw ForbiddenException for unauthorized email', async () => {
-      await expect(
-        service.requestAccess(testAssignmentId, 'wrong@example.com')
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.requestAccess(testAssignmentId, 'wrong@example.com')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should throw ForbiddenException if not verified', async () => {

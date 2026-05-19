@@ -19,6 +19,9 @@ jest.mock('@prisma/client', () => ({
   },
 }));
 
+import { Logger } from '@nestjs/common';
+
+import { IdMap } from '../id-map';
 import {
   mapCurrency,
   mapAssetType,
@@ -29,7 +32,6 @@ import {
   mapCryptoToAccount,
   mapRecurringItem,
 } from '../lunchmoney-mapper';
-import { IdMap } from '../id-map';
 import { LMAsset, LMPlaidAccount, LMCrypto, LMRecurringItem } from '../lunchmoney-types';
 
 describe('LunchMoney Mapper', () => {
@@ -43,8 +45,8 @@ describe('LunchMoney Mapper', () => {
       expect(mapCurrency(input)).toBe(expected);
     });
 
-    it('defaults unknown currency to MXN with console.warn', () => {
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    it('defaults unknown currency to MXN with a logger warning', () => {
+      const warnSpy = jest.spyOn(Logger.prototype, 'warn').mockImplementation();
 
       const result = mapCurrency('GBP');
 

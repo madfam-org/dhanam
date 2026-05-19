@@ -209,16 +209,17 @@ export class MonteCarloEngine {
     });
 
     // Calculate probabilities
-    const successRate = allOutcomes.filter(balance => balance > 0).length / config.iterations;
+    const successRate = allOutcomes.filter((balance) => balance > 0).length / config.iterations;
 
     const doublingProbability =
-      allOutcomes.filter(balance => balance >= config.initialBalance * 2).length /
+      allOutcomes.filter((balance) => balance >= config.initialBalance * 2).length /
       config.iterations;
 
     const inflationRate = config.inflationRate || 0;
-    const inflationAdjustedInitial = config.initialBalance * Math.pow(1 + inflationRate, config.years);
+    const inflationAdjustedInitial =
+      config.initialBalance * Math.pow(1 + inflationRate, config.years);
     const maintainingPurchasingPower =
-      allOutcomes.filter(balance => balance >= inflationAdjustedInitial).length /
+      allOutcomes.filter((balance) => balance >= inflationAdjustedInitial).length /
       config.iterations;
 
     const executionTimeMs = Date.now() - startTime;
@@ -342,7 +343,7 @@ export class MonteCarloEngine {
       distributionOutcomes.push(finalBalance);
 
       // Track when money runs out
-      const depletionYear = yearlyBalance.findIndex(balance => balance <= 0);
+      const depletionYear = yearlyBalance.findIndex((balance) => balance <= 0);
       if (depletionYear !== -1) {
         yearsUntilDepletionSum += depletionYear;
         depletionCount++;
@@ -350,9 +351,9 @@ export class MonteCarloEngine {
 
       // Combine accumulation and distribution yearly balances
       const combinedYearly = [
-        ...accumulationResult.yearlyProjections.slice(0, yearsUntilRetirement + 1).map((_, idx) =>
-          accumulationResult.allOutcomes[i] * (idx / yearsUntilRetirement)
-        ),
+        ...accumulationResult.yearlyProjections
+          .slice(0, yearsUntilRetirement + 1)
+          .map((_, idx) => accumulationResult.allOutcomes[i] * (idx / yearsUntilRetirement)),
         ...yearlyBalance.slice(1), // Skip first year (duplicate of retirement year)
       ];
 
@@ -364,7 +365,8 @@ export class MonteCarloEngine {
     }
 
     // Calculate success probability (not running out of money)
-    const successProbability = distributionOutcomes.filter(balance => balance > 0).length / iterations;
+    const successProbability =
+      distributionOutcomes.filter((balance) => balance > 0).length / iterations;
 
     // Calculate yearly projections
     const yearlyProjections: YearlyProjection[] = yearlyBalances.map((balances, year) => {
@@ -401,7 +403,7 @@ export class MonteCarloEngine {
       const yearIndex = age - config.currentAge;
       if (yearlyBalances[yearIndex] && yearlyBalances[yearIndex].length > 0) {
         const successAtAge =
-          yearlyBalances[yearIndex].filter(balance => balance > 0).length / iterations;
+          yearlyBalances[yearIndex].filter((balance) => balance > 0).length / iterations;
         successByAge.push({ age, successRate: successAtAge });
       }
     }
@@ -411,7 +413,8 @@ export class MonteCarloEngine {
       balanceAtRetirement: summarize(balanceAtRetirementOutcomes),
       balanceAtLifeExpectancy: summarize(distributionOutcomes),
       yearlyProjections,
-      medianYearsUntilDepletion: depletionCount > 0 ? yearsUntilDepletionSum / depletionCount : null,
+      medianYearsUntilDepletion:
+        depletionCount > 0 ? yearsUntilDepletionSum / depletionCount : null,
       successByAge,
     };
   }
@@ -426,18 +429,21 @@ export class MonteCarloEngine {
     expectedReturn: number;
     returnVolatility: number;
     inflationRate?: number;
+    iterations?: number;
+    maxAttempts?: number;
   }): number {
     const targetSuccess = params.successProbability;
 
     // Binary search for the withdrawal rate
     let low = 0.01; // 1%
-    let high = 0.10; // 10%
+    let high = 0.1; // 10%
     let bestRate = 0.04; // Default to 4% rule
 
-    const iterations = 10000;
+    const iterations = params.iterations ?? 10000;
+    const maxAttempts = params.maxAttempts ?? 20;
     const tolerance = 0.001; // 0.1% tolerance
 
-    for (let attempt = 0; attempt < 20; attempt++) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       const testRate = (low + high) / 2;
       const monthlyWithdrawal = (params.portfolioValue * testRate) / 12;
 

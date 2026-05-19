@@ -84,9 +84,11 @@ export const analytics = {
     },
     longTerm: {
       netWorthProjection: 'Proyección del patrimonio neto',
-      netWorthDescription: 'Tu patrimonio neto proyectado a lo largo del tiempo. El área sombreada muestra los años de jubilación.',
+      netWorthDescription:
+        'Tu patrimonio neto proyectado a lo largo del tiempo. El área sombreada muestra los años de jubilación.',
       incomeVsExpenses: 'Ingresos vs Gastos',
-      incomeVsExpensesDescription: 'Ingresos y gastos proyectados a lo largo del tiempo. El área verde muestra flujo de caja positivo.',
+      incomeVsExpensesDescription:
+        'Ingresos y gastos proyectados a lo largo del tiempo. El área verde muestra flujo de caja positivo.',
       totalAssets: 'Activos totales',
       netWorth: 'Patrimonio neto',
       totalDebt: 'Deuda total',
@@ -107,7 +109,8 @@ export const analytics = {
       worst10: 'Peor 10%',
       p10: 'Percentil 10',
       p90: 'Percentil 90',
-      confidenceNote: 'El área sombreada representa el intervalo de confianza del 80% (percentil 10 al 90). La línea mediana muestra el resultado más probable.',
+      confidenceNote:
+        'El área sombreada representa el intervalo de confianza del 80% (percentil 10 al 90). La línea mediana muestra el resultado más probable.',
     },
     budget: {
       categorySpending: 'Gasto por categoría',

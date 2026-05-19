@@ -15,15 +15,15 @@ The ML module provides AI-powered features that learn from user behavior to impr
 
 ## Key Entities
 
-| Service | Description |
-|---------|-------------|
-| `TransactionCategorizationService` | Core categorization engine |
-| `CorrectionService` | User correction recording |
-| `CorrectionAggregatorService` | Pattern learning from corrections |
-| `MerchantNormalizerService` | Merchant name standardization |
-| `FuzzyMatcherService` | String similarity algorithms |
-| `ProviderSelectionService` | ML-based provider selection |
-| `SplitPredictionService` | Transaction split suggestions |
+| Service                            | Description                       |
+| ---------------------------------- | --------------------------------- |
+| `TransactionCategorizationService` | Core categorization engine        |
+| `CorrectionService`                | User correction recording         |
+| `CorrectionAggregatorService`      | Pattern learning from corrections |
+| `MerchantNormalizerService`        | Merchant name standardization     |
+| `FuzzyMatcherService`              | String similarity algorithms      |
+| `ProviderSelectionService`         | ML-based provider selection       |
+| `SplitPredictionService`           | Transaction split suggestions     |
 
 ## Service Architecture
 
@@ -58,13 +58,13 @@ The ML module provides AI-powered features that learn from user behavior to impr
 
 The categorization service uses multiple strategies in priority order:
 
-| Priority | Strategy | Confidence | Description |
-|----------|----------|------------|-------------|
-| 1 | Correction Patterns | 0.7-1.0 | Learned from user corrections |
-| 2 | Exact Merchant | 0.7-0.95 | Historical merchant→category mapping |
-| 3 | Fuzzy Merchant | 0.75 | Similar merchant match using Levenshtein |
-| 4 | Keyword Match | 0.7 | Description keyword analysis |
-| 5 | Amount Pattern | 0.5 | Statistical amount range matching |
+| Priority | Strategy            | Confidence | Description                              |
+| -------- | ------------------- | ---------- | ---------------------------------------- |
+| 1        | Correction Patterns | 0.7-1.0    | Learned from user corrections            |
+| 2        | Exact Merchant      | 0.7-0.95   | Historical merchant→category mapping     |
+| 3        | Fuzzy Merchant      | 0.75       | Similar merchant match using Levenshtein |
+| 4        | Keyword Match       | 0.7        | Description keyword analysis             |
+| 5        | Amount Pattern      | 0.5        | Statistical amount range matching        |
 
 ### Auto-Categorization Threshold
 
@@ -72,12 +72,12 @@ Transactions are automatically categorized only when confidence ≥ 0.9 (HIGH_CO
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/ml/categorize` | POST | Get category prediction for transaction |
-| `/ml/corrections` | POST | Record user category correction |
-| `/ml/accuracy` | GET | Get categorization accuracy metrics |
-| `/ml/patterns/:spaceId` | GET | Get learned patterns for a space |
+| Endpoint                | Method | Description                             |
+| ----------------------- | ------ | --------------------------------------- |
+| `/ml/categorize`        | POST   | Get category prediction for transaction |
+| `/ml/corrections`       | POST   | Record user category correction         |
+| `/ml/accuracy`          | GET    | Get categorization accuracy metrics     |
+| `/ml/patterns/:spaceId` | GET    | Get learned patterns for a space        |
 
 ## Data Flow
 
@@ -105,12 +105,12 @@ Transactions are automatically categorized only when confidence ≥ 0.9 (HIGH_CO
 
 The normalizer standardizes merchant names:
 
-| Input | Output |
-|-------|--------|
-| `AMZN MKTP US*ABC123` | `Amazon` |
-| `UBER *EATS US JAN01` | `Uber Eats` |
-| `PAYPAL *NETFLIX` | `Netflix` |
-| `SQ *COFFEE SHOP` | `Coffee Shop` |
+| Input                 | Output        |
+| --------------------- | ------------- |
+| `AMZN MKTP US*ABC123` | `Amazon`      |
+| `UBER *EATS US JAN01` | `Uber Eats`   |
+| `PAYPAL *NETFLIX`     | `Netflix`     |
+| `SQ *COFFEE SHOP`     | `Coffee Shop` |
 
 ### Pattern Extraction
 
@@ -124,11 +124,11 @@ The normalizer standardizes merchant names:
 
 The fuzzy matcher combines multiple algorithms:
 
-| Algorithm | Weight | Purpose |
-|-----------|--------|---------|
-| Levenshtein | 40% | Edit distance |
-| Jaccard | 30% | Word overlap |
-| Prefix Match | 30% | Common beginnings |
+| Algorithm    | Weight | Purpose           |
+| ------------ | ------ | ----------------- |
+| Levenshtein  | 40%    | Edit distance     |
+| Jaccard      | 30%    | Word overlap      |
+| Prefix Match | 30%    | Common beginnings |
 
 ### Match Threshold
 
@@ -146,23 +146,23 @@ ML-based provider selection considers:
 
 ## Error Handling
 
-| Error | Handling |
-|-------|----------|
-| No prediction | Return null (user categorizes manually) |
-| Low confidence | Flag for review, don't auto-categorize |
-| Database error | Log and fail gracefully |
+| Error          | Handling                                |
+| -------------- | --------------------------------------- |
+| No prediction  | Return null (user categorizes manually) |
+| Low confidence | Flag for review, don't auto-categorize  |
+| Database error | Log and fail gracefully                 |
 
 ## Configuration
 
 ```typescript
 // Confidence thresholds
-HIGH_CONFIDENCE = 0.9   // Auto-categorize
-MEDIUM_CONFIDENCE = 0.7 // Suggest category
-LOW_CONFIDENCE = 0.5    // Low-priority suggestion
+HIGH_CONFIDENCE = 0.9; // Auto-categorize
+MEDIUM_CONFIDENCE = 0.7; // Suggest category
+LOW_CONFIDENCE = 0.5; // Low-priority suggestion
 
 // Pattern requirements
-MIN_MERCHANT_COUNT = 3  // Transactions needed for merchant pattern
-MIN_KEYWORD_OVERLAP = 0.3 // Minimum keyword match ratio
+MIN_MERCHANT_COUNT = 3; // Transactions needed for merchant pattern
+MIN_KEYWORD_OVERLAP = 0.3; // Minimum keyword match ratio
 ```
 
 ## Accuracy Metrics
@@ -178,12 +178,12 @@ interface CategorizationAccuracy {
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| [`transactions`](../transactions/README.md) | Triggers categorization on new transactions |
-| [`categories`](../categories/README.md) | Category entity management |
-| [`providers/orchestrator`](../providers/orchestrator/README.md) | Uses provider selection service |
-| [`budgets`](../budgets/README.md) | Categories linked to budgets |
+| Module                                                          | Relationship                                |
+| --------------------------------------------------------------- | ------------------------------------------- |
+| [`transactions`](../transactions/README.md)                     | Triggers categorization on new transactions |
+| [`categories`](../categories/README.md)                         | Category entity management                  |
+| [`providers/orchestrator`](../providers/orchestrator/README.md) | Uses provider selection service             |
+| [`budgets`](../budgets/README.md)                               | Categories linked to budgets                |
 
 ## Testing
 

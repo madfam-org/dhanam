@@ -1,11 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
+import {
+  createRedisMock,
+  createConfigMock,
+  createLoggerMock,
+} from '../../../../test/helpers/api-mock-factory';
 import { RedisService } from '../../../core/redis/redis.service';
 
 import { EnjinAdapter } from './enjin.adapter';
-
-import { createRedisMock, createConfigMock, createLoggerMock } from '../../../../test/helpers/api-mock-factory';
 
 describe('EnjinAdapter', () => {
   let adapter: EnjinAdapter;

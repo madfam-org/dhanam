@@ -18,7 +18,8 @@ export const legal = {
     'This Privacy Policy describes how Dhanam ("we", "our", or "us") collects, uses, and protects your personal information in compliance with the Mexican Federal Law on Protection of Personal Data Held by Private Parties (LFPDPPP).',
   privacySections: {
     dataController: 'Data Controller',
-    dataControllerContent: '[LEGAL COUNSEL TO PROVIDE — Company name, RFC, address, contact email for data privacy officer]',
+    dataControllerContent:
+      '[LEGAL COUNSEL TO PROVIDE — Company name, RFC, address, contact email for data privacy officer]',
     dataCollected: 'Personal Data Collected',
     dataCollectedContent:
       '[LEGAL COUNSEL TO PROVIDE — Categories: identity data, financial data, device data, usage analytics]',
@@ -26,7 +27,8 @@ export const legal = {
     purposesContent:
       '[LEGAL COUNSEL TO PROVIDE — Primary purposes: account management, financial aggregation, analytics. Secondary purposes: marketing, product improvement]',
     legalBasis: 'Legal Basis',
-    legalBasisContent: '[LEGAL COUNSEL TO PROVIDE — Consent, contract performance, legitimate interest]',
+    legalBasisContent:
+      '[LEGAL COUNSEL TO PROVIDE — Consent, contract performance, legitimate interest]',
     arcoRights: 'ARCO Rights',
     arcoRightsContent:
       '[LEGAL COUNSEL TO PROVIDE — Access, Rectification, Cancellation, Opposition rights per LFPDPPP Articles 28-35. Process for exercising rights, response timeline (20 business days)]',
@@ -40,12 +42,14 @@ export const legal = {
     securityContent:
       'We implement industry-standard security measures including AES-256-GCM encryption for sensitive data at rest, TLS 1.3 for data in transit, and regular security assessments.',
     cookies: 'Cookies and Tracking',
-    cookiesContent: 'For details on our use of cookies and tracking technologies, please see our Cookie Policy.',
+    cookiesContent:
+      'For details on our use of cookies and tracking technologies, please see our Cookie Policy.',
     changes: 'Changes to This Policy',
     changesContent:
       '[LEGAL COUNSEL TO PROVIDE — Notification procedures for material changes, consent renewal requirements]',
     contact: 'Contact Information',
-    contactContent: '[LEGAL COUNSEL TO PROVIDE — Privacy officer contact, physical address, email, phone]',
+    contactContent:
+      '[LEGAL COUNSEL TO PROVIDE — Privacy officer contact, physical address, email, phone]',
   },
 
   // Terms of Service
@@ -149,7 +153,8 @@ export const legal = {
       'Help us understand how visitors use our application. We use PostHog for analytics. These are only enabled with your consent.',
     analyticsExamples: 'PostHog tracking cookies',
     preferences: 'Preference Cookies',
-    preferencesContent: 'Remember your settings such as theme (light/dark mode) and language preference.',
+    preferencesContent:
+      'Remember your settings such as theme (light/dark mode) and language preference.',
     preferencesExamples: 'dhanam_locale, theme preference',
     consentMechanism: 'Your Cookie Choices',
     consentMechanismContent:
@@ -161,7 +166,8 @@ export const legal = {
     managingContent:
       'You can control cookies through your browser settings. Note that disabling essential cookies may prevent the application from functioning correctly.',
     changes: 'Changes to This Policy',
-    changesContent: 'We may update this Cookie Policy from time to time. Changes will be posted on this page.',
+    changesContent:
+      'We may update this Cookie Policy from time to time. Changes will be posted on this page.',
   },
 
   // ESG Methodology
@@ -192,7 +198,8 @@ export const legal = {
     limitationsContent:
       'ESG scores are estimates based on available data and should not be the sole basis for investment decisions. Methodology and data sources are subject to change. Scores may not capture all relevant factors.',
     updates: 'Score Updates',
-    updatesContent: 'ESG scores are refreshed periodically as new data becomes available and methodology is refined.',
+    updatesContent:
+      'ESG scores are refreshed periodically as new data becomes available and methodology is refined.',
   },
 
   // Status Page

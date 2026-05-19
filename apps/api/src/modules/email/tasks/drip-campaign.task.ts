@@ -1,7 +1,8 @@
-import { PrismaService } from '@core/prisma/prisma.service';
-import { PostHogService } from '@modules/analytics/posthog.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+
+import { PrismaService } from '@core/prisma/prisma.service';
+import { PostHogService } from '@modules/analytics/posthog.service';
 
 import { EmailService } from '../email.service';
 

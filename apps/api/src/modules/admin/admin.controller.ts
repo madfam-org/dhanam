@@ -1,5 +1,3 @@
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
-import { AuthenticatedRequest } from '@core/types/authenticated-request';
 import {
   Controller,
   Get,
@@ -24,6 +22,9 @@ import {
   ApiForbiddenResponse,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
+import { AuthenticatedRequest } from '@core/types/authenticated-request';
 
 import { AdminOpsService } from './admin-ops.service';
 import { AdminService } from './admin.service';

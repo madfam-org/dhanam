@@ -87,9 +87,7 @@ describe('AuditService', () => {
     });
 
     it('should chain HMAC hashes across consecutive events', async () => {
-      cryptoService.hmac
-        .mockReturnValueOnce('hash-1')
-        .mockReturnValueOnce('hash-2');
+      cryptoService.hmac.mockReturnValueOnce('hash-1').mockReturnValueOnce('hash-2');
 
       await service.logEvent({ action: 'EVENT_1' });
       await service.logEvent({ action: 'EVENT_2' });
@@ -155,7 +153,7 @@ describe('AuditService', () => {
 
       expect(logger.warn).toHaveBeenCalledWith(
         expect.stringContaining('Security event: SUSPICIOUS_LOGIN'),
-        'AuditService',
+        'AuditService'
       );
     });
 
@@ -169,7 +167,7 @@ describe('AuditService', () => {
 
       expect(logger.warn).toHaveBeenCalledWith(
         expect.stringContaining('Security event: PASSWORD_RESET'),
-        'AuditService',
+        'AuditService'
       );
     });
 
@@ -193,7 +191,7 @@ describe('AuditService', () => {
       expect(logger.error).toHaveBeenCalledWith(
         'Failed to log audit event',
         'DB connection failed',
-        'AuditService',
+        'AuditService'
       );
     });
 
@@ -337,7 +335,7 @@ describe('AuditService', () => {
 
       expect(logger.log).toHaveBeenCalledWith(
         'Retention policy applied: 10 audit logs purged',
-        'AuditService',
+        'AuditService'
       );
     });
   });

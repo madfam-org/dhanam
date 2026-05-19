@@ -12,57 +12,57 @@ The Spaces module provides the foundational multi-tenant architecture for Dhanam
 
 The primary container for financial data segregation.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID | Unique identifier |
-| `name` | string | Display name for the space |
-| `type` | enum | `personal` or `business` |
-| `currency` | enum | Default currency (MXN, USD, EUR) |
-| `createdAt` | datetime | Creation timestamp |
-| `updatedAt` | datetime | Last modification timestamp |
+| Field       | Type     | Description                      |
+| ----------- | -------- | -------------------------------- |
+| `id`        | UUID     | Unique identifier                |
+| `name`      | string   | Display name for the space       |
+| `type`      | enum     | `personal` or `business`         |
+| `currency`  | enum     | Default currency (MXN, USD, EUR) |
+| `createdAt` | datetime | Creation timestamp               |
+| `updatedAt` | datetime | Last modification timestamp      |
 
 ### SpaceMember (UserSpace)
 
 Junction table linking users to spaces with role assignments.
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `userId` | UUID | Reference to user |
-| `spaceId` | UUID | Reference to space |
-| `role` | enum | Member's permission level |
-| `joinedAt` | datetime | When the user joined |
+| Field      | Type     | Description               |
+| ---------- | -------- | ------------------------- |
+| `userId`   | UUID     | Reference to user         |
+| `spaceId`  | UUID     | Reference to space        |
+| `role`     | enum     | Member's permission level |
+| `joinedAt` | datetime | When the user joined      |
 
 ### Role Hierarchy
 
 Roles follow a strict hierarchy for permission checks:
 
-| Role | Level | Capabilities |
-|------|-------|--------------|
-| `owner` | 4 | Full control, delete space, transfer ownership |
-| `admin` | 3 | Manage members, modify settings |
-| `member` | 2 | Create/edit transactions, budgets |
-| `viewer` | 1 | Read-only access |
+| Role     | Level | Capabilities                                   |
+| -------- | ----- | ---------------------------------------------- |
+| `owner`  | 4     | Full control, delete space, transfer ownership |
+| `admin`  | 3     | Manage members, modify settings                |
+| `member` | 2     | Create/edit transactions, budgets              |
+| `viewer` | 1     | Read-only access                               |
 
 ## API Endpoints
 
 ### Space Management
 
-| Method | Endpoint | Description | Required Role |
-|--------|----------|-------------|---------------|
-| `GET` | `/spaces` | List all spaces for current user | - |
-| `POST` | `/spaces` | Create a new space | - |
-| `GET` | `/spaces/:spaceId` | Get space details | viewer |
-| `PATCH` | `/spaces/:spaceId` | Update space settings | owner, admin |
-| `DELETE` | `/spaces/:spaceId` | Delete space permanently | owner |
+| Method   | Endpoint           | Description                      | Required Role |
+| -------- | ------------------ | -------------------------------- | ------------- |
+| `GET`    | `/spaces`          | List all spaces for current user | -             |
+| `POST`   | `/spaces`          | Create a new space               | -             |
+| `GET`    | `/spaces/:spaceId` | Get space details                | viewer        |
+| `PATCH`  | `/spaces/:spaceId` | Update space settings            | owner, admin  |
+| `DELETE` | `/spaces/:spaceId` | Delete space permanently         | owner         |
 
 ### Member Management
 
-| Method | Endpoint | Description | Required Role |
-|--------|----------|-------------|---------------|
-| `GET` | `/spaces/:spaceId/members` | List all members | viewer |
-| `POST` | `/spaces/:spaceId/members` | Invite a new member | owner, admin |
-| `PATCH` | `/spaces/:spaceId/members/:userId` | Update member role | owner |
-| `DELETE` | `/spaces/:spaceId/members/:userId` | Remove member | owner, admin |
+| Method   | Endpoint                           | Description         | Required Role |
+| -------- | ---------------------------------- | ------------------- | ------------- |
+| `GET`    | `/spaces/:spaceId/members`         | List all members    | viewer        |
+| `POST`   | `/spaces/:spaceId/members`         | Invite a new member | owner, admin  |
+| `PATCH`  | `/spaces/:spaceId/members/:userId` | Update member role  | owner         |
+| `DELETE` | `/spaces/:spaceId/members/:userId` | Remove member       | owner, admin  |
 
 ### Request/Response Examples
 
@@ -163,11 +163,11 @@ Decorators:
 
 ## Error Handling
 
-| Error | Status | Condition |
-|-------|--------|-----------|
-| `NotFoundException` | 404 | Space or user not found |
-| `BadRequestException` | 400 | User already member, removing self, last owner |
-| `ForbiddenException` | 403 | Insufficient role level for operation |
+| Error                 | Status | Condition                                      |
+| --------------------- | ------ | ---------------------------------------------- |
+| `NotFoundException`   | 404    | Space or user not found                        |
+| `BadRequestException` | 400    | User already member, removing self, last owner |
+| `ForbiddenException`  | 403    | Insufficient role level for operation          |
 
 ### Error Messages
 
@@ -181,15 +181,15 @@ Decorators:
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `accounts` | Accounts belong to spaces |
+| Module         | Relationship                          |
+| -------------- | ------------------------------------- |
+| `accounts`     | Accounts belong to spaces             |
 | `transactions` | Transactions scoped to space accounts |
-| `budgets` | Budgets created within spaces |
-| `goals` | Goals associated with spaces |
-| `categories` | Category rules per space |
-| `recurring` | Recurring patterns per space |
-| `households` | Spaces can belong to households |
+| `budgets`      | Budgets created within spaces         |
+| `goals`        | Goals associated with spaces          |
+| `categories`   | Category rules per space              |
+| `recurring`    | Recurring patterns per space          |
+| `households`   | Spaces can belong to households       |
 
 ## Testing
 
@@ -219,5 +219,6 @@ pnpm test:cov -- spaces
 ```
 
 ---
+
 **Module**: `spaces`
 **Last Updated**: January 2025

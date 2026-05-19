@@ -24,10 +24,7 @@ describe('WebhookDlqRetryJob', () => {
 
   async function buildJob(serviceMock: jest.Mocked<WebhookDlqService>) {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        WebhookDlqRetryJob,
-        { provide: WebhookDlqService, useValue: serviceMock },
-      ],
+      providers: [WebhookDlqRetryJob, { provide: WebhookDlqService, useValue: serviceMock }],
     }).compile();
     job = module.get(WebhookDlqRetryJob);
     dlq = module.get(WebhookDlqService) as jest.Mocked<WebhookDlqService>;

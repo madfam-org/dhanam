@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { EmailService } from '../../email/email.service';
 import { PreferencesService } from '../../preferences/preferences.service';
-import { OnboardingService } from '../onboarding.service';
 import { OnboardingAnalytics } from '../onboarding.analytics';
+import { OnboardingService } from '../onboarding.service';
 
 describe('OnboardingService', () => {
   let service: OnboardingService;
@@ -208,7 +208,10 @@ describe('OnboardingService', () => {
   describe('updateOnboardingStep', () => {
     it('should update onboarding step', async () => {
       prisma.user.findUnique.mockResolvedValue(mockUserWithProgress as any);
-      prisma.user.update.mockResolvedValue({ ...mockUserWithProgress, onboardingStep: 'space_setup' } as any);
+      prisma.user.update.mockResolvedValue({
+        ...mockUserWithProgress,
+        onboardingStep: 'space_setup',
+      } as any);
 
       const result = await service.updateOnboardingStep('user-123', { step: 'space_setup' });
 
@@ -351,9 +354,9 @@ describe('OnboardingService', () => {
     it('should throw NotFoundException for non-existent user', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.updatePreferences('nonexistent', { locale: 'en' })
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updatePreferences('nonexistent', { locale: 'en' })).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should update notification preferences via preferences service', async () => {
@@ -519,7 +522,11 @@ describe('OnboardingService', () => {
       });
       prisma.user.findUnique
         .mockResolvedValueOnce({ ...mockUser, onboardingStep: 'email_verification' } as any)
-        .mockResolvedValueOnce({ ...mockUser, emailVerified: true, onboardingStep: 'preferences' } as any);
+        .mockResolvedValueOnce({
+          ...mockUser,
+          emailVerified: true,
+          onboardingStep: 'preferences',
+        } as any);
       prisma.user.update.mockResolvedValue({ ...mockUser, emailVerified: true } as any);
 
       await service.verifyEmail({ token: 'valid-token' });
@@ -531,8 +538,14 @@ describe('OnboardingService', () => {
 
   describe('skipOnboardingStep', () => {
     it('should skip optional step and move to next', async () => {
-      prisma.user.findUnique.mockResolvedValue({ ...mockUserWithProgress, onboardingStep: 'connect_accounts' } as any);
-      prisma.user.update.mockResolvedValue({ ...mockUserWithProgress, onboardingStep: 'first_budget' } as any);
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUserWithProgress,
+        onboardingStep: 'connect_accounts',
+      } as any);
+      prisma.user.update.mockResolvedValue({
+        ...mockUserWithProgress,
+        onboardingStep: 'first_budget',
+      } as any);
 
       const result = await service.skipOnboardingStep('user-123', 'connect_accounts');
 
@@ -542,19 +555,22 @@ describe('OnboardingService', () => {
     });
 
     it('should throw error when skipping required step', async () => {
-      await expect(
-        service.skipOnboardingStep('user-123', 'email_verification')
-      ).rejects.toThrow('Cannot skip required step');
+      await expect(service.skipOnboardingStep('user-123', 'email_verification')).rejects.toThrow(
+        'Cannot skip required step'
+      );
     });
 
     it('should throw error for invalid step', async () => {
-      await expect(
-        service.skipOnboardingStep('user-123', 'invalid' as any)
-      ).rejects.toThrow('Invalid step');
+      await expect(service.skipOnboardingStep('user-123', 'invalid' as any)).rejects.toThrow(
+        'Invalid step'
+      );
     });
 
     it('should complete onboarding if skipping last optional step', async () => {
-      prisma.user.findUnique.mockResolvedValue({ ...mockUserWithProgress, onboardingStep: 'feature_tour' } as any);
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUserWithProgress,
+        onboardingStep: 'feature_tour',
+      } as any);
       prisma.user.update.mockResolvedValue({
         ...mockUserWithProgress,
         onboardingCompleted: true,

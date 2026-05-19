@@ -16,14 +16,14 @@ The Jobs module orchestrates all background processing for the Dhanam platform:
 
 ### Queue Types
 
-| Queue Name | Purpose | Default Concurrency |
-|------------|---------|---------------------|
-| `sync-transactions` | Provider data synchronization | 5 |
-| `categorize-transactions` | AI/rules-based categorization | 5 |
-| `esg-updates` | ESG score refresh | 5 |
-| `valuation-snapshots` | Daily asset valuations | 5 |
-| `email-notifications` | Email delivery | 5 |
-| `system-maintenance` | Cleanup and maintenance | 5 |
+| Queue Name                | Purpose                       | Default Concurrency |
+| ------------------------- | ----------------------------- | ------------------- |
+| `sync-transactions`       | Provider data synchronization | 5                   |
+| `categorize-transactions` | AI/rules-based categorization | 5                   |
+| `esg-updates`             | ESG score refresh             | 5                   |
+| `valuation-snapshots`     | Daily asset valuations        | 5                   |
+| `email-notifications`     | Email delivery                | 5                   |
+| `system-maintenance`      | Cleanup and maintenance       | 5                   |
 
 ### Job Data Types
 
@@ -69,12 +69,12 @@ interface ValuationSnapshotJobData {
 
 ## API Endpoints
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/jobs/categorize/:spaceId` | JWT | Trigger categorization for specific space |
-| `POST` | `/jobs/categorize` | JWT | Trigger global categorization (all spaces) |
-| `POST` | `/jobs/sync-portfolio` | JWT | Sync portfolio for current user |
-| `POST` | `/jobs/sync-portfolio/all` | JWT (Admin) | Sync portfolios for all users |
+| Method | Endpoint                    | Auth        | Description                                |
+| ------ | --------------------------- | ----------- | ------------------------------------------ |
+| `POST` | `/jobs/categorize/:spaceId` | JWT         | Trigger categorization for specific space  |
+| `POST` | `/jobs/categorize`          | JWT         | Trigger global categorization (all spaces) |
+| `POST` | `/jobs/sync-portfolio`      | JWT         | Sync portfolio for current user            |
+| `POST` | `/jobs/sync-portfolio/all`  | JWT (Admin) | Sync portfolios for all users              |
 
 ### Example: Trigger Categorization
 
@@ -84,6 +84,7 @@ curl -X POST "https://api.dhan.am/jobs/categorize/space_123" \
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Categorized 45 out of 120 transactions",
@@ -118,13 +119,13 @@ JobsModule
 
 ### Scheduled Jobs (Cron)
 
-| Schedule | Job | Description |
-|----------|-----|-------------|
-| Every hour | `categorizeNewTransactions` | Auto-categorize uncategorized transactions |
-| Every 4 hours | `syncCryptoPortfolios` | Sync Bitso crypto positions |
-| Every 6 hours | `syncBlockchainWallets` | Sync ETH/BTC wallet balances |
-| Daily 2 AM | `cleanupExpiredSessions` | Remove stale provider connections |
-| Daily 3 AM | `generateValuationSnapshots` | Create daily asset valuation records |
+| Schedule      | Job                          | Description                                |
+| ------------- | ---------------------------- | ------------------------------------------ |
+| Every hour    | `categorizeNewTransactions`  | Auto-categorize uncategorized transactions |
+| Every 4 hours | `syncCryptoPortfolios`       | Sync Bitso crypto positions                |
+| Every 6 hours | `syncBlockchainWallets`      | Sync ETH/BTC wallet balances               |
+| Daily 2 AM    | `cleanupExpiredSessions`     | Remove stale provider connections          |
+| Daily 3 AM    | `generateValuationSnapshots` | Create daily asset valuation records       |
 
 ### Queue Configuration
 
@@ -146,14 +147,14 @@ Default job options applied to all queues:
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `REDIS_URL` | Redis connection URL | `redis://localhost:6379` |
-| `QUEUE_SYNC_TRANSACTIONS_CONCURRENCY` | Sync queue workers | `5` |
-| `QUEUE_CATEGORIZE_TRANSACTIONS_CONCURRENCY` | Categorize queue workers | `5` |
-| `QUEUE_ESG_UPDATES_CONCURRENCY` | ESG queue workers | `5` |
-| `QUEUE_VALUATION_SNAPSHOTS_CONCURRENCY` | Valuation queue workers | `5` |
-| `QUEUE_EMAIL_NOTIFICATIONS_CONCURRENCY` | Email queue workers | `5` |
+| Variable                                    | Description              | Default                  |
+| ------------------------------------------- | ------------------------ | ------------------------ |
+| `REDIS_URL`                                 | Redis connection URL     | `redis://localhost:6379` |
+| `QUEUE_SYNC_TRANSACTIONS_CONCURRENCY`       | Sync queue workers       | `5`                      |
+| `QUEUE_CATEGORIZE_TRANSACTIONS_CONCURRENCY` | Categorize queue workers | `5`                      |
+| `QUEUE_ESG_UPDATES_CONCURRENCY`             | ESG queue workers        | `5`                      |
+| `QUEUE_VALUATION_SNAPSHOTS_CONCURRENCY`     | Valuation queue workers  | `5`                      |
+| `QUEUE_EMAIL_NOTIFICATIONS_CONCURRENCY`     | Email queue workers      | `5`                      |
 
 ### Queue Management Methods
 
@@ -189,14 +190,14 @@ queueService.isAcceptingJobs(); // false during shutdown
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `categories` | RulesService for transaction categorization |
-| `providers/bitso` | Crypto portfolio sync |
-| `providers/blockchain` | Wallet balance sync |
-| `email` | Email notification queue |
-| `esg` | ESG score updates |
-| `accounts` | Valuation snapshot creation |
+| Module                 | Relationship                                |
+| ---------------------- | ------------------------------------------- |
+| `categories`           | RulesService for transaction categorization |
+| `providers/bitso`      | Crypto portfolio sync                       |
+| `providers/blockchain` | Wallet balance sync                         |
+| `email`                | Email notification queue                    |
+| `esg`                  | ESG score updates                           |
+| `accounts`             | Valuation snapshot creation                 |
 
 ## Testing
 
@@ -244,6 +245,7 @@ curl "https://api.dhan.am/admin/queues/stats" \
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -258,5 +260,6 @@ curl "https://api.dhan.am/admin/queues/stats" \
 ```
 
 ---
+
 **Module**: `jobs`
 **Last Updated**: January 2025

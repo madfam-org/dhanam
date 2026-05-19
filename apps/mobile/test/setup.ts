@@ -97,15 +97,16 @@ jest.mock('react-native-paper', () => {
         const Wrapper = onPress ? TouchableOpacity : View;
         return React.createElement(Wrapper, { onPress, style }, children);
       },
-      { Content: ({ children }: any) => React.createElement(View, null, children) },
+      { Content: ({ children }: any) => React.createElement(View, null, children) }
     ),
-    Text: ({ children, variant, style }: any) =>
-      React.createElement(Text, { style }, children),
+    Text: ({ children, variant, style }: any) => React.createElement(Text, { style }, children),
     ActivityIndicator: ({ size, style }: any) =>
       React.createElement(View, { testID: 'activity-indicator', style }),
     Button: ({ children, onPress, mode, style }: any) =>
-      React.createElement(TouchableOpacity, { onPress, style, testID: 'paper-button' },
-        React.createElement(Text, null, children),
+      React.createElement(
+        TouchableOpacity,
+        { onPress, style, testID: 'paper-button' },
+        React.createElement(Text, null, children)
       ),
     Chip: ({ children, style }: any) =>
       React.createElement(View, { style }, React.createElement(Text, null, children)),
@@ -115,13 +116,15 @@ jest.mock('react-native-paper', () => {
           onPress ? TouchableOpacity : View,
           { onPress, style, testID: 'list-item' },
           left && left({}),
-          React.createElement(View, null,
+          React.createElement(
+            View,
+            null,
             React.createElement(Text, null, title),
             typeof description === 'string'
               ? React.createElement(Text, null, description)
-              : description,
+              : description
           ),
-          right && right({}),
+          right && right({})
         ),
     },
   };

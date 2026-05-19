@@ -1,4 +1,5 @@
 import { CircuitBreakerService } from '../../modules/providers/orchestrator/circuit-breaker.service';
+
 import { createMockPrismaService } from './helpers/mock-prisma';
 
 // Mock the Provider enum since we can't import generated Prisma in tests
@@ -246,16 +247,16 @@ describe('Circuit Breaker Chaos Tests', () => {
       mockPrisma.setMode('fail');
 
       await expect(
-        service.recordFailure(Provider.plaid as any, 'US', 'test error'),
+        service.recordFailure(Provider.plaid as any, 'US', 'test error')
       ).rejects.toThrow('Database unavailable');
     });
 
     it('propagates error when DB is down during recordSuccess', async () => {
       mockPrisma.setMode('fail');
 
-      await expect(
-        service.recordSuccess(Provider.plaid as any, 'US', 100),
-      ).rejects.toThrow('Database unavailable');
+      await expect(service.recordSuccess(Provider.plaid as any, 'US', 100)).rejects.toThrow(
+        'Database unavailable'
+      );
     });
 
     it('propagates error when DB is down during reset', async () => {
@@ -263,9 +264,9 @@ describe('Circuit Breaker Chaos Tests', () => {
       await service.recordFailure(Provider.plaid as any, 'US', 'setup');
       mockPrisma.setMode('fail');
 
-      await expect(
-        service.reset(Provider.plaid as any, 'US'),
-      ).rejects.toThrow('Database unavailable');
+      await expect(service.reset(Provider.plaid as any, 'US')).rejects.toThrow(
+        'Database unavailable'
+      );
     });
   });
 

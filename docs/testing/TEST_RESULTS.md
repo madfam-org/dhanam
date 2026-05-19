@@ -24,13 +24,13 @@ PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma generate
 
 ### Summary Statistics
 
-| Metric | Count |
-|--------|-------|
-| **Test Suites** | 24 total |
+| Metric            | Count                               |
+| ----------------- | ----------------------------------- |
+| **Test Suites**   | 24 total                            |
 | **Failed Suites** | 24 (due to Prisma/workspace issues) |
-| **Passed Tests** | 18 |
-| **Failed Tests** | 2 |
-| **Total Tests** | 20 executed |
+| **Passed Tests**  | 18                                  |
+| **Failed Tests**  | 2                                   |
+| **Total Tests**   | 20 executed                         |
 
 ---
 
@@ -39,6 +39,7 @@ PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 npx prisma generate
 ### 1. Prisma Client Missing (Priority: HIGH)
 
 **Error:**
+
 ```
 Module '"@prisma/client"' has no exported member 'Currency'
 Module '"@prisma/client"' has no exported member 'AccountType'
@@ -46,10 +47,12 @@ Namespace 'Prisma' has no exported member 'JsonObject'
 ```
 
 **Affected Files:**
+
 - All service files using Prisma
 - All tests importing Prisma types
 
 **Fix:**
+
 ```bash
 # Generate Prisma client (requires internet or pre-downloaded binaries)
 cd apps/api
@@ -61,12 +64,14 @@ npx prisma generate
 ### 2. Workspace Packages Not Built (Priority: HIGH)
 
 **Error:**
+
 ```
 Cannot find module '@dhanam/shared'
 Cannot find module '@dhanam/esg'
 ```
 
 **Fix:**
+
 ```bash
 # Build all workspace packages
 cd /home/user/dhanam
@@ -85,6 +90,7 @@ cd packages/esg && pnpm build
 
 **Test:** `sanitizeError › should sanitize error objects`
 **Error:**
+
 ```
 Expected substring: "[REDACTED_TOKEN]"
 Received string:    "Invalid token: eyJhbGci.test.token"
@@ -93,6 +99,7 @@ Received string:    "Invalid token: eyJhbGci.test.token"
 **Root Cause:** `sanitizeError` doesn't call `sanitizeString` on error messages
 
 **Fix Required:**
+
 ```typescript
 // In log-sanitizer.ts, sanitizeError method:
 static sanitizeError(error: Error | any): any {
@@ -117,6 +124,7 @@ static sanitizeError(error: Error | any): any {
 
 **Test:** `should not redact non-sensitive partial matches`
 **Error:**
+
 ```
 Expected: 5
 Received: "[REDACTED]"
@@ -126,6 +134,7 @@ Field: tokenCount
 **Root Cause:** Field name contains "token" substring, triggers redaction
 
 **Fix Required:**
+
 ```typescript
 // More precise field matching to avoid false positives
 private static isSensitiveKey(key: string): boolean {
@@ -154,11 +163,13 @@ private static isSensitiveKey(key: string): boolean {
 #### Unused Imports
 
 **Files:**
+
 - `totp.service.spec.ts`: `qrcode`, `randomBytes` unused
 - `kms.service.spec.ts`: `CryptoService` unused
 - `categories/rules.service.spec.ts`: `invalidCondition` unused
 
 **Fix:**
+
 ```typescript
 // Remove or use the imports
 // If testing implementation details, use them in tests
@@ -199,12 +210,14 @@ Despite environment issues, **18 tests passed**, including:
 ### Immediate (To Run Tests)
 
 1. **Build Workspace Packages:**
+
    ```bash
    cd /home/user/dhanam
    pnpm build
    ```
 
 2. **Generate Prisma Client:**
+
    ```bash
    cd apps/api
    # Set environment variable to skip checksum validation
@@ -224,6 +237,7 @@ Despite environment issues, **18 tests passed**, including:
 ### After Environment Setup
 
 5. **Run Full Test Suite:**
+
    ```bash
    pnpm test --coverage
    ```
@@ -237,14 +251,14 @@ Despite environment issues, **18 tests passed**, including:
 
 ## Expected Results (After Fixes)
 
-| Test Suite | Tests | Expected Pass Rate |
-|------------|-------|-------------------|
-| auth.service.spec.ts | 17 | 100% (17/17) |
-| totp.service.spec.ts | 30 | 100% (30/30) |
-| session.service.spec.ts | 20 | 100% (20/20) |
-| log-sanitizer.spec.ts | 25 | 100% (25/25) |
-| kms.service.spec.ts | 15 | 100% (15/15) |
-| **TOTAL** | **107** | **100% (107/107)** |
+| Test Suite              | Tests   | Expected Pass Rate |
+| ----------------------- | ------- | ------------------ |
+| auth.service.spec.ts    | 17      | 100% (17/17)       |
+| totp.service.spec.ts    | 30      | 100% (30/30)       |
+| session.service.spec.ts | 20      | 100% (20/20)       |
+| log-sanitizer.spec.ts   | 25      | 100% (25/25)       |
+| kms.service.spec.ts     | 15      | 100% (15/15)       |
+| **TOTAL**               | **107** | **100% (107/107)** |
 
 ---
 
@@ -281,11 +295,13 @@ Despite environment issues, **18 tests passed**, including:
 ## Test Coverage Estimate
 
 **Current (with fixes):**
+
 - Core Auth Services: ~90%
 - Security Services: ~85%
 - Overall: ~35-40%
 
 **Target:**
+
 - Core Auth Services: 90% ✅ (Already achieved)
 - Security Services: 85% ✅ (Already achieved)
 - Overall: 80% (Need providers, budgets, transactions tests)

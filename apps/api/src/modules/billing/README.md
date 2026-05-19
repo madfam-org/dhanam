@@ -15,13 +15,13 @@ The Billing module handles all payment and subscription operations:
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| `BillingService` | Main billing orchestration |
-| `StripeService` | Stripe API wrapper |
+| Entity                | Description                      |
+| --------------------- | -------------------------------- |
+| `BillingService`      | Main billing orchestration       |
+| `StripeService`       | Stripe API wrapper               |
 | `JanuaBillingService` | Janua multi-provider integration |
-| `BillingEvent` | Payment history records |
-| `UsageMetric` | Daily feature usage tracking |
+| `BillingEvent`        | Payment history records          |
+| `UsageMetric`         | Daily feature usage tracking     |
 
 ## Service Architecture
 
@@ -53,28 +53,28 @@ The Billing module handles all payment and subscription operations:
 
 ## Subscription Tiers
 
-| Tier | Price (USD) | Key Features |
-|------|-------------|-------------|
-| **Community** | $0 | Self-hosted, full features with BYOK |
-| **Essentials** | $4.99/mo | AI categorization, bank sync, 10 sims/day |
-| **Pro** | $11.99/mo | Unlimited usage, all connections, LifeBeat |
-| **Premium** | $19.99/mo | 50K Monte Carlo, 24 scenarios, 25 GB, priority support |
+| Tier           | Price (USD) | Key Features                                           |
+| -------------- | ----------- | ------------------------------------------------------ |
+| **Community**  | $0          | Self-hosted, full features with BYOK                   |
+| **Essentials** | $4.99/mo    | AI categorization, bank sync, 10 sims/day              |
+| **Pro**        | $11.99/mo   | Unlimited usage, all connections, LifeBeat             |
+| **Premium**    | $19.99/mo   | 50K Monte Carlo, 24 scenarios, 25 GB, priority support |
 
 Regional pricing applies: Tier 2 (25% off), LATAM (45% off), Emerging (65% off).
 Mexico promo: MXN$31/32/33 per month for first 3 months.
 
 ### Usage Limits by Tier
 
-| Feature | Community (Self-Hosted) | Essentials | Pro | Premium |
-|---------|------------------------|-----------|-----|---------|
-| ESG Calculations | Unlimited | 20/day | Unlimited | Unlimited |
-| Monte Carlo Simulations | Unlimited | 10/day | Unlimited | Unlimited |
-| Goal Probability | Unlimited | 5/day | Unlimited | Unlimited |
-| Scenario Analysis | Unlimited | 3/day | Unlimited | Unlimited |
-| Portfolio Rebalance | Unlimited | 0 | Unlimited | Unlimited |
-| API Requests | Unlimited | 5,000/day | Unlimited | Unlimited |
-| Spaces | Unlimited | 2 | 5 | 10 |
-| Storage | Unlimited (BYOK) | 500 MB | 5 GB | 25 GB |
+| Feature                 | Community (Self-Hosted) | Essentials | Pro       | Premium   |
+| ----------------------- | ----------------------- | ---------- | --------- | --------- |
+| ESG Calculations        | Unlimited               | 20/day     | Unlimited | Unlimited |
+| Monte Carlo Simulations | Unlimited               | 10/day     | Unlimited | Unlimited |
+| Goal Probability        | Unlimited               | 5/day      | Unlimited | Unlimited |
+| Scenario Analysis       | Unlimited               | 3/day      | Unlimited | Unlimited |
+| Portfolio Rebalance     | Unlimited               | 0          | Unlimited | Unlimited |
+| API Requests            | Unlimited               | 5,000/day  | Unlimited | Unlimited |
+| Spaces                  | Unlimited               | 2          | 5         | 10        |
+| Storage                 | Unlimited (BYOK)        | 500 MB     | 5 GB      | 25 GB     |
 
 > **Note:** Community tier is for self-hosted deployments only. All features are unlimited because
 > users provide their own infrastructure, API keys, and storage. Paid tiers gate **managed cloud
@@ -82,19 +82,19 @@ Mexico promo: MXN$31/32/33 per month for first 3 months.
 
 ## API Endpoints
 
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| `/billing/pricing` | GET | No | Get regional pricing for a country |
-| `/billing/trial/start` | POST | Yes | Start a free trial |
-| `/billing/trial/extend` | POST | Yes | Extend trial with credit card |
-| `/billing/upgrade` | POST | Yes | Initiate subscription upgrade |
-| `/billing/portal` | POST | Yes | Create billing portal session |
-| `/billing/usage` | GET | Yes | Get current usage statistics |
-| `/billing/history` | GET | Yes | Get payment history |
-| `/billing/status` | GET | Yes | Get subscription status (incl. trial/promo) |
-| `/billing/checkout` | GET | No | Public checkout redirect (external apps) |
-| `/billing/webhook` | POST | No | Stripe webhook handler |
-| `/billing/webhook/janua` | POST | No | Janua webhook handler |
+| Endpoint                 | Method | Auth | Description                                 |
+| ------------------------ | ------ | ---- | ------------------------------------------- |
+| `/billing/pricing`       | GET    | No   | Get regional pricing for a country          |
+| `/billing/trial/start`   | POST   | Yes  | Start a free trial                          |
+| `/billing/trial/extend`  | POST   | Yes  | Extend trial with credit card               |
+| `/billing/upgrade`       | POST   | Yes  | Initiate subscription upgrade               |
+| `/billing/portal`        | POST   | Yes  | Create billing portal session               |
+| `/billing/usage`         | GET    | Yes  | Get current usage statistics                |
+| `/billing/history`       | GET    | Yes  | Get payment history                         |
+| `/billing/status`        | GET    | Yes  | Get subscription status (incl. trial/promo) |
+| `/billing/checkout`      | GET    | No   | Public checkout redirect (external apps)    |
+| `/billing/webhook`       | POST   | No   | Stripe webhook handler                      |
+| `/billing/webhook/janua` | POST   | No   | Janua webhook handler                       |
 
 ## Trial & Promo Flow
 
@@ -134,36 +134,36 @@ Mexico promo: MXN$31/32/33 per month for first 3 months.
 
 ## Provider Selection
 
-| Country | Provider | Payment Methods |
-|---------|----------|-----------------|
-| Mexico (MX) | Conekta | Cards, OXXO, SPEI |
-| International | Polar | Cards |
-| Fallback | Stripe | Cards |
+| Country       | Provider | Payment Methods   |
+| ------------- | -------- | ----------------- |
+| Mexico (MX)   | Conekta  | Cards, OXXO, SPEI |
+| International | Polar    | Cards             |
+| Fallback      | Stripe   | Cards             |
 
 ## Webhook Events
 
 ### Stripe Events
 
-| Event | Handler |
-|-------|---------|
-| `customer.subscription.created` | `handleSubscriptionCreated` |
-| `customer.subscription.updated` | `handleSubscriptionUpdated` |
+| Event                           | Handler                       |
+| ------------------------------- | ----------------------------- |
+| `customer.subscription.created` | `handleSubscriptionCreated`   |
+| `customer.subscription.updated` | `handleSubscriptionUpdated`   |
 | `customer.subscription.deleted` | `handleSubscriptionCancelled` |
-| `invoice.payment_succeeded` | `handlePaymentSucceeded` |
-| `invoice.payment_failed` | `handlePaymentFailed` |
+| `invoice.payment_succeeded`     | `handlePaymentSucceeded`      |
+| `invoice.payment_failed`        | `handlePaymentFailed`         |
 
 ### Janua Events
 
-| Event | Handler |
-|-------|---------|
-| `subscription.created` | `handleJanuaSubscriptionCreated` |
-| `subscription.updated` | `handleJanuaSubscriptionUpdated` |
+| Event                    | Handler                            |
+| ------------------------ | ---------------------------------- |
+| `subscription.created`   | `handleJanuaSubscriptionCreated`   |
+| `subscription.updated`   | `handleJanuaSubscriptionUpdated`   |
 | `subscription.cancelled` | `handleJanuaSubscriptionCancelled` |
-| `subscription.paused` | `handleJanuaSubscriptionPaused` |
-| `subscription.resumed` | `handleJanuaSubscriptionResumed` |
-| `payment.succeeded` | `handleJanuaPaymentSucceeded` |
-| `payment.failed` | `handleJanuaPaymentFailed` |
-| `payment.refunded` | `handleJanuaPaymentRefunded` |
+| `subscription.paused`    | `handleJanuaSubscriptionPaused`    |
+| `subscription.resumed`   | `handleJanuaSubscriptionResumed`   |
+| `payment.succeeded`      | `handleJanuaPaymentSucceeded`      |
+| `payment.failed`         | `handleJanuaPaymentFailed`         |
+| `payment.refunded`       | `handleJanuaPaymentRefunded`       |
 
 ## MADFAM Integration
 
@@ -188,6 +188,7 @@ The billing module supports the Enclii → Dhanam → Janua payment loop:
 ### Organization Linking
 
 When upgrading with an `orgId`:
+
 1. Payment processed through provider
 2. Dhanam notifies Janua of tier change
 3. Janua updates organization's `subscription_tier`
@@ -241,21 +242,21 @@ WEB_URL=https://app.dhan.am
 
 ## Error Handling
 
-| Scenario | Behavior |
-|----------|----------|
-| Payment failed | Log event, don't downgrade (retry expected) |
-| Webhook verification failed | Reject with 401 |
-| User not found | Log error, acknowledge webhook |
-| Already premium | Throw error (400) |
+| Scenario                    | Behavior                                    |
+| --------------------------- | ------------------------------------------- |
+| Payment failed              | Log event, don't downgrade (retry expected) |
+| Webhook verification failed | Reject with 401                             |
+| User not found              | Log error, acknowledge webhook              |
+| Already premium             | Throw error (400)                           |
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| [`users`](../users/README.md) | User subscription tier stored |
-| [`simulations`](../simulations/README.md) | Uses usage limits for Monte Carlo |
-| [`esg`](../esg/README.md) | Uses usage limits for ESG calculations |
-| [`analytics`](../analytics/README.md) | Uses usage limits for reports |
+| Module                                    | Relationship                           |
+| ----------------------------------------- | -------------------------------------- |
+| [`users`](../users/README.md)             | User subscription tier stored          |
+| [`simulations`](../simulations/README.md) | Uses usage limits for Monte Carlo      |
+| [`esg`](../esg/README.md)                 | Uses usage limits for ESG calculations |
+| [`analytics`](../analytics/README.md)     | Uses usage limits for reports          |
 
 ## Testing
 

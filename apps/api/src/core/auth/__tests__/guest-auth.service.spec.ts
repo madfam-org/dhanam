@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { GuestAuthService } from '../guest-auth.service';
-import { DemoAuthService } from '../demo-auth.service';
 import { PrismaService } from '@core/prisma/prisma.service';
+
+import { DemoAuthService } from '../demo-auth.service';
+import { GuestAuthService } from '../guest-auth.service';
 
 describe('GuestAuthService', () => {
   let service: GuestAuthService;

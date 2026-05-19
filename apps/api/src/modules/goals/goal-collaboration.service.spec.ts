@@ -1,10 +1,8 @@
+import { NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+
 import { GoalCollaborationService } from './goal-collaboration.service';
+
 import { PrismaService } from '@/core/prisma/prisma.service';
 
 // Mock Prisma enums
@@ -157,9 +155,7 @@ describe('GoalCollaborationService', () => {
       mockPrismaService.goal.findFirst.mockResolvedValue(mockGoal);
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.shareGoal('user-owner', mockInput)
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.shareGoal('user-owner', mockInput)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw BadRequestException if goal already shared with user', async () => {
@@ -171,9 +167,7 @@ describe('GoalCollaborationService', () => {
         sharedWith: 'user-share',
       });
 
-      await expect(
-        service.shareGoal('user-owner', mockInput)
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.shareGoal('user-owner', mockInput)).rejects.toThrow(BadRequestException);
     });
 
     it('should mark goal as shared and update message', async () => {
@@ -259,26 +253,26 @@ describe('GoalCollaborationService', () => {
     it('should throw NotFoundException if share not found', async () => {
       mockPrismaService.goalShare.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.acceptShare('user-invited', 'share-nonexistent')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.acceptShare('user-invited', 'share-nonexistent')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw ForbiddenException if invitation not for current user', async () => {
       mockPrismaService.goalShare.findUnique.mockResolvedValue(mockShare);
 
-      await expect(
-        service.acceptShare('wrong-user', 'share-123')
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.acceptShare('wrong-user', 'share-123')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should throw BadRequestException if invitation not pending', async () => {
       const acceptedShare = { ...mockShare, status: 'accepted' };
       mockPrismaService.goalShare.findUnique.mockResolvedValue(acceptedShare);
 
-      await expect(
-        service.acceptShare('user-invited', 'share-123')
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.acceptShare('user-invited', 'share-123')).rejects.toThrow(
+        BadRequestException
+      );
     });
 
     it('should create activity when accepting share', async () => {
@@ -325,17 +319,17 @@ describe('GoalCollaborationService', () => {
     it('should throw NotFoundException if share not found', async () => {
       mockPrismaService.goalShare.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.declineShare('user-invited', 'share-nonexistent')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.declineShare('user-invited', 'share-nonexistent')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should throw ForbiddenException if invitation not for current user', async () => {
       mockPrismaService.goalShare.findUnique.mockResolvedValue(mockShare);
 
-      await expect(
-        service.declineShare('wrong-user', 'share-123')
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.declineShare('wrong-user', 'share-123')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should create activity when declining share', async () => {
@@ -388,9 +382,9 @@ describe('GoalCollaborationService', () => {
     it('should throw NotFoundException if share not found', async () => {
       mockPrismaService.goalShare.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.revokeShare('user-owner', 'share-nonexistent')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.revokeShare('user-owner', 'share-nonexistent')).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should verify manager permission before revoking', async () => {
@@ -531,9 +525,9 @@ describe('GoalCollaborationService', () => {
       mockPrismaService.goal.findFirst.mockResolvedValue(null);
       mockPrismaService.goalShare.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.getGoalShares('unauthorized-user', 'goal-123')
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getGoalShares('unauthorized-user', 'goal-123')).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -762,12 +756,12 @@ describe('GoalCollaborationService', () => {
 
       mockPrismaService.goalShare.findUnique.mockResolvedValue(acceptedShare);
 
-      await expect(
-        service.declineShare('user-invited', 'share-123')
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        service.declineShare('user-invited', 'share-123')
-      ).rejects.toThrow('Cannot decline invitation with status: accepted');
+      await expect(service.declineShare('user-invited', 'share-123')).rejects.toThrow(
+        BadRequestException
+      );
+      await expect(service.declineShare('user-invited', 'share-123')).rejects.toThrow(
+        'Cannot decline invitation with status: accepted'
+      );
     });
 
     it('should throw BadRequestException when declining revoked share', async () => {
@@ -780,9 +774,9 @@ describe('GoalCollaborationService', () => {
 
       mockPrismaService.goalShare.findUnique.mockResolvedValue(revokedShare);
 
-      await expect(
-        service.declineShare('user-invited', 'share-123')
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.declineShare('user-invited', 'share-123')).rejects.toThrow(
+        BadRequestException
+      );
     });
   });
 
@@ -806,9 +800,9 @@ describe('GoalCollaborationService', () => {
       mockPrismaService.goalShare.findFirst.mockResolvedValue(shareWithViewerRole);
 
       // Try to access with manager role requirement (e.g., revoking share)
-      await expect(
-        service.revokeShare('user-shared', 'share-456')
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.revokeShare('user-shared', 'share-456')).rejects.toThrow(
+        ForbiddenException
+      );
     });
 
     it('should throw ForbiddenException with specific message for insufficient role', async () => {
@@ -832,9 +826,9 @@ describe('GoalCollaborationService', () => {
         goal: { id: 'goal-123' },
       });
 
-      await expect(
-        service.revokeShare('user-shared', 'share-456')
-      ).rejects.toThrow('Insufficient permissions');
+      await expect(service.revokeShare('user-shared', 'share-456')).rejects.toThrow(
+        'Insufficient permissions'
+      );
     });
   });
 });

@@ -1,6 +1,7 @@
+import { Injectable, Logger } from '@nestjs/common';
+
 import { PrismaService } from '@core/prisma/prisma.service';
 import { QueueService } from '@modules/jobs/queue.service';
-import { Injectable, Logger } from '@nestjs/common';
 
 export interface SystemMetrics {
   database: {

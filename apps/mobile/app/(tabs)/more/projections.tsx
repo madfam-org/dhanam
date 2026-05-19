@@ -141,8 +141,8 @@ export default function ProjectionsScreen() {
                 Premium Feature
               </Text>
               <Text variant="bodyMedium" style={styles.premiumDescription}>
-                Long-term financial projections with Monte Carlo simulations are
-                available to Premium members.
+                Long-term financial projections with Monte Carlo simulations are available to
+                Premium members.
               </Text>
               <View style={styles.premiumFeatures}>
                 <View style={styles.featureItem}>
@@ -191,9 +191,7 @@ export default function ProjectionsScreen() {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          projection ? (
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          ) : undefined
+          projection ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} /> : undefined
         }
       >
         {/* Configuration Card */}
@@ -329,9 +327,7 @@ export default function ProjectionsScreen() {
                       { backgroundColor: getRiskColor(projection.summary.riskScore) },
                     ]}
                   >
-                    <Text style={styles.riskScore}>
-                      {Math.round(projection.summary.riskScore)}
-                    </Text>
+                    <Text style={styles.riskScore}>{Math.round(projection.summary.riskScore)}</Text>
                   </View>
                   <View style={styles.riskInfo}>
                     <Text
@@ -408,8 +404,8 @@ export default function ProjectionsScreen() {
                 Ready to project your future
               </Text>
               <Text variant="bodyMedium" style={styles.emptyResultDescription}>
-                Configure your settings above and tap "Generate Projection" to see
-                your long-term financial outlook
+                Configure your settings above and tap "Generate Projection" to see your long-term
+                financial outlook
               </Text>
             </Card.Content>
           </Card>

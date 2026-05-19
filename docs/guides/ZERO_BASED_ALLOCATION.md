@@ -11,20 +11,24 @@ Zero-Based Allocation is a budgeting methodology (popularized by YNAB) where eve
 ## Key Features
 
 ### 1. Income Tracking
+
 - Each budget now tracks monthly/periodic income
 - Income field added to Budget model (`apps/api/prisma/schema.prisma:450`)
 
 ### 2. Ready to Assign Calculation
+
 - Formula: `Ready to Assign = Income + Total Carryover - Total Budgeted`
 - Warns users when `Ready to Assign > 0`
 - Prevents over-allocation
 
 ### 3. Carryover Balances
+
 - Unspent category funds can roll over to next budget period
 - `carryoverAmount` field added to Category model (`schema.prisma:408`)
 - Rollover method: `POST /spaces/:spaceId/budgets/:id/rollover`
 
 ### 4. Allocation Workflow
+
 - Users set income: `PATCH /spaces/:spaceId/budgets/:id/income`
 - Allocate funds to categories: `POST /spaces/:spaceId/budgets/:id/allocate`
 - System enforces allocation constraints
@@ -32,6 +36,7 @@ Zero-Based Allocation is a budgeting methodology (popularized by YNAB) where eve
 ## Database Schema Changes
 
 ### Budget Model
+
 ```prisma
 model Budget {
   // ... existing fields
@@ -41,6 +46,7 @@ model Budget {
 ```
 
 ### Category Model
+
 ```prisma
 model Category {
   // ... existing fields
@@ -52,6 +58,7 @@ model Category {
 ## API Endpoints
 
 ### Update Budget Income
+
 ```http
 PATCH /spaces/:spaceId/budgets/:id/income
 Content-Type: application/json
@@ -62,6 +69,7 @@ Content-Type: application/json
 ```
 
 ### Allocate Funds to Category
+
 ```http
 POST /spaces/:spaceId/budgets/:id/allocate
 Content-Type: application/json
@@ -73,10 +81,12 @@ Content-Type: application/json
 ```
 
 **Validation:**
+
 - Checks if `amount <= readyToAssign`
 - Throws `ConflictException` if insufficient funds
 
 ### Rollover Unspent Funds
+
 ```http
 POST /spaces/:spaceId/budgets/:id/rollover
 Content-Type: application/json
@@ -87,6 +97,7 @@ Content-Type: application/json
 ```
 
 **Logic:**
+
 1. Calculate unspent for each category in old budget
 2. Find matching categories by name in new budget
 3. Add unspent to `carryoverAmount` in new budget categories
@@ -94,9 +105,11 @@ Content-Type: application/json
 ## Frontend Component
 
 ### ReadyToAssign Component
+
 **Location:** `apps/web/src/components/budgets/ready-to-assign.tsx`
 
 **Features:**
+
 - Visual indicator when funds are unassigned (orange alert)
 - Success indicator when fully allocated (green checkmark)
 - Quick income update UI
@@ -104,6 +117,7 @@ Content-Type: application/json
 - Real-time calculation display
 
 **Usage:**
+
 ```tsx
 import { ReadyToAssign } from '@/components/budgets/ready-to-assign';
 
@@ -116,30 +130,36 @@ import { ReadyToAssign } from '@/components/budgets/ready-to-assign';
   categories={budget.categories}
   onUpdateIncome={handleUpdateIncome}
   onAllocateFunds={handleAllocateFunds}
-/>
+/>;
 ```
 
 ## Backend Implementation
 
 ### Service Methods
+
 **File:** `apps/api/src/modules/budgets/budgets.service.ts`
 
 #### `updateIncome()`
+
 - Updates budget income amount
 - Requires `member` permission
 
 #### `allocateFunds()`
+
 - Increments category `budgetedAmount`
 - Validates sufficient funds available
 - Prevents over-allocation
 
 #### `rolloverBudget()`
+
 - Transfers unspent balances to next period
 - Matches categories by name
 - Creates carryover amounts
 
 ### Updated getBudgetSummary()
+
 Now returns:
+
 ```typescript
 {
   summary: {
@@ -147,9 +167,9 @@ Now returns:
     totalSpent: number;
     totalRemaining: number;
     totalPercentUsed: number;
-    totalIncome: number;       // NEW
-    readyToAssign: number;     // NEW
-    totalCarryover: number;    // NEW
+    totalIncome: number; // NEW
+    readyToAssign: number; // NEW
+    totalCarryover: number; // NEW
   }
 }
 ```
@@ -157,12 +177,14 @@ Now returns:
 ## Migration Instructions
 
 ### For Development
+
 ```bash
 cd apps/api
 npx prisma db push
 ```
 
 ### For Production
+
 ```bash
 cd apps/api
 npx prisma migrate dev --name add_zero_based_allocation
@@ -170,6 +192,7 @@ npx prisma migrate deploy
 ```
 
 **Migration SQL:**
+
 ```sql
 -- Add income to budgets
 ALTER TABLE budgets ADD COLUMN income DECIMAL(19,4) DEFAULT 0 NOT NULL;
@@ -181,6 +204,7 @@ ALTER TABLE categories ADD COLUMN carryover_amount DECIMAL(19,4) DEFAULT 0 NOT N
 ## Testing
 
 ### Manual Testing Steps
+
 1. Create a budget
 2. Set income: `PATCH /budgets/:id/income { "income": 5000 }`
 3. Verify `readyToAssign = 5000` in budget summary
@@ -194,9 +218,11 @@ ALTER TABLE categories ADD COLUMN carryover_amount DECIMAL(19,4) DEFAULT 0 NOT N
 11. Verify `carryoverAmount` in new budget categories
 
 ### Automated Tests
+
 **Location:** `apps/api/src/modules/budgets/__tests__/budgets.service.spec.ts`
 
 Add tests for:
+
 - [ ] `updateIncome()` - valid income update
 - [ ] `updateIncome()` - unauthorized user
 - [ ] `allocateFunds()` - successful allocation
@@ -207,14 +233,17 @@ Add tests for:
 ## Implementation Impact
 
 ### Addresses Market Gap
+
 From _(removed — audit reports archived)_:
 
 **Gap Closed:** Zero-Based Allocation (Tier 1 Critical Gap)
+
 - **Business Impact:** HIGH - YNAB's #1 feature
 - **Complexity:** LOW (as predicted)
 - **Timeline:** 1-2 weeks (achieved ✅)
 
 ### Competitive Positioning
+
 - **vs YNAB:** Feature parity on zero-based methodology
 - **vs Monarch:** Differentiation (Monarch doesn't enforce allocation)
 - **vs Kubera:** Not applicable (wealth tracking focus)

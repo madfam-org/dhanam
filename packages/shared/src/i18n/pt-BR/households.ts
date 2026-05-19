@@ -137,9 +137,11 @@ export const households = {
 
   // Tooltips & Help
   whatIsHousehold: 'O que é um lar?',
-  householdExplanation: 'Um lar é um grupo de pessoas que compartilham planejamento financeiro, como uma família, fideicomisso ou patrimônio.',
+  householdExplanation:
+    'Um lar é um grupo de pessoas que compartilham planejamento financeiro, como uma família, fideicomisso ou patrimônio.',
 
-  multiGenPlanningHelp: 'O planejamento multigeracional ajuda a coordenar objetivos financeiros em múltiplas gerações',
+  multiGenPlanningHelp:
+    'O planejamento multigeracional ajuda a coordenar objetivos financeiros em múltiplas gerações',
 
   minorAccessHelp: 'Os menores têm acesso limitado até atingirem a maioridade',
 
@@ -177,7 +179,8 @@ export const households = {
     members: 'Membros',
     minor: 'Menor de idade',
     yoursMineOurs: 'Seu, meu e nosso',
-    ownershipDescription: 'Visualize as finanças do lar por titularidade. Filtre contas entre propriedade individual e conjunta.',
+    ownershipDescription:
+      'Visualize as finanças do lar por titularidade. Filtre contas entre propriedade individual e conjunta.',
     yourAccounts: 'Suas contas',
     partnerAccounts: 'Contas do parceiro(a)',
     jointAccounts: 'Contas conjuntas',

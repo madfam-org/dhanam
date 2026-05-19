@@ -1,7 +1,7 @@
 import fastifyCookie from '@fastify/cookie';
 import { ValidationPipe } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import { Test } from '@nestjs/testing';
 
 import { AppModule } from '../../../src/app.module';
 
@@ -18,19 +18,15 @@ export async function createE2EApp(): Promise<NestFastifyApplication> {
     imports: [AppModule],
   }).compile();
 
-  const app = moduleFixture.createNestApplication<NestFastifyApplication>(
-    new FastifyAdapter(),
-  );
+  const app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 
   // Cookie plugin — auth controller calls res.setCookie()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   await app.register(fastifyCookie as any, {
     secret: 'e2e-test-cookie-secret',
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({ transform: true, whitelist: true }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.setGlobalPrefix('v1');
 
   await app.init();

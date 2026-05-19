@@ -1,10 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PreferencesService } from './preferences.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
-import { AuditService } from '../../core/audit/audit.service';
 import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { Currency } from '@db';
+
+import { AuditService } from '../../core/audit/audit.service';
+import { PrismaService } from '../../core/prisma/prisma.service';
+
 import { UpdatePreferencesDto, BulkPreferencesUpdateDto } from './dto';
+import { PreferencesService } from './preferences.service';
 
 describe('PreferencesService', () => {
   let service: PreferencesService;
@@ -150,9 +153,7 @@ describe('PreferencesService', () => {
       mockPrismaService.userPreferences.findUnique.mockResolvedValue(null);
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.getUserPreferences(mockUserId)).rejects.toThrow(
-        NotFoundException
-      );
+      await expect(service.getUserPreferences(mockUserId)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -168,7 +169,7 @@ describe('PreferencesService', () => {
       mockPrismaService.userPreferences.findUnique
         .mockResolvedValueOnce(mockUserPreferences) // For ensurePreferencesExist
         .mockResolvedValueOnce(mockUserPreferences); // For getting previous preferences
-      
+
       const updatedPreferences = {
         ...mockUserPreferences,
         ...updateDto,
@@ -193,7 +194,7 @@ describe('PreferencesService', () => {
       mockPrismaService.userPreferences.findUnique
         .mockResolvedValueOnce(mockUserPreferences)
         .mockResolvedValueOnce(mockUserPreferences);
-      
+
       const updatedPreferences = {
         ...mockUserPreferences,
         emailNotifications: false,
@@ -247,7 +248,7 @@ describe('PreferencesService', () => {
       mockPrismaService.userPreferences.findUnique
         .mockResolvedValueOnce(mockUserPreferences)
         .mockResolvedValueOnce(mockUserPreferences);
-      
+
       mockPrismaService.userPreferences.update.mockResolvedValue(mockUserPreferences);
 
       await service.updateUserPreferences(mockUserId, { emailNotifications: true });
@@ -275,7 +276,7 @@ describe('PreferencesService', () => {
       mockPrismaService.userPreferences.findUnique
         .mockResolvedValueOnce(mockUserPreferences)
         .mockResolvedValueOnce(mockUserPreferences);
-      
+
       const updatedPreferences = {
         ...mockUserPreferences,
         emailNotifications: false,
@@ -308,7 +309,7 @@ describe('PreferencesService', () => {
       mockPrismaService.userPreferences.findUnique
         .mockResolvedValueOnce(mockUserPreferences)
         .mockResolvedValueOnce(mockUserPreferences);
-      
+
       mockPrismaService.userPreferences.update.mockResolvedValue({
         ...mockUserPreferences,
         ...bulkUpdateDto,
@@ -461,7 +462,7 @@ describe('PreferencesService', () => {
         timezone: 'America/Mexico_City',
         preferences: mockUserPreferences,
       };
-      
+
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
       mockPrismaService.userPreferences.delete.mockResolvedValue(mockUserPreferences);
       mockPrismaService.userPreferences.create.mockResolvedValue({
@@ -499,7 +500,7 @@ describe('PreferencesService', () => {
         timezone: 'UTC',
         preferences: null,
       };
-      
+
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
       mockPrismaService.userPreferences.create.mockResolvedValue(mockUserPreferences);
 
@@ -570,11 +571,11 @@ describe('PreferencesService', () => {
         ...mockUserPreferences,
         backupFrequency: null,
       };
-      
+
       mockPrismaService.userPreferences.findUnique
         .mockResolvedValueOnce(preferencesWithNulls)
         .mockResolvedValueOnce(preferencesWithNulls);
-      
+
       mockPrismaService.userPreferences.update.mockResolvedValue({
         ...preferencesWithNulls,
         backupFrequency: 'weekly',
@@ -589,7 +590,7 @@ describe('PreferencesService', () => {
               backupFrequency: { from: null, to: 'weekly' },
             },
           }),
-        }),
+        })
       );
     });
   });
@@ -603,7 +604,7 @@ describe('PreferencesService', () => {
         themeMode: 'dark', // Default is light
         defaultCurrency: Currency.USD, // Default for es locale is MXN
       };
-      
+
       mockPrismaService.userPreferences.findUnique.mockResolvedValue(customizedPreferences);
 
       const result = await service.getPreferencesSummary(mockUserId);

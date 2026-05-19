@@ -219,7 +219,7 @@ describe('Statistical Utilities', () => {
     it('should handle different confidence levels', () => {
       const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-      const [lower50, upper50] = confidenceInterval(data, 0.50);
+      const [lower50, upper50] = confidenceInterval(data, 0.5);
       const [lower95, upper95] = confidenceInterval(data, 0.95);
 
       // 50% CI should be narrower than 95% CI

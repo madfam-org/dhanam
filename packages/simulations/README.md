@@ -32,9 +32,9 @@ const result = monteCarloEngine.simulate({
   monthlyContribution: 1000,
   years: 30,
   iterations: 10000,
-  expectedReturn: 0.07,      // 7% annual return
-  returnVolatility: 0.15,    // 15% standard deviation
-  inflationRate: 0.03,       // 3% inflation
+  expectedReturn: 0.07, // 7% annual return
+  returnVolatility: 0.15, // 15% standard deviation
+  inflationRate: 0.03, // 3% inflation
   inflationAdjustedContributions: true,
 });
 
@@ -54,15 +54,17 @@ const retirement = monteCarloEngine.simulateRetirement({
   currentSavings: 150000,
   monthlyContribution: 2000,
   monthlyWithdrawal: 5000,
-  preRetirementReturn: 0.08,   // Higher risk during accumulation
-  postRetirementReturn: 0.05,  // Lower risk during distribution
+  preRetirementReturn: 0.08, // Higher risk during accumulation
+  postRetirementReturn: 0.05, // Lower risk during distribution
   returnVolatility: 0.12,
   iterations: 10000,
   inflationRate: 0.025,
 });
 
 console.log(`Retirement success probability: ${(retirement.successProbability * 100).toFixed(1)}%`);
-console.log(`Balance at retirement (median): $${retirement.balanceAtRetirement.median.toLocaleString()}`);
+console.log(
+  `Balance at retirement (median): $${retirement.balanceAtRetirement.median.toLocaleString()}`
+);
 ```
 
 ### Scenario Analysis
@@ -80,19 +82,17 @@ const baselineConfig = {
 };
 
 // Analyze single scenario
-const result = scenarioAnalysisEngine.analyzeScenario(
-  baselineConfig,
-  ScenarioType.MARKET_CRASH
-);
+const result = scenarioAnalysisEngine.analyzeScenario(baselineConfig, ScenarioType.MARKET_CRASH);
 
 console.log(`Impact severity: ${result.comparison.impactSeverity}`);
 console.log(`Median impact: ${result.comparison.medianDifferencePercent.toFixed(1)}%`);
 
 // Analyze multiple scenarios
-const allResults = scenarioAnalysisEngine.analyzeMultipleScenarios(
-  baselineConfig,
-  [ScenarioType.JOB_LOSS, ScenarioType.MARKET_CRASH, ScenarioType.RECESSION]
-);
+const allResults = scenarioAnalysisEngine.analyzeMultipleScenarios(baselineConfig, [
+  ScenarioType.JOB_LOSS,
+  ScenarioType.MARKET_CRASH,
+  ScenarioType.RECESSION,
+]);
 ```
 
 ## API Reference
@@ -144,15 +144,15 @@ Run multiple scenario analyses in batch.
 
 ### Predefined Scenarios
 
-| Scenario | Description | Severity |
-|----------|-------------|----------|
-| `JOB_LOSS` | 6-month complete income loss | Severe |
-| `MARKET_CRASH` | 30% market downturn (2008-style) | Severe |
-| `RECESSION` | Economic downturn with reduced income/returns | Moderate |
-| `MEDICAL_EMERGENCY` | $50k unexpected medical expense | Moderate |
-| `INFLATION_SPIKE` | 5-year high inflation period | Moderate |
-| `DISABILITY` | Long-term disability (40% income replacement) | Severe |
-| `MARKET_CORRECTION` | 10% market correction with quick recovery | Mild |
+| Scenario            | Description                                   | Severity |
+| ------------------- | --------------------------------------------- | -------- |
+| `JOB_LOSS`          | 6-month complete income loss                  | Severe   |
+| `MARKET_CRASH`      | 30% market downturn (2008-style)              | Severe   |
+| `RECESSION`         | Economic downturn with reduced income/returns | Moderate |
+| `MEDICAL_EMERGENCY` | $50k unexpected medical expense               | Moderate |
+| `INFLATION_SPIKE`   | 5-year high inflation period                  | Moderate |
+| `DISABILITY`        | Long-term disability (40% income replacement) | Severe   |
+| `MARKET_CORRECTION` | 10% market correction with quick recovery     | Mild     |
 
 ### Statistical Utilities
 
@@ -201,6 +201,7 @@ packages/simulations/
 - **Scenario analysis**: ~100-150ms per scenario
 
 Recommended iteration counts:
+
 - Quick estimates: 1,000-5,000
 - Standard analysis: 10,000
 - High-precision: 50,000-100,000
@@ -251,6 +252,7 @@ R_monthly ~ N(μ/12, σ/√12)
 ```
 
 Where:
+
 - μ = expected annual return
 - σ = annual volatility
 

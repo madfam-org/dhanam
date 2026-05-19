@@ -12,88 +12,93 @@ The Preferences module centralizes all user-configurable settings across the Dha
 
 Comprehensive user settings record.
 
-| Category | Fields |
-|----------|--------|
+| Category                | Fields                                                                                                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | **Email Notifications** | `emailNotifications`, `transactionAlerts`, `budgetAlerts`, `weeklyReports`, `monthlyReports`, `securityAlerts`, `promotionalEmails` |
-| **Push Notifications** | `pushNotifications`, `transactionPush`, `budgetPush`, `securityPush` |
-| **Privacy** | `dataSharing`, `analyticsTracking`, `personalizedAds` |
-| **Display** | `dashboardLayout`, `chartType`, `themeMode`, `compactView`, `showBalances` |
-| **Financial** | `defaultCurrency`, `hideSensitiveData`, `autoCategorizeTxns`, `includeWeekends` |
-| **ESG** | `esgScoreVisibility`, `sustainabilityAlerts`, `impactReporting` |
-| **Backup** | `autoBackup`, `backupFrequency`, `exportFormat` |
+| **Push Notifications**  | `pushNotifications`, `transactionPush`, `budgetPush`, `securityPush`                                                                |
+| **Privacy**             | `dataSharing`, `analyticsTracking`, `personalizedAds`                                                                               |
+| **Display**             | `dashboardLayout`, `chartType`, `themeMode`, `compactView`, `showBalances`                                                          |
+| **Financial**           | `defaultCurrency`, `hideSensitiveData`, `autoCategorizeTxns`, `includeWeekends`                                                     |
+| **ESG**                 | `esgScoreVisibility`, `sustainabilityAlerts`, `impactReporting`                                                                     |
+| **Backup**              | `autoBackup`, `backupFrequency`, `exportFormat`                                                                                     |
 
 ### Default Values
 
-| Setting | Default | Notes |
-|---------|---------|-------|
-| `emailNotifications` | `true` | Master email toggle |
-| `transactionAlerts` | `true` | New transaction alerts |
-| `budgetAlerts` | `true` | Budget threshold alerts |
-| `weeklyReports` | `true` | Weekly summary email |
-| `monthlyReports` | `true` | Monthly summary email |
-| `securityAlerts` | `true` | Security-related notifications |
-| `promotionalEmails` | `false` | Marketing communications |
-| `pushNotifications` | `true` | Master push toggle |
-| `transactionPush` | `true` | Transaction push alerts |
-| `budgetPush` | `true` | Budget push alerts |
-| `securityPush` | `true` | Security push alerts |
-| `dataSharing` | `false` | Third-party data sharing |
-| `analyticsTracking` | `true` | Usage analytics |
-| `personalizedAds` | `false` | Ad personalization |
-| `dashboardLayout` | `standard` | Dashboard view mode |
-| `chartType` | `line` | Default chart type |
-| `themeMode` | `light` | UI theme |
-| `compactView` | `false` | Compact display mode |
-| `showBalances` | `true` | Balance visibility |
-| `defaultCurrency` | Locale-based | MXN for es, USD otherwise |
-| `hideSensitiveData` | `false` | Mask sensitive values |
-| `autoCategorizeTxns` | `true` | AI categorization |
-| `includeWeekends` | `true` | Weekend in calculations |
-| `esgScoreVisibility` | `true` | Show ESG scores |
-| `sustainabilityAlerts` | `false` | ESG change alerts |
-| `impactReporting` | `false` | Environmental reports |
-| `autoBackup` | `false` | Automatic backups |
-| `backupFrequency` | `null` | Backup schedule |
-| `exportFormat` | `csv` | Data export format |
+| Setting                | Default      | Notes                          |
+| ---------------------- | ------------ | ------------------------------ |
+| `emailNotifications`   | `true`       | Master email toggle            |
+| `transactionAlerts`    | `true`       | New transaction alerts         |
+| `budgetAlerts`         | `true`       | Budget threshold alerts        |
+| `weeklyReports`        | `true`       | Weekly summary email           |
+| `monthlyReports`       | `true`       | Monthly summary email          |
+| `securityAlerts`       | `true`       | Security-related notifications |
+| `promotionalEmails`    | `false`      | Marketing communications       |
+| `pushNotifications`    | `true`       | Master push toggle             |
+| `transactionPush`      | `true`       | Transaction push alerts        |
+| `budgetPush`           | `true`       | Budget push alerts             |
+| `securityPush`         | `true`       | Security push alerts           |
+| `dataSharing`          | `false`      | Third-party data sharing       |
+| `analyticsTracking`    | `true`       | Usage analytics                |
+| `personalizedAds`      | `false`      | Ad personalization             |
+| `dashboardLayout`      | `standard`   | Dashboard view mode            |
+| `chartType`            | `line`       | Default chart type             |
+| `themeMode`            | `light`      | UI theme                       |
+| `compactView`          | `false`      | Compact display mode           |
+| `showBalances`         | `true`       | Balance visibility             |
+| `defaultCurrency`      | Locale-based | MXN for es, USD otherwise      |
+| `hideSensitiveData`    | `false`      | Mask sensitive values          |
+| `autoCategorizeTxns`   | `true`       | AI categorization              |
+| `includeWeekends`      | `true`       | Weekend in calculations        |
+| `esgScoreVisibility`   | `true`       | Show ESG scores                |
+| `sustainabilityAlerts` | `false`      | ESG change alerts              |
+| `impactReporting`      | `false`      | Environmental reports          |
+| `autoBackup`           | `false`      | Automatic backups              |
+| `backupFrequency`      | `null`       | Backup schedule                |
+| `exportFormat`         | `csv`        | Data export format             |
 
 ### Configuration Options
 
 **Theme Modes**
+
 - `light`
 - `dark`
 - `system`
 
 **Dashboard Layouts**
+
 - `standard`
 - `compact`
 - `detailed`
 
 **Chart Types**
+
 - `line`
 - `bar`
 - `pie`
 - `area`
 
 **Export Formats**
+
 - `csv`
 - `json`
 - `xlsx`
 - `pdf`
 
 **Backup Frequencies**
+
 - `daily`
 - `weekly`
 - `monthly`
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/preferences` | Get current preferences |
-| `GET` | `/preferences/summary` | Get preferences summary |
-| `PATCH` | `/preferences` | Update individual preferences |
-| `PUT` | `/preferences/bulk` | Bulk update by category |
-| `POST` | `/preferences/reset` | Reset to defaults |
+| Method  | Endpoint               | Description                   |
+| ------- | ---------------------- | ----------------------------- |
+| `GET`   | `/preferences`         | Get current preferences       |
+| `GET`   | `/preferences/summary` | Get preferences summary       |
+| `PATCH` | `/preferences`         | Update individual preferences |
+| `PUT`   | `/preferences/bulk`    | Bulk update by category       |
+| `POST`  | `/preferences/reset`   | Reset to defaults             |
 
 ### Request/Response Examples
 
@@ -276,9 +281,9 @@ PreferencesController
 
 ## Error Handling
 
-| Error | Status | Condition |
-|-------|--------|-----------|
-| `NotFoundException` | 404 | User not found |
+| Error               | Status | Condition      |
+| ------------------- | ------ | -------------- |
+| `NotFoundException` | 404    | User not found |
 
 ### Error Messages
 
@@ -286,15 +291,15 @@ PreferencesController
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `users` | Preferences belong to users |
+| Module          | Relationship                              |
+| --------------- | ----------------------------------------- |
+| `users`         | Preferences belong to users               |
 | `notifications` | Preferences control notification delivery |
-| `alerts` | Alert settings reference preferences |
-| `dashboard` | Layout/display preferences |
-| `transactions` | Auto-categorization preference |
-| `esg` | ESG visibility preferences |
-| `backup` | Backup schedule preferences |
+| `alerts`        | Alert settings reference preferences      |
+| `dashboard`     | Layout/display preferences                |
+| `transactions`  | Auto-categorization preference            |
+| `esg`           | ESG visibility preferences                |
+| `backup`        | Backup schedule preferences               |
 
 ## Testing
 
@@ -338,5 +343,6 @@ pnpm test:cov -- preferences
 - Track changes in audit log
 
 ---
+
 **Module**: `preferences`
 **Last Updated**: January 2025

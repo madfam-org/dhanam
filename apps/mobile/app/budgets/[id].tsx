@@ -81,10 +81,14 @@ export default function BudgetDetailScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return '#4CAF50';
-      case 'exceeded': return '#F44336';
-      case 'completed': return '#757575';
-      default: return '#757575';
+      case 'active':
+        return '#4CAF50';
+      case 'exceeded':
+        return '#F44336';
+      case 'completed':
+        return '#757575';
+      default:
+        return '#757575';
     }
   };
 
@@ -97,7 +101,9 @@ export default function BudgetDetailScreen() {
       >
         {/* Budget Header */}
         <View style={styles.headerSection}>
-          <Text variant="headlineSmall" style={styles.budgetName}>{budget.name}</Text>
+          <Text variant="headlineSmall" style={styles.budgetName}>
+            {budget.name}
+          </Text>
           <View style={styles.badgeRow}>
             <Chip
               mode="outlined"
@@ -106,7 +112,9 @@ export default function BudgetDetailScreen() {
             >
               {budget.status.charAt(0).toUpperCase() + budget.status.slice(1)}
             </Chip>
-            <Chip mode="outlined">{budget.period.charAt(0).toUpperCase() + budget.period.slice(1)}</Chip>
+            <Chip mode="outlined">
+              {budget.period.charAt(0).toUpperCase() + budget.period.slice(1)}
+            </Chip>
           </View>
         </View>
 
@@ -115,20 +123,31 @@ export default function BudgetDetailScreen() {
           <Card.Content>
             <View style={styles.amountRow}>
               <View>
-                <Text variant="bodySmall" style={styles.amountLabel}>Spent</Text>
-                <Text variant="titleLarge" style={[styles.amountValue, isOver && { color: '#F44336' }]}>
+                <Text variant="bodySmall" style={styles.amountLabel}>
+                  Spent
+                </Text>
+                <Text
+                  variant="titleLarge"
+                  style={[styles.amountValue, isOver && { color: '#F44336' }]}
+                >
                   {formatCurrency(budget.spent, budget.currency)}
                 </Text>
               </View>
               <View style={styles.amountRight}>
-                <Text variant="bodySmall" style={styles.amountLabel}>Budget</Text>
+                <Text variant="bodySmall" style={styles.amountLabel}>
+                  Budget
+                </Text>
                 <Text variant="titleLarge" style={styles.amountValue}>
                   {formatCurrency(budget.amount, budget.currency)}
                 </Text>
               </View>
             </View>
 
-            <ProgressBar progress={progress} color={getProgressColor()} style={styles.progressBar} />
+            <ProgressBar
+              progress={progress}
+              color={getProgressColor()}
+              style={styles.progressBar}
+            />
 
             <View style={styles.progressFooter}>
               <Text variant="bodySmall" style={styles.progressText}>
@@ -149,8 +168,13 @@ export default function BudgetDetailScreen() {
         {/* Details */}
         <Card style={styles.detailsCard}>
           <Card.Content>
-            <Text variant="titleMedium" style={styles.sectionTitle}>Details</Text>
-            <DetailRow label="Period" value={`${new Date(budget.startDate).toLocaleDateString()} - ${new Date(budget.endDate).toLocaleDateString()}`} />
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              Details
+            </Text>
+            <DetailRow
+              label="Period"
+              value={`${new Date(budget.startDate).toLocaleDateString()} - ${new Date(budget.endDate).toLocaleDateString()}`}
+            />
             <Divider style={styles.divider} />
             <DetailRow label="Currency" value={budget.currency} />
           </Card.Content>
@@ -159,10 +183,14 @@ export default function BudgetDetailScreen() {
         {/* Categories */}
         <Card style={styles.categoriesCard}>
           <Card.Content>
-            <Text variant="titleMedium" style={styles.sectionTitle}>Categories</Text>
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              Categories
+            </Text>
             <View style={styles.chipRow}>
               {budget.categories.map((cat) => (
-                <Chip key={cat} mode="outlined" style={styles.categoryChip}>{cat}</Chip>
+                <Chip key={cat} mode="outlined" style={styles.categoryChip}>
+                  {cat}
+                </Chip>
               ))}
             </View>
           </Card.Content>
@@ -172,11 +200,15 @@ export default function BudgetDetailScreen() {
         {budget.transactions && budget.transactions.length > 0 && (
           <Card style={styles.txCard}>
             <Card.Content>
-              <Text variant="titleMedium" style={styles.sectionTitle}>Recent Spending</Text>
+              <Text variant="titleMedium" style={styles.sectionTitle}>
+                Recent Spending
+              </Text>
               {budget.transactions.slice(0, 10).map((tx) => (
                 <View key={tx.id} style={styles.txRow}>
                   <View style={styles.txInfo}>
-                    <Text variant="bodyMedium" style={styles.txDescription}>{tx.description}</Text>
+                    <Text variant="bodyMedium" style={styles.txDescription}>
+                      {tx.description}
+                    </Text>
                     <Text variant="bodySmall" style={styles.txMeta}>
                       {tx.category} - {new Date(tx.date).toLocaleDateString()}
                     </Text>
@@ -205,14 +237,23 @@ export default function BudgetDetailScreen() {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={detailStyles.row}>
-      <Text variant="bodyMedium" style={detailStyles.label}>{label}</Text>
-      <Text variant="bodyMedium" style={detailStyles.value}>{value}</Text>
+      <Text variant="bodyMedium" style={detailStyles.label}>
+        {label}
+      </Text>
+      <Text variant="bodyMedium" style={detailStyles.value}>
+        {value}
+      </Text>
     </View>
   );
 }
 
 const detailStyles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12 },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
   label: { color: '#757575' },
   value: { color: '#212121', fontWeight: '500', flex: 1, textAlign: 'right' },
 });
@@ -240,8 +281,12 @@ const styles = StyleSheet.create({
   categoryChip: { backgroundColor: '#FAFAFA' },
   txCard: { marginHorizontal: 20, marginBottom: 16, elevation: 1 },
   txRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f3f4f6',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   txInfo: { flex: 1, marginRight: 12 },
   txDescription: { color: '#212121' },

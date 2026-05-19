@@ -98,21 +98,21 @@ module.exports = {
 
 ### ESLint Presets
 
-| Config | Use Case | Extends |
-|--------|----------|---------|
-| `eslint/base` | Packages and libraries | ESLint recommended, TypeScript, Import, Prettier |
-| `eslint/nestjs` | NestJS API applications | Base + NestJS patterns |
-| `eslint/nextjs` | Next.js applications | Base + React, JSX-a11y |
-| `eslint/react-native` | React Native apps | Base + React Native, React Hooks |
+| Config                | Use Case                | Extends                                          |
+| --------------------- | ----------------------- | ------------------------------------------------ |
+| `eslint/base`         | Packages and libraries  | ESLint recommended, TypeScript, Import, Prettier |
+| `eslint/nestjs`       | NestJS API applications | Base + NestJS patterns                           |
+| `eslint/nextjs`       | Next.js applications    | Base + React, JSX-a11y                           |
+| `eslint/react-native` | React Native apps       | Base + React Native, React Hooks                 |
 
 ### TypeScript Presets
 
-| Config | Use Case | Target |
-|--------|----------|--------|
-| `typescript/base.json` | Packages and libraries | ES2022 |
-| `typescript/nestjs.json` | NestJS applications | ES2022, Node module resolution |
-| `typescript/nextjs.json` | Next.js applications | ES2022, Bundler resolution |
-| `typescript/react-native.json` | React Native apps | ESNext, React Native JSX |
+| Config                         | Use Case               | Target                         |
+| ------------------------------ | ---------------------- | ------------------------------ |
+| `typescript/base.json`         | Packages and libraries | ES2022                         |
+| `typescript/nestjs.json`       | NestJS applications    | ES2022, Node module resolution |
+| `typescript/nextjs.json`       | Next.js applications   | ES2022, Bundler resolution     |
+| `typescript/react-native.json` | React Native apps      | ESNext, React Native JSX       |
 
 ## Key Rules
 
@@ -180,10 +180,12 @@ packages/config/
 ## Dependencies
 
 **Peer Dependencies (ESLint):**
+
 - `eslint` (^8.0.0)
 - `typescript` (^5.0.0)
 
 **Included Plugins:**
+
 - `@typescript-eslint/eslint-plugin`
 - `@typescript-eslint/parser`
 - `eslint-config-prettier`
@@ -222,16 +224,17 @@ module.exports = {
 
 ## Related Packages
 
-| Package | Relationship |
-|---------|--------------|
-| [`@dhanam/shared`](../shared/README.md) | Uses this config for build |
-| [`@dhanam/esg`](../esg/README.md) | Uses this config for build |
+| Package                                           | Relationship               |
+| ------------------------------------------------- | -------------------------- |
+| [`@dhanam/shared`](../shared/README.md)           | Uses this config for build |
+| [`@dhanam/esg`](../esg/README.md)                 | Uses this config for build |
 | [`@dhanam/simulations`](../simulations/README.md) | Uses this config for build |
-| [`@dhanam/ui`](../ui/README.md) | Uses Next.js config preset |
+| [`@dhanam/ui`](../ui/README.md)                   | Uses Next.js config preset |
 
 ## Ignored Patterns
 
 All configs ignore:
+
 - `node_modules/`
 - `dist/`
 - `build/`

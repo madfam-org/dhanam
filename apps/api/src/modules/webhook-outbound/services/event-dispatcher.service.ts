@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+
+import { Injectable, Logger } from '@nestjs/common';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 
@@ -24,7 +25,7 @@ export class EventDispatcherService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly svix: SvixClient,
+    private readonly svix: SvixClient
   ) {}
 
   async emit(eventType: string, payload: Record<string, unknown>): Promise<void> {
@@ -36,10 +37,7 @@ export class EventDispatcherService {
     const endpoints = await this.prisma.webhookEndpoint.findMany({
       where: {
         active: true,
-        OR: [
-          { subscribedEvents: { has: eventType } },
-          { subscribedEvents: { isEmpty: true } },
-        ],
+        OR: [{ subscribedEvents: { has: eventType } }, { subscribedEvents: { isEmpty: true } }],
       },
     });
 
@@ -77,7 +75,7 @@ export class EventDispatcherService {
         });
       } catch (err) {
         this.logger.error(
-          `Failed to dispatch ${eventType} to endpoint ${endpoint.id}: ${(err as Error).message}`,
+          `Failed to dispatch ${eventType} to endpoint ${endpoint.id}: ${(err as Error).message}`
         );
         await this.prisma.webhookDelivery.create({
           data: {

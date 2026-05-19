@@ -13,15 +13,18 @@ GitHub Actions is enabled by default. Once you push the workflow files, they wil
 ### 2. Set Up Codecov (Optional but Recommended)
 
 **Step 1: Sign up for Codecov**
+
 1. Go to https://codecov.io/
 2. Sign in with your GitHub account
 3. Select the `dhanam` repository
 
 **Step 2: Get Codecov Token**
+
 1. In Codecov dashboard, go to Settings → General
 2. Copy the "Repository Upload Token"
 
 **Step 3: Add Token to GitHub Secrets**
+
 1. Go to GitHub repository Settings → Secrets and variables → Actions
 2. Click "New repository secret"
 3. Name: `CODECOV_TOKEN`
@@ -29,6 +32,7 @@ GitHub Actions is enabled by default. Once you push the workflow files, they wil
 5. Click "Add secret"
 
 **Step 4: Add Coverage Badge to README**
+
 ```markdown
 [![codecov](https://codecov.io/gh/madfam-io/dhanam/branch/main/graph/badge.svg)](https://codecov.io/gh/madfam-io/dhanam)
 ```
@@ -38,11 +42,14 @@ GitHub Actions is enabled by default. Once you push the workflow files, they wil
 ## 📋 Workflow Files
 
 ### `test-coverage.yml`
+
 **Triggers:**
+
 - Push to `main`, `develop`, or `claude/**` branches
 - Pull requests to `main` or `develop`
 
 **Jobs:**
+
 1. **test** - Unit tests with coverage
    - Runs on Ubuntu latest
    - Uses Postgres 15 + Redis 7
@@ -64,10 +71,13 @@ GitHub Actions is enabled by default. Once you push the workflow files, they wil
 **Timeout:** 15 minutes (test), 10 minutes (e2e), 10 minutes (build)
 
 ### `lint.yml`
+
 **Triggers:**
+
 - Same as test-coverage.yml
 
 **Jobs:**
+
 1. **lint** - ESLint checks
 2. **type-check** - TypeScript type checking
 3. **prettier** - Code formatting validation
@@ -89,6 +99,7 @@ chmod +x scripts/test-ci.sh
 ```
 
 **What it does:**
+
 1. Starts Postgres and Redis via Docker
 2. Installs dependencies
 3. Generates Prisma client
@@ -119,15 +130,18 @@ coverageThreshold: {
 ### Codecov Configuration (from `codecov.yml`)
 
 **Project Coverage:**
+
 - Target: 80%
 - Threshold: 1% (allows 79% to pass)
 - Base: auto (compares to base branch)
 
 **Patch Coverage:**
+
 - Target: 80%
 - Threshold: 5% (for new code in PRs)
 
 **Components:**
+
 - API: `apps/api/src/**`
 - Web: `apps/web/src/**`
 - Shared: `packages/shared/src/**`
@@ -140,6 +154,7 @@ coverageThreshold: {
 ### In Pull Requests
 
 Coverage reports are automatically commented on PRs:
+
 - Shows overall coverage change
 - Highlights files with coverage changes
 - Flags if coverage drops below threshold
@@ -172,12 +187,14 @@ start coverage/index.html  # Windows
 ### Prisma Client Generation Fails
 
 **Error:**
+
 ```
 Error: Failed to fetch the engine file
 ```
 
 **Solution:**
 The workflow sets `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1` to bypass this. If it still fails, check:
+
 1. GitHub Actions has internet access
 2. Prisma binaries CDN is not blocked
 3. Try running locally first
@@ -185,6 +202,7 @@ The workflow sets `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1` to bypass this. If 
 ### Tests Fail in CI but Pass Locally
 
 **Common causes:**
+
 1. **Missing environment variables**
    - Check `env:` section in workflow
    - Add missing vars to GitHub Secrets if needed
@@ -204,11 +222,13 @@ The workflow sets `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1` to bypass this. If 
 ### Coverage Upload Fails
 
 **Error:**
+
 ```
 Failed to upload coverage
 ```
 
 **Solutions:**
+
 1. Check `CODECOV_TOKEN` secret is set
 2. Verify `lcov.info` file exists
 3. Check Codecov service status
@@ -217,10 +237,11 @@ Failed to upload coverage
 ### E2E Tests Timeout
 
 **Increase timeout in workflow:**
+
 ```yaml
 - name: Run E2E tests
   run: pnpm test:e2e
-  timeout-minutes: 15  # Increase if needed
+  timeout-minutes: 15 # Increase if needed
 ```
 
 ---
@@ -229,19 +250,20 @@ Failed to upload coverage
 
 ### Required Secrets
 
-| Secret | Description | Required |
-|--------|-------------|----------|
-| `CODECOV_TOKEN` | Codecov upload token | Recommended |
-| `GITHUB_TOKEN` | Automatic, no setup needed | Auto |
+| Secret          | Description                | Required    |
+| --------------- | -------------------------- | ----------- |
+| `CODECOV_TOKEN` | Codecov upload token       | Recommended |
+| `GITHUB_TOKEN`  | Automatic, no setup needed | Auto        |
 
 ### Optional Secrets (for future)
 
-| Secret | Description | When Needed |
-|--------|-------------|-------------|
-| `SENTRY_DSN` | Sentry error tracking | Production |
-| `POSTHOG_KEY` | PostHog analytics | Production |
+| Secret        | Description           | When Needed |
+| ------------- | --------------------- | ----------- |
+| `SENTRY_DSN`  | Sentry error tracking | Production  |
+| `POSTHOG_KEY` | PostHog analytics     | Production  |
 
 **How to add:**
+
 1. Go to GitHub repo → Settings → Secrets and variables → Actions
 2. Click "New repository secret"
 3. Enter name and value
@@ -254,6 +276,7 @@ Failed to upload coverage
 ### Tracking Over Time
 
 Codecov automatically tracks:
+
 - Coverage by commit
 - Coverage by branch
 - Coverage by component
@@ -262,14 +285,16 @@ Codecov automatically tracks:
 ### Setting Up Notifications
 
 **Slack Integration:**
+
 ```yaml
 # In codecov.yml
 slack:
-  url: "secret:SLACK_WEBHOOK_URL"
+  url: 'secret:SLACK_WEBHOOK_URL'
 ```
 
 **GitHub Status Checks:**
 Already enabled in `codecov.yml`:
+
 ```yaml
 github_checks:
   annotations: true
@@ -282,6 +307,7 @@ github_checks:
 ### 1. Write Tests Before Pushing
 
 Run locally first:
+
 ```bash
 pnpm test:cov
 ```
@@ -289,6 +315,7 @@ pnpm test:cov
 ### 2. Check Coverage Locally
 
 Before creating PR:
+
 ```bash
 ./scripts/test-ci.sh
 ```
@@ -332,6 +359,7 @@ Add these to README.md:
 ### Change Test Database
 
 Edit `test-coverage.yml`:
+
 ```yaml
 services:
   postgres:
@@ -368,11 +396,13 @@ runs-on: ${{ matrix.os }}
 ### Skip CI for Docs Changes
 
 Add to commit message:
+
 ```
 docs: update README [skip ci]
 ```
 
 Or configure in workflow:
+
 ```yaml
 on:
   push:
@@ -388,6 +418,7 @@ on:
 ### Test the Workflow Locally
 
 Use `act` to test GitHub Actions locally:
+
 ```bash
 # Install act
 brew install act  # macOS
@@ -401,6 +432,7 @@ act -j test
 ### Validate Workflow Syntax
 
 GitHub automatically validates on push, or use:
+
 ```bash
 # Using actionlint
 actionlint .github/workflows/*.yml
@@ -411,12 +443,14 @@ actionlint .github/workflows/*.yml
 ## 📞 Support
 
 **Issues with CI/CD:**
+
 1. Check workflow logs in GitHub Actions tab
 2. Run `./scripts/test-ci.sh` locally to reproduce
 3. Review this guide for common solutions
 4. Check GitHub Actions documentation
 
 **Need Help:**
+
 - GitHub Actions Docs: https://docs.github.com/en/actions
 - Codecov Docs: https://docs.codecov.com/
 - Jest Docs: https://jestjs.io/

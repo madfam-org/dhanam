@@ -30,30 +30,34 @@ No Prediction - Manual categorization required
 
 ### Confidence Levels
 
-| Level | Threshold | Auto-Categorize | Description |
-|-------|-----------|-----------------|-------------|
-| High | 0.90+ | Yes | 3+ historical matches, consistent pattern |
-| Medium | 0.70-0.89 | No | Fuzzy match or keyword similarity |
-| Low | 0.50-0.69 | No | Amount-based correlation only |
+| Level  | Threshold | Auto-Categorize | Description                               |
+| ------ | --------- | --------------- | ----------------------------------------- |
+| High   | 0.90+     | Yes             | 3+ historical matches, consistent pattern |
+| Medium | 0.70-0.89 | No              | Fuzzy match or keyword similarity         |
+| Low    | 0.50-0.69 | No              | Amount-based correlation only             |
 
 ### Strategy Details
 
 #### 1. Exact Merchant Match
+
 - Requires exact merchant name match (case-insensitive)
 - Needs 3+ historical transactions with same merchant
 - Confidence scales with frequency: `min(0.95, 0.7 + (count - 3) * 0.05)`
 
 #### 2. Fuzzy Merchant Match
+
 - Substring matching (either direction)
 - Falls back to most recent similar merchant pattern
 - Fixed medium confidence (0.70)
 
 #### 3. Description Keyword Match
+
 - Extracts top 5 keywords (excluding stop words)
 - Compares against historical transaction descriptions per category
 - Requires 30%+ keyword overlap for prediction
 
 #### 4. Amount Pattern Match
+
 - Statistical analysis of transaction amounts by category
 - Uses z-score calculation (within 1 standard deviation)
 - Requires 5+ historical transactions in category
@@ -167,33 +171,29 @@ Intelligently routes financial data requests to the optimal provider based on:
 
 ### Available Providers
 
-| Provider | Region | Specialization |
-|----------|--------|----------------|
-| Belvo | Mexico, LATAM | Primary MX provider |
-| Plaid | US, Canada | Primary US provider |
-| MX | US, Canada | Backup aggregation |
-| Finicity | US | Open Banking (Mastercard) |
-| Bitso | Global | Crypto exchange |
-| Blockchain | Global | On-chain data |
+| Provider   | Region        | Specialization            |
+| ---------- | ------------- | ------------------------- |
+| Belvo      | Mexico, LATAM | Primary MX provider       |
+| Plaid      | US, Canada    | Primary US provider       |
+| MX         | US, Canada    | Backup aggregation        |
+| Finicity   | US            | Open Banking (Mastercard) |
+| Bitso      | Global        | Crypto exchange           |
+| Blockchain | Global        | On-chain data             |
 
 ### Selection Algorithm
 
 ```typescript
 // Provider selection factors
 interface ProviderScore {
-  availability: number;      // 0-1, can serve this region/institution
-  reliability: number;       // 0-1, recent success rate
-  featureMatch: number;      // 0-1, supports required features
-  cost: number;              // 0-1, cost efficiency
-  latency: number;           // 0-1, response time score
+  availability: number; // 0-1, can serve this region/institution
+  reliability: number; // 0-1, recent success rate
+  featureMatch: number; // 0-1, supports required features
+  cost: number; // 0-1, cost efficiency
+  latency: number; // 0-1, response time score
 }
 
 // Final score = weighted sum
-score = (availability * 0.3) +
-        (reliability * 0.25) +
-        (featureMatch * 0.25) +
-        (cost * 0.1) +
-        (latency * 0.1)
+score = availability * 0.3 + reliability * 0.25 + featureMatch * 0.25 + cost * 0.1 + latency * 0.1;
 ```
 
 ### API Usage
@@ -230,21 +230,21 @@ When users manually re-categorize a transaction:
 
 ### Data Requirements
 
-| Feature | Minimum Data | Optimal Data |
-|---------|--------------|--------------|
-| Merchant Match | 3 transactions | 10+ transactions |
-| Keyword Match | 100 transactions | 500+ transactions |
-| Amount Pattern | 5 transactions | 20+ per category |
+| Feature          | Minimum Data     | Optimal Data       |
+| ---------------- | ---------------- | ------------------ |
+| Merchant Match   | 3 transactions   | 10+ transactions   |
+| Keyword Match    | 100 transactions | 500+ transactions  |
+| Amount Pattern   | 5 transactions   | 20+ per category   |
 | Split Prediction | 3 similar splits | 10+ similar splits |
 
 ## Performance Characteristics
 
-| Operation | Latency | Throughput |
-|-----------|---------|------------|
-| Single prediction | <50ms | 1000/sec |
-| Batch categorization | <500ms/100 txn | 200/sec |
-| Provider selection | <20ms | 5000/sec |
-| Accuracy metrics | <200ms | 100/sec |
+| Operation            | Latency        | Throughput |
+| -------------------- | -------------- | ---------- |
+| Single prediction    | <50ms          | 1000/sec   |
+| Batch categorization | <500ms/100 txn | 200/sec    |
+| Provider selection   | <20ms          | 5000/sec   |
+| Accuracy metrics     | <200ms         | 100/sec    |
 
 ## Configuration
 
@@ -268,9 +268,9 @@ Users can configure ML behavior per space:
 ```typescript
 interface SpaceMLSettings {
   autoCategorizeEnabled: boolean;
-  minConfidenceThreshold: number;  // 0.80 - 0.95
+  minConfidenceThreshold: number; // 0.80 - 0.95
   splitPredictionEnabled: boolean;
-  learningEnabled: boolean;        // Allow model updates from corrections
+  learningEnabled: boolean; // Allow model updates from corrections
 }
 ```
 

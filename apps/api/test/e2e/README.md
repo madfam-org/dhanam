@@ -60,12 +60,14 @@ The tests use a separate test database that is automatically created and cleaned
 ## Key Testing Patterns
 
 ### 1. Authentication
+
 ```typescript
 const user = await testHelper.createUser(userData);
 const authToken = testHelper.generateAuthToken(user);
 ```
 
 ### 2. Request Testing
+
 ```typescript
 const response = await request(app.getHttpServer())
   .post('/endpoint')
@@ -75,9 +77,10 @@ const response = await request(app.getHttpServer())
 ```
 
 ### 3. Database State Verification
+
 ```typescript
 const updatedUser = await prisma.user.findUnique({
-  where: { id: userId }
+  where: { id: userId },
 });
 expect(updatedUser.onboardingCompleted).toBe(true);
 ```
@@ -107,12 +110,14 @@ The onboarding flow consists of 7 steps:
 ## Preferences Testing
 
 ### User Preferences
+
 - Language, timezone, currency settings
 - Notification preferences
 - Display preferences
 - Financial year settings
 
 ### Space Preferences
+
 - Auto-categorization settings
 - Budget management options
 - Export preferences
@@ -139,11 +144,13 @@ The onboarding flow consists of 7 steps:
 ## Debugging Tests
 
 ### Enable Debug Logging
+
 ```bash
 DEBUG=* pnpm test:e2e
 ```
 
 ### Run Single Test
+
 ```typescript
 it.only('should test specific scenario', async () => {
   // Test code
@@ -151,6 +158,7 @@ it.only('should test specific scenario', async () => {
 ```
 
 ### Inspect Database State
+
 ```typescript
 console.log(await prisma.user.findMany());
 ```

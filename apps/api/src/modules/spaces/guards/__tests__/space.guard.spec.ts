@@ -1,10 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { SpaceGuard } from '../space.guard';
-import { SpacesService } from '../../spaces.service';
 import { ROLES_KEY } from '../../decorators/require-role.decorator';
+import { SpacesService } from '../../spaces.service';
+import { SpaceGuard } from '../space.guard';
 
 describe('SpaceGuard', () => {
   let guard: SpaceGuard;

@@ -15,10 +15,24 @@
  * madfam-events controller — so secret rotation, replay-window policy, and
  * constant-time comparison are all centralized.
  */
-import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Logger, Post, Query, Req, UnauthorizedException, BadRequestException, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Logger,
+  Post,
+  Query,
+  Req,
+  UnauthorizedException,
+  BadRequestException,
+  UseGuards,
+} from '@nestjs/common';
+import type { RawBodyRequest } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { RawBodyRequest } from '@nestjs/common';
 import type { Request } from 'express';
 
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';

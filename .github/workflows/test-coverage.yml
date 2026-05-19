@@ -126,18 +126,6 @@ jobs:
             cat coverage/coverage-summary.json | jq -r '.total | "| Lines | \(.lines.pct)% |", "| Statements | \(.statements.pct)% |", "| Functions | \(.functions.pct)% |", "| Branches | \(.branches.pct)% |"' >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Check coverage thresholds
-        run: |
-          cd apps/api
-          pnpm test:cov --coverageReporters=text-summary 2>&1 | tee coverage-output.txt
-
-          if grep -q "Coverage for" coverage-output.txt; then
-            echo "✅ Coverage thresholds met"
-          else
-            echo "⚠️ Coverage thresholds not met"
-            exit 0
-          fi
-
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v7
         if: always()

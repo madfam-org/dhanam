@@ -18,7 +18,8 @@ export const legal = {
     'Esta Política de Privacidade descreve como a Dhanam ("nós", "nosso") coleta, usa e protege suas informações pessoais em conformidade com a Lei Federal de Proteção de Dados Pessoais em Posse de Particulares (LFPDPPP) do México.',
   privacySections: {
     dataController: 'Controlador de Dados',
-    dataControllerContent: '[CONSULTOR JURÍDICO DEVE FORNECER — Nome da empresa, RFC, endereço, e-mail de contato do oficial de privacidade]',
+    dataControllerContent:
+      '[CONSULTOR JURÍDICO DEVE FORNECER — Nome da empresa, RFC, endereço, e-mail de contato do oficial de privacidade]',
     dataCollected: 'Dados Pessoais Coletados',
     dataCollectedContent:
       '[CONSULTOR JURÍDICO DEVE FORNECER — Categorias: dados de identidade, dados financeiros, dados do dispositivo, análise de uso]',
@@ -26,7 +27,8 @@ export const legal = {
     purposesContent:
       '[CONSULTOR JURÍDICO DEVE FORNECER — Finalidades primárias: gestão de conta, agregação financeira, análise. Finalidades secundárias: marketing, melhoria do produto]',
     legalBasis: 'Base Legal',
-    legalBasisContent: '[CONSULTOR JURÍDICO DEVE FORNECER — Consentimento, execução contratual, interesse legítimo]',
+    legalBasisContent:
+      '[CONSULTOR JURÍDICO DEVE FORNECER — Consentimento, execução contratual, interesse legítimo]',
     arcoRights: 'Direitos ARCO',
     arcoRightsContent:
       '[CONSULTOR JURÍDICO DEVE FORNECER — Direitos de Acesso, Retificação, Cancelamento e Oposição conforme artigos 28-35 da LFPDPPP. Processo para exercer direitos, prazo de resposta (20 dias úteis)]',
@@ -40,12 +42,14 @@ export const legal = {
     securityContent:
       'Implementamos medidas de segurança padrão da indústria, incluindo criptografia AES-256-GCM para dados sensíveis em repouso, TLS 1.3 para dados em trânsito e avaliações periódicas de segurança.',
     cookies: 'Cookies e Rastreamento',
-    cookiesContent: 'Para detalhes sobre nosso uso de cookies e tecnologias de rastreamento, consulte nossa Política de Cookies.',
+    cookiesContent:
+      'Para detalhes sobre nosso uso de cookies e tecnologias de rastreamento, consulte nossa Política de Cookies.',
     changes: 'Alterações nesta Política',
     changesContent:
       '[CONSULTOR JURÍDICO DEVE FORNECER — Procedimentos de notificação para alterações materiais, requisitos de renovação de consentimento]',
     contact: 'Informações de Contato',
-    contactContent: '[CONSULTOR JURÍDICO DEVE FORNECER — Contato do oficial de privacidade, endereço, e-mail, telefone]',
+    contactContent:
+      '[CONSULTOR JURÍDICO DEVE FORNECER — Contato do oficial de privacidade, endereço, e-mail, telefone]',
   },
 
   // Terms of Service
@@ -149,7 +153,8 @@ export const legal = {
       'Nos ajudam a entender como os visitantes usam nosso aplicativo. Usamos PostHog para análise. São ativados apenas com seu consentimento.',
     analyticsExamples: 'Cookies de rastreamento do PostHog',
     preferences: 'Cookies de Preferências',
-    preferencesContent: 'Lembram suas configurações como tema (modo claro/escuro) e preferência de idioma.',
+    preferencesContent:
+      'Lembram suas configurações como tema (modo claro/escuro) e preferência de idioma.',
     preferencesExamples: 'dhanam_locale, preferência de tema',
     consentMechanism: 'Suas Opções de Cookies',
     consentMechanismContent:
@@ -161,7 +166,8 @@ export const legal = {
     managingContent:
       'Você pode controlar cookies através das configurações do seu navegador. Note que desativar cookies essenciais pode impedir o funcionamento correto do aplicativo.',
     changes: 'Alterações nesta Política',
-    changesContent: 'Podemos atualizar esta Política de Cookies periodicamente. As alterações serão publicadas nesta página.',
+    changesContent:
+      'Podemos atualizar esta Política de Cookies periodicamente. As alterações serão publicadas nesta página.',
   },
 
   // ESG Methodology
@@ -192,18 +198,21 @@ export const legal = {
     limitationsContent:
       'As classificações ESG são estimativas baseadas em dados disponíveis e não devem ser a única base para decisões de investimento. A metodologia e as fontes de dados estão sujeitas a alterações. As classificações podem não capturar todos os fatores relevantes.',
     updates: 'Atualizações de Classificações',
-    updatesContent: 'As classificações ESG são atualizadas periodicamente à medida que novos dados ficam disponíveis e a metodologia é refinada.',
+    updatesContent:
+      'As classificações ESG são atualizadas periodicamente à medida que novos dados ficam disponíveis e a metodologia é refinada.',
   },
 
   // Status Page
   statusTitle: 'Status do Sistema',
   statusSubtitle: 'Status operacional atual dos serviços da Dhanam',
-  statusDescription: 'Para o status do sistema em tempo real e histórico de incidentes, visite nossa página de status.',
+  statusDescription:
+    'Para o status do sistema em tempo real e histórico de incidentes, visite nossa página de status.',
   statusRedirect: 'Ir para a Página de Status',
 
   // Documentation
   docsTitle: 'Documentação',
   docsSubtitle: 'Documentação para desenvolvedores e usuários',
-  docsDescription: 'Explore nossa documentação para guias, referências de API e detalhes de integração.',
+  docsDescription:
+    'Explore nossa documentação para guias, referências de API e detalhes de integração.',
   docsRedirect: 'Ver Documentação',
 } as const;

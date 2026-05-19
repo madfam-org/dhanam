@@ -4,6 +4,8 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,6 +13,7 @@ import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { AccountOwnership as _AccountOwnership } from '@db';
 
+import { BelvoService } from '../providers/belvo/belvo.service';
 import { BitsoService } from '../providers/bitso/bitso.service';
 import { PlaidService } from '../providers/plaid/plaid.service';
 
@@ -26,7 +29,9 @@ export class AccountsService {
     private prisma: PrismaService,
     private logger: LoggerService,
     private plaidService: PlaidService,
-    private bitsoService: BitsoService
+    private bitsoService: BitsoService,
+    @Inject(forwardRef(() => BelvoService))
+    private belvoService: BelvoService
   ) {}
 
   async listAccounts(spaceId: string, type?: string): Promise<Account[]> {
@@ -203,9 +208,45 @@ export class AccountsService {
       throw new BadRequestException('Cannot sync manual accounts');
     }
 
-    // This is a placeholder for the actual sync process
-    // In production, this would trigger a background job
     const jobId = uuidv4();
+
+    switch (account.provider) {
+      case 'belvo': {
+        const linkId = this.readMetadataString(account.metadata, 'linkId');
+        if (!linkId) {
+          throw new BadRequestException('Belvo account missing link metadata');
+        }
+        await this.belvoService.syncTransactions(spaceId, '', linkId);
+        break;
+      }
+
+      case 'plaid': {
+        await this.plaidService.fetchTransactionsByDateRange(
+          accountId,
+          new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
+        );
+        break;
+      }
+
+      case 'bitso': {
+        const clientId = this.readMetadataString(account.metadata, 'clientId');
+        if (!clientId) {
+          throw new BadRequestException('Bitso account missing client metadata');
+        }
+        const connection = await this.prisma.providerConnection.findFirst({
+          where: { provider: 'bitso', providerUserId: clientId },
+          select: { id: true },
+        });
+        if (!connection) {
+          throw new BadRequestException('Bitso connection not found');
+        }
+        await this.bitsoService.fetchBalances(connection.id);
+        break;
+      }
+
+      default:
+        throw new BadRequestException(`Sync not supported for provider ${account.provider}`);
+    }
 
     await this.prisma.account.update({
       where: { id: accountId },
@@ -218,8 +259,17 @@ export class AccountsService {
 
     return {
       jobId,
-      status: 'pending',
+      status: 'completed',
     };
+  }
+
+  private readMetadataString(metadata: unknown, key: string): string | undefined {
+    if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+      return undefined;
+    }
+
+    const value = (metadata as Record<string, unknown>)[key];
+    return typeof value === 'string' && value.length > 0 ? value : undefined;
   }
 
   /**

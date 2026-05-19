@@ -149,12 +149,21 @@ export const settings = {
   },
   section: {
     usage: { title: 'Usage Limits', description: 'Track your daily usage of premium features' },
-    billing: { title: 'Subscription & Billing', description: 'Manage your subscription plan and billing' },
-    notifications: { title: 'Notifications', description: 'Configure how and when you receive notifications' },
+    billing: {
+      title: 'Subscription & Billing',
+      description: 'Manage your subscription plan and billing',
+    },
+    notifications: {
+      title: 'Notifications',
+      description: 'Configure how and when you receive notifications',
+    },
     privacy: { title: 'Privacy', description: 'Control your data and privacy settings' },
     display: { title: 'Display', description: 'Customize how Dhanam looks and feels' },
     financial: { title: 'Financial', description: 'Configure financial settings and preferences' },
-    esg: { title: 'ESG Settings', description: 'Environmental, Social, and Governance preferences' },
+    esg: {
+      title: 'ESG Settings',
+      description: 'Environmental, Social, and Governance preferences',
+    },
     backup: { title: 'Backup & Export', description: 'Data backup and export preferences' },
   },
   billingPage: {
@@ -169,31 +178,64 @@ export const settings = {
   },
   notificationsPage: {
     email: { label: 'Email Notifications', description: 'Receive notifications via email' },
-    transactions: { label: 'Transaction Alerts', description: 'Get notified about new transactions' },
+    transactions: {
+      label: 'Transaction Alerts',
+      description: 'Get notified about new transactions',
+    },
     budget: { label: 'Budget Alerts', description: 'Alerts when approaching budget limits' },
     weeklyReports: { label: 'Weekly Reports', description: 'Receive weekly financial summaries' },
-    security: { label: 'Security Alerts', description: 'Get notified about security-related events' },
+    security: {
+      label: 'Security Alerts',
+      description: 'Get notified about security-related events',
+    },
   },
   privacy: {
-    analytics: { label: 'Analytics Tracking', description: 'Help improve Dhanam with usage analytics' },
-    hideSensitive: { label: 'Hide Sensitive Data', description: 'Mask balances and amounts by default' },
+    analytics: {
+      label: 'Analytics Tracking',
+      description: 'Help improve Dhanam with usage analytics',
+    },
+    hideSensitive: {
+      label: 'Hide Sensitive Data',
+      description: 'Mask balances and amounts by default',
+    },
   },
   display: {
-    theme: { label: 'Theme', description: 'Choose your preferred color theme', light: 'Light', dark: 'Dark', system: 'System' },
+    theme: {
+      label: 'Theme',
+      description: 'Choose your preferred color theme',
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System',
+    },
     compactView: { label: 'Compact View', description: 'Use a more condensed layout' },
     showBalances: { label: 'Show Balances', description: 'Display account balances by default' },
   },
   financial: {
-    defaultCurrency: { label: 'Default Currency', description: 'Currency used for display and calculations' },
-    autoCategorize: { label: 'Auto-Categorize Transactions', description: 'Automatically categorize new transactions' },
+    defaultCurrency: {
+      label: 'Default Currency',
+      description: 'Currency used for display and calculations',
+    },
+    autoCategorize: {
+      label: 'Auto-Categorize Transactions',
+      description: 'Automatically categorize new transactions',
+    },
   },
   esg: {
     showScores: { label: 'Show ESG Scores', description: 'Display ESG scores for crypto holdings' },
-    sustainabilityAlerts: { label: 'Sustainability Alerts', description: 'Get alerts about ESG score changes' },
-    impactReporting: { label: 'Impact Reporting', description: 'Include ESG impact in periodic reports' },
+    sustainabilityAlerts: {
+      label: 'Sustainability Alerts',
+      description: 'Get alerts about ESG score changes',
+    },
+    impactReporting: {
+      label: 'Impact Reporting',
+      description: 'Include ESG impact in periodic reports',
+    },
   },
   backup: {
-    autoBackup: { label: 'Auto Backup', description: 'Automatically backup your data periodically' },
+    autoBackup: {
+      label: 'Auto Backup',
+      description: 'Automatically backup your data periodically',
+    },
     exportFormat: { label: 'Export Format', description: 'Default format for data exports' },
   },
   securityPage: {
@@ -204,8 +246,10 @@ export const settings = {
     authenticatorApp: 'Authenticator App',
     twoFactorEnabled: 'Two-factor authentication is enabled',
     twoFactorPrompt: 'Use your phone to generate verification codes',
-    accountProtected: 'Your account is protected with two-factor authentication. You have {{count}} backup codes remaining.',
-    accountNotProtected: 'Your account is not protected by two-factor authentication. We strongly recommend enabling it for enhanced security.',
+    accountProtected:
+      'Your account is protected with two-factor authentication. You have {{count}} backup codes remaining.',
+    accountNotProtected:
+      'Your account is not protected by two-factor authentication. We strongly recommend enabling it for enhanced security.',
     generating: 'Generating...',
     newBackupCodes: 'New Backup Codes',
     disabling: 'Disabling...',

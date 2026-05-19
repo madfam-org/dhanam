@@ -1,11 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { SubscriptionTier } from '@db';
 
-import { SubscriptionGuard } from '../guards/subscription.guard';
-import { PaymentRequiredException, SubscriptionExpiredException } from '../exceptions';
 import { TIER_KEY } from '../decorators';
+import { PaymentRequiredException, SubscriptionExpiredException } from '../exceptions';
+import { SubscriptionGuard } from '../guards/subscription.guard';
 
 describe('SubscriptionGuard', () => {
   let guard: SubscriptionGuard;

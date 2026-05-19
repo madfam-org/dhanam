@@ -109,24 +109,20 @@ export default function AssetsScreen() {
   };
 
   const handleDeleteAsset = (asset: ManualAsset) => {
-    Alert.alert(
-      'Delete Asset',
-      `Are you sure you want to delete "${asset.name}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteMutation.mutateAsync(asset.id);
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete asset');
-            }
-          },
+    Alert.alert('Delete Asset', `Are you sure you want to delete "${asset.name}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteMutation.mutateAsync(asset.id);
+          } catch (error) {
+            Alert.alert('Error', 'Failed to delete asset');
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const totalValue = assets?.reduce((sum, asset) => sum + asset.currentValue, 0) || 0;
@@ -162,9 +158,7 @@ export default function AssetsScreen() {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {/* Summary Card */}
         <Card style={styles.summaryCard}>
@@ -233,7 +227,11 @@ export default function AssetsScreen() {
                           {typeInfo?.label || 'Other'}
                         </Text>
                         {asset.description && (
-                          <Text variant="bodySmall" style={styles.assetDescription} numberOfLines={1}>
+                          <Text
+                            variant="bodySmall"
+                            style={styles.assetDescription}
+                            numberOfLines={1}
+                          >
                             {asset.description}
                           </Text>
                         )}

@@ -60,16 +60,16 @@ POST /aggregation/v2/partners/authentication
 
 Finicity implements `IFinancialProvider`:
 
-| Method | Description |
-|--------|-------------|
-| `healthCheck()` | Authenticate and return status |
-| `createLink(params)` | Create customer and Connect URL |
-| `exchangeToken(params)` | Fetch accounts after Connect |
-| `getAccounts(params)` | List customer accounts |
-| `syncTransactions(params)` | Sync transaction history |
-| `handleWebhook(payload, signature)` | Process Finicity webhooks |
-| `searchInstitutions(query, region)` | Search institutions |
-| `getInstitution(institutionId)` | Get institution details |
+| Method                              | Description                     |
+| ----------------------------------- | ------------------------------- |
+| `healthCheck()`                     | Authenticate and return status  |
+| `createLink(params)`                | Create customer and Connect URL |
+| `exchangeToken(params)`             | Fetch accounts after Connect    |
+| `getAccounts(params)`               | List customer accounts          |
+| `syncTransactions(params)`          | Sync transaction history        |
+| `handleWebhook(payload, signature)` | Process Finicity webhooks       |
+| `searchInstitutions(query, region)` | Search institutions             |
+| `getInstitution(institutionId)`     | Get institution details         |
 
 ### Service Methods
 
@@ -92,13 +92,13 @@ Finicity implements `IFinancialProvider`:
 
 ### Webhook Events
 
-| Event | Action |
-|-------|--------|
-| `aggregation` | Re-sync accounts |
-| `account.created` | Log and sync account |
-| `account.updated` | Update account data |
+| Event                 | Action                   |
+| --------------------- | ------------------------ |
+| `aggregation`         | Re-sync accounts         |
+| `account.created`     | Log and sync account     |
+| `account.updated`     | Update account data      |
 | `transaction.created` | Trigger transaction sync |
-| `transaction.updated` | Update transaction data |
+| `transaction.updated` | Update transaction data  |
 
 ### Common Errors
 
@@ -115,24 +115,25 @@ All webhooks verified using HMAC-SHA256 with timing-safe comparison to prevent t
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `FINICITY_PARTNER_ID` | Finicity partner ID | Required |
-| `FINICITY_PARTNER_SECRET` | Finicity partner secret | Required |
-| `FINICITY_APP_KEY` | Finicity application key | Required |
-| `FINICITY_BASE_URL` | Finicity API base URL | `https://api.finicity.com` |
-| `FINICITY_WEBHOOK_SECRET` | Webhook signature secret | Required |
+| Variable                  | Description              | Default                    |
+| ------------------------- | ------------------------ | -------------------------- |
+| `FINICITY_PARTNER_ID`     | Finicity partner ID      | Required                   |
+| `FINICITY_PARTNER_SECRET` | Finicity partner secret  | Required                   |
+| `FINICITY_APP_KEY`        | Finicity application key | Required                   |
+| `FINICITY_BASE_URL`       | Finicity API base URL    | `https://api.finicity.com` |
+| `FINICITY_WEBHOOK_SECRET` | Webhook signature secret | Required                   |
 
 ### Environments
 
-| Environment | Description |
-|-------------|-------------|
-| Production | `https://api.finicity.com` |
-| Sandbox | Testing environment available |
+| Environment | Description                   |
+| ----------- | ----------------------------- |
+| Production  | `https://api.finicity.com`    |
+| Sandbox     | Testing environment available |
 
 ### Data Mapping
 
 **Account Type Mapping**:
+
 - `checking` -> `checking`
 - `savings` -> `savings`
 - `moneyMarket` -> `savings`
@@ -149,6 +150,7 @@ All webhooks verified using HMAC-SHA256 with timing-safe comparison to prevent t
 - `loan` -> `other`
 
 **Currency Mapping**:
+
 - `USD` -> `Currency.USD` (default)
 - `MXN` -> `Currency.MXN`
 - `EUR` -> `Currency.EUR`
@@ -187,5 +189,6 @@ interface InstitutionInfo {
 - `providers/orchestrator/provider.interface` - Interface definition
 
 ---
+
 **Provider**: `providers/finicity`
 **Last Updated**: January 2025

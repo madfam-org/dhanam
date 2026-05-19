@@ -1,15 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { OnboardingService } from './onboarding.service';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../../core/prisma/prisma.service';
-import { CryptoService } from '../../core/crypto/crypto.service';
-import { AuditService } from '../../core/audit/audit.service';
-import { EmailService } from '../email/email.service';
-import { OnboardingAnalytics } from './onboarding.analytics';
-import { PreferencesService } from '../preferences/preferences.service';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { Currency } from '@db';
+
+import { AuditService } from '../../core/audit/audit.service';
+import { CryptoService } from '../../core/crypto/crypto.service';
+import { PrismaService } from '../../core/prisma/prisma.service';
+import { EmailService } from '../email/email.service';
+import { PreferencesService } from '../preferences/preferences.service';
+
 import {
   UpdateOnboardingStepDto,
   CompleteOnboardingDto,
@@ -17,6 +18,8 @@ import {
   VerifyEmailDto,
   OnboardingStep,
 } from './dto';
+import { OnboardingAnalytics } from './onboarding.analytics';
+import { OnboardingService } from './onboarding.service';
 
 describe('OnboardingService', () => {
   let service: OnboardingService;
@@ -150,7 +153,11 @@ describe('OnboardingService', () => {
           first_budget: false,
           feature_tour: false,
         },
-        remainingSteps: expect.arrayContaining(['email_verification', 'preferences', 'space_setup']),
+        remainingSteps: expect.arrayContaining([
+          'email_verification',
+          'preferences',
+          'space_setup',
+        ]),
         optionalSteps: expect.arrayContaining(['connect_accounts', 'first_budget', 'feature_tour']),
       });
     });
@@ -259,7 +266,7 @@ describe('OnboardingService', () => {
       };
 
       await expect(service.updateOnboardingStep(mockUserId, invalidStepDto)).rejects.toThrow(
-        BadRequestException,
+        BadRequestException
       );
     });
 
@@ -275,7 +282,7 @@ describe('OnboardingService', () => {
       };
 
       await expect(service.updateOnboardingStep(mockUserId, dto)).rejects.toThrow(
-        BadRequestException,
+        BadRequestException
       );
     });
 
@@ -406,7 +413,7 @@ describe('OnboardingService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
       await expect(service.updatePreferences(mockUserId, preferencesDto)).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
 
@@ -437,7 +444,7 @@ describe('OnboardingService', () => {
         {
           secret: 'test-secret',
           expiresIn: '24h',
-        },
+        }
       );
       expect(mockEmailService.sendEmailVerification).toHaveBeenCalledWith(mockUserId, {
         verificationToken: mockToken,
@@ -581,7 +588,10 @@ describe('OnboardingService', () => {
       mockPrismaService.user.findUnique.mockResolvedValue(userWithSpace);
       mockPrismaService.user.update.mockResolvedValue(userWithSpace);
 
-      const result = await service.skipOnboardingStep(mockUserId, 'connect_accounts' as OnboardingStep);
+      const result = await service.skipOnboardingStep(
+        mockUserId,
+        'connect_accounts' as OnboardingStep
+      );
 
       expect(mockAuditService.logEvent).toHaveBeenCalledWith({
         action: 'onboarding_step_skipped',
@@ -594,13 +604,13 @@ describe('OnboardingService', () => {
 
     it('should throw BadRequestException for required step', async () => {
       await expect(
-        service.skipOnboardingStep(mockUserId, 'email_verification' as OnboardingStep),
+        service.skipOnboardingStep(mockUserId, 'email_verification' as OnboardingStep)
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException for invalid step', async () => {
       await expect(
-        service.skipOnboardingStep(mockUserId, 'invalid_step' as OnboardingStep),
+        service.skipOnboardingStep(mockUserId, 'invalid_step' as OnboardingStep)
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -619,7 +629,7 @@ describe('OnboardingService', () => {
           data: expect.objectContaining({
             onboardingCompleted: true,
           }),
-        }),
+        })
       );
     });
   });
@@ -661,7 +671,7 @@ describe('OnboardingService', () => {
       mockPrismaService.user.findUnique.mockRejectedValue(new Error('Database connection failed'));
 
       await expect(service.getOnboardingStatus(mockUserId)).rejects.toThrow(
-        'Database connection failed',
+        'Database connection failed'
       );
     });
 

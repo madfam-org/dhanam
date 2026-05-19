@@ -4,6 +4,7 @@ build/
 .next/
 out/
 .turbo/
+apps/api/generated/
 
 # Dependencies
 node_modules/
@@ -15,6 +16,9 @@ node_modules/
 web-build/
 
 # Misc
+.claude/
+.pytest_cache/
+.serena/
 coverage/
 *.min.js
 *.min.css

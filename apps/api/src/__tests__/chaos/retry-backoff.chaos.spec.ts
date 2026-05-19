@@ -4,6 +4,7 @@ import {
   withBatchRetry,
   RETRY_PRESETS,
 } from '../../core/utils/retry.util';
+
 import { createFailingOperation, createNetworkError } from './helpers/chaos-utils';
 
 describe('Retry Backoff Chaos Tests', () => {
@@ -211,7 +212,7 @@ describe('Retry Backoff Chaos Tests', () => {
           if (item % 2 === 0) throw new Error(`Fail ${item}`);
           return item * 10;
         },
-        { maxRetries: 0, baseDelayMs: 10 },
+        { maxRetries: 0, baseDelayMs: 10 }
       );
 
       expect(results[0].result).toBe(10);
@@ -241,7 +242,7 @@ describe('Retry Backoff Chaos Tests', () => {
 
         expect(result).toBe('recovered');
         expect(attempts).toBe(3);
-      },
+      }
     );
   });
 });

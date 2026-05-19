@@ -1,6 +1,7 @@
 export const apiErrors = {
   AUTH_INVALID_CREDENTIALS: 'Invalid email or password.',
-  AUTH_ACCOUNT_LOCKED: 'Your account has been locked due to multiple failed login attempts. Please reset your password or contact support.',
+  AUTH_ACCOUNT_LOCKED:
+    'Your account has been locked due to multiple failed login attempts. Please reset your password or contact support.',
   AUTH_SESSION_EXPIRED: 'Your session has expired. Please log in again.',
   AUTH_TOKEN_INVALID: 'Invalid authentication token. Please log in again.',
   AUTH_TOKEN_EXPIRED: 'Authentication token has expired. Please log in again.',
@@ -30,19 +31,23 @@ export const apiErrors = {
 
   // Connection health: rate limit
   CONN_RATE_LIMIT_TITLE: 'Sync Temporarily Paused',
-  CONN_RATE_LIMIT_MESSAGE: "We've made too many requests to {{provider}} in a short time. This is normal and will resolve automatically.",
+  CONN_RATE_LIMIT_MESSAGE:
+    "We've made too many requests to {{provider}} in a short time. This is normal and will resolve automatically.",
   CONN_RATE_LIMIT_ACTION: 'Wait a few minutes before trying again.',
   CONN_RATE_LIMIT_BUTTON: 'Retry Sync',
 
   // Connection health: authentication
   CONN_AUTH_TITLE: 'Reconnection Required',
-  CONN_AUTH_MESSAGE: 'Your connection to {{provider}} needs to be refreshed. This happens periodically for security.',
-  CONN_AUTH_ACTION: 'Please reconnect your account to continue syncing. Your transaction history will be preserved.',
+  CONN_AUTH_MESSAGE:
+    'Your connection to {{provider}} needs to be refreshed. This happens periodically for security.',
+  CONN_AUTH_ACTION:
+    'Please reconnect your account to continue syncing. Your transaction history will be preserved.',
   CONN_AUTH_BUTTON: 'Reconnect Account',
 
   // Connection health: connection error
   CONN_CONNECTION_TITLE: 'Connection Issue',
-  CONN_CONNECTION_MESSAGE: "We're having trouble reaching {{provider}}. This is usually a temporary network issue.",
+  CONN_CONNECTION_MESSAGE:
+    "We're having trouble reaching {{provider}}. This is usually a temporary network issue.",
   CONN_CONNECTION_ACTION: 'Check your internet connection and try again in a few minutes.',
   CONN_CONNECTION_BUTTON: 'Retry',
 
@@ -54,14 +59,17 @@ export const apiErrors = {
 
   // Connection health: maintenance
   CONN_MAINTENANCE_TITLE: 'Scheduled Maintenance',
-  CONN_MAINTENANCE_MESSAGE: '{{provider}} is undergoing maintenance. Syncing will resume automatically when complete.',
+  CONN_MAINTENANCE_MESSAGE:
+    '{{provider}} is undergoing maintenance. Syncing will resume automatically when complete.',
   CONN_MAINTENANCE_ACTION: "No action needed. We'll sync your data when the service is back.",
   CONN_MAINTENANCE_BUTTON: 'Check Status',
 
   // Connection health: institution error
   CONN_INSTITUTION_TITLE: 'Bank Connection Issue',
-  CONN_INSTITUTION_MESSAGE: 'Your bank or institution is experiencing technical difficulties. This is on their end, not yours.',
-  CONN_INSTITUTION_ACTION: 'Wait for the institution to resolve the issue. You can try reconnecting if the problem persists.',
+  CONN_INSTITUTION_MESSAGE:
+    'Your bank or institution is experiencing technical difficulties. This is on their end, not yours.',
+  CONN_INSTITUTION_ACTION:
+    'Wait for the institution to resolve the issue. You can try reconnecting if the problem persists.',
   CONN_INSTITUTION_BUTTON: 'View Status',
 
   // Connection health: default error

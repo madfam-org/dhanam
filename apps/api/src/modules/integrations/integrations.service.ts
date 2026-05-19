@@ -142,7 +142,7 @@ export class IntegrationsService {
       await client.institutions.list();
       return { latency: Date.now() - start };
     } catch (error) {
-      throw new Error(`Belvo health check failed: ${(error as Error).message}`);
+      throw new Error(`Belvo health check failed: ${(error as Error).message}`, { cause: error });
     }
   }
 
@@ -167,7 +167,7 @@ export class IntegrationsService {
       await client.categoriesGet({});
       return { latency: Date.now() - start };
     } catch (error) {
-      throw new Error(`Plaid health check failed: ${(error as Error).message}`);
+      throw new Error(`Plaid health check failed: ${(error as Error).message}`, { cause: error });
     }
   }
 
@@ -178,7 +178,7 @@ export class IntegrationsService {
       await axios.get('https://api.bitso.com/v3/ticker', { timeout: 5000 });
       return { latency: Date.now() - start };
     } catch (error) {
-      throw new Error(`Bitso health check failed: ${(error as Error).message}`);
+      throw new Error(`Bitso health check failed: ${(error as Error).message}`, { cause: error });
     }
   }
 }

@@ -1,6 +1,7 @@
-import { Provider } from '@db';
 import { PROVIDER_DEFAULTS } from '@dhanam/shared';
 import { Injectable, Logger } from '@nestjs/common';
+
+import { Provider } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 

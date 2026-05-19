@@ -1,3 +1,6 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+
 import { AuditModule } from '@core/audit/audit.module';
 import { AuthModule } from '@core/auth/auth.module';
 import { CoreModule } from '@core/core.module';
@@ -35,8 +38,6 @@ import { TagsModule } from '@modules/tags/tags.module';
 import { TransactionExecutionModule } from '@modules/transaction-execution/transaction-execution.module';
 import { TransactionsModule } from '@modules/transactions/transactions.module';
 import { UsersModule } from '@modules/users/users.module';
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 
 import { configuration } from './config/configuration';
 import { validationSchema } from './config/validation';

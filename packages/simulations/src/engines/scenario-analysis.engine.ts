@@ -5,7 +5,11 @@
  * Allows comparison of baseline projections vs. scenario-stressed outcomes.
  */
 
-import { MonteCarloEngine, type SimulationConfig, type SimulationResult } from './monte-carlo.engine';
+import {
+  MonteCarloEngine,
+  type SimulationConfig,
+  type SimulationResult,
+} from './monte-carlo.engine';
 
 /**
  * Predefined stress scenarios
@@ -24,7 +28,12 @@ export enum ScenarioType {
  * Scenario shock configuration
  */
 export interface ScenarioShock {
-  type: 'income_reduction' | 'expense_increase' | 'return_reduction' | 'volatility_increase' | 'one_time_expense';
+  type:
+    | 'income_reduction'
+    | 'expense_increase'
+    | 'return_reduction'
+    | 'volatility_increase'
+    | 'one_time_expense';
   magnitude: number; // Percentage or absolute amount
   startYear: number;
   durationYears: number;
@@ -223,7 +232,8 @@ export class ScenarioAnalysisEngine {
     scenario: Scenario | ScenarioType
   ): ScenarioComparisonResult {
     // Resolve scenario if type was provided
-    const resolvedScenario = typeof scenario === 'string' ? PREDEFINED_SCENARIOS[scenario] : scenario;
+    const resolvedScenario =
+      typeof scenario === 'string' ? PREDEFINED_SCENARIOS[scenario] : scenario;
 
     // Run baseline simulation
     const baseline = this.monteCarloEngine.simulate(baselineConfig);
@@ -333,7 +343,10 @@ export class ScenarioAnalysisEngine {
   /**
    * Calculate how many years it takes to recover to 90% of baseline
    */
-  private calculateRecoveryTime(baseline: SimulationResult, stressed: SimulationResult): number | null {
+  private calculateRecoveryTime(
+    baseline: SimulationResult,
+    stressed: SimulationResult
+  ): number | null {
     const targetValue = baseline.finalBalance.median * 0.9;
 
     // If stressed outcome already exceeds target, recovery is immediate
@@ -348,22 +361,25 @@ export class ScenarioAnalysisEngine {
 
     // Estimate recovery based on growth trajectories
     // This is simplified - a more accurate version would track year-by-year
-    const baselineGrowthRate = Math.pow(
-      baseline.finalBalance.median / baseline.yearlyProjections[0].median,
-      1 / (baseline.yearlyProjections.length - 1)
-    ) - 1;
+    const baselineGrowthRate =
+      Math.pow(
+        baseline.finalBalance.median / baseline.yearlyProjections[0].median,
+        1 / (baseline.yearlyProjections.length - 1)
+      ) - 1;
 
-    const stressedGrowthRate = Math.pow(
-      stressed.finalBalance.median / stressed.yearlyProjections[0].median,
-      1 / (stressed.yearlyProjections.length - 1)
-    ) - 1;
+    const stressedGrowthRate =
+      Math.pow(
+        stressed.finalBalance.median / stressed.yearlyProjections[0].median,
+        1 / (stressed.yearlyProjections.length - 1)
+      ) - 1;
 
     // Estimate years needed for stressed to reach target
     if (stressedGrowthRate <= 0) {
       return null;
     }
 
-    const yearsToRecover = Math.log(targetValue / stressed.finalBalance.median) / Math.log(1 + stressedGrowthRate);
+    const yearsToRecover =
+      Math.log(targetValue / stressed.finalBalance.median) / Math.log(1 + stressedGrowthRate);
 
     return Math.round(yearsToRecover * 10) / 10; // Round to 1 decimal
   }
@@ -375,7 +391,7 @@ export class ScenarioAnalysisEngine {
     baselineConfig: SimulationConfig,
     scenarios: (Scenario | ScenarioType)[]
   ): ScenarioComparisonResult[] {
-    return scenarios.map(scenario => this.analyzeScenario(baselineConfig, scenario));
+    return scenarios.map((scenario) => this.analyzeScenario(baselineConfig, scenario));
   }
 
   /**

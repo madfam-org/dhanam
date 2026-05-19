@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { hash } from 'argon2';
 import request from 'supertest';
+
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/core/prisma/prisma.service';
 import { QueueService } from '../../src/modules/jobs/queue.service';
-import { hash } from 'argon2';
 
 describe('Jobs System Integration (e2e)', () => {
   let app: INestApplication;
@@ -21,12 +22,12 @@ describe('Jobs System Integration (e2e)', () => {
     app = moduleFixture.createNestApplication();
     prisma = app.get<PrismaService>(PrismaService);
     queueService = app.get<QueueService>(QueueService);
-    
+
     await app.init();
 
     // Clean database and setup test user
     await prisma.user.deleteMany();
-    
+
     const user = await prisma.user.create({
       data: {
         email: 'jobs@example.com',
@@ -35,12 +36,10 @@ describe('Jobs System Integration (e2e)', () => {
       },
     });
 
-    const loginResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        email: 'jobs@example.com',
-        password: 'JobsPass123!',
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+      email: 'jobs@example.com',
+      password: 'JobsPass123!',
+    });
 
     accessToken = loginResponse.body.accessToken;
 
@@ -130,7 +129,7 @@ describe('Jobs System Integration (e2e)', () => {
 
   describe('Manual Job Triggers', () => {
     it('should manually trigger user sync', async () => {
-      // This would typically require a provider connection, 
+      // This would typically require a provider connection,
       // but we can test the endpoint exists and handles missing connections gracefully
       const response = await request(app.getHttpServer())
         .post('/jobs/manual/user-sync')

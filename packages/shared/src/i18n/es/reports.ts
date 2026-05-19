@@ -16,7 +16,8 @@ export const reports = {
   templates: {
     heading: 'Plantillas de reportes',
     financialSummary: 'Resumen financiero',
-    financialSummaryDesc: 'Panorama financiero completo incluyendo ingresos, gastos y patrimonio neto',
+    financialSummaryDesc:
+      'Panorama financiero completo incluyendo ingresos, gastos y patrimonio neto',
     transactionExport: 'Exportar transacciones',
     transactionExportDesc: 'Exporta todas las transacciones del período seleccionado',
     budgetPerformance: 'Rendimiento del presupuesto',
@@ -52,7 +53,8 @@ export const reports = {
   },
   createDialog: {
     title: 'Crear reporte guardado',
-    description: 'Guarda una configuración de reporte para generar y archivar bajo demanda o de forma programada.',
+    description:
+      'Guarda una configuración de reporte para generar y archivar bajo demanda o de forma programada.',
     reportName: 'Nombre del reporte',
     reportNamePlaceholder: 'Resumen financiero mensual',
     reportDescription: 'Descripción (Opcional)',

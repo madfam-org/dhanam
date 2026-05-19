@@ -1,8 +1,9 @@
-import { PrismaService } from '../../../src/core/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
-import { hash } from 'argon2';
-import { User, Space, Account, Budget, Category, ProviderConnection } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { User, Space, Account, Budget, Category, ProviderConnection } from '@prisma/client';
+import { hash } from 'argon2';
+
+import { PrismaService } from '../../../src/core/prisma/prisma.service';
 
 export interface CreateUserData {
   email: string;
@@ -45,7 +46,7 @@ export class TestHelper {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService
   ) {
     this.configService = new ConfigService();
   }
@@ -154,13 +155,16 @@ export class TestHelper {
     });
   }
 
-  async createCategory(budgetId: string, data: {
-    name: string;
-    budgetedAmount: number;
-    icon?: string;
-    color?: string;
-    description?: string;
-  }): Promise<Category> {
+  async createCategory(
+    budgetId: string,
+    data: {
+      name: string;
+      budgetedAmount: number;
+      icon?: string;
+      color?: string;
+      description?: string;
+    }
+  ): Promise<Category> {
     return await this.prisma.category.create({
       data: {
         budgetId,
@@ -173,12 +177,15 @@ export class TestHelper {
     });
   }
 
-  async createProviderConnection(userId: string, data: {
-    provider: 'belvo' | 'plaid' | 'bitso' | 'mx' | 'finicity' | 'blockchain' | 'manual';
-    encryptedToken: string;
-    providerUserId: string;
-    metadata?: any;
-  }): Promise<ProviderConnection> {
+  async createProviderConnection(
+    userId: string,
+    data: {
+      provider: 'belvo' | 'plaid' | 'bitso' | 'mx' | 'finicity' | 'blockchain' | 'manual';
+      encryptedToken: string;
+      providerUserId: string;
+      metadata?: any;
+    }
+  ): Promise<ProviderConnection> {
     return await this.prisma.providerConnection.create({
       data: {
         userId,
@@ -245,13 +252,16 @@ export class TestHelper {
     return { user, space, authToken };
   }
 
-  async createMockTransaction(accountId: string, data: {
-    amount: number;
-    description: string;
-    date?: Date;
-    categoryId?: string;
-    merchant?: string;
-  }) {
+  async createMockTransaction(
+    accountId: string,
+    data: {
+      amount: number;
+      description: string;
+      date?: Date;
+      categoryId?: string;
+      merchant?: string;
+    }
+  ) {
     return await this.prisma.transaction.create({
       data: {
         accountId,
@@ -296,17 +306,17 @@ export class TestHelper {
   async waitForCondition(
     condition: () => Promise<boolean>,
     timeout: number = 5000,
-    interval: number = 100,
+    interval: number = 100
   ): Promise<void> {
     const startTime = Date.now();
-    
+
     while (Date.now() - startTime < timeout) {
       if (await condition()) {
         return;
       }
-      await new Promise(resolve => setTimeout(resolve, interval));
+      await new Promise((resolve) => setTimeout(resolve, interval));
     }
-    
+
     throw new Error('Condition not met within timeout');
   }
 

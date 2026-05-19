@@ -1,6 +1,7 @@
 export const apiErrors = {
   AUTH_INVALID_CREDENTIALS: 'Correo electrónico o contraseña incorrectos',
-  AUTH_ACCOUNT_LOCKED: 'Tu cuenta ha sido bloqueada por seguridad. Por favor verifica tu correo para desbloquearla',
+  AUTH_ACCOUNT_LOCKED:
+    'Tu cuenta ha sido bloqueada por seguridad. Por favor verifica tu correo para desbloquearla',
   AUTH_SESSION_EXPIRED: 'Tu sesión ha expirado. Por favor inicia sesión nuevamente',
   AUTH_TOKEN_INVALID: 'Token de autenticación inválido',
   AUTH_TOKEN_EXPIRED: 'El token de autenticación ha expirado',
@@ -30,38 +31,47 @@ export const apiErrors = {
 
   // Connection health: rate limit
   CONN_RATE_LIMIT_TITLE: 'Sincronización pausada temporalmente',
-  CONN_RATE_LIMIT_MESSAGE: 'Hemos realizado demasiadas solicitudes a {{provider}} en poco tiempo. Esto es normal y se resolverá automáticamente.',
+  CONN_RATE_LIMIT_MESSAGE:
+    'Hemos realizado demasiadas solicitudes a {{provider}} en poco tiempo. Esto es normal y se resolverá automáticamente.',
   CONN_RATE_LIMIT_ACTION: 'Espera unos minutos antes de intentar nuevamente.',
   CONN_RATE_LIMIT_BUTTON: 'Reintentar sincronización',
 
   // Connection health: authentication
   CONN_AUTH_TITLE: 'Reconexión requerida',
-  CONN_AUTH_MESSAGE: 'Tu conexión con {{provider}} necesita actualizarse. Esto ocurre periódicamente por seguridad.',
-  CONN_AUTH_ACTION: 'Por favor reconecta tu cuenta para continuar sincronizando. Tu historial de transacciones se conservará.',
+  CONN_AUTH_MESSAGE:
+    'Tu conexión con {{provider}} necesita actualizarse. Esto ocurre periódicamente por seguridad.',
+  CONN_AUTH_ACTION:
+    'Por favor reconecta tu cuenta para continuar sincronizando. Tu historial de transacciones se conservará.',
   CONN_AUTH_BUTTON: 'Reconectar cuenta',
 
   // Connection health: connection error
   CONN_CONNECTION_TITLE: 'Problema de conexión',
-  CONN_CONNECTION_MESSAGE: 'Estamos teniendo problemas para conectar con {{provider}}. Generalmente es un problema temporal de red.',
+  CONN_CONNECTION_MESSAGE:
+    'Estamos teniendo problemas para conectar con {{provider}}. Generalmente es un problema temporal de red.',
   CONN_CONNECTION_ACTION: 'Verifica tu conexión a internet e intenta nuevamente en unos minutos.',
   CONN_CONNECTION_BUTTON: 'Reintentar',
 
   // Connection health: timeout
   CONN_TIMEOUT_TITLE: 'La sincronización tarda más de lo esperado',
-  CONN_TIMEOUT_MESSAGE: '{{provider}} está tardando más de lo usual en responder. Tus datos están seguros.',
+  CONN_TIMEOUT_MESSAGE:
+    '{{provider}} está tardando más de lo usual en responder. Tus datos están seguros.',
   CONN_TIMEOUT_ACTION: 'Reintentaremos automáticamente. También puedes intentar manualmente.',
   CONN_TIMEOUT_BUTTON: 'Reintentar sincronización',
 
   // Connection health: maintenance
   CONN_MAINTENANCE_TITLE: 'Mantenimiento programado',
-  CONN_MAINTENANCE_MESSAGE: '{{provider}} está en mantenimiento. La sincronización se reanudará automáticamente al finalizar.',
-  CONN_MAINTENANCE_ACTION: 'No se requiere acción. Sincronizaremos tus datos cuando el servicio vuelva.',
+  CONN_MAINTENANCE_MESSAGE:
+    '{{provider}} está en mantenimiento. La sincronización se reanudará automáticamente al finalizar.',
+  CONN_MAINTENANCE_ACTION:
+    'No se requiere acción. Sincronizaremos tus datos cuando el servicio vuelva.',
   CONN_MAINTENANCE_BUTTON: 'Ver estado',
 
   // Connection health: institution error
   CONN_INSTITUTION_TITLE: 'Problema con la institución bancaria',
-  CONN_INSTITUTION_MESSAGE: 'Tu banco o institución está experimentando dificultades técnicas. El problema es de ellos, no tuyo.',
-  CONN_INSTITUTION_ACTION: 'Espera a que la institución resuelva el problema. Puedes intentar reconectar si el problema persiste.',
+  CONN_INSTITUTION_MESSAGE:
+    'Tu banco o institución está experimentando dificultades técnicas. El problema es de ellos, no tuyo.',
+  CONN_INSTITUTION_ACTION:
+    'Espera a que la institución resuelva el problema. Puedes intentar reconectar si el problema persiste.',
   CONN_INSTITUTION_BUTTON: 'Ver estado',
 
   // Connection health: default error

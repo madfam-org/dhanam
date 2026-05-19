@@ -1,11 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
+import {
+  createRedisMock,
+  createConfigMock,
+  createLoggerMock,
+} from '../../../../test/helpers/api-mock-factory';
 import { RedisService } from '../../../core/redis/redis.service';
 
 import { StarAtlasAdapter } from './star-atlas.adapter';
-
-import { createRedisMock, createConfigMock, createLoggerMock } from '../../../../test/helpers/api-mock-factory';
 
 describe('StarAtlasAdapter', () => {
   let adapter: StarAtlasAdapter;

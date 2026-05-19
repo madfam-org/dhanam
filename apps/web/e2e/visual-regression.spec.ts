@@ -46,10 +46,7 @@ test.describe('Visual Regression - Desktop', () => {
       await expect(guestPage).toHaveScreenshot('dashboard-desktop.png', {
         ...screenshotOptions,
         // Mask dynamic content that changes between runs
-        mask: [
-          guestPage.locator('[data-testid="sync-status"]'),
-          guestPage.locator('time'),
-        ],
+        mask: [guestPage.locator('[data-testid="sync-status"]'), guestPage.locator('time')],
       });
     });
 
@@ -116,10 +113,7 @@ test.describe('Visual Regression - Mobile', () => {
     await guestPage.waitForLoadState('networkidle');
     await expect(guestPage).toHaveScreenshot('dashboard-mobile.png', {
       ...screenshotOptions,
-      mask: [
-        guestPage.locator('[data-testid="sync-status"]'),
-        guestPage.locator('time'),
-      ],
+      mask: [guestPage.locator('[data-testid="sync-status"]'), guestPage.locator('time')],
     });
   });
 

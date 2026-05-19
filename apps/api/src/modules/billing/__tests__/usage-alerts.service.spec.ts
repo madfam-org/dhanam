@@ -1,9 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UsageAlertsService, WaybillAlertPayload } from '../services/usage-alerts.service';
-import { EmailService } from '../../email/email.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
+import { EmailService } from '../../email/email.service';
+import { UsageAlertsService, WaybillAlertPayload } from '../services/usage-alerts.service';
 
 describe('UsageAlertsService (P2.2)', () => {
   let service: UsageAlertsService;

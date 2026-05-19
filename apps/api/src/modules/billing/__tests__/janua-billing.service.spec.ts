@@ -1,6 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { JanuaBillingService } from '../janua-billing.service';
 
@@ -132,26 +133,23 @@ describe('JanuaBillingService', () => {
         metadata: { dhanam_user_id: 'user-123' },
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${JANUA_API_URL}/api/billing/customers`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${JANUA_API_KEY}`,
+      expect(mockFetch).toHaveBeenCalledWith(`${JANUA_API_URL}/api/billing/customers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${JANUA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          email: 'test@example.com',
+          name: 'Test User',
+          country_code: 'MX',
+          provider: 'conekta', // Mexico → conekta
+          metadata: {
+            dhanam_user_id: 'user-123',
+            product: 'dhanam',
           },
-          body: JSON.stringify({
-            email: 'test@example.com',
-            name: 'Test User',
-            country_code: 'MX',
-            provider: 'conekta', // Mexico → conekta
-            metadata: {
-              dhanam_user_id: 'user-123',
-              product: 'dhanam',
-            },
-          }),
-        }
-      );
+        }),
+      });
 
       expect(result).toEqual({
         customerId: 'cus_janua_123',
@@ -241,29 +239,26 @@ describe('JanuaBillingService', () => {
         metadata: { dhanam_user_id: 'user-123' },
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${JANUA_API_URL}/api/billing/checkout`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${JANUA_API_KEY}`,
+      expect(mockFetch).toHaveBeenCalledWith(`${JANUA_API_URL}/api/billing/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${JANUA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          customer_id: 'cus_123',
+          customer_email: 'test@ejemplo.mx',
+          plan_id: 'dhanam_pro',
+          country_code: 'MX',
+          provider: 'conekta',
+          success_url: 'https://app.dhanam.com/success',
+          cancel_url: 'https://app.dhanam.com/cancel',
+          metadata: {
+            dhanam_user_id: 'user-123',
+            product: 'dhanam',
           },
-          body: JSON.stringify({
-            customer_id: 'cus_123',
-            customer_email: 'test@ejemplo.mx',
-            plan_id: 'dhanam_pro',
-            country_code: 'MX',
-            provider: 'conekta',
-            success_url: 'https://app.dhanam.com/success',
-            cancel_url: 'https://app.dhanam.com/cancel',
-            metadata: {
-              dhanam_user_id: 'user-123',
-              product: 'dhanam',
-            },
-          }),
-        }
-      );
+        }),
+      });
 
       expect(result).toEqual({
         checkoutUrl: 'https://checkout.conekta.com/session123',
@@ -331,21 +326,18 @@ describe('JanuaBillingService', () => {
         returnUrl: 'https://app.dhanam.com/billing',
       });
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${JANUA_API_URL}/api/billing/portal`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${JANUA_API_KEY}`,
-          },
-          body: JSON.stringify({
-            customer_id: 'cus_123',
-            provider: 'conekta',
-            return_url: 'https://app.dhanam.com/billing',
-          }),
-        }
-      );
+      expect(mockFetch).toHaveBeenCalledWith(`${JANUA_API_URL}/api/billing/portal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${JANUA_API_KEY}`,
+        },
+        body: JSON.stringify({
+          customer_id: 'cus_123',
+          provider: 'conekta',
+          return_url: 'https://app.dhanam.com/billing',
+        }),
+      });
 
       expect(result).toEqual({
         portalUrl: 'https://billing.conekta.com/portal123',

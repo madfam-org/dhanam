@@ -8,13 +8,13 @@ The Estate Planning module provides digital estate planning tools including will
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| `Will` | Estate plan document with status lifecycle |
-| `BeneficiaryDesignation` | Asset allocation to household members |
-| `WillExecutor` | Designated executor with priority order |
-| `ExecutorAssignment` | Life Beat executor with verification status |
-| `ExecutorAccessLog` | Audit trail for executor actions |
+| Entity                   | Description                                 |
+| ------------------------ | ------------------------------------------- |
+| `Will`                   | Estate plan document with status lifecycle  |
+| `BeneficiaryDesignation` | Asset allocation to household members       |
+| `WillExecutor`           | Designated executor with priority order     |
+| `ExecutorAssignment`     | Life Beat executor with verification status |
+| `ExecutorAccessLog`      | Audit trail for executor actions            |
 
 ### Will Status Lifecycle
 
@@ -30,11 +30,11 @@ draft -> active -> executed
 ```typescript
 interface BeneficiaryDesignation {
   willId: string;
-  beneficiaryId: string;    // Household member ID
-  assetType: AssetType;     // all_assets, crypto, real_estate, etc.
-  assetId?: string;         // Specific asset (optional)
-  percentage: number;       // Must sum to 100% per asset type
-  conditions?: string;      // Conditional inheritance
+  beneficiaryId: string; // Household member ID
+  assetType: AssetType; // all_assets, crypto, real_estate, etc.
+  assetId?: string; // Specific asset (optional)
+  percentage: number; // Must sum to 100% per asset type
+  conditions?: string; // Conditional inheritance
   notes?: string;
 }
 ```
@@ -43,47 +43,47 @@ interface BeneficiaryDesignation {
 
 ### Will Management
 
-| Method | Endpoint | Auth | Tier | Description |
-|--------|----------|------|------|-------------|
-| `POST` | `/wills` | JWT | Premium | Create new will (draft) |
-| `GET` | `/wills/household/:householdId` | JWT | Premium | List household wills |
-| `GET` | `/wills/:id` | JWT | Premium | Get will details |
-| `PUT` | `/wills/:id` | JWT | Premium | Update will |
-| `DELETE` | `/wills/:id` | JWT | Premium | Delete draft will |
-| `POST` | `/wills/:id/activate` | JWT | Premium | Activate will (rate-limited) |
-| `POST` | `/wills/:id/revoke` | JWT | Premium | Revoke active will |
-| `GET` | `/wills/:id/validate` | JWT | Premium | Validate beneficiary allocations |
+| Method   | Endpoint                        | Auth | Tier    | Description                      |
+| -------- | ------------------------------- | ---- | ------- | -------------------------------- |
+| `POST`   | `/wills`                        | JWT  | Premium | Create new will (draft)          |
+| `GET`    | `/wills/household/:householdId` | JWT  | Premium | List household wills             |
+| `GET`    | `/wills/:id`                    | JWT  | Premium | Get will details                 |
+| `PUT`    | `/wills/:id`                    | JWT  | Premium | Update will                      |
+| `DELETE` | `/wills/:id`                    | JWT  | Premium | Delete draft will                |
+| `POST`   | `/wills/:id/activate`           | JWT  | Premium | Activate will (rate-limited)     |
+| `POST`   | `/wills/:id/revoke`             | JWT  | Premium | Revoke active will               |
+| `GET`    | `/wills/:id/validate`           | JWT  | Premium | Validate beneficiary allocations |
 
 ### Beneficiary Management
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/wills/:id/beneficiaries` | JWT | Add beneficiary designation |
-| `PUT` | `/wills/:id/beneficiaries/:beneficiaryId` | JWT | Update designation |
-| `DELETE` | `/wills/:id/beneficiaries/:beneficiaryId` | JWT | Remove beneficiary |
+| Method   | Endpoint                                  | Auth | Description                 |
+| -------- | ----------------------------------------- | ---- | --------------------------- |
+| `POST`   | `/wills/:id/beneficiaries`                | JWT  | Add beneficiary designation |
+| `PUT`    | `/wills/:id/beneficiaries/:beneficiaryId` | JWT  | Update designation          |
+| `DELETE` | `/wills/:id/beneficiaries/:beneficiaryId` | JWT  | Remove beneficiary          |
 
 ### Executor Management
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| `POST` | `/wills/:id/executors` | JWT | Add executor |
-| `PUT` | `/wills/:id/executors/:executorId` | JWT | Update executor |
-| `DELETE` | `/wills/:id/executors/:executorId` | JWT | Remove executor |
+| Method   | Endpoint                           | Auth | Description     |
+| -------- | ---------------------------------- | ---- | --------------- |
+| `POST`   | `/wills/:id/executors`             | JWT  | Add executor    |
+| `PUT`    | `/wills/:id/executors/:executorId` | JWT  | Update executor |
+| `DELETE` | `/wills/:id/executors/:executorId` | JWT  | Remove executor |
 
 ### Life Beat Executor Access (ExecutorAccessService)
 
-| Operation | Description |
-|-----------|-------------|
-| `addExecutor` | Assign an executor with email verification |
-| `verifyExecutor` | Confirm executor via email link |
-| `removeExecutor` | Remove executor assignment |
-| `getExecutors` | List all assigned executors |
-| `requestAccess` | Executor requests access (triggers two-person rule) |
-| `grantAccess` | Provision time-limited read-only access |
-| `validateAccessToken` | Verify executor access token |
-| `revokeAccess` | Account holder revokes executor access |
-| `logExecutorAction` | Audit executor activity |
-| `getAccessLog` | Retrieve access audit trail |
+| Operation             | Description                                         |
+| --------------------- | --------------------------------------------------- |
+| `addExecutor`         | Assign an executor with email verification          |
+| `verifyExecutor`      | Confirm executor via email link                     |
+| `removeExecutor`      | Remove executor assignment                          |
+| `getExecutors`        | List all assigned executors                         |
+| `requestAccess`       | Executor requests access (triggers two-person rule) |
+| `grantAccess`         | Provision time-limited read-only access             |
+| `validateAccessToken` | Verify executor access token                        |
+| `revokeAccess`        | Account holder revokes executor access              |
+| `logExecutorAction`   | Audit executor activity                             |
+| `getAccessLog`        | Retrieve access audit trail                         |
 
 ### Example Requests
 
@@ -198,18 +198,18 @@ ELSE
 
 ### Rate Limiting
 
-| Endpoint | Limit | Window |
-|----------|-------|--------|
+| Endpoint                   | Limit      | Window |
+| -------------------------- | ---------- | ------ |
 | `POST /wills/:id/activate` | 3 requests | 1 hour |
-| `POST /wills/:id/revoke` | 5 requests | 1 hour |
+| `POST /wills/:id/revoke`   | 5 requests | 1 hour |
 
 ### Access Token Settings
 
 ```typescript
 const ACCESS_TOKEN_CONFIG = {
-  expiresIn: 7,          // Days
-  tokenLength: 32,       // Bytes (64 hex chars)
-  readOnlyAccess: true,  // Always read-only
+  expiresIn: 7, // Days
+  tokenLength: 32, // Bytes (64 hex chars)
+  readOnlyAccess: true, // Always read-only
 };
 ```
 
@@ -227,12 +227,12 @@ User-configurable `lifeBeatAlertDays` array determines when executor access beco
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
+| Module       | Relationship                                     |
+| ------------ | ------------------------------------------------ |
 | `households` | Provides household membership for access control |
-| `billing` | Premium tier required for estate planning |
-| `audit` | All estate actions are audit logged |
-| `users` | Activity tracking for Life Beat |
+| `billing`    | Premium tier required for estate planning        |
+| `audit`      | All estate actions are audit logged              |
+| `users`      | Activity tracking for Life Beat                  |
 
 ## Testing
 

@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Currency } from '@dhanam/shared';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
-import { SpacesService } from '../../spaces/spaces.service';
 import { FxRatesService } from '../../fx-rates/fx-rates.service';
+import { SpacesService } from '../../spaces/spaces.service';
 import { AnalyticsQueryService } from '../analytics-query.service';
 import { AnalyticsService } from '../analytics.service';
 

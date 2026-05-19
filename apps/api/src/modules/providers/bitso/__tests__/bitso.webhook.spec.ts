@@ -1,13 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
 import * as crypto from 'crypto';
+
+import { BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { CryptoService } from '@core/crypto/crypto.service';
+import { PrismaService } from '@core/prisma/prisma.service';
+import { CircuitBreakerService } from '@modules/providers/orchestrator/circuit-breaker.service';
 
 import { BitsoService } from '../bitso.service';
 import { BitsoWebhookDto } from '../dto/webhook.dto';
-import { PrismaService } from '@core/prisma/prisma.service';
-import { CryptoService } from '@core/crypto/crypto.service';
-import { CircuitBreakerService } from '@modules/providers/orchestrator/circuit-breaker.service';
-import { ConfigService } from '@nestjs/config';
 
 describe('BitsoService - Webhook Contract Tests', () => {
   let service: BitsoService;
@@ -608,7 +610,9 @@ describe('BitsoService - Webhook Contract Tests', () => {
       const loggerSpy = jest.spyOn((service as any).logger, 'error');
 
       // Act & Assert
-      await expect(service.handleWebhook(webhookDto, validSignature)).rejects.toThrow('Sync failed');
+      await expect(service.handleWebhook(webhookDto, validSignature)).rejects.toThrow(
+        'Sync failed'
+      );
       expect(loggerSpy).toHaveBeenCalledWith(
         'Failed to handle webhook for transaction txn-123:',
         expect.any(Error)

@@ -25,23 +25,25 @@ Raw merchant names are normalized for consistent matching:
 function normalizeMerchant(raw: string): string {
   return raw
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')      // Remove special chars
-    .replace(/\s+/g, ' ')              // Normalize whitespace
-    .replace(/\d+/g, '')               // Remove numbers
+    .replace(/[^a-z0-9\s]/g, '') // Remove special chars
+    .replace(/\s+/g, ' ') // Normalize whitespace
+    .replace(/\d+/g, '') // Remove numbers
     .trim()
-    .split(' ')[0];                    // Take first word
+    .split(' ')[0]; // Take first word
 }
 ```
 
 ### Stage 2: ML Prediction
 
 A trained model predicts category based on:
+
 - Normalized merchant name
 - Transaction amount
 - Transaction description
 - Historical patterns
 
 **Model Architecture:**
+
 - Algorithm: Gradient Boosted Trees (XGBoost)
 - Features: TF-IDF on merchant + amount buckets + time features
 - Output: Category ID with confidence score
@@ -96,14 +98,16 @@ function findFuzzyMerchantMatch(merchant: string): CategoryMatch | null {
   const threshold = 0.85; // Similarity threshold
 
   for (const known of knownMerchants) {
-    const similarity = 1 - (levenshtein(normalized, known.normalized) /
-                           Math.max(normalized.length, known.normalized.length));
+    const similarity =
+      1 -
+      levenshtein(normalized, known.normalized) /
+        Math.max(normalized.length, known.normalized.length);
 
     if (similarity >= threshold) {
       return {
         categoryId: known.categoryId,
         confidence: similarity,
-        matchedMerchant: known.name
+        matchedMerchant: known.name,
       };
     }
   }
@@ -136,11 +140,14 @@ Corrections are aggregated with weighted scoring:
 ```typescript
 interface CorrectionAggregate {
   normalizedMerchant: string;
-  categoryVotes: Map<string, {
-    count: number;
-    weight: number;
-    lastVote: Date;
-  }>;
+  categoryVotes: Map<
+    string,
+    {
+      count: number;
+      weight: number;
+      lastVote: Date;
+    }
+  >;
 }
 
 function calculateWeight(correction: Correction): number {
@@ -170,20 +177,17 @@ async function applyToSimilar(correction: Correction): Promise<number> {
     where: {
       spaceId: correction.spaceId,
       normalizedMerchant: normalized,
-      OR: [
-        { categoryId: null },
-        { categoryConfidence: { lt: 0.75 } }
-      ]
-    }
+      OR: [{ categoryId: null }, { categoryConfidence: { lt: 0.75 } }],
+    },
   });
 
   await prisma.transaction.updateMany({
-    where: { id: { in: similar.map(t => t.id) } },
+    where: { id: { in: similar.map((t) => t.id) } },
     data: {
       categoryId: correction.correctedCategoryId,
       categorySource: 'user_correction',
-      categoryConfidence: 1.0
-    }
+      categoryConfidence: 1.0,
+    },
   });
 
   return similar.length;
@@ -232,12 +236,12 @@ export class MlRetrainProcessor {
 
 ### Model Metrics
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Accuracy | > 85% | 87.3% |
-| Precision | > 80% | 82.1% |
-| Recall | > 80% | 84.7% |
-| F1 Score | > 80% | 83.4% |
+| Metric    | Target | Current |
+| --------- | ------ | ------- |
+| Accuracy  | > 85%  | 87.3%   |
+| Precision | > 80%  | 82.1%   |
+| Recall    | > 80%  | 84.7%   |
+| F1 Score  | > 80%  | 83.4%   |
 
 ## API Endpoints
 
@@ -272,6 +276,7 @@ GET /ml/metrics
 ```
 
 **Response:**
+
 ```json
 {
   "currentModel": {
@@ -321,12 +326,12 @@ ML_VALIDATION_SPLIT=0.2
 
 ### Common Issues
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Same merchant, different categories | Merchant name variations | Add categorization rule |
-| Low confidence scores | New/unusual merchants | Provide corrections |
-| Model not improving | Insufficient data | Wait for more corrections |
-| Corrections not applying | Cache issue | Clear category cache |
+| Issue                               | Cause                    | Solution                  |
+| ----------------------------------- | ------------------------ | ------------------------- |
+| Same merchant, different categories | Merchant name variations | Add categorization rule   |
+| Low confidence scores               | New/unusual merchants    | Provide corrections       |
+| Model not improving                 | Insufficient data        | Wait for more corrections |
+| Corrections not applying            | Cache issue              | Clear category cache      |
 
 ## Related Documentation
 

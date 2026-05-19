@@ -1,8 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { PostHogService } from '../analytics/posthog.service';
 
 import { ProvidersAnalytics } from './providers.analytics';
-import { PostHogService } from '../analytics/posthog.service';
 
 describe('ProvidersAnalytics', () => {
   let service: ProvidersAnalytics;
@@ -178,12 +179,7 @@ describe('ProvidersAnalytics', () => {
 
   describe('trackConnectionFailed', () => {
     it('should track failed connection with institution', async () => {
-      await service.trackConnectionFailed(
-        'user-123',
-        'belvo',
-        'Invalid credentials',
-        'Banorte'
-      );
+      await service.trackConnectionFailed('user-123', 'belvo', 'Invalid credentials', 'Banorte');
 
       expect(posthogService.capture).toHaveBeenCalledWith({
         distinctId: 'user-123',

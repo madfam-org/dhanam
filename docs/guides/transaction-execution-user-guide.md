@@ -5,6 +5,7 @@
 Dhanam's autonomous transaction execution system enables you to create, manage, and execute financial transactions across multiple providers with built-in security and reliability features.
 
 **What you can do:**
+
 - ✅ Buy and sell cryptocurrency (Bitso)
 - ✅ Transfer money between accounts (Plaid ACH, Belvo SPEI)
 - ✅ Automate goal-based rebalancing
@@ -23,11 +24,11 @@ Dhanam's autonomous transaction execution system enables you to create, manage, 
 
 ### Supported Providers
 
-| Provider | Region | Capabilities | Currencies |
-|----------|--------|--------------|------------|
-| **Bitso** | Mexico | Buy/Sell crypto | MXN, USD |
-| **Plaid** | United States | ACH transfers | USD |
-| **Belvo** | Mexico | SPEI transfers | MXN |
+| Provider  | Region        | Capabilities    | Currencies |
+| --------- | ------------- | --------------- | ---------- |
+| **Bitso** | Mexico        | Buy/Sell crypto | MXN, USD   |
+| **Plaid** | United States | ACH transfers   | USD        |
+| **Belvo** | Mexico        | SPEI transfers  | MXN        |
 
 ---
 
@@ -42,12 +43,14 @@ Dhanam's autonomous transaction execution system enables you to create, manage, 
 ### Step 2: Fill Out Order Details
 
 **Required Fields:**
+
 - **Account** - Select source account
 - **Order Type** - Choose buy, sell, transfer, deposit, or withdraw
 - **Amount** - Enter transaction amount
 - **Provider** - Automatically selected based on account
 
 **Optional Fields:**
+
 - **Asset Symbol** - For buy/sell orders (e.g., BTC, ETH)
 - **Target Price** - For limit orders (leave empty for market price)
 - **Destination Account** - For transfers
@@ -70,6 +73,7 @@ High-value transactions (≥ $10,000) require 2FA:
 ### Step 5: Execution
 
 Your order will be executed automatically and you'll see:
+
 - ✅ Execution status
 - 💰 Executed amount
 - 💵 Fees charged
@@ -84,6 +88,7 @@ Your order will be executed automatically and you'll see:
 Purchase cryptocurrency using fiat currency.
 
 **Example:**
+
 ```
 Account: Bitso MXN Account
 Type: Buy
@@ -99,6 +104,7 @@ Provider: Bitso
 Sell cryptocurrency for fiat currency.
 
 **Example:**
+
 ```
 Account: Bitso BTC Account
 Type: Sell
@@ -114,6 +120,7 @@ Provider: Bitso
 Move money between your accounts.
 
 **Example:**
+
 ```
 Account: Checking Account (Plaid)
 Type: Transfer
@@ -136,15 +143,15 @@ Move money from Dhanam account to external destination.
 
 ## Understanding Order Status
 
-| Status | Description | Actions Available |
-|--------|-------------|-------------------|
-| **Pending Verification** | Waiting for 2FA | Enter OTP code |
-| **Pending Execution** | Verified, queued | Cancel |
-| **Executing** | Currently processing | Wait |
-| **Completed** | Successfully executed | View details |
-| **Failed** | Execution failed | View error, retry |
-| **Cancelled** | User cancelled | None |
-| **Rejected** | System rejected | View reason |
+| Status                   | Description           | Actions Available |
+| ------------------------ | --------------------- | ----------------- |
+| **Pending Verification** | Waiting for 2FA       | Enter OTP code    |
+| **Pending Execution**    | Verified, queued      | Cancel            |
+| **Executing**            | Currently processing  | Wait              |
+| **Completed**            | Successfully executed | View details      |
+| **Failed**               | Execution failed      | View error, retry |
+| **Cancelled**            | User cancelled        | None              |
+| **Rejected**             | System rejected       | View reason       |
 
 ---
 
@@ -153,16 +160,19 @@ Move money from Dhanam account to external destination.
 ### Market vs. Limit Orders
 
 **Market Order:**
+
 - Executes immediately at current price
 - No target price specified
 - Subject to slippage
 
 **Limit Order:**
+
 - Executes only at specified price or better
 - Set target price
 - May not execute if price not reached
 
 **Example:**
+
 ```
 Type: Buy
 Asset: BTC
@@ -175,12 +185,14 @@ Target Price: 500,000 MXN/BTC  ← This makes it a limit order
 Test your strategies without risking real money.
 
 **How it works:**
+
 1. Enable "Dry Run" when creating order
 2. System simulates execution with realistic fees and slippage
 3. See expected results without actual transaction
 4. Review and adjust before real execution
 
 **Use Cases:**
+
 - Test new trading strategies
 - Verify order parameters
 - Estimate fees and execution
@@ -208,13 +220,14 @@ Link orders to goals for automatic execution:
 
 Protect yourself from runaway algorithms:
 
-| Limit Type | Default | Purpose |
-|------------|---------|---------|
-| Daily | $50,000 | Daily spending cap |
-| Weekly | $200,000 | Weekly spending cap |
-| Monthly | $500,000 | Monthly spending cap |
+| Limit Type | Default  | Purpose              |
+| ---------- | -------- | -------------------- |
+| Daily      | $50,000  | Daily spending cap   |
+| Weekly     | $200,000 | Weekly spending cap  |
+| Monthly    | $500,000 | Monthly spending cap |
 
 **To increase limits:**
+
 1. Go to Settings → Transaction Limits
 2. Request limit increase
 3. Provide verification documents
@@ -225,11 +238,11 @@ Protect yourself from runaway algorithms:
 
 ### Provider Fees
 
-| Provider | Buy/Sell | Transfer | Additional |
-|----------|----------|----------|------------|
-| **Bitso** | 0.1% | N/A | Minimum 5 MXN |
-| **Plaid** | N/A | $0.25-0.50 | Per transfer |
-| **Belvo** | N/A | MXN 3-8 | SPEI fee |
+| Provider  | Buy/Sell | Transfer   | Additional    |
+| --------- | -------- | ---------- | ------------- |
+| **Bitso** | 0.1%     | N/A        | Minimum 5 MXN |
+| **Plaid** | N/A      | $0.25-0.50 | Per transfer  |
+| **Belvo** | N/A      | MXN 3-8    | SPEI fee      |
 
 ### Dhanam Platform Fee
 
@@ -242,6 +255,7 @@ Protect yourself from runaway algorithms:
 ### 1. Enable 2FA
 
 Protect high-value transactions:
+
 - Go to Settings → Security
 - Enable TOTP 2FA
 - Save backup codes
@@ -249,12 +263,14 @@ Protect high-value transactions:
 ### 2. Use Unique Idempotency Keys
 
 Prevent duplicate orders:
+
 - Each order gets a unique key automatically
 - Resubmitting same key returns original order
 
 ### 3. Review Before Executing
 
 Always verify:
+
 - ✅ Correct account
 - ✅ Correct amount
 - ✅ Correct asset (for crypto)
@@ -263,6 +279,7 @@ Always verify:
 ### 4. Monitor Execution
 
 Check execution history:
+
 - View all attempts
 - Review error messages
 - Track fees paid
@@ -270,6 +287,7 @@ Check execution history:
 ### 5. Set Reasonable Limits
 
 Configure limits based on your needs:
+
 - Start with lower limits
 - Increase as needed
 - Monitor usage regularly
@@ -305,6 +323,7 @@ Configure limits based on your needs:
 ### Order Cancelled Unexpectedly
 
 **Possible Reasons:**
+
 - Order expired (>24 hours old)
 - Account credentials expired
 - Provider maintenance
@@ -319,6 +338,7 @@ Configure limits based on your needs:
 ### Q: How long does execution take?
 
 **A:** Varies by provider:
+
 - **Bitso:** Instant (seconds)
 - **Plaid:** Same-day ACH (hours) or standard ACH (1-3 days)
 - **Belvo:** SPEI transfers (same-day or next-day)
@@ -330,6 +350,7 @@ Configure limits based on your needs:
 ### Q: What happens if execution fails?
 
 **A:** The system will:
+
 1. Mark order as failed
 2. Log error details
 3. Refund any fees (if applicable)
@@ -338,6 +359,7 @@ Configure limits based on your needs:
 ### Q: Are there minimum order amounts?
 
 **A:** Yes, varies by provider:
+
 - **Bitso:** 0.001 (currency units)
 - **Plaid:** $1.00
 - **Belvo:** MXN 1.00
@@ -349,6 +371,7 @@ Configure limits based on your needs:
 ### Q: How do I get help?
 
 **A:** Contact support:
+
 - Email: support@dhanam.io
 - In-app chat
 - Help Center: https://help.dhanam.io

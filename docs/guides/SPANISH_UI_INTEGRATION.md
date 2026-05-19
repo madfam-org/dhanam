@@ -23,12 +23,14 @@ Added I18nProvider and PostHogProvider to the application provider stack:
 ```tsx
 <QueryClientProvider>
   <ThemeProvider>
-    <I18nProvider>          {/* ← Added */}
-      <PostHogProvider>     {/* ← Added */}
+    <I18nProvider>
+      {' '}
+      {/* ← Added */}
+      <PostHogProvider>
+        {' '}
+        {/* ← Added */}
         <AuthProvider>
-          <PreferencesProvider>
-            {children}
-          </PreferencesProvider>
+          <PreferencesProvider>{children}</PreferencesProvider>
         </AuthProvider>
       </PostHogProvider>
     </I18nProvider>
@@ -37,6 +39,7 @@ Added I18nProvider and PostHogProvider to the application provider stack:
 ```
 
 **Features:**
+
 - Automatic locale detection from browser settings
 - localStorage persistence (key: `dhanam_locale`)
 - Falls back to Spanish (LATAM-first approach)
@@ -49,6 +52,7 @@ Added I18nProvider and PostHogProvider to the application provider stack:
 **File:** `apps/web/src/components/locale-switcher/LocaleSwitcher.tsx`
 
 Created a reusable locale switcher component with:
+
 - Dropdown menu with language options
 - Flag emojis (🇲🇽 Spanish, 🇺🇸 English)
 - Active state indication
@@ -56,6 +60,7 @@ Created a reusable locale switcher component with:
 - Responsive design (hides text on mobile)
 
 **Usage:**
+
 ```tsx
 import { LocaleSwitcher } from '~/components/locale-switcher';
 
@@ -90,12 +95,14 @@ export { useTranslation } from '../hooks/useTranslation';
 Updated the login page to demonstrate translation integration:
 
 **Before:**
+
 ```tsx
 <CardTitle>Welcome back</CardTitle>
 <CardDescription>Sign in to your account to continue</CardDescription>
 ```
 
 **After:**
+
 ```tsx
 const { t } = useTranslation('auth');
 
@@ -104,6 +111,7 @@ const { t } = useTranslation('auth');
 ```
 
 **Result:**
+
 - English: "Sign in to your account" / "Welcome back"
 - Spanish: "Inicia sesión en tu cuenta" / "Bienvenido de nuevo"
 
@@ -132,17 +140,17 @@ demoAccessFailed: 'Error al acceder a la demo. Intenta de nuevo',
 
 ### Existing Translation Modules (1,300+ keys):
 
-| Module | Keys | Coverage |
-|--------|------|----------|
-| `common.ts` | 140+ | General UI, actions, status |
-| `auth.ts` | 80+ | Login, signup, 2FA, password reset |
-| `transactions.ts` | 80+ | Transaction management |
-| `budgets.ts` | 100+ | Budget management |
-| `accounts.ts` | 70+ | Account management |
-| `spaces.ts` | 60+ | Multi-tenant spaces |
-| `wealth.ts` | 90+ | Net worth, wealth tracking |
-| `errors.ts` | 100+ | Error messages |
-| `validations.ts` | 80+ | Form validations |
+| Module            | Keys | Coverage                           |
+| ----------------- | ---- | ---------------------------------- |
+| `common.ts`       | 140+ | General UI, actions, status        |
+| `auth.ts`         | 80+  | Login, signup, 2FA, password reset |
+| `transactions.ts` | 80+  | Transaction management             |
+| `budgets.ts`      | 100+ | Budget management                  |
+| `accounts.ts`     | 70+  | Account management                 |
+| `spaces.ts`       | 60+  | Multi-tenant spaces                |
+| `wealth.ts`       | 90+  | Net worth, wealth tracking         |
+| `errors.ts`       | 100+ | Error messages                     |
+| `validations.ts`  | 80+  | Form validations                   |
 
 **Total:** 800+ Spanish keys ready to use
 
@@ -153,11 +161,13 @@ demoAccessFailed: 'Error al acceder a la demo. Intenta de nuevo',
 ### Using Translations in Components
 
 **1. Import the hook:**
+
 ```tsx
 import { useTranslation } from '@dhanam/shared';
 ```
 
 **2. Use in component:**
+
 ```tsx
 export function MyComponent() {
   const { t } = useTranslation('auth'); // Specify namespace
@@ -172,11 +182,12 @@ export function MyComponent() {
 ```
 
 **3. With interpolation:**
+
 ```tsx
 const { t } = useTranslation('common');
 
 // Translation: "Hello, {{name}}!"
-<p>{t('greeting', { name: user.name })}</p>
+<p>{t('greeting', { name: user.name })}</p>;
 ```
 
 ---
@@ -210,12 +221,12 @@ The `formatCurrency` utility automatically formats based on locale:
 import { formatCurrency } from '@dhanam/shared';
 
 // In Spanish locale
-formatCurrency(1000, 'MXN', 'es') // "$1,000.00 MXN"
-formatCurrency(1000, 'USD', 'es') // "$1,000.00 USD"
+formatCurrency(1000, 'MXN', 'es'); // "$1,000.00 MXN"
+formatCurrency(1000, 'USD', 'es'); // "$1,000.00 USD"
 
 // In English locale
-formatCurrency(1000, 'MXN', 'en') // "MXN $1,000.00"
-formatCurrency(1000, 'USD', 'en') // "$1,000.00 USD"
+formatCurrency(1000, 'MXN', 'en'); // "MXN $1,000.00"
+formatCurrency(1000, 'USD', 'en'); // "$1,000.00 USD"
 ```
 
 ---
@@ -226,10 +237,10 @@ formatCurrency(1000, 'USD', 'en') // "$1,000.00 USD"
 import { formatDate } from '@dhanam/shared';
 
 // In Spanish locale
-formatDate(new Date(), 'es') // "17 de noviembre de 2025"
+formatDate(new Date(), 'es'); // "17 de noviembre de 2025"
 
 // In English locale
-formatDate(new Date(), 'en') // "November 17, 2025"
+formatDate(new Date(), 'en'); // "November 17, 2025"
 ```
 
 ---
@@ -241,10 +252,12 @@ Locale changes are automatically tracked in PostHog:
 **Event:** `locale_changed`
 
 **Properties:**
+
 - `from_locale`: Previous locale ('en' or 'es')
 - `to_locale`: New locale ('en' or 'es')
 
 This allows you to analyze:
+
 - Which locales users prefer
 - Locale switching patterns
 - Regional user distribution
@@ -341,6 +354,7 @@ export default function MyPage() {
 ### Issue: Translations not appearing
 
 **Check:**
+
 1. I18nProvider is wrapping your app (in `app/layout.tsx` via `Providers`)
 2. You're using the correct namespace (`useTranslation('auth')`)
 3. Translation key exists in the namespace file
@@ -349,6 +363,7 @@ export default function MyPage() {
 ### Issue: Locale not persisting
 
 **Check:**
+
 1. localStorage is enabled in browser
 2. Storage key is `dhanam_locale`
 3. Value is either `'en'` or `'es'` (string, not object)
@@ -356,6 +371,7 @@ export default function MyPage() {
 ### Issue: Wrong language on first load
 
 **Check:**
+
 1. Browser language settings
 2. localStorage value
 3. Default locale in I18nProvider (should fallback to 'es')
@@ -365,11 +381,13 @@ export default function MyPage() {
 ## Files Created/Modified
 
 ### Created:
+
 - `apps/web/src/components/locale-switcher/LocaleSwitcher.tsx` (96 lines)
 - `apps/web/src/components/locale-switcher/index.ts` (1 line)
 - `SPANISH_UI_INTEGRATION.md` (this file)
 
 ### Modified:
+
 - `apps/web/src/lib/providers.tsx` - Added I18nProvider and PostHogProvider
 - `apps/web/src/app/(auth)/login/page.tsx` - Integrated translations
 - `packages/shared/src/i18n/index.ts` - Exported React components

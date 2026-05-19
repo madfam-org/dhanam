@@ -59,7 +59,8 @@ export const estatePlanning = {
   notesOptional: 'Notas (Opcional)',
 
   legalDisclaimer: 'Aviso Legal',
-  legalDisclaimerText: 'Entendo que este é um testamento digital e devo consultar um assessor jurídico',
+  legalDisclaimerText:
+    'Entendo que este é um testamento digital e devo consultar um assessor jurídico',
   acceptLegalDisclaimer: 'Aceito o aviso legal',
 
   percentage: 'Porcentagem',
@@ -91,7 +92,8 @@ export const estatePlanning = {
 
   // Messages & Alerts
   noWillsYet: 'Ainda Não Há Testamentos',
-  noWillsDescription: 'Crie seu primeiro testamento para começar o planejamento patrimonial do seu lar',
+  noWillsDescription:
+    'Crie seu primeiro testamento para começar o planejamento patrimonial do seu lar',
 
   cannotActivateWill: 'Não é possível ativar o testamento',
   validationErrors: 'Erros de Validação',
@@ -124,7 +126,8 @@ export const estatePlanning = {
   executorNotFound: 'Executor não encontrado',
 
   cannotUpdateActiveWill: 'Não é possível atualizar um testamento ativo',
-  cannotDeleteActiveWill: 'Não é possível excluir um testamento ativo. Revogue os testamentos ativos primeiro.',
+  cannotDeleteActiveWill:
+    'Não é possível excluir um testamento ativo. Revogue os testamentos ativos primeiro.',
   cannotModifyExecutedWill: 'Não é possível modificar um testamento executado',
 
   beneficiaryMustBeHouseholdMember: 'O beneficiário deve ser membro do lar',
@@ -139,9 +142,12 @@ export const estatePlanning = {
   upgradeToPremium: 'Upgrade para Premium',
 
   // Descriptions
-  createWillDescription: 'Crie um rascunho de testamento para seu lar. Você pode adicionar beneficiários e executores antes de ativá-lo.',
-  activateWillDescription: 'Ativar este testamento o tornará legalmente vinculante (sujeito a revisão legal)',
-  revokeWillDescription: 'Revogar este testamento o tornará inválido. Esta ação não pode ser desfeita.',
+  createWillDescription:
+    'Crie um rascunho de testamento para seu lar. Você pode adicionar beneficiários e executores antes de ativá-lo.',
+  activateWillDescription:
+    'Ativar este testamento o tornará legalmente vinculante (sujeito a revisão legal)',
+  revokeWillDescription:
+    'Revogar este testamento o tornará inválido. Esta ação não pode ser desfeita.',
 
   draftWillsOnly: 'Somente testamentos em rascunho podem ser excluídos',
   oneActiveWillPerHousehold: 'Apenas um testamento ativo por lar',
@@ -152,10 +158,13 @@ export const estatePlanning = {
 
   // Tooltips & Help
   whatIsDigitalWill: 'O que é um testamento digital?',
-  digitalWillExplanation: 'Um testamento digital é uma ferramenta de planejamento patrimonial que ajuda a organizar a distribuição de ativos. Sempre consulte um assessor jurídico para validade legal.',
+  digitalWillExplanation:
+    'Um testamento digital é uma ferramenta de planejamento patrimonial que ajuda a organizar a distribuição de ativos. Sempre consulte um assessor jurídico para validade legal.',
 
-  beneficiaryAllocationHelp: 'As distribuições percentuais devem somar 100% para cada tipo de ativo',
-  executorOrderHelp: 'O executor principal é responsável por executar o testamento. Os executores secundários servem como substitutos.',
+  beneficiaryAllocationHelp:
+    'As distribuições percentuais devem somar 100% para cada tipo de ativo',
+  executorOrderHelp:
+    'O executor principal é responsável por executar o testamento. Os executores secundários servem como substitutos.',
 
   // Page-level keys (used by estate-planning page component)
   page: {
@@ -164,7 +173,8 @@ export const estatePlanning = {
     createWill: 'Criar Testamento',
     createDraft: 'Criar Rascunho',
     noWills: 'Sem Testamentos Ainda',
-    noWillsDescription: 'Crie seu primeiro testamento para começar o planejamento patrimonial do seu lar',
+    noWillsDescription:
+      'Crie seu primeiro testamento para começar o planejamento patrimonial do seu lar',
     willDetails: 'Detalhes e Gestão do Testamento',
     noBeneficiaries: 'Sem beneficiários adicionados ainda',
     noExecutors: 'Sem executores designados ainda',
@@ -172,7 +182,8 @@ export const estatePlanning = {
   dialog: {
     createWill: {
       title: 'Criar Novo Testamento',
-      description: 'Crie um rascunho de testamento para seu lar. Você pode adicionar beneficiários e executores antes de ativá-lo.',
+      description:
+        'Crie um rascunho de testamento para seu lar. Você pode adicionar beneficiários e executores antes de ativá-lo.',
     },
   },
   fields: {
@@ -180,7 +191,8 @@ export const estatePlanning = {
     willNamePlaceholder: 'ex., Testamento Família Silva 2025',
     notesOptional: 'Notas (Opcional)',
     notesPlaceholder: 'Notas ou instruções adicionais',
-    legalDisclaimer: 'Entendo que este é um testamento digital e devo consultar assessoria jurídica',
+    legalDisclaimer:
+      'Entendo que este é um testamento digital e devo consultar assessoria jurídica',
     beneficiaries: 'Beneficiários:',
     executors: 'Executores:',
     activated: 'Ativado:',
@@ -200,17 +212,20 @@ export const estatePlanning = {
     title: 'Life Beat',
     description: 'Sua rede de segurança financeira diante das incertezas da vida',
     protectionStatus: 'Status de Proteção',
-    statusDescription: 'Life Beat monitora sua atividade e alerta contatos de confiança se necessário',
+    statusDescription:
+      'Life Beat monitora sua atividade e alerta contatos de confiança se necessário',
     lastActivity: 'Última Atividade',
     daysAgo: 'há {{days}} dias',
     alertThresholds: 'Limites de Alerta',
     trustedExecutors: 'Executores de Confiança',
     pendingAlerts: 'Alertas Pendentes',
-    pendingAlertsDescription: 'Você tem {{count}} alerta(s) de inatividade pendente(s). Faça check-in para reiniciar seu temporizador.',
+    pendingAlertsDescription:
+      'Você tem {{count}} alerta(s) de inatividade pendente(s). Faça check-in para reiniciar seu temporizador.',
     checkIn: 'Estou Bem - Fazer Check-in Agora',
     disabled: {
       title: 'Life Beat está Desativado',
-      description: 'Ative o Life Beat para garantir que seus executores designados possam acessar suas informações financeiras se algo acontecer com você.',
+      description:
+        'Ative o Life Beat para garantir que seus executores designados possam acessar suas informações financeiras se algo acontecer com você.',
       enable: 'Ativar Life Beat',
     },
     executors: {
@@ -219,7 +234,8 @@ export const estatePlanning = {
       add: 'Adicionar Executor',
       empty: {
         title: 'Sem Executores Ainda',
-        description: 'Adicione pessoas de confiança que possam acessar suas informações financeiras.',
+        description:
+          'Adicione pessoas de confiança que possam acessar suas informações financeiras.',
       },
       verified: 'Verificado',
       pending: 'Pendente',
@@ -227,7 +243,8 @@ export const estatePlanning = {
     },
     addDialog: {
       title: 'Adicionar Executor',
-      description: 'Adicione uma pessoa de confiança que possa acessar suas informações financeiras.',
+      description:
+        'Adicione uma pessoa de confiança que possa acessar suas informações financeiras.',
       fullName: 'Nome Completo',
       namePlaceholder: 'João Silva',
       email: 'E-mail',
@@ -257,7 +274,8 @@ export const estatePlanning = {
       },
       step3: {
         title: 'Acesso do Executor',
-        description: 'Se você não responder, seus executores podem solicitar acesso somente leitura.',
+        description:
+          'Se você não responder, seus executores podem solicitar acesso somente leitura.',
       },
     },
     enableDialog: {
@@ -265,10 +283,13 @@ export const estatePlanning = {
       description: 'Configure seus limites de inatividade e aceite o aviso legal.',
       thresholdLabel: 'Limites de Alerta (dias de inatividade)',
       days: '{{days}} dias',
-      thresholdHint: 'Você receberá lembretes em cada limite. Os executores são notificados no limite final.',
+      thresholdHint:
+        'Você receberá lembretes em cada limite. Os executores são notificados no limite final.',
       legalTitle: 'Aviso Legal Importante',
-      legalDescription: 'Life Beat fornece acesso somente leitura a resumos financeiros. Não concede autoridade de transação, acesso a contas ou procuração. Este recurso é destinado apenas para fins informativos e deve complementar, não substituir, um planejamento patrimonial adequado com assessoria jurídica.',
-      legalCheckbox: 'Entendo que o Life Beat fornece visibilidade financeira somente leitura e não constitui procuração ou autoridade de acesso a contas. Aceito os Termos de Serviço deste recurso.',
+      legalDescription:
+        'Life Beat fornece acesso somente leitura a resumos financeiros. Não concede autoridade de transação, acesso a contas ou procuração. Este recurso é destinado apenas para fins informativos e deve complementar, não substituir, um planejamento patrimonial adequado com assessoria jurídica.',
+      legalCheckbox:
+        'Entendo que o Life Beat fornece visibilidade financeira somente leitura e não constitui procuração ou autoridade de acesso a contas. Aceito os Termos de Serviço deste recurso.',
       cancel: 'Cancelar',
       enable: 'Ativar Life Beat',
     },

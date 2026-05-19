@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { hash } from 'argon2';
 import request from 'supertest';
+
 import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/core/prisma/prisma.service';
-import { hash } from 'argon2';
 
 describe('Authentication Integration (e2e)', () => {
   let app: INestApplication;
@@ -16,7 +17,7 @@ describe('Authentication Integration (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     prisma = app.get<PrismaService>(PrismaService);
-    
+
     await app.init();
 
     // Clean database
@@ -109,12 +110,10 @@ describe('Authentication Integration (e2e)', () => {
     let refreshToken: string;
 
     beforeAll(async () => {
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: 'login@example.com',
-          password: 'LoginPass123!',
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: 'login@example.com',
+        password: 'LoginPass123!',
+      });
 
       refreshToken = loginResponse.body.refreshToken;
     });
@@ -141,12 +140,10 @@ describe('Authentication Integration (e2e)', () => {
     let accessToken: string;
 
     beforeAll(async () => {
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: 'login@example.com',
-          password: 'LoginPass123!',
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: 'login@example.com',
+        password: 'LoginPass123!',
+      });
 
       accessToken = loginResponse.body.accessToken;
     });
@@ -161,9 +158,7 @@ describe('Authentication Integration (e2e)', () => {
     });
 
     it('should reject access without token', async () => {
-      await request(app.getHttpServer())
-        .get('/auth/me')
-        .expect(401);
+      await request(app.getHttpServer()).get('/auth/me').expect(401);
     });
 
     it('should reject access with invalid token', async () => {

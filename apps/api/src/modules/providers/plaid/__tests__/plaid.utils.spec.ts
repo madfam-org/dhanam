@@ -1,5 +1,6 @@
-import { AccountType, Currency } from '@db';
 import { ProviderException, ErrorCode } from '@core/exceptions/domain-exceptions';
+import { AccountType, Currency } from '@db';
+
 import { CircuitBreakerService } from '../../orchestrator/circuit-breaker.service';
 import {
   mapPlaidAccountType,

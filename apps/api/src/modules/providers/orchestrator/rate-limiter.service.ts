@@ -1,5 +1,6 @@
-import { Provider } from '@db';
 import { Injectable, Logger } from '@nestjs/common';
+
+import { Provider } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 

@@ -44,12 +44,16 @@ async function main() {
   console.log('  - 1 Guest user (instant demo access)');
   console.log('  - 1 Individual user (Maria) with zero-based budgeting');
   console.log('  - 1 Small business owner (Carlos) with manual assets + collectibles');
-  console.log('  - 1 Enterprise admin (Patricia) with PE fund, real estate, insurance, 529, annuity');
+  console.log(
+    '  - 1 Enterprise admin (Patricia) with PE fund, real estate, insurance, 529, annuity'
+  );
   console.log('  - 1 Web3/Metaverse user (Diego) with DeFi, DAO, L2, BTC, Decentraland, YGG');
   console.log('  - 1 Platform admin');
   console.log('  - 6 Spaces with budgets');
   console.log('  - 34 Connected accounts (incl. BTC, Decentraland, YGG, Arbitrum, Base)');
-  console.log('  - 23 Manual assets (real estate, insurance, 529, annuity, wine, classic car, PCGS coin, PSA card)');
+  console.log(
+    '  - 23 Manual assets (real estate, insurance, 529, annuity, wine, classic car, PCGS coin, PSA card)'
+  );
   console.log('  - 8 PE cash flows');
   console.log('  - 16 Recurring transactions');
   console.log('  - 10 Subscriptions');

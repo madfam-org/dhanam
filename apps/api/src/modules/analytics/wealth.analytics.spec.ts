@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { WealthAnalytics } from './wealth.analytics';
 import { PostHogService } from './posthog.service';
+import { WealthAnalytics } from './wealth.analytics';
 
 describe('WealthAnalytics', () => {
   let service: WealthAnalytics;
@@ -94,9 +94,7 @@ describe('WealthAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackNetWorthViewed('user-123', 300000, 'USD')
-      ).resolves.not.toThrow();
+      await expect(service.trackNetWorthViewed('user-123', 300000, 'USD')).resolves.not.toThrow();
     });
   });
 
@@ -169,9 +167,7 @@ describe('WealthAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackDataExported('user-123', 'accounts', 'csv')
-      ).resolves.not.toThrow();
+      await expect(service.trackDataExported('user-123', 'accounts', 'csv')).resolves.not.toThrow();
     });
   });
 
@@ -288,9 +284,7 @@ describe('WealthAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackWealthTrendsViewed('user-123', 'year')
-      ).resolves.not.toThrow();
+      await expect(service.trackWealthTrendsViewed('user-123', 'year')).resolves.not.toThrow();
     });
   });
 
@@ -324,9 +318,7 @@ describe('WealthAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackESGScoresViewed('user-123', 15, 8.2)
-      ).resolves.not.toThrow();
+      await expect(service.trackESGScoresViewed('user-123', 15, 8.2)).resolves.not.toThrow();
     });
   });
 
@@ -367,9 +359,7 @@ describe('WealthAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackPortfolioAnalysisViewed('user-123', 'risk')
-      ).resolves.not.toThrow();
+      await expect(service.trackPortfolioAnalysisViewed('user-123', 'risk')).resolves.not.toThrow();
     });
   });
 
@@ -569,9 +559,7 @@ describe('WealthAnalytics', () => {
     it('should handle errors gracefully', async () => {
       posthogService.capture.mockRejectedValue(new Error('PostHog error'));
 
-      await expect(
-        service.trackCashflowForecastViewed('user-123', 60, 0.8)
-      ).resolves.not.toThrow();
+      await expect(service.trackCashflowForecastViewed('user-123', 60, 0.8)).resolves.not.toThrow();
     });
   });
 });

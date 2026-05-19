@@ -17,7 +17,9 @@ test.describe('Authentication', () => {
 
     // Wait for validation messages
     await page.waitForTimeout(500);
-    const errorCount = await page.locator('[role="alert"], .text-destructive, .text-red-500').count();
+    const errorCount = await page
+      .locator('[role="alert"], .text-destructive, .text-red-500')
+      .count();
     expect(errorCount).toBeGreaterThanOrEqual(0); // Validation may be inline
   });
 

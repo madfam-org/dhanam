@@ -41,12 +41,12 @@ User -> API -> Belvo API -> Link Created -> Accounts Synced -> Transactions Sync
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/providers/belvo/spaces/:spaceId/link` | Create new Belvo link |
-| `POST` | `/providers/belvo/spaces/:spaceId/sync/:linkId` | Manual sync trigger |
-| `DELETE` | `/providers/belvo/link/:linkId` | Delete Belvo link |
-| `POST` | `/providers/belvo/webhook` | Webhook handler |
+| Method   | Endpoint                                        | Description           |
+| -------- | ----------------------------------------------- | --------------------- |
+| `POST`   | `/providers/belvo/spaces/:spaceId/link`         | Create new Belvo link |
+| `POST`   | `/providers/belvo/spaces/:spaceId/sync/:linkId` | Manual sync trigger   |
+| `DELETE` | `/providers/belvo/link/:linkId`                 | Delete Belvo link     |
+| `POST`   | `/providers/belvo/webhook`                      | Webhook handler       |
 
 ### Service Methods
 
@@ -60,11 +60,11 @@ User -> API -> Belvo API -> Link Created -> Accounts Synced -> Transactions Sync
 
 ### Webhook Events
 
-| Event | Action |
-|-------|--------|
-| `ACCOUNTS_CREATED` | Sync all accounts for the link |
-| `TRANSACTIONS_CREATED` | Sync transactions for the link |
-| `LINK_FAILED` | Log error, mark connection as failed |
+| Event                  | Action                               |
+| ---------------------- | ------------------------------------ |
+| `ACCOUNTS_CREATED`     | Sync all accounts for the link       |
+| `TRANSACTIONS_CREATED` | Sync transactions for the link       |
+| `LINK_FAILED`          | Log error, mark connection as failed |
 
 ### Common Errors
 
@@ -80,22 +80,24 @@ All webhooks verified using HMAC-SHA256 with timing-safe comparison to prevent t
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `BELVO_SECRET_KEY_ID` | Belvo API key ID | Required |
-| `BELVO_SECRET_KEY_PASSWORD` | Belvo API key password | Required |
-| `BELVO_ENV` | Environment (sandbox/production) | `sandbox` |
-| `BELVO_WEBHOOK_SECRET` | Webhook signature verification secret | Required |
+| Variable                    | Description                           | Default   |
+| --------------------------- | ------------------------------------- | --------- |
+| `BELVO_SECRET_KEY_ID`       | Belvo API key ID                      | Required  |
+| `BELVO_SECRET_KEY_PASSWORD` | Belvo API key password                | Required  |
+| `BELVO_ENV`                 | Environment (sandbox/production)      | `sandbox` |
+| `BELVO_WEBHOOK_SECRET`      | Webhook signature verification secret | Required  |
 
 ### Data Mapping
 
 **Currency Mapping**:
+
 - `MXN` -> `Currency.MXN`
 - `USD` -> `Currency.USD`
 - `EUR` -> `Currency.EUR`
 - Default: `Currency.MXN`
 
 **Account Type Mapping**:
+
 - `CHECKING_ACCOUNT` -> `checking`
 - `SAVINGS_ACCOUNT` -> `savings`
 - `CREDIT_CARD` -> `credit`
@@ -111,5 +113,6 @@ All webhooks verified using HMAC-SHA256 with timing-safe comparison to prevent t
 - `providers/connection-health` - Connection status monitoring
 
 ---
+
 **Provider**: `providers/belvo`
 **Last Updated**: January 2025

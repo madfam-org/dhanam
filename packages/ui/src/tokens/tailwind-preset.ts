@@ -32,7 +32,7 @@ import {
  */
 const madfamColors = {
   // Solarpunk-inspired greens (primary across ecosystem)
-  'solarpunk': {
+  solarpunk: {
     50: '#f0fdf4',
     100: '#dcfce7',
     200: '#bbf7d0',
@@ -47,7 +47,7 @@ const madfamColors = {
   },
 
   // Golden amber (accent, representing the golden ratio)
-  'golden': {
+  golden: {
     50: '#fffbeb',
     100: '#fef3c7',
     200: '#fde68a',
@@ -62,7 +62,7 @@ const madfamColors = {
   },
 
   // Deep earth tones (grounding, stability)
-  'earth': {
+  earth: {
     50: '#faf5f0',
     100: '#f0e6d8',
     200: '#e0ccb0',
@@ -100,7 +100,7 @@ export const madfamPreset: Partial<Config> = {
       boxShadow: {
         ...goldenShadows,
         // Glass morphism shadows
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+        glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
         'glass-lg': '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
       },
 
@@ -117,7 +117,7 @@ export const madfamPreset: Partial<Config> = {
       // Max widths for containers
       maxWidth: {
         'phi-sm': goldenSizing['phi-container-sm'],
-        'phi': goldenSizing['phi-container'],
+        phi: goldenSizing['phi-container'],
         'phi-lg': goldenSizing['phi-container-lg'],
       },
 
@@ -128,13 +128,13 @@ export const madfamPreset: Partial<Config> = {
 
       // Golden ratio aspect ratios
       aspectRatio: {
-        'golden': '1.618 / 1',
+        golden: '1.618 / 1',
         'golden-portrait': '1 / 1.618',
       },
 
       // Glass morphism backgrounds
       backdropBlur: {
-        'glass': '16px',
+        glass: '16px',
         'glass-lg': '24px',
       },
 

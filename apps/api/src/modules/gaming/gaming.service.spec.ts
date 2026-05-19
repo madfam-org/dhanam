@@ -1,6 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
+import {
+  createRedisMock,
+  createConfigMock,
+  createLoggerMock,
+} from '../../../test/helpers/api-mock-factory';
 import { RedisService } from '../../core/redis/redis.service';
 
 import { AxieAdapter } from './adapters/axie.adapter';
@@ -12,12 +17,6 @@ import { SandboxAdapter } from './adapters/sandbox.adapter';
 import { StarAtlasAdapter } from './adapters/star-atlas.adapter';
 import { GamingService } from './gaming.service';
 import { MetaversePosition } from './interfaces/platform.interface';
-
-import {
-  createRedisMock,
-  createConfigMock,
-  createLoggerMock,
-} from '../../../test/helpers/api-mock-factory';
 
 const makeMockPosition = (
   platform: string,
@@ -197,7 +196,15 @@ describe('GamingService', () => {
 
       expect(platforms).toHaveLength(7);
       expect(platforms.map((p) => p.platform)).toEqual(
-        expect.arrayContaining(['sandbox', 'axie', 'illuvium', 'star-atlas', 'gala', 'enjin', 'immutable'])
+        expect.arrayContaining([
+          'sandbox',
+          'axie',
+          'illuvium',
+          'star-atlas',
+          'gala',
+          'enjin',
+          'immutable',
+        ])
       );
     });
 
@@ -215,8 +222,18 @@ describe('GamingService', () => {
   describe('getEarnings', () => {
     it('should return earnings breakdown', async () => {
       const earnings = [
-        { source: 'staking' as const, platform: 'sandbox' as any, monthlyAmountUsd: 48, token: 'SAND' },
-        { source: 'rental' as const, platform: 'sandbox' as any, monthlyAmountUsd: 135, token: 'SAND' },
+        {
+          source: 'staking' as const,
+          platform: 'sandbox' as any,
+          monthlyAmountUsd: 48,
+          token: 'SAND',
+        },
+        {
+          source: 'rental' as const,
+          platform: 'sandbox' as any,
+          monthlyAmountUsd: 135,
+          token: 'SAND',
+        },
       ];
       redisMock.get.mockResolvedValue(null);
 
@@ -241,7 +258,15 @@ describe('GamingService', () => {
   describe('getNftInventory', () => {
     it('should extract NFTs from all positions', async () => {
       const nfts = [
-        { id: 'nft-1', name: 'NFT 1', collection: 'Col1', platform: 'sandbox' as any, chain: 'polygon' as any, currentValueUsd: 500, acquisitionCostUsd: 300 },
+        {
+          id: 'nft-1',
+          name: 'NFT 1',
+          collection: 'Col1',
+          platform: 'sandbox' as any,
+          chain: 'polygon' as any,
+          currentValueUsd: 500,
+          acquisitionCostUsd: 300,
+        },
       ];
       redisMock.get.mockResolvedValue(null);
 

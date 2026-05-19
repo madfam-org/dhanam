@@ -59,7 +59,8 @@ export const estatePlanning = {
   notesOptional: 'Notas (Opcional)',
 
   legalDisclaimer: 'Aviso Legal',
-  legalDisclaimerText: 'Entiendo que esto es un testamento digital y debo consultar con un asesor legal',
+  legalDisclaimerText:
+    'Entiendo que esto es un testamento digital y debo consultar con un asesor legal',
   acceptLegalDisclaimer: 'Acepto el aviso legal',
 
   percentage: 'Porcentaje',
@@ -91,7 +92,8 @@ export const estatePlanning = {
 
   // Messages & Alerts
   noWillsYet: 'Aún No Hay Testamentos',
-  noWillsDescription: 'Crea tu primer testamento para comenzar la planificación patrimonial de tu hogar',
+  noWillsDescription:
+    'Crea tu primer testamento para comenzar la planificación patrimonial de tu hogar',
 
   cannotActivateWill: 'No se puede activar el testamento',
   validationErrors: 'Errores de Validación',
@@ -124,7 +126,8 @@ export const estatePlanning = {
   executorNotFound: 'Albacea no encontrado',
 
   cannotUpdateActiveWill: 'No se puede actualizar un testamento activo',
-  cannotDeleteActiveWill: 'No se puede eliminar un testamento activo. Revoca los testamentos activos en su lugar.',
+  cannotDeleteActiveWill:
+    'No se puede eliminar un testamento activo. Revoca los testamentos activos en su lugar.',
   cannotModifyExecutedWill: 'No se puede modificar un testamento ejecutado',
 
   beneficiaryMustBeHouseholdMember: 'El beneficiario debe ser miembro del hogar',
@@ -139,9 +142,12 @@ export const estatePlanning = {
   upgradeToPremium: 'Actualizar a Premium',
 
   // Descriptions
-  createWillDescription: 'Crea un borrador de testamento para tu hogar. Puedes agregar beneficiarios y albaceas antes de activarlo.',
-  activateWillDescription: 'Activar este testamento lo hará legalmente vinculante (sujeto a revisión legal)',
-  revokeWillDescription: 'Revocar este testamento lo hará inválido. Esta acción no se puede deshacer.',
+  createWillDescription:
+    'Crea un borrador de testamento para tu hogar. Puedes agregar beneficiarios y albaceas antes de activarlo.',
+  activateWillDescription:
+    'Activar este testamento lo hará legalmente vinculante (sujeto a revisión legal)',
+  revokeWillDescription:
+    'Revocar este testamento lo hará inválido. Esta acción no se puede deshacer.',
 
   draftWillsOnly: 'Solo se pueden eliminar testamentos en borrador',
   oneActiveWillPerHousehold: 'Solo un testamento activo por hogar',
@@ -152,10 +158,13 @@ export const estatePlanning = {
 
   // Tooltips & Help
   whatIsDigitalWill: '¿Qué es un testamento digital?',
-  digitalWillExplanation: 'Un testamento digital es una herramienta de planificación patrimonial que te ayuda a organizar la distribución de activos. Consulta siempre con un asesor legal para la validez legal.',
+  digitalWillExplanation:
+    'Un testamento digital es una herramienta de planificación patrimonial que te ayuda a organizar la distribución de activos. Consulta siempre con un asesor legal para la validez legal.',
 
-  beneficiaryAllocationHelp: 'Las asignaciones de porcentaje deben sumar 100% para cada tipo de activo',
-  executorOrderHelp: 'El albacea principal es responsable de ejecutar el testamento. Los albaceas secundarios sirven como respaldo.',
+  beneficiaryAllocationHelp:
+    'Las asignaciones de porcentaje deben sumar 100% para cada tipo de activo',
+  executorOrderHelp:
+    'El albacea principal es responsable de ejecutar el testamento. Los albaceas secundarios sirven como respaldo.',
 
   // Page-level keys (used by estate-planning page component)
   page: {
@@ -164,7 +173,8 @@ export const estatePlanning = {
     createWill: 'Crear Testamento',
     createDraft: 'Crear Borrador',
     noWills: 'Sin Testamentos Aún',
-    noWillsDescription: 'Crea tu primer testamento para comenzar la planificación patrimonial de tu hogar',
+    noWillsDescription:
+      'Crea tu primer testamento para comenzar la planificación patrimonial de tu hogar',
     willDetails: 'Detalles y Gestión del Testamento',
     noBeneficiaries: 'Sin beneficiarios agregados aún',
     noExecutors: 'Sin albaceas asignados aún',
@@ -172,7 +182,8 @@ export const estatePlanning = {
   dialog: {
     createWill: {
       title: 'Crear Nuevo Testamento',
-      description: 'Crea un borrador de testamento para tu hogar. Puedes agregar beneficiarios y albaceas antes de activarlo.',
+      description:
+        'Crea un borrador de testamento para tu hogar. Puedes agregar beneficiarios y albaceas antes de activarlo.',
     },
   },
   fields: {
@@ -200,17 +211,20 @@ export const estatePlanning = {
     title: 'Life Beat',
     description: 'Tu red de seguridad financiera ante las incertidumbres de la vida',
     protectionStatus: 'Estado de Protección',
-    statusDescription: 'Life Beat monitorea tu actividad y alerta a contactos de confianza si es necesario',
+    statusDescription:
+      'Life Beat monitorea tu actividad y alerta a contactos de confianza si es necesario',
     lastActivity: 'Última Actividad',
     daysAgo: 'hace {{days}} días',
     alertThresholds: 'Umbrales de Alerta',
     trustedExecutors: 'Albaceas de Confianza',
     pendingAlerts: 'Alertas Pendientes',
-    pendingAlertsDescription: 'Tienes {{count}} alerta(s) de inactividad pendiente(s). Regístrate para reiniciar tu temporizador.',
+    pendingAlertsDescription:
+      'Tienes {{count}} alerta(s) de inactividad pendiente(s). Regístrate para reiniciar tu temporizador.',
     checkIn: 'Estoy Bien - Registrarme Ahora',
     disabled: {
       title: 'Life Beat está Desactivado',
-      description: 'Activa Life Beat para asegurar que tus albaceas designados puedan acceder a tu información financiera si algo te sucede.',
+      description:
+        'Activa Life Beat para asegurar que tus albaceas designados puedan acceder a tu información financiera si algo te sucede.',
       enable: 'Activar Life Beat',
     },
     executors: {
@@ -253,7 +267,8 @@ export const estatePlanning = {
       },
       step2: {
         title: 'Alertas Escalonadas',
-        description: 'Después de 30, 60, 90 días de inactividad, te enviamos recordatorios de registro.',
+        description:
+          'Después de 30, 60, 90 días de inactividad, te enviamos recordatorios de registro.',
       },
       step3: {
         title: 'Acceso del Albacea',
@@ -265,10 +280,13 @@ export const estatePlanning = {
       description: 'Configura tus umbrales de inactividad y acepta el aviso legal.',
       thresholdLabel: 'Umbrales de Alerta (días de inactividad)',
       days: '{{days}} días',
-      thresholdHint: 'Recibirás recordatorios en cada umbral. Los albaceas son notificados en el umbral final.',
+      thresholdHint:
+        'Recibirás recordatorios en cada umbral. Los albaceas son notificados en el umbral final.',
       legalTitle: 'Aviso Legal Importante',
-      legalDescription: 'Life Beat proporciona acceso de solo lectura a resúmenes financieros. No otorga autoridad de transacción, acceso a cuentas ni poder legal notarial. Esta función está diseñada solo con fines informativos y debe complementar, no reemplazar, una planificación patrimonial adecuada con asesoría legal.',
-      legalCheckbox: 'Entiendo que Life Beat proporciona visibilidad financiera de solo lectura y no constituye un poder legal notarial ni autoridad de acceso a cuentas. Acepto los Términos de Servicio de esta función.',
+      legalDescription:
+        'Life Beat proporciona acceso de solo lectura a resúmenes financieros. No otorga autoridad de transacción, acceso a cuentas ni poder legal notarial. Esta función está diseñada solo con fines informativos y debe complementar, no reemplazar, una planificación patrimonial adecuada con asesoría legal.',
+      legalCheckbox:
+        'Entiendo que Life Beat proporciona visibilidad financiera de solo lectura y no constituye un poder legal notarial ni autoridad de acceso a cuentas. Acepto los Términos de Servicio de esta función.',
       cancel: 'Cancelar',
       enable: 'Activar Life Beat',
     },

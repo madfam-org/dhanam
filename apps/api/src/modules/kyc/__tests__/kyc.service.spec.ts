@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { KycService } from '../kyc.service';
@@ -36,6 +36,10 @@ describe('KycService', () => {
             verificationDocument: {
               findFirst: jest.fn(),
               create: jest.fn(),
+            },
+            user: {
+              findUnique: jest.fn(),
+              update: jest.fn(),
             },
           },
         },
@@ -256,6 +260,13 @@ describe('KycService', () => {
         eventName: 'verification_completed',
       });
 
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: mockUserId },
+        data: {
+          kycVerified: true,
+          kycVerifiedAt: expect.any(Date),
+        },
+      });
       expect(prisma.identityVerification.update).toHaveBeenCalledWith({
         where: { id: 'ver-010' },
         data: expect.objectContaining({
@@ -459,6 +470,7 @@ describe('KycService', () => {
   // ---------------------------------------------------------------------------
   describe('isVerified', () => {
     it('should return true when VERIFIED verification exists', async () => {
+      prisma.user.findUnique.mockResolvedValue({ kycVerified: false } as any);
       prisma.identityVerification.findFirst.mockResolvedValue({
         id: 'ver-030',
         kycStatus: KycStatus.VERIFIED,
@@ -468,6 +480,7 @@ describe('KycService', () => {
     });
 
     it('should return false when no VERIFIED verification exists', async () => {
+      prisma.user.findUnique.mockResolvedValue({ kycVerified: false } as any);
       prisma.identityVerification.findFirst.mockResolvedValue(null);
 
       expect(await service.isVerified(mockUserId)).toBe(false);

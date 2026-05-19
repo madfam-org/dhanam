@@ -1,8 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { GoalProbabilityService } from './goal-probability.service';
-import { PrismaService } from '@/core/prisma/prisma.service';
-import { MonteCarloEngine } from '../simulations/engines/monte-carlo.engine';
+
 import { Decimal } from '@db';
+
+import { MonteCarloEngine } from '../simulations/engines/monte-carlo.engine';
+
+import { GoalProbabilityService } from './goal-probability.service';
+
+import { PrismaService } from '@/core/prisma/prisma.service';
 
 describe('GoalProbabilityService', () => {
   let service: GoalProbabilityService;
@@ -233,9 +237,9 @@ describe('GoalProbabilityService', () => {
     it('should throw error if goal not found', async () => {
       mockPrismaService.goal.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.calculateGoalProbability('user-123', 'nonexistent')
-      ).rejects.toThrow('Goal not found');
+      await expect(service.calculateGoalProbability('user-123', 'nonexistent')).rejects.toThrow(
+        'Goal not found'
+      );
     });
 
     it('should handle goal without monthly contribution', async () => {
@@ -293,9 +297,7 @@ describe('GoalProbabilityService', () => {
       finalValues: Array(10000).fill(55000),
       p10: 45000,
       p90: 65000,
-      timeSeries: [
-        { month: 24, median: 52000, p10: 45000, p90: 60000 },
-      ],
+      timeSeries: [{ month: 24, median: 52000, p10: 45000, p90: 60000 }],
     };
 
     it('should update goal with probability data', async () => {
@@ -348,7 +350,10 @@ describe('GoalProbabilityService', () => {
     it('should keep only last 90 days of probability history', async () => {
       const now = new Date();
       const existingHistory = [
-        { date: new Date(now.getTime() - 100 * 24 * 60 * 60 * 1000).toISOString(), probability: 70 }, // 100 days old
+        {
+          date: new Date(now.getTime() - 100 * 24 * 60 * 60 * 1000).toISOString(),
+          probability: 70,
+        }, // 100 days old
         { date: new Date(now.getTime() - 50 * 24 * 60 * 60 * 1000).toISOString(), probability: 75 }, // 50 days old
         { date: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(), probability: 78 }, // 10 days old
       ];
@@ -412,9 +417,7 @@ describe('GoalProbabilityService', () => {
       finalValues: Array(10000).fill(55000),
       p10: 45000,
       p90: 65000,
-      timeSeries: [
-        { month: 24, median: 52000, p10: 45000, p90: 60000 },
-      ],
+      timeSeries: [{ month: 24, median: 52000, p10: 45000, p90: 60000 }],
     };
 
     it('should run scenario with modified monthly contribution', async () => {
@@ -475,12 +478,12 @@ describe('GoalProbabilityService', () => {
       mockMonteCarloEngine.calculateSuccessRate.mockReturnValue(0.88);
 
       await service.runWhatIfScenario('user-123', 'goal-123', {
-        expectedReturn: 0.10, // 10% instead of 8%
+        expectedReturn: 0.1, // 10% instead of 8%
       });
 
       expect(mockMonteCarloEngine.simulate).toHaveBeenCalledWith(
         expect.objectContaining({
-          expectedReturn: 0.10,
+          expectedReturn: 0.1,
         })
       );
     });
@@ -599,9 +602,7 @@ describe('GoalProbabilityService', () => {
       finalValues: Array(10000).fill(55000),
       p10: 45000,
       p90: 65000,
-      timeSeries: [
-        { month: 24, median: 52000, p10: 45000, p90: 60000 },
-      ],
+      timeSeries: [{ month: 24, median: 52000, p10: 45000, p90: 60000 }],
     };
 
     it('should update all active goals in space', async () => {

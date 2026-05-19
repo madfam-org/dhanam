@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
+import { EnhancedJobsService } from '../enhanced-jobs.service';
 import { CategorizeTransactionsProcessor } from '../processors/categorize-transactions.processor';
 import { ESGUpdateProcessor } from '../processors/esg-update.processor';
 import { SyncTransactionsProcessor } from '../processors/sync-transactions.processor';
 import { ValuationSnapshotProcessor } from '../processors/valuation-snapshot.processor';
 import { QueueService } from '../queue.service';
-import { EnhancedJobsService } from '../enhanced-jobs.service';
 
 describe('EnhancedJobsService', () => {
   let service: EnhancedJobsService;
@@ -109,9 +109,13 @@ describe('EnhancedJobsService', () => {
     prisma = module.get(PrismaService) as jest.Mocked<PrismaService>;
     queueService = module.get(QueueService) as jest.Mocked<QueueService>;
     syncProcessor = module.get(SyncTransactionsProcessor) as jest.Mocked<SyncTransactionsProcessor>;
-    categorizeProcessor = module.get(CategorizeTransactionsProcessor) as jest.Mocked<CategorizeTransactionsProcessor>;
+    categorizeProcessor = module.get(
+      CategorizeTransactionsProcessor
+    ) as jest.Mocked<CategorizeTransactionsProcessor>;
     esgProcessor = module.get(ESGUpdateProcessor) as jest.Mocked<ESGUpdateProcessor>;
-    snapshotProcessor = module.get(ValuationSnapshotProcessor) as jest.Mocked<ValuationSnapshotProcessor>;
+    snapshotProcessor = module.get(
+      ValuationSnapshotProcessor
+    ) as jest.Mocked<ValuationSnapshotProcessor>;
 
     jest.clearAllMocks();
   });
@@ -128,10 +132,19 @@ describe('EnhancedJobsService', () => {
 
       // Should register 4 workers
       expect(queueService.registerWorker).toHaveBeenCalledTimes(4);
-      expect(queueService.registerWorker).toHaveBeenCalledWith('sync-transactions', expect.any(Function));
-      expect(queueService.registerWorker).toHaveBeenCalledWith('categorize-transactions', expect.any(Function));
+      expect(queueService.registerWorker).toHaveBeenCalledWith(
+        'sync-transactions',
+        expect.any(Function)
+      );
+      expect(queueService.registerWorker).toHaveBeenCalledWith(
+        'categorize-transactions',
+        expect.any(Function)
+      );
       expect(queueService.registerWorker).toHaveBeenCalledWith('esg-updates', expect.any(Function));
-      expect(queueService.registerWorker).toHaveBeenCalledWith('valuation-snapshots', expect.any(Function));
+      expect(queueService.registerWorker).toHaveBeenCalledWith(
+        'valuation-snapshots',
+        expect.any(Function)
+      );
 
       // Should schedule 4 recurring jobs
       expect(queueService.scheduleRecurringJob).toHaveBeenCalledTimes(4);
@@ -147,7 +160,10 @@ describe('EnhancedJobsService', () => {
 
   describe('triggerUserSync', () => {
     it('should trigger sync jobs for all user connections', async () => {
-      const connections = [mockConnection, { ...mockConnection, id: 'conn-456', provider: 'plaid' }];
+      const connections = [
+        mockConnection,
+        { ...mockConnection, id: 'conn-456', provider: 'plaid' },
+      ];
       prisma.providerConnection.findMany.mockResolvedValue(connections as any);
       queueService.addSyncTransactionsJob.mockResolvedValue(undefined);
 
@@ -267,8 +283,14 @@ describe('EnhancedJobsService', () => {
       await service.triggerBulkCategorization(['space-1', 'space-2']);
 
       expect(queueService.addCategorizeTransactionsJob).toHaveBeenCalledTimes(2);
-      expect(queueService.addCategorizeTransactionsJob).toHaveBeenCalledWith({ spaceId: 'space-1' }, 70);
-      expect(queueService.addCategorizeTransactionsJob).toHaveBeenCalledWith({ spaceId: 'space-2' }, 70);
+      expect(queueService.addCategorizeTransactionsJob).toHaveBeenCalledWith(
+        { spaceId: 'space-1' },
+        70
+      );
+      expect(queueService.addCategorizeTransactionsJob).toHaveBeenCalledWith(
+        { spaceId: 'space-2' },
+        70
+      );
     });
   });
 
@@ -320,10 +342,7 @@ describe('EnhancedJobsService', () => {
 
   describe('refreshESGData (Cron)', () => {
     it('should queue ESG refresh for crypto symbols', async () => {
-      const accounts = [
-        { metadata: { cryptoCurrency: 'btc' } },
-        { metadata: { symbol: 'ETH' } },
-      ];
+      const accounts = [{ metadata: { cryptoCurrency: 'btc' } }, { metadata: { symbol: 'ETH' } }];
       prisma.account.findMany.mockResolvedValue(accounts as any);
       queueService.addESGUpdateJob.mockResolvedValue(undefined);
 
@@ -351,7 +370,16 @@ describe('EnhancedJobsService', () => {
 
       expect(queueService.addESGUpdateJob).toHaveBeenCalledWith(
         expect.objectContaining({
-          symbols: expect.arrayContaining(['BTC', 'ETH', 'ADA', 'DOT', 'SOL', 'ALGO', 'MATIC', 'AVAX']),
+          symbols: expect.arrayContaining([
+            'BTC',
+            'ETH',
+            'ADA',
+            'DOT',
+            'SOL',
+            'ALGO',
+            'MATIC',
+            'AVAX',
+          ]),
         }),
         25
       );

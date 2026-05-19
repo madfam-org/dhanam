@@ -26,7 +26,7 @@ export function stdDev(values: number[]): number {
   }
 
   const avg = mean(values);
-  const squaredDiffs = values.map(val => Math.pow(val - avg, 2));
+  const squaredDiffs = values.map((val) => Math.pow(val - avg, 2));
   const variance = squaredDiffs.reduce((acc, val) => acc + val, 0) / (values.length - 1);
 
   return Math.sqrt(variance);
@@ -41,7 +41,7 @@ export function variance(values: number[]): number {
   }
 
   const avg = mean(values);
-  const squaredDiffs = values.map(val => Math.pow(val - avg, 2));
+  const squaredDiffs = values.map((val) => Math.pow(val - avg, 2));
 
   return squaredDiffs.reduce((acc, val) => acc + val, 0) / (values.length - 1);
 }
@@ -56,11 +56,15 @@ export function percentile(values: number[], p: number): number {
     throw new Error('Cannot calculate percentile of empty array');
   }
 
+  const sorted = [...values].sort((a, b) => a - b);
+  return percentileFromSorted(sorted, p);
+}
+
+function percentileFromSorted(sorted: number[], p: number): number {
   if (p < 0 || p > 100) {
     throw new Error('Percentile must be between 0 and 100');
   }
 
-  const sorted = [...values].sort((a, b) => a - b);
   const index = (p / 100) * (sorted.length - 1);
 
   if (Number.isInteger(index)) {
@@ -262,13 +266,18 @@ export function confidenceInterval(values: number[], confidence: number = 0.95):
     throw new Error('Confidence must be between 0 and 1');
   }
 
+  if (values.length === 0) {
+    throw new Error('Cannot calculate percentile of empty array');
+  }
+
   const alpha = 1 - confidence;
   const lowerPercentile = (alpha / 2) * 100;
   const upperPercentile = (1 - alpha / 2) * 100;
+  const sorted = [...values].sort((a, b) => a - b);
 
   return [
-    percentile(values, lowerPercentile),
-    percentile(values, upperPercentile)
+    percentileFromSorted(sorted, lowerPercentile),
+    percentileFromSorted(sorted, upperPercentile),
   ];
 }
 
@@ -295,18 +304,22 @@ export function summarize(values: number[]): SummaryStatistics {
   }
 
   const sorted = [...values].sort((a, b) => a - b);
+  const count = values.length;
+  const avg = values.reduce((acc, val) => acc + val, 0) / count;
+  const varianceValue =
+    count >= 2 ? values.reduce((acc, val) => acc + Math.pow(val - avg, 2), 0) / (count - 1) : 0;
 
   return {
-    count: values.length,
-    mean: mean(values),
-    median: median(values),
-    stdDev: values.length >= 2 ? stdDev(values) : 0,
-    variance: values.length >= 2 ? variance(values) : 0,
+    count,
+    mean: avg,
+    median: percentileFromSorted(sorted, 50),
+    stdDev: Math.sqrt(varianceValue),
+    variance: varianceValue,
     min: sorted[0],
     max: sorted[sorted.length - 1],
-    p10: percentile(values, 10),
-    p25: percentile(values, 25),
-    p75: percentile(values, 75),
-    p90: percentile(values, 90),
+    p10: percentileFromSorted(sorted, 10),
+    p25: percentileFromSorted(sorted, 25),
+    p75: percentileFromSorted(sorted, 75),
+    p90: percentileFromSorted(sorted, 90),
   };
 }

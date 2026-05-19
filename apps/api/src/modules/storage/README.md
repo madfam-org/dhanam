@@ -8,22 +8,22 @@ The Storage module provides a global document storage service using Cloudflare R
 
 ## Key Entities
 
-| Entity | Description |
-|--------|-------------|
-| `UploadedDocument` | Stored document metadata |
+| Entity               | Description                        |
+| -------------------- | ---------------------------------- |
+| `UploadedDocument`   | Stored document metadata           |
 | `PresignedUrlResult` | Upload URL with expiry information |
 
 ### Uploaded Document Structure
 
 ```typescript
 interface UploadedDocument {
-  key: string;           // Storage path
-  url: string;           // Public URL (if configured)
-  filename: string;      // Original filename
-  fileType: string;      // MIME type
-  fileSize: number;      // Size in bytes
-  category: string;      // Document category
-  uploadedAt: string;    // ISO timestamp
+  key: string; // Storage path
+  url: string; // Public URL (if configured)
+  filename: string; // Original filename
+  fileType: string; // MIME type
+  fileSize: number; // Size in bytes
+  category: string; // Document category
+  uploadedAt: string; // ISO timestamp
 }
 ```
 
@@ -31,9 +31,9 @@ interface UploadedDocument {
 
 ```typescript
 interface PresignedUrlResult {
-  uploadUrl: string;     // Presigned PUT URL
-  key: string;           // Storage key for confirmation
-  expiresAt: string;     // URL expiry timestamp
+  uploadUrl: string; // Presigned PUT URL
+  key: string; // Storage key for confirmation
+  expiresAt: string; // URL expiry timestamp
 }
 ```
 
@@ -41,15 +41,15 @@ interface PresignedUrlResult {
 
 The `R2StorageService` is a global service available throughout the application.
 
-| Method | Description |
-|--------|-------------|
-| `isAvailable()` | Check if R2 storage is configured |
-| `getPresignedUploadUrl()` | Generate URL for browser upload |
+| Method                      | Description                       |
+| --------------------------- | --------------------------------- |
+| `isAvailable()`             | Check if R2 storage is configured |
+| `getPresignedUploadUrl()`   | Generate URL for browser upload   |
 | `getPresignedDownloadUrl()` | Generate URL for browser download |
-| `uploadFile()` | Server-side direct upload |
-| `deleteFile()` | Remove file from storage |
-| `fileExists()` | Check if file exists |
-| `getPublicUrl()` | Get public URL for file |
+| `uploadFile()`              | Server-side direct upload         |
+| `deleteFile()`              | Remove file from storage          |
+| `fileExists()`              | Check if file exists              |
+| `getPublicUrl()`            | Get public URL for file           |
 
 ### Method Signatures
 
@@ -112,13 +112,14 @@ spaces/abc123/assets/def456/deed/550e8400-e29b-41d4-a716-446655440000.pdf
 
 ```typescript
 // 1. Request presigned URL from API
-const { uploadUrl, key } = await fetch('/manual-assets/:id/documents/upload-url?' +
-  new URLSearchParams({
-    filename: 'deed.pdf',
-    contentType: 'application/pdf',
-    category: 'deed'
-  })
-).then(r => r.json());
+const { uploadUrl, key } = await fetch(
+  '/manual-assets/:id/documents/upload-url?' +
+    new URLSearchParams({
+      filename: 'deed.pdf',
+      contentType: 'application/pdf',
+      category: 'deed',
+    })
+).then((r) => r.json());
 
 // 2. Upload directly to R2
 await fetch(uploadUrl, {
@@ -161,7 +162,7 @@ const document = await r2StorageService.uploadFile(
 ```typescript
 const downloadUrl = await r2StorageService.getPresignedDownloadUrl(
   documentKey,
-  3600  // 1 hour expiry
+  3600 // 1 hour expiry
 );
 // Client fetches from downloadUrl directly
 ```
@@ -170,13 +171,13 @@ const downloadUrl = await r2StorageService.getPresignedDownloadUrl(
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `R2_ACCOUNT_ID` | Cloudflare account ID | Yes |
-| `R2_ACCESS_KEY_ID` | R2 API access key ID | Yes |
-| `R2_SECRET_ACCESS_KEY` | R2 API secret key | Yes |
-| `R2_BUCKET_NAME` | Storage bucket name | No (default: `dhanam-documents`) |
-| `R2_PUBLIC_URL` | Public URL prefix for bucket | No |
+| Variable               | Description                  | Required                         |
+| ---------------------- | ---------------------------- | -------------------------------- |
+| `R2_ACCOUNT_ID`        | Cloudflare account ID        | Yes                              |
+| `R2_ACCESS_KEY_ID`     | R2 API access key ID         | Yes                              |
+| `R2_SECRET_ACCESS_KEY` | R2 API secret key            | Yes                              |
+| `R2_BUCKET_NAME`       | Storage bucket name          | No (default: `dhanam-documents`) |
+| `R2_PUBLIC_URL`        | Public URL prefix for bucket | No                               |
 
 ### Service Initialization
 
@@ -195,8 +196,8 @@ if (accountId && accessKeyId && secretAccessKey) {
 
 ```typescript
 const PRESIGNED_CONFIG = {
-  uploadExpiry: 3600,     // 1 hour for uploads
-  downloadExpiry: 3600,   // 1 hour for downloads
+  uploadExpiry: 3600, // 1 hour for uploads
+  downloadExpiry: 3600, // 1 hour for downloads
 };
 ```
 
@@ -216,10 +217,10 @@ export class StorageModule {}
 
 ## Related Modules
 
-| Module | Relationship |
-|--------|--------------|
-| `manual-assets` | Primary consumer for asset document storage |
-| `manual-assets/DocumentService` | High-level document management |
+| Module                          | Relationship                                |
+| ------------------------------- | ------------------------------------------- |
+| `manual-assets`                 | Primary consumer for asset document storage |
+| `manual-assets/DocumentService` | High-level document management              |
 
 ## File Metadata
 
@@ -269,12 +270,12 @@ pnpm test:cov -- r2
 
 ## Error Handling
 
-| Scenario | Behavior |
-|----------|----------|
+| Scenario          | Behavior                                           |
+| ----------------- | -------------------------------------------------- |
 | R2 not configured | `isAvailable()` returns false, methods throw error |
-| Invalid key | S3 client throws NotFound error |
-| Upload failed | Client receives error from R2 directly |
-| Expired URL | R2 rejects with 403 Forbidden |
+| Invalid key       | S3 client throws NotFound error                    |
+| Upload failed     | Client receives error from R2 directly             |
+| Expired URL       | R2 rejects with 403 Forbidden                      |
 
 ## Cloudflare R2 Features Used
 

@@ -79,10 +79,11 @@
 
 import { randomUUID, createHmac } from 'node:crypto';
 
-import { BillingEventType, BillingStatus, Currency } from '@db';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type Stripe from 'stripe';
+
+import { BillingEventType, BillingStatus, Currency } from '@db';
 
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
@@ -545,7 +546,7 @@ export class StripeMxSpeiRelayService {
         let statusCode: number | undefined;
         let errorMessage: string | undefined;
         let ok = false;
-        let responseBodySnippet = '';
+        let responseBodySnippet: string;
 
         try {
           const res = await fetch(url, {

@@ -25,17 +25,17 @@ Forj's browser-verified production state on 2026-04-24 showed the marketplace is
 
 ### What dhanam already has (keep, don't rebuild)
 
-| Capability | Status | Evidence |
-|---|---|---|
-| Multi-processor routing by geography | ✅ | `payment-router.service.ts:88-106` |
-| Subscription lifecycle (create/upgrade/pause/cancel/resume) | ✅ | `billing.controller.ts`, `cancellation.service.ts` |
-| Self-service billing portal | ✅ | `stripe-mx.service.ts:279-292`, `stripe.service.ts` portal methods |
-| Inbound webhook receiver, idempotent via `stripeEventId` unique | ✅ | `webhook-processor.service.ts`, schema L1168 |
-| Usage metering + daily quotas + alerts | ✅ | `usage-tracking.service.ts` |
-| Regional pricing (MXN / USD) + tier catalog | ✅ | `pricing-engine.service.ts` |
-| Tax (Stripe MX RFC collection, Paddle MoR) | ✅ | `stripe-mx.service.ts:146-150` |
-| Refund coordination via webhook events | ✅ | `BillingEventType.refund_issued` |
-| `@dhanam/billing-sdk` v0.2.0 published to `npm.madfam.io` | ✅ | `packages/billing-sdk/` |
+| Capability                                                      | Status | Evidence                                                           |
+| --------------------------------------------------------------- | ------ | ------------------------------------------------------------------ |
+| Multi-processor routing by geography                            | ✅     | `payment-router.service.ts:88-106`                                 |
+| Subscription lifecycle (create/upgrade/pause/cancel/resume)     | ✅     | `billing.controller.ts`, `cancellation.service.ts`                 |
+| Self-service billing portal                                     | ✅     | `stripe-mx.service.ts:279-292`, `stripe.service.ts` portal methods |
+| Inbound webhook receiver, idempotent via `stripeEventId` unique | ✅     | `webhook-processor.service.ts`, schema L1168                       |
+| Usage metering + daily quotas + alerts                          | ✅     | `usage-tracking.service.ts`                                        |
+| Regional pricing (MXN / USD) + tier catalog                     | ✅     | `pricing-engine.service.ts`                                        |
+| Tax (Stripe MX RFC collection, Paddle MoR)                      | ✅     | `stripe-mx.service.ts:146-150`                                     |
+| Refund coordination via webhook events                          | ✅     | `BillingEventType.refund_issued`                                   |
+| `@dhanam/billing-sdk` v0.2.0 published to `npm.madfam.io`       | ✅     | `packages/billing-sdk/`                                            |
 
 ### What's missing
 
@@ -52,17 +52,12 @@ Forj's browser-verified production state on 2026-04-24 showed the marketplace is
 A new file `apps/api/src/modules/billing/services/payment-processor.interface.ts` defines:
 
 ```ts
-export type ProcessorId =
-  | 'stripe'
-  | 'stripe_mx'
-  | 'paddle'
-  | 'conekta'
-  | 'polar';
+export type ProcessorId = 'stripe' | 'stripe_mx' | 'paddle' | 'conekta' | 'polar';
 
 export interface ProcessorCapabilities {
   subscriptions: boolean;
   oneOffCharges: boolean;
-  marketplace: boolean;       // accounts, destination charges, transfers, payouts
+  marketplace: boolean; // accounts, destination charges, transfers, payouts
   disputes: boolean;
   threeDSecure: boolean;
   taxCompliance: 'merchant-of-record' | 'automatic' | 'manual' | 'none';
@@ -268,6 +263,7 @@ Migration file: `20260424000000_add_marketplace_and_webhook_schema`.
 ### 3. NestJS modules
 
 **`MarketplaceModule`** (new): `apps/api/src/modules/marketplace/`
+
 - `marketplace.module.ts`
 - `merchants.controller.ts` → `POST/GET /billing/merchants`, `POST /billing/merchants/:id/onboarding-link`, `GET /billing/merchants/:id/balance`
 - `charges.controller.ts` → `POST /billing/charges` (destination charges)
@@ -283,6 +279,7 @@ Migration file: `20260424000000_add_marketplace_and_webhook_schema`.
 All injected through the existing `BillingModule` to share the adapter pool.
 
 **`WebhookOutboundModule`** (new): `apps/api/src/modules/webhook-outbound/`
+
 - `webhook-outbound.module.ts`
 - `endpoints.controller.ts` → `POST/GET/DELETE /billing/webhook-endpoints`, `POST /.../:id/replay-failed`
 - `services/svix.client.ts` — thin wrapper around `svix` npm package pointing at `SVIX_API_URL` env var (self-hosted URL, e.g. `http://svix.svix-system.svc.cluster.local:8071`)
@@ -307,6 +304,7 @@ Dhanam accesses Svix via `SVIX_API_URL` + `SVIX_AUTH_TOKEN` secrets. No public e
 ### 5. SDK updates (`@dhanam/billing-sdk` → v0.3.0)
 
 New exports:
+
 - `DhanamClient.merchants.create / get / onboardingLink / balance`
 - `DhanamClient.charges.createDestinationCharge`
 - `DhanamClient.transfers.create / list`
@@ -316,6 +314,7 @@ New exports:
 - `verifyMarketplaceWebhookSignature` — identical signature format to the existing subscription webhook, so consumers can use one verifier
 
 New event types in `DhanamWebhookEventType`:
+
 - `merchant.onboarded`
 - `merchant.disabled`
 - `merchant.requirements_updated`
@@ -374,6 +373,7 @@ Expected calendar: 3 weeks from merge of this PR to forj fully migrated. 6 weeks
 ### 9. What this PR delivers vs. defers
 
 **Delivered in this PR:**
+
 - RFC (this document)
 - `IPaymentProcessor` interface + all three existing adapters conforming
 - Prisma schema migration
@@ -385,6 +385,7 @@ Expected calendar: 3 weeks from merge of this PR to forj fully migrated. 6 weeks
 - Tests at ~47% coverage ratio matching current billing module standard
 
 **Deferred (separate issues on dhanam repo):**
+
 - SetupIntent / saved payment methods (tier 4)
 - 3D-Secure enforcement (tier 4)
 - Processor-to-processor customer migration (tier 4)
@@ -402,6 +403,7 @@ Expected calendar: 3 weeks from merge of this PR to forj fully migrated. 6 weeks
 ## Appendix: file manifest
 
 **New files:**
+
 - `docs/rfcs/connect-marketplace.md` (this document)
 - `apps/api/src/modules/billing/services/payment-processor.interface.ts`
 - `apps/api/src/modules/marketplace/marketplace.module.ts`
@@ -414,6 +416,7 @@ Expected calendar: 3 weeks from merge of this PR to forj fully migrated. 6 weeks
 - `apps/api/prisma/migrations/20260424000000_add_marketplace_and_webhook_schema/migration.sql`
 
 **Modified files:**
+
 - `apps/api/prisma/schema.prisma` (add 7 models + User relation back-ref)
 - `apps/api/src/modules/billing/stripe.service.ts` (add marketplace methods)
 - `apps/api/src/modules/billing/services/stripe-mx.service.ts` (conform interface, capabilities)
@@ -429,6 +432,7 @@ Expected calendar: 3 weeks from merge of this PR to forj fully migrated. 6 weeks
 - `packages/billing-sdk/package.json` (bump to 0.3.0)
 
 **Test files** (new, co-located under `__tests__/`):
+
 - Adapter conformance test (every processor implements the interface)
 - Stripe Connect service unit tests
 - Marketplace controller E2E tests
@@ -437,4 +441,4 @@ Expected calendar: 3 weeks from merge of this PR to forj fully migrated. 6 weeks
 
 ---
 
-*This RFC is implemented in the same PR as the RFC itself lands. Reviewers: please evaluate the proposal and the code together — the implementation is the proof the proposal is tractable.*
+_This RFC is implemented in the same PR as the RFC itself lands. Reviewers: please evaluate the proposal and the code together — the implementation is the proof the proposal is tractable._
