@@ -479,8 +479,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     retryable: boolean;
   } {
     const message = error.message.toLowerCase();
+    const statusCode = (error as unknown as Record<string, unknown>).statusCode;
     const errorCode =
       ((error as unknown as Record<string, unknown>).code as string)?.toLowerCase() ?? '';
+
+    // Fastify plugin errors are plain Error instances with statusCode attached,
+    // so map rate-limit errors before they fall through to INTERNAL_ERROR.
+    if (statusCode === HttpStatus.TOO_MANY_REQUESTS || message.includes('rate limit exceeded')) {
+      return {
+        status: HttpStatus.TOO_MANY_REQUESTS,
+        code: ErrorCode.RATE_LIMITED,
+        retryable: true,
+      };
+    }
 
     // Network errors
     if (

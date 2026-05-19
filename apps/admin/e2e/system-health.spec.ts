@@ -7,12 +7,16 @@ test.describe('System Health', () => {
   });
 
   test('should display the system health page heading', async ({ adminPage }) => {
-    const heading = adminPage.getByRole('heading', { name: 'System Health' });
+    const heading = adminPage
+      .getByRole('main')
+      .getByRole('heading', { name: 'System Health', level: 1 });
     await expect(heading).toBeVisible({ timeout: 10000 });
   });
 
   test('should display the page subtitle', async ({ adminPage }) => {
-    await expect(adminPage.getByText('Monitor system status and performance')).toBeVisible({
+    await expect(
+      adminPage.getByRole('main').getByText('Monitor system status and performance')
+    ).toBeVisible({
       timeout: 10000,
     });
   });
@@ -28,7 +32,7 @@ test.describe('System Health', () => {
     const serviceNames = ['Database', 'Redis', 'Job Queues', 'Providers'];
 
     for (const name of serviceNames) {
-      await expect(adminPage.getByText(name, { exact: true })).toBeVisible({
+      await expect(adminPage.getByRole('main').getByText(name, { exact: true })).toBeVisible({
         timeout: 10000,
       });
     }

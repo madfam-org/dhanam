@@ -1,6 +1,24 @@
 import { test as base, expect, Page } from '@playwright/test';
 import { loginAsGuest, loginWithCredentials, logout } from './auth';
 
+async function gotoAuthenticatedDashboard(page: Page): Promise<void> {
+  try {
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (!message.includes('net::ERR_ABORTED')) {
+      throw error;
+    }
+
+    if (!/\/dashboard/.test(page.url())) {
+      await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    }
+  }
+
+  await expect(page).toHaveURL(/\/dashboard/);
+  await expect(page.locator('main')).toBeVisible();
+}
+
 /**
  * Extended test fixtures with authentication helpers
  */
@@ -12,9 +30,9 @@ export const test = base.extend<{
    * Page pre-authenticated as a guest demo user
    */
   guestPage: async ({ page }, use) => {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await loginAsGuest(page);
-    await page.goto('/dashboard');
+    await gotoAuthenticatedDashboard(page);
     await use(page);
     await logout(page);
   },
@@ -26,16 +44,15 @@ export const test = base.extend<{
     const email = process.env.E2E_TEST_EMAIL || 'test@dhanam.demo';
     const password = process.env.E2E_TEST_PASSWORD || 'TestPassword123!';
 
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     try {
       await loginWithCredentials(page, email, password);
-      await page.goto('/dashboard');
     } catch {
       // Fallback to guest login if credentials don't work
       await loginAsGuest(page);
-      await page.goto('/dashboard');
     }
 
+    await gotoAuthenticatedDashboard(page);
     await use(page);
     await logout(page);
   },

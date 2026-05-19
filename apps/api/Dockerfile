@@ -10,8 +10,8 @@ FROM node:20-alpine AS base
 # Install dependencies for native modules (including Python for node-gyp)
 RUN apk add --no-cache libc6-compat openssl python3 make g++
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@8.6.7 --activate
+# Install the repo-pinned pnpm version so Docker builds understand lockfile v9.
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 

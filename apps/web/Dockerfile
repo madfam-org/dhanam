@@ -10,8 +10,9 @@ FROM node:20-alpine AS base
 # Install dependencies for native modules
 RUN apk add --no-cache libc6-compat
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@8.6.7 --activate
+# Install the repo-pinned pnpm version. The lockfile is v9, so older pnpm
+# releases fail Enclii/Kaniko builds even when local CI package builds pass.
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 
 WORKDIR /app
 

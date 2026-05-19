@@ -386,6 +386,24 @@ describe('GlobalExceptionFilter', () => {
       );
     });
 
+    it('should map Fastify rate limit errors to 429', () => {
+      const exception = Object.assign(new Error('Rate limit exceeded, retry in 1 minute'), {
+        statusCode: 429,
+      });
+
+      filter.catch(exception, mockHost);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(429);
+      expect(mockResponse.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: expect.objectContaining({
+            code: 'S008',
+            retryable: true,
+          }),
+        })
+      );
+    });
+
     it('should handle non-Error exceptions', () => {
       const exception = { arbitrary: 'object' };
 

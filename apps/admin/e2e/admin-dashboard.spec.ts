@@ -7,7 +7,7 @@ test.describe('Admin Dashboard', () => {
   });
 
   test('should display the dashboard page heading', async ({ adminPage }) => {
-    const heading = adminPage.getByRole('heading', { name: 'Admin Dashboard' });
+    const heading = adminPage.getByRole('main').getByRole('heading', { name: 'Admin Dashboard' });
     await expect(heading).toBeVisible();
   });
 

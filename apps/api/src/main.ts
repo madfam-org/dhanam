@@ -106,25 +106,29 @@ async function bootstrap() {
     },
   });
 
-  // Rate limiting
-
-  await app.register(fastifyRateLimit as any, {
-    max: configService.get('RATE_LIMIT_MAX') ? parseInt(configService.get('RATE_LIMIT_MAX')!) : 100,
-    timeWindow: (configService.get('RATE_LIMIT_WINDOW') as string) || '15 minutes',
-    allowList: (req) => {
-      const path = req.url?.split('?')[0] || '';
-      return [
-        '/v1/monitoring/health',
-        '/v1/monitoring/health/live',
-        '/v1/monitoring/health/ready',
-        '/v1/monitoring/ready',
-        '/metrics',
-        '/health',
-        '/health/full',
-        '/ready',
-      ].includes(path);
-    },
-  });
+  // Rate limiting. E2E runs boot the production entrypoint with NODE_ENV=test
+  // and need deterministic auth/bootstrap calls without global IP throttling.
+  if (configService.get('NODE_ENV') !== 'test') {
+    await app.register(fastifyRateLimit as any, {
+      max: configService.get('RATE_LIMIT_MAX')
+        ? parseInt(configService.get('RATE_LIMIT_MAX')!)
+        : 100,
+      timeWindow: (configService.get('RATE_LIMIT_WINDOW') as string) || '15 minutes',
+      allowList: (req) => {
+        const path = req.url?.split('?')[0] || '';
+        return [
+          '/v1/monitoring/health',
+          '/v1/monitoring/health/live',
+          '/v1/monitoring/health/ready',
+          '/v1/monitoring/ready',
+          '/metrics',
+          '/health',
+          '/health/full',
+          '/ready',
+        ].includes(path);
+      },
+    });
+  }
 
   // Global middleware and filters
   app.use(new RequestIdMiddleware().use);

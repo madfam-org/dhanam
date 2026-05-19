@@ -1,4 +1,16 @@
+import type { Page } from '@playwright/test';
+
 import { test, expect } from './helpers/fixtures';
+
+async function expectPageHeading(page: Page) {
+  await expect(page.locator('h1')).toBeVisible();
+}
+
+async function navigateBySidebarLabel(page: Page, label: RegExp, urlPattern: string | RegExp) {
+  await page.getByRole('link', { name: label }).click();
+  await page.waitForURL(urlPattern);
+  await expectPageHeading(page);
+}
 
 /**
  * Core User Journey E2E Tests
@@ -14,7 +26,7 @@ import { test, expect } from './helpers/fixtures';
 test.describe('Core User Journey', () => {
   test('guest user can access dashboard', async ({ guestPage }) => {
     // guestPage fixture already navigates to /dashboard after guest login
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await expectPageHeading(guestPage);
     await expect(guestPage).toHaveURL(/dashboard/);
   });
 
@@ -26,62 +38,46 @@ test.describe('Core User Journey', () => {
   });
 
   test('can navigate to accounts page', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-accounts"] a').click();
-    await guestPage.waitForURL('**/accounts');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Accounts$/, '**/accounts');
   });
 
   test('can navigate to transactions page', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-transactions"] a').click();
-    await guestPage.waitForURL('**/transactions');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Transactions$/, '**/transactions');
   });
 
   test('can navigate to budgets page', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-budgets"] a').click();
-    await guestPage.waitForURL('**/budgets');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Budgets$/, '**/budgets');
   });
 
   test('can navigate to analytics page', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-analytics"] a').click();
-    await guestPage.waitForURL('**/analytics');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Analytics$/, '**/analytics');
   });
 
   test('can navigate to settings page', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-settings"] a').click();
-    await guestPage.waitForURL('**/settings');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Settings$/, '**/settings');
   });
 
   test('can navigate to assets page', async ({ guestPage }) => {
     // Assets is not in the sidebar nav; navigate directly
-    await guestPage.goto('/assets');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await guestPage.goto('/assets', { waitUntil: 'domcontentloaded' });
+    await expectPageHeading(guestPage);
   });
 
   test('can navigate to estate planning', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-estatePlanning"] a').click();
-    await guestPage.waitForURL('**/estate-planning');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Estate Planning$/, '**/estate-planning');
   });
 
   test('can navigate to households', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-households"] a').click();
-    await guestPage.waitForURL('**/households');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Households$/, '**/households');
   });
 
   test('can navigate to reports', async ({ guestPage }) => {
-    await guestPage.locator('[data-tour="sidebar-reports"] a').click();
-    await guestPage.waitForURL('**/reports');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await navigateBySidebarLabel(guestPage, /^Reports$/, '**/reports');
   });
 
   test('can navigate to notifications', async ({ guestPage }) => {
     // Notifications is not in the sidebar nav; navigate directly
-    await guestPage.goto('/notifications');
-    await expect(guestPage.locator('h1')).toBeVisible();
+    await guestPage.goto('/notifications', { waitUntil: 'domcontentloaded' });
+    await expectPageHeading(guestPage);
   });
 });
