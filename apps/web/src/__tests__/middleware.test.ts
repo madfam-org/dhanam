@@ -7,6 +7,8 @@
  * rather than running the full middleware function.
  */
 
+import { getHostnameFromHostHeader, getWwwApexRedirectUrl } from '../lib/routing/hosts';
+
 describe('middleware public paths', () => {
   // We extract and test the routing logic by checking what the middleware
   // source defines as public. This avoids needing edge-runtime globals.
@@ -117,6 +119,39 @@ describe('middleware public paths', () => {
 
     it('/terms/of-service should match /terms', () => {
       expect(isPublicPath('/terms/of-service')).toBe(true);
+    });
+  });
+});
+
+describe('middleware host routing helpers', () => {
+  describe('getHostnameFromHostHeader', () => {
+    it('removes a forwarded internal port from public host headers', () => {
+      expect(getHostnameFromHostHeader('www.dhan.am:4200')).toBe('www.dhan.am');
+    });
+
+    it('uses the first value from a comma-separated forwarded host header', () => {
+      expect(getHostnameFromHostHeader('www.dhan.am, dhanam-web:4200')).toBe('www.dhan.am');
+    });
+  });
+
+  describe('getWwwApexRedirectUrl', () => {
+    it('redirects www.dhan.am to apex without leaking the internal service port', () => {
+      const redirectUrl = getWwwApexRedirectUrl('https://www.dhan.am:4200/', 'www.dhan.am');
+
+      expect(redirectUrl?.toString()).toBe('https://dhan.am/');
+    });
+
+    it('preserves path and query while canonicalizing www to apex', () => {
+      const redirectUrl = getWwwApexRedirectUrl(
+        'https://www.dhan.am:4200/es?utm_source=test',
+        'www.dhan.am:4200'
+      );
+
+      expect(redirectUrl?.toString()).toBe('https://dhan.am/es?utm_source=test');
+    });
+
+    it('does not redirect non-www hosts', () => {
+      expect(getWwwApexRedirectUrl('https://app.dhan.am/login', 'app.dhan.am')).toBeNull();
     });
   });
 });

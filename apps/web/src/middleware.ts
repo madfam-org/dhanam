@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { AUTH_CONSTANTS } from './lib/constants';
+import { getHostnameFromHostHeader, getWwwApexRedirectUrl } from './lib/routing/hosts';
 
 // Paths that don't require authentication
 const publicPaths = [
@@ -54,15 +55,15 @@ function getLocaleFromCountry(country: string | null): string {
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const hostname = request.headers.get('host') || '';
+  const hostHeader =
+    request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.host;
+  const hostname = getHostnameFromHostHeader(hostHeader);
   const token = request.cookies.get('auth-storage');
 
   // === WWW → APEX REDIRECT ===
-  if (hostname.startsWith('www.')) {
-    const apex = hostname.replace(/^www\./, '');
-    const url = new URL(request.url);
-    url.hostname = apex;
-    return NextResponse.redirect(url, 301);
+  const apexRedirectUrl = getWwwApexRedirectUrl(request.url, hostHeader);
+  if (apexRedirectUrl) {
+    return NextResponse.redirect(apexRedirectUrl, 301);
   }
 
   // === ADMIN SUBDOMAIN HANDLING ===
