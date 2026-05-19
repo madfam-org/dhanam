@@ -3,7 +3,19 @@ import { ValidationPipe } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 
-import { AppModule } from '../../../src/app.module';
+function disableExternalProviderCredentialsForE2E() {
+  process.env.PLAID_CLIENT_ID = '';
+  process.env.PLAID_SECRET = '';
+}
+
+function configureE2EAuthEnvironment() {
+  process.env.AUTH_MODE = 'local';
+  process.env.ENABLE_LOCAL_AUTH = 'true';
+  process.env.JANUA_ISSUER = process.env.JANUA_ISSUER || 'https://auth.test.madfam.local';
+  process.env.JANUA_JWKS_URI =
+    process.env.JANUA_JWKS_URI || 'https://auth.test.madfam.local/.well-known/jwks.json';
+  process.env.JANUA_AUDIENCE = process.env.JANUA_AUDIENCE || 'dhanam-api';
+}
 
 /**
  * Creates and initialises a NestFastifyApplication for E2E tests.
@@ -14,6 +26,10 @@ import { AppModule } from '../../../src/app.module';
  *  - Global prefix v1
  */
 export async function createE2EApp(): Promise<NestFastifyApplication> {
+  configureE2EAuthEnvironment();
+  disableExternalProviderCredentialsForE2E();
+  const { AppModule } = await import('../../../src/app.module');
+
   const moduleFixture = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();

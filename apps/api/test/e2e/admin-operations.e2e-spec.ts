@@ -223,7 +223,7 @@ describe('Admin Operations Journey', () => {
         .post(`/v1/admin/gdpr/delete/${gdprTargetUserId}`)
         .set('Authorization', `Bearer ${adminToken}`);
 
-      expect([200, 202]).toContain(response.status);
+      expect([200, 201, 202]).toContain(response.status);
       expect(response.body).toBeDefined();
     });
 

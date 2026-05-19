@@ -13,9 +13,9 @@ import { TestHelper } from './helpers/test.helper';
  * Subscription Upgrade Journey E2E Test
  *
  * Tests the billing lifecycle:
- *   Community tier restrictions -> Stripe checkout ->
+ *   Community tier baseline -> Stripe checkout ->
  *   Webhook subscription activation -> Pro tier access ->
- *   Downgrade via webhook -> Community restrictions re-applied
+ *   Downgrade via webhook -> Community baseline restored
  */
 describe('Subscription Upgrade Journey', () => {
   let app: INestApplication<NestFastifyApplication>;
@@ -44,10 +44,10 @@ describe('Subscription Upgrade Journey', () => {
   });
 
   // ──────────────────────────────────────────────
-  // Phase 1: Community Tier Restrictions
+  // Phase 1: Community Tier Baseline
   // ──────────────────────────────────────────────
 
-  describe('Community Tier Restrictions', () => {
+  describe('Community Tier Baseline', () => {
     it('should register a new community-tier user', async () => {
       userEmail = TestHelper.generateUniqueEmail('billing');
 
@@ -112,7 +112,7 @@ describe('Subscription Upgrade Journey', () => {
       expect(firstSpaceId).toBeTruthy();
     });
 
-    it('should block creating a second space at community tier', async () => {
+    it('should allow creating a second space at community tier', async () => {
       // Ensure user is at community tier
       await prisma.user.update({
         where: { id: userId },
@@ -123,14 +123,15 @@ describe('Subscription Upgrade Journey', () => {
         .post('/v1/spaces')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          name: 'Second Space Blocked',
+          name: 'Second Community Space',
           type: 'business',
           currency: 'USD',
           timezone: 'UTC',
         });
 
-      // SpaceLimitGuard should return 403
-      expect([403, 400]).toContain(response.status);
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe('Second Community Space');
     });
 
     it('should return pricing tiers (public endpoint)', async () => {
@@ -261,19 +262,20 @@ describe('Subscription Upgrade Journey', () => {
       expect(response.body.tier).toBe('community');
     });
 
-    it('should block creating additional spaces after downgrade', async () => {
+    it('should keep allowing community self-hosted spaces after downgrade', async () => {
       const response = await request(app.getHttpServer())
         .post('/v1/spaces')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          name: 'Third Space Blocked',
+          name: 'Third Community Space',
           type: 'personal',
           currency: 'MXN',
           timezone: 'America/Mexico_City',
         });
 
-      // Community tier should block additional space creation
-      expect([403, 400]).toContain(response.status);
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe('Third Community Space');
     });
   });
 

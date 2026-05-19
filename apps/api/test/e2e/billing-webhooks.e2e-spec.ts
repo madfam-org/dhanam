@@ -20,12 +20,10 @@ import { TestHelper } from './helpers/test.helper';
  *   subscription.deleted -> downgrade ->
  *   webhook security (signature, idempotency, unknown events)
  *
- * Note: Stripe webhook endpoints verify signatures using
- * STRIPE_WEBHOOK_SECRET. In the test environment, the webhook
- * handler checks the raw body against the stripe-signature header.
- * Since we cannot generate valid Stripe signatures without the
- * actual Stripe SDK secret, many tests simulate the webhook effect
- * via direct DB updates and verify the billing status endpoint.
+ * Note: Stripe webhook endpoints verify signatures using STRIPE_WEBHOOK_SECRET
+ * and fail closed on missing config or invalid signatures. These tests simulate
+ * webhook effects via direct DB updates, then assert the endpoint rejects
+ * unsigned requests without mutating billing state.
  */
 describe('Billing Webhooks Journey', () => {
   let app: INestApplication<NestFastifyApplication>;
@@ -125,10 +123,7 @@ describe('Billing Webhooks Journey', () => {
         .set('stripe-signature', 'invalid_test_signature')
         .send(payload);
 
-      // The webhook handler returns 200 with { received: false } on
-      // signature failure, or 200 with { received: true } on success
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty('received');
+      expect(response.status).toBe(400);
     });
   });
 
@@ -161,7 +156,7 @@ describe('Billing Webhooks Journey', () => {
         .set('stripe-signature', 'invalid_test_signature')
         .send(payload);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
 
       // Tier should remain essentials during grace period
       const statusResponse = await request(app.getHttpServer())
@@ -191,19 +186,20 @@ describe('Billing Webhooks Journey', () => {
       expect(response.body.tier).toBe('community');
     });
 
-    it('should enforce community restrictions after downgrade', async () => {
-      // Try creating a second space which should be blocked at community
+    it('should keep community space creation aligned with self-hosted limits after downgrade', async () => {
       const response = await request(app.getHttpServer())
         .post('/v1/spaces')
         .set('Authorization', `Bearer ${authToken}`)
         .send({
-          name: 'Blocked Space',
+          name: 'Community Business Space',
           type: 'business',
           currency: 'USD',
           timezone: 'UTC',
         });
 
-      expect([400, 403]).toContain(response.status);
+      expect(response.status).toBe(201);
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.name).toBe('Community Business Space');
     });
   });
 
@@ -220,9 +216,7 @@ describe('Billing Webhooks Journey', () => {
         .set('stripe-signature', 'completely_invalid_signature_value')
         .send(payload);
 
-      // Controller returns 200 with { received: false, error: 'Invalid signature' }
-      expect(response.status).toBe(200);
-      expect(response.body.received).toBe(false);
+      expect(response.status).toBe(400);
     });
 
     it('should handle missing signature header', async () => {
@@ -230,9 +224,7 @@ describe('Billing Webhooks Journey', () => {
 
       const response = await request(app.getHttpServer()).post('/v1/billing/webhook').send(payload);
 
-      // Missing stripe-signature header
-      expect(response.status).toBe(200);
-      expect(response.body.received).toBe(false);
+      expect(response.status).toBe(400);
     });
 
     it('should acknowledge unknown event types', async () => {
@@ -251,9 +243,7 @@ describe('Billing Webhooks Journey', () => {
         .set('stripe-signature', 'test_sig')
         .send(unknownPayload);
 
-      // Webhook handler returns 200 even for unknown events
-      // (after signature check which may fail)
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
     });
 
     it('should handle empty webhook body', async () => {
@@ -262,7 +252,7 @@ describe('Billing Webhooks Journey', () => {
         .set('stripe-signature', 'test_sig')
         .send({});
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
     });
   });
 
