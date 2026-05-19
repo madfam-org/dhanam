@@ -44,6 +44,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
       - name: Install dependencies
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/dhanam_test
         run: pnpm install --frozen-lockfile
 
       - name: Check for schema drift
@@ -57,11 +59,11 @@ jobs:
           # Deploy migrations to test database
           pnpm db:migrate:deploy
 
-          # Check for schema drift (deployed database state vs schema.prisma)
-          # This compares what the database has vs what schema.prisma defines
+          # Check for schema drift (deployed database state vs schema.prisma).
+          # Prisma v7 reads the datasource from prisma.config.ts.
           pnpm prisma migrate diff \
-            --from-url "$DATABASE_URL" \
-            --to-schema-datamodel prisma/schema.prisma \
+            --from-config-datasource \
+            --to-schema prisma/schema.prisma \
             --exit-code || {
             echo "❌ Schema drift detected!"
             echo "The schema.prisma file doesn't match the deployed migrations."
@@ -140,6 +142,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
       - name: Install dependencies
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/dhanam_test
         run: pnpm install --frozen-lockfile
 
       - name: Test rollback capability

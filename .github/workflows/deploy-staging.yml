@@ -90,6 +90,13 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.WEB_IMAGE }}:staging-${{ steps.sha.outputs.short }}
             ${{ env.REGISTRY }}/${{ env.WEB_IMAGE }}:staging-latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.STAGING_WEB_API_URL || 'https://staging-api.dhan.am/v1' }}
+            NEXT_PUBLIC_BASE_URL=${{ vars.STAGING_WEB_URL || 'https://staging.dhan.am' }}
+            NEXT_PUBLIC_ADMIN_URL=${{ vars.STAGING_ADMIN_URL || 'https://staging-admin.dhan.am' }}
+            NEXT_PUBLIC_OIDC_ISSUER=${{ vars.STAGING_OIDC_ISSUER || '' }}
+            NEXT_PUBLIC_OIDC_CLIENT_ID=${{ vars.STAGING_OIDC_CLIENT_ID || '' }}
+            NEXT_PUBLIC_JANUA_API_URL=${{ vars.STAGING_JANUA_API_URL || '' }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,scope=web,mode=max
 

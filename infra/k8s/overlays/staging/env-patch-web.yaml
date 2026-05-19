@@ -17,6 +17,8 @@ spec:
               value: "https://staging-api.dhan.am/v1"
             - name: NEXT_PUBLIC_BASE_URL
               value: "https://staging.dhan.am"
+            - name: NEXT_PUBLIC_ADMIN_URL
+              value: "https://staging-admin.dhan.am"
             - name: SENTRY_ENVIRONMENT
               value: "staging"
             - name: SENTRY_RELEASE

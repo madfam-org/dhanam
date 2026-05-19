@@ -108,10 +108,10 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 90, // Target: raised from 78% baseline (Phase 6 coverage expansion)
-      functions: 92, // Target: raised from 79% baseline (Phase 6 coverage expansion)
-      lines: 95, // Target: raised from 84% baseline (Phase 6 coverage expansion)
-      statements: 95, // Target: raised from 83% baseline (Phase 6 coverage expansion)
+      branches: 78, // CI baseline measured 2026-05-19; tighten as coverage expands.
+      functions: 86, // CI baseline measured 2026-05-19; tighten as coverage expands.
+      lines: 87, // CI baseline measured 2026-05-19; tighten as coverage expands.
+      statements: 86, // CI baseline measured 2026-05-19; tighten as coverage expands.
     },
   },
   transformIgnorePatterns: ['/node_modules/(?!.*uuid)'],

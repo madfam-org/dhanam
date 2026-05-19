@@ -804,7 +804,8 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/dhanam_pw
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: apps/web
 
       - name: Build packages, API, and web app
         run: |
@@ -858,7 +859,7 @@ jobs:
 
       - name: Run Playwright tests
         working-directory: apps/web
-        run: npx playwright test --project=chromium
+        run: pnpm exec playwright test --project=chromium
         env:
           E2E_BASE_URL: http://localhost:3040
           CI: true
@@ -964,7 +965,8 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/dhanam_pw_admin
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: apps/admin
 
       - name: Build packages, API, and admin app
         run: |
@@ -1016,7 +1018,7 @@ jobs:
 
       - name: Run Playwright admin tests
         working-directory: apps/admin
-        run: npx playwright test --project=chromium
+        run: pnpm exec playwright test --project=chromium
         env:
           E2E_BASE_URL: http://localhost:3400
           CI: true
