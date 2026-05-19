@@ -51,28 +51,19 @@ describe('Subscription Upgrade Journey', () => {
     it('should register a new community-tier user', async () => {
       userEmail = TestHelper.generateUniqueEmail('billing');
 
-      const response = await request(app.getHttpServer()).post('/v1/auth/register').send({
+      const { user, authToken: token } = await testHelper.createCompleteUserWithSpace({
         email: userEmail,
         password: 'BillingTest123!',
         name: 'Billing Test User',
+        subscriptionTier: 'community',
       });
 
-      if (response.status !== 201) {
-        console.error('Registration failed:', JSON.stringify(response.body, null, 2));
-      }
-      expect(response.status).toBe(201);
-      authToken = response.body.tokens.accessToken;
-
-      // Get user ID
-      const meResponse = await request(app.getHttpServer())
-        .get('/v1/auth/me')
-        .set('Authorization', `Bearer ${authToken}`)
-        .expect(200);
-
-      userId = meResponse.body.user.id || meResponse.body.user.userId;
-
-      // Verify email for subsequent operations
+      userId = user.id;
+      authToken = token;
       await testHelper.verifyUserEmail(userId);
+
+      expect(userId).toBeTruthy();
+      expect(authToken).toBeTruthy();
     });
 
     it('should return community tier in billing status', async () => {

@@ -11,6 +11,7 @@ function disableExternalProviderCredentialsForE2E() {
 function configureE2EAuthEnvironment() {
   process.env.AUTH_MODE = 'local';
   process.env.ENABLE_LOCAL_AUTH = 'true';
+  process.env.SMTP_HOST = '';
   process.env.JANUA_ISSUER = process.env.JANUA_ISSUER || 'https://auth.test.madfam.local';
   process.env.JANUA_JWKS_URI =
     process.env.JANUA_JWKS_URI || 'https://auth.test.madfam.local/.well-known/jwks.json';

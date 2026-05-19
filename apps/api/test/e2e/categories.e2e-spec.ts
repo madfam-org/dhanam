@@ -1,12 +1,10 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
-import { AppModule } from '../../src/app.module';
 import { PrismaService } from '../../src/core/prisma/prisma.service';
 
+import { createE2EApp } from './helpers/e2e-app.helper';
 import { TestHelper } from './helpers/test.helper';
 
 describe('Categories E2E', () => {
@@ -21,20 +19,12 @@ describe('Categories E2E', () => {
   let categoryId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-    app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-    app.setGlobalPrefix('v1');
+    app = await createE2EApp();
 
     prisma = app.get<PrismaService>(PrismaService);
     jwtService = app.get<JwtService>(JwtService);
     testHelper = new TestHelper(prisma, jwtService);
 
-    await app.init();
-    await app.getHttpAdapter().getInstance().ready();
     await testHelper.cleanDatabase();
   }, 30000);
 
@@ -98,7 +88,6 @@ describe('Categories E2E', () => {
           .expect(201);
 
         expect(response.body).toHaveProperty('id');
-        console.log('Created Category ID:', response.body.id);
         categoryId = response.body.id;
 
         expect(response.body.name).toBe('Food & Dining');

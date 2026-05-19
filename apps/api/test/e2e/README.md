@@ -48,6 +48,18 @@ pnpm test:e2e --coverage
 pnpm test:e2e --watch
 ```
 
+## Runtime Bootstrap
+
+E2E suites should use `helpers/e2e-app.helper.ts` to create the Nest app. The
+helper sets local auth mode before importing `AppModule`, disables external
+Plaid credentials, suppresses SMTP delivery, applies the shared validation pipe,
+and waits for Fastify readiness.
+
+Set `DATABASE_URL` and `REDIS_URL` explicitly when running against local
+containers. Bull queues are initialized from `REDIS_URL`, including database
+selection from the path segment, so isolated E2E runs can use a dedicated Redis
+database or port without leaking queue state across suites.
+
 ## Test Database Setup
 
 The tests use a separate test database that is automatically created and cleaned up. The `TestHelper` class provides utilities for:

@@ -1,5 +1,6 @@
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AuditModule } from '@core/audit/audit.module';
 import { AuthModule } from '@core/auth/auth.module';
@@ -42,6 +43,28 @@ import { UsersModule } from '@modules/users/users.module';
 import { configuration } from './config/configuration';
 import { validationSchema } from './config/validation';
 
+function redisOptionsFromUrl(redisUrl?: string) {
+  if (!redisUrl) {
+    return {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: Number(process.env.REDIS_PORT || 6379),
+      password: process.env.REDIS_PASSWORD || undefined,
+      db: Number(process.env.REDIS_DB || 0),
+    };
+  }
+
+  const url = new URL(redisUrl);
+  const db = url.pathname && url.pathname !== '/' ? Number(url.pathname.slice(1)) : undefined;
+
+  return {
+    host: url.hostname,
+    port: Number(url.port || 6379),
+    username: url.username ? decodeURIComponent(url.username) : undefined,
+    password: url.password ? decodeURIComponent(url.password) : undefined,
+    db: Number.isFinite(db) ? db : undefined,
+  };
+}
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -49,6 +72,13 @@ import { validationSchema } from './config/validation';
       load: [configuration],
       validationSchema,
       cache: true,
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        redis: redisOptionsFromUrl(config.get<string>('REDIS_URL')),
+      }),
     }),
     CoreModule,
     EventsModule,
