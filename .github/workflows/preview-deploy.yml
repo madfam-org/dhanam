@@ -123,7 +123,7 @@ jobs:
           # Need write access to push back to the PR branch. Default
           # GITHUB_TOKEN is insufficient for fork-guarded workflows only;
           # same-repo PRs work fine with the default token.
-          token: ${{ secrets.MADFAM_BOT_PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ github.token }}
           fetch-depth: 0
 
       - name: Patch preview overlay api digest
