@@ -17,4 +17,5 @@ export interface AuthenticatedUser {
   locale: string;
   timezone: string;
   totpEnabled: boolean;
+  isAdmin?: boolean;
 }

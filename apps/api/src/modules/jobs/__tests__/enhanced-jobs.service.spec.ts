@@ -69,6 +69,7 @@ describe('EnhancedJobsService', () => {
           useValue: {
             registerWorker: jest.fn(),
             scheduleRecurringJob: jest.fn(),
+            removeRecurringJob: jest.fn(),
             addSyncTransactionsJob: jest.fn(),
             addCategorizeTransactionsJob: jest.fn(),
             addESGUpdateJob: jest.fn(),
@@ -125,8 +126,8 @@ describe('EnhancedJobsService', () => {
   });
 
   describe('onModuleInit', () => {
-    it('should register workers and schedule recurring jobs', async () => {
-      queueService.scheduleRecurringJob.mockResolvedValue(undefined);
+    it('should register workers and remove obsolete generic recurring jobs', async () => {
+      queueService.removeRecurringJob.mockResolvedValue(false);
 
       await service.onModuleInit();
 
@@ -146,12 +147,22 @@ describe('EnhancedJobsService', () => {
         expect.any(Function)
       );
 
-      // Should schedule 4 recurring jobs
-      expect(queueService.scheduleRecurringJob).toHaveBeenCalledTimes(4);
+      expect(queueService.removeRecurringJob).toHaveBeenCalledTimes(4);
+      expect(queueService.removeRecurringJob).toHaveBeenCalledWith(
+        'categorize-transactions',
+        'hourly-categorization',
+        '0 * * * *'
+      );
+      expect(queueService.removeRecurringJob).toHaveBeenCalledWith(
+        'sync-transactions',
+        'crypto-portfolio-sync',
+        '0 */4 * * *'
+      );
+      expect(queueService.scheduleRecurringJob).not.toHaveBeenCalled();
     });
 
-    it('should handle scheduling errors gracefully', async () => {
-      queueService.scheduleRecurringJob.mockRejectedValue(new Error('Redis error'));
+    it('should handle recurring cleanup errors gracefully', async () => {
+      queueService.removeRecurringJob.mockRejectedValue(new Error('Redis error'));
 
       // Should not throw
       await expect(service.onModuleInit()).resolves.not.toThrow();
@@ -304,6 +315,11 @@ describe('EnhancedJobsService', () => {
 
       expect(prisma.space.findMany).toHaveBeenCalledWith({ select: { id: true } });
       expect(queueService.addCategorizeTransactionsJob).toHaveBeenCalledTimes(2);
+      expect(queueService.addCategorizeTransactionsJob).toHaveBeenCalledWith(
+        { spaceId: 'space-1' },
+        30,
+        expect.stringMatching(/^cron-categorize-space-1-\d{4}-\d{2}-\d{2}T\d{2}$/)
+      );
     });
   });
 
@@ -324,6 +340,17 @@ describe('EnhancedJobsService', () => {
         distinct: ['userId'],
       });
       expect(queueService.addSyncTransactionsJob).toHaveBeenCalledTimes(2);
+      expect(queueService.addSyncTransactionsJob).toHaveBeenCalledWith(
+        {
+          provider: 'bitso',
+          userId: 'user-1',
+          connectionId: 'conn-1',
+          fullSync: false,
+        },
+        50,
+        0,
+        expect.stringMatching(/^cron-sync-bitso-user-1-conn-1-\d{4}-\d{2}-\d{2}T\d{2}$/)
+      );
     });
   });
 
@@ -358,7 +385,8 @@ describe('EnhancedJobsService', () => {
           symbols: expect.arrayContaining(['BTC', 'ETH', 'ADA', 'DOT', 'SOL']),
           forceRefresh: false,
         }),
-        25
+        25,
+        expect.stringMatching(/^cron-esg-refresh-\d{4}-\d{2}-\d{2}T\d{2}$/)
       );
     });
 
@@ -381,7 +409,8 @@ describe('EnhancedJobsService', () => {
             'AVAX',
           ]),
         }),
-        25
+        25,
+        expect.stringMatching(/^cron-esg-refresh-\d{4}-\d{2}-\d{2}T\d{2}$/)
       );
     });
   });

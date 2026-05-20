@@ -17,6 +17,17 @@ This is the concise end-state from the production-stability push on
 
 - Added safe failed-job inspection and failed-job-only cleanup for BullMQ queues.
 - Updated admin/web queue controls to clear failed jobs only.
+- Hardened platform-admin authorization so space `owner` / `admin` membership
+  no longer grants global admin API access.
+- Removed obsolete generic BullMQ repeatable schedules on startup; the existing
+  cron dispatchers now enqueue concrete per-space/per-connection jobs with
+  stable IDs to avoid duplicate work across API replicas.
+- Hardened staging overlays so staging does not inherit production webhook
+  fan-out, PhyndCRM, `WEB_URL`, NextAuth, or Paddle production values.
+- Prevented staging digest bot commits from self-triggering another staging
+  deploy workflow.
+- Seeded the product catalog in API E2E app startup so billing/catalog-backed
+  tests do not depend on out-of-band database state.
 - Clarified provider health semantics for required, optional, and unconfigured
   providers.
 - Fixed the API chaos test command.
@@ -29,6 +40,8 @@ This is the concise end-state from the production-stability push on
 
 - Local pre-push hook passed format, typecheck, lint, tests, build, and Prisma
   validation.
+- Full local `pnpm test` passed across 13 monorepo tasks.
+- Full local `pnpm build` passed across 8 monorepo tasks.
 - Hosted `CI` run `26146547824` passed.
 - Hosted `Lint & Type Check` run `26146547856` passed.
 - Hosted `Test Coverage` run `26146547825` passed.
@@ -48,9 +61,12 @@ This is the concise end-state from the production-stability push on
 - Full production health is HTTP 200 but `status: "degraded"` because 100
   retained failed jobs remain: 50 in `sync-transactions` and 50 in
   `categorize-transactions`.
-- The new queue-safe production remediation path is implemented in `71f03516`,
-  but it is not live until the current build is promoted after green staging
-  smoke, or through a documented break-glass promotion.
+- The new queue-safe production remediation path and the recurring-job source
+  fix are in current source, but production still needs a new build/promotion
+  and a failed-job cleanup. The live API currently returns 401 for
+  `GET /v1/admin/queues` and `POST /v1/admin/queues/:name/retry-failed`, but
+  404 for the safer `failed` and `clear-failed` endpoints, proving those
+  endpoints are not live yet.
 
 ## Next Order Of Work
 
@@ -59,7 +75,7 @@ This is the concise end-state from the production-stability push on
 2. Register/sync `infra/argocd/dhanam-staging-application.yaml` and populate
    staging Vault/ESO values.
 3. Re-run `deploy-staging.yml` until the smoke job passes.
-4. Promote `71f03516` through `promote-to-prod.yml` with the successful staging
+4. Build and promote the current source through staging with the successful
    smoke run id, or record an explicit break-glass bypass if the queue incident
    requires earlier production remediation.
 5. Inspect, retry, and only then clear retained production queue failures
@@ -67,6 +83,6 @@ This is the concise end-state from the production-stability push on
 
 ## Stability Estimate
 
-Overall full-system stability remains about 87 percent. The remaining gap is
+Overall full-system stability remains about 88 percent. The remaining gap is
 operational: staging routing, production queue cleanup, production rollout truth
 alignment, and Enclii adapter coverage.

@@ -6,6 +6,10 @@ Dhanam uses layered tests across API, web, admin, mobile, contracts, and
 Playwright journeys. Prefer focused checks while developing and run the broader
 gates before merging to `main`.
 
+Current 2026-05-20 stabilization state: full monorepo `pnpm test` and
+`pnpm build` both pass locally after the admin authorization, queue scheduler,
+staging overlay, and E2E catalog-seeding updates.
+
 ## Main Commands
 
 ```bash
@@ -63,6 +67,9 @@ Latest wrap-up: hosted CI, lint/typecheck, and test coverage passed for
 smoke at HTTP 404 due the staging tunnel-route gap. See
 [Verification Snapshot](TEST_RESULTS.md) and
 [Stability Wrap-Up 2026-05-20](../STABILITY_WRAP_UP_2026-05-20.md).
+After that hosted snapshot, local targeted Jest passed for the admin
+authorization hardening, auth strategy admin-claim propagation, queue recurring
+cleanup, and cron job idempotency changes.
 
 ## Local Playwright Notes
 

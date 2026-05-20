@@ -16,6 +16,8 @@ const createMockQueue = (name: string) => ({
   pause: jest.fn().mockResolvedValue(undefined),
   resume: jest.fn().mockResolvedValue(undefined),
   obliterate: jest.fn().mockResolvedValue(undefined),
+  removeRepeatable: jest.fn().mockResolvedValue(true),
+  removeJobScheduler: jest.fn().mockResolvedValue(false),
   close: jest.fn().mockResolvedValue(undefined),
 });
 
@@ -92,6 +94,31 @@ describe('QueueService', () => {
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
     });
+
+    it('should use caller supplied job id for idempotent cron jobs', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const queue = queues.get('sync-transactions');
+      const jobData = {
+        provider: 'bitso' as const,
+        userId: 'user1',
+        connectionId: 'conn1',
+      };
+
+      await service.addSyncTransactionsJob(
+        jobData,
+        50,
+        0,
+        'cron-sync-bitso-user1-conn1-2026-05-20T16'
+      );
+
+      expect(queue.add).toHaveBeenCalledWith(
+        'sync-transactions',
+        jobData,
+        expect.objectContaining({
+          jobId: 'cron-sync-bitso-user1-conn1-2026-05-20T16',
+        })
+      );
+    });
   });
 
   describe('addCategorizeTransactionsJob', () => {
@@ -106,6 +133,26 @@ describe('QueueService', () => {
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
     });
+
+    it('should use caller supplied job id for idempotent cron jobs', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const queue = queues.get('categorize-transactions');
+      const jobData = { spaceId: 'space1' };
+
+      await service.addCategorizeTransactionsJob(
+        jobData,
+        30,
+        'cron-categorize-space1-2026-05-20T16'
+      );
+
+      expect(queue.add).toHaveBeenCalledWith(
+        'categorize-transactions',
+        jobData,
+        expect.objectContaining({
+          jobId: 'cron-categorize-space1-2026-05-20T16',
+        })
+      );
+    });
   });
 
   describe('addESGUpdateJob', () => {
@@ -119,6 +166,29 @@ describe('QueueService', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
+    });
+  });
+
+  describe('removeRecurringJob', () => {
+    it('should remove legacy repeatable and job scheduler entries', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const queue = queues.get('categorize-transactions');
+      queue.removeRepeatable.mockResolvedValue(true);
+      queue.removeJobScheduler.mockResolvedValue(false);
+
+      const result = await service.removeRecurringJob(
+        'categorize-transactions',
+        'hourly-categorization',
+        '0 * * * *'
+      );
+
+      expect(result).toBe(true);
+      expect(queue.removeRepeatable).toHaveBeenCalledWith(
+        'hourly-categorization',
+        { pattern: '0 * * * *' },
+        'recurring-hourly-categorization'
+      );
+      expect(queue.removeJobScheduler).toHaveBeenCalledWith('recurring-hourly-categorization');
     });
   });
 

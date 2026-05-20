@@ -19,6 +19,10 @@ spec:
               value: "https://staging.dhan.am"
             - name: NEXT_PUBLIC_ADMIN_URL
               value: "https://staging-admin.dhan.am"
+            - name: NEXTAUTH_URL
+              value: "https://staging.dhan.am"
+            - name: NEXT_PUBLIC_PADDLE_ENVIRONMENT
+              value: "sandbox"
             - name: SENTRY_ENVIRONMENT
               value: "staging"
             - name: SENTRY_RELEASE

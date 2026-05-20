@@ -37,6 +37,7 @@ describe('JanuaStrategy', () => {
     name: 'Existing User',
     locale: 'en',
     isActive: true,
+    isAdmin: false,
   };
 
   beforeEach(async () => {
@@ -164,6 +165,7 @@ describe('JanuaStrategy', () => {
                 name: args.data.name,
                 locale: args.data.locale,
                 isActive: true,
+                isAdmin: args.data.isAdmin,
               });
             }),
           },
@@ -204,6 +206,14 @@ describe('JanuaStrategy', () => {
       const result = await strategy.validate(payload);
 
       expect(result.tier).toBe('pro');
+      expect(result.isAdmin).toBe(true);
+    });
+
+    it('should preserve local platform admin status when the token omits admin claim', async () => {
+      prisma.user.findFirst.mockResolvedValue({ ...existingUser, isAdmin: true });
+
+      const result = await strategy.validate(basePayload);
+
       expect(result.isAdmin).toBe(true);
     });
   });

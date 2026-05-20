@@ -137,6 +137,7 @@ export class JanuaStrategy extends PassportStrategy(Strategy, 'janua') {
         name: true,
         locale: true,
         isActive: true,
+        isAdmin: true,
       },
     });
 
@@ -157,6 +158,7 @@ export class JanuaStrategy extends PassportStrategy(Strategy, 'janua') {
               timezone: 'America/Mexico_City', // Default for LATAM-first
               passwordHash: '', // No local password (SSO only)
               isActive: true,
+              isAdmin: payload.is_admin || false,
               emailVerified: true, // Janua handles verification
             },
             select: {
@@ -165,6 +167,7 @@ export class JanuaStrategy extends PassportStrategy(Strategy, 'janua') {
               name: true,
               locale: true,
               isActive: true,
+              isAdmin: true,
             },
           });
 
@@ -220,7 +223,7 @@ export class JanuaStrategy extends PassportStrategy(Strategy, 'janua') {
       tier: payload.tier || 'community',
       roles: payload.roles || [],
       subStatus: payload.sub_status || 'active',
-      isAdmin: payload.is_admin || false,
+      isAdmin: payload.is_admin === true || dhanamUser?.isAdmin === true,
       dhanamUserId: dhanamUser?.id,
     };
   }

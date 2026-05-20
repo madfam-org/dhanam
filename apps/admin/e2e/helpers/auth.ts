@@ -7,6 +7,7 @@ type AdminE2EUser = {
   id: string;
   email: string;
   name: string;
+  isAdmin: boolean;
   spaces: Array<{ id: string; role: string }>;
 };
 
@@ -49,7 +50,8 @@ function syntheticAdminUser(email = 'admin@dhanam.demo'): AdminE2EUser {
     id: 'e2e-admin-user',
     email,
     name: 'E2E Admin',
-    spaces: [{ id: 'e2e-admin-space', role: 'owner' }],
+    isAdmin: true,
+    spaces: [{ id: 'e2e-admin-space', role: 'admin' }],
   };
 }
 

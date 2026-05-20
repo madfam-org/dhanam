@@ -8,23 +8,22 @@ import { AdminGuard } from '../admin.guard';
 
 describe('AdminGuard', () => {
   let guard: AdminGuard;
-  let prisma: jest.Mocked<PrismaService>;
+  let prisma: { user: { findUnique: jest.Mock } };
   let logger: jest.Mocked<LoggerService>;
 
-  const createMockExecutionContext = (user?: any): ExecutionContext => {
-    return {
+  const createMockExecutionContext = (user?: any): ExecutionContext =>
+    ({
       switchToHttp: () => ({
         getRequest: () => ({ user }),
       }),
       getHandler: () => jest.fn(),
       getClass: () => jest.fn(),
-    } as unknown as ExecutionContext;
-  };
+    }) as unknown as ExecutionContext;
 
   beforeEach(async () => {
     const mockPrisma = {
-      userSpace: {
-        findMany: jest.fn(),
+      user: {
+        findUnique: jest.fn(),
       },
     };
 
@@ -43,7 +42,7 @@ describe('AdminGuard', () => {
     }).compile();
 
     guard = module.get<AdminGuard>(AdminGuard);
-    prisma = module.get(PrismaService);
+    prisma = module.get(PrismaService) as unknown as { user: { findUnique: jest.Mock } };
     logger = module.get(LoggerService);
   });
 
@@ -51,211 +50,72 @@ describe('AdminGuard', () => {
     jest.clearAllMocks();
   });
 
-  describe('canActivate', () => {
-    it('should throw ForbiddenException when no user in request', async () => {
-      const context = createMockExecutionContext(undefined);
+  it('throws ForbiddenException when no user is authenticated', async () => {
+    await expect(guard.canActivate(createMockExecutionContext())).rejects.toThrow(
+      new ForbiddenException('User not authenticated')
+    );
+  });
 
-      await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
-      await expect(guard.canActivate(context)).rejects.toThrow('User not authenticated');
+  it('allows a user with a verified admin claim without querying local fallback', async () => {
+    const context = createMockExecutionContext({ id: 'user-123', isAdmin: true });
+
+    const result = await guard.canActivate(context);
+
+    expect(result).toBe(true);
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
+    expect(logger.log).toHaveBeenCalledWith('Admin access granted to user user-123', 'AdminGuard');
+  });
+
+  it('allows a local platform admin when the request context lacks an admin claim', async () => {
+    const context = createMockExecutionContext({ id: 'user-123' });
+    prisma.user.findUnique.mockResolvedValue({ isAdmin: true });
+
+    const result = await guard.canActivate(context);
+
+    expect(result).toBe(true);
+  });
+
+  it('uses dhanamUserId from Janua-authenticated request context when present', async () => {
+    const context = createMockExecutionContext({
+      id: 'janua-user-123',
+      dhanamUserId: 'local-user-123',
     });
+    prisma.user.findUnique.mockResolvedValue({ isAdmin: true });
 
-    it('should throw ForbiddenException when user is null', async () => {
-      const context = createMockExecutionContext(null);
+    await guard.canActivate(context);
 
-      await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
-    });
-
-    it('should return true when user has admin role in a space', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      prisma.userSpace.findMany
-        .mockResolvedValueOnce([
-          { userId: 'user-123', role: 'admin', space: { id: 'space-1', name: 'Admin Space' } },
-        ] as any)
-        .mockResolvedValueOnce([]);
-
-      const result = await guard.canActivate(context);
-
-      expect(result).toBe(true);
-      expect(logger.log).toHaveBeenCalledWith(
-        'Admin access granted to user user-123',
-        'AdminGuard'
-      );
-    });
-
-    it('should return true when user is owner of a space', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      prisma.userSpace.findMany
-        .mockResolvedValueOnce([]) // No admin spaces
-        .mockResolvedValueOnce([
-          { userId: 'user-123', role: 'owner', space: { id: 'space-1', name: 'My Space' } },
-        ] as any);
-
-      const result = await guard.canActivate(context);
-
-      expect(result).toBe(true);
-    });
-
-    it('should return true when user has both admin and owner roles', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      prisma.userSpace.findMany
-        .mockResolvedValueOnce([
-          { userId: 'user-123', role: 'admin', space: { id: 'space-1' } },
-        ] as any)
-        .mockResolvedValueOnce([
-          { userId: 'user-123', role: 'owner', space: { id: 'space-2' } },
-        ] as any);
-
-      const result = await guard.canActivate(context);
-
-      expect(result).toBe(true);
-    });
-
-    it('should throw ForbiddenException when user has no admin or owner roles', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      // Need to set up mocks for both calls each time canActivate is called
-      prisma.userSpace.findMany
-        .mockResolvedValueOnce([]) // No admin spaces (first canActivate)
-        .mockResolvedValueOnce([]) // No owned spaces (first canActivate)
-        .mockResolvedValueOnce([]) // No admin spaces (second canActivate for error message check)
-        .mockResolvedValueOnce([]); // No owned spaces (second canActivate)
-
-      await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
-      await expect(guard.canActivate(context)).rejects.toThrow('Admin access required');
-    });
-
-    it('should log warning when non-admin user attempts access', async () => {
-      const context = createMockExecutionContext({ id: 'user-456' });
-
-      prisma.userSpace.findMany
-        .mockResolvedValueOnce([]) // No admin spaces
-        .mockResolvedValueOnce([]); // No owned spaces
-
-      try {
-        await guard.canActivate(context);
-      } catch {
-        // Expected to throw
-      }
-
-      expect(logger.warn).toHaveBeenCalledWith(
-        'Non-admin user user-456 attempted to access admin endpoint',
-        'AdminGuard'
-      );
-    });
-
-    it('should query for admin spaces correctly', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      prisma.userSpace.findMany.mockResolvedValue([
-        { userId: 'user-123', role: 'admin', space: {} },
-      ] as any);
-
-      await guard.canActivate(context);
-
-      expect(prisma.userSpace.findMany).toHaveBeenCalledWith({
-        where: {
-          userId: 'user-123',
-          role: 'admin',
-        },
-        include: {
-          space: true,
-        },
-      });
-    });
-
-    it('should query for owned spaces correctly', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      prisma.userSpace.findMany
-        .mockResolvedValueOnce([]) // First call for admin
-        .mockResolvedValueOnce([{ userId: 'user-123', role: 'owner', space: {} }] as any);
-
-      await guard.canActivate(context);
-
-      expect(prisma.userSpace.findMany).toHaveBeenNthCalledWith(2, {
-        where: {
-          userId: 'user-123',
-          role: 'owner',
-        },
-        include: {
-          space: true,
-        },
-      });
-    });
-
-    it('should handle database errors gracefully', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      prisma.userSpace.findMany.mockRejectedValue(new Error('Database error'));
-
-      await expect(guard.canActivate(context)).rejects.toThrow('Database error');
-    });
-
-    it('should check admin role before owner role', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-      const callOrder: string[] = [];
-
-      prisma.userSpace.findMany
-        .mockImplementationOnce(async (args) => {
-          callOrder.push(args?.where?.role as string);
-          return [];
-        })
-        .mockImplementationOnce(async (args) => {
-          callOrder.push(args?.where?.role as string);
-          return [{ userId: 'user-123', role: 'owner', space: {} }];
-        });
-
-      await guard.canActivate(context);
-
-      expect(callOrder).toEqual(['admin', 'owner']);
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: 'local-user-123' },
+      select: { isAdmin: true },
     });
   });
 
-  describe('user identification', () => {
-    it('should correctly extract user id from request', async () => {
-      const testUser = { id: 'specific-user-id', email: 'test@example.com' };
-      const context = createMockExecutionContext(testUser);
+  it('rejects users who only own or administer a regular space', async () => {
+    const context = createMockExecutionContext({ id: 'space-owner-123' });
+    prisma.user.findUnique.mockResolvedValue({ isAdmin: false });
 
-      prisma.userSpace.findMany.mockResolvedValue([
-        { userId: 'specific-user-id', role: 'admin', space: {} },
-      ] as any);
-
-      await guard.canActivate(context);
-
-      expect(prisma.userSpace.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            userId: 'specific-user-id',
-          }),
-        })
-      );
-    });
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      new ForbiddenException('Admin access required')
+    );
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Non-admin user space-owner-123 attempted to access admin endpoint',
+      'AdminGuard'
+    );
   });
 
-  describe('edge cases', () => {
-    it('should handle user with empty id', async () => {
-      const context = createMockExecutionContext({ id: '' });
+  it('rejects a user with an empty id', async () => {
+    const context = createMockExecutionContext({ id: '' });
 
-      prisma.userSpace.findMany.mockResolvedValue([]);
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      new ForbiddenException('Admin access required')
+    );
+    expect(prisma.user.findUnique).not.toHaveBeenCalled();
+  });
 
-      await expect(guard.canActivate(context)).rejects.toThrow(ForbiddenException);
-    });
+  it('propagates database errors from the local admin lookup', async () => {
+    const context = createMockExecutionContext({ id: 'user-123' });
+    prisma.user.findUnique.mockRejectedValue(new Error('Database error'));
 
-    it('should handle multiple admin spaces', async () => {
-      const context = createMockExecutionContext({ id: 'user-123' });
-
-      prisma.userSpace.findMany.mockResolvedValueOnce([
-        { userId: 'user-123', role: 'admin', space: { id: 'space-1' } },
-        { userId: 'user-123', role: 'admin', space: { id: 'space-2' } },
-        { userId: 'user-123', role: 'admin', space: { id: 'space-3' } },
-      ] as any);
-
-      const result = await guard.canActivate(context);
-
-      expect(result).toBe(true);
-    });
+    await expect(guard.canActivate(context)).rejects.toThrow('Database error');
   });
 });

@@ -36,12 +36,12 @@ Dhanam is considered fully stable only when all of these are true:
 
 | Area                      | Current estimate | Status                                                                                            |
 | ------------------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
-| Codebase and CI           | 96%              | Hosted lint/typecheck, coverage, CI, build, and Playwright are green.                             |
+| Codebase and CI           | 97%              | Targeted security/job tests are green; full hosted gates still need to run for the latest source. |
 | Public production surface | 90%              | Public DNS and health checks pass for apex, `www`, app, admin, and API liveness.                  |
 | API runtime health        | 82%              | DB, Redis, Belvo, and optional external checks are up; production queue health remains degraded.  |
 | Release and staging path  | 74%              | Images build/sign and staging overlay patches; latest staging smoke fails 404 due tunnel routing. |
 | Ops control plane         | 80%              | ArgoCD production app is Healthy/Synced; Enclii `prod` is not yet live rollout truth.             |
-| Overall stability         | 87%              | Mostly stable production with unresolved operational debt, not a finished stability mission.      |
+| Overall stability         | 88%              | Mostly stable production with source fixes pending deployment and unresolved operational debt.    |
 
 ## Current Verification Snapshot
 
@@ -65,6 +65,10 @@ As of 2026-05-20:
 - Full production health still returns `status: "degraded"` because there are
   100 retained failed jobs: 50 in `sync-transactions` and 50 in
   `categorize-transactions`.
+- Current source after that snapshot hardens platform-admin authorization,
+  removes obsolete generic BullMQ repeatable schedules, gives cron-dispatched
+  jobs stable IDs across replicas, isolates staging env values from production,
+  and prevents staging digest bot commits from retriggering staging deploys.
 
 ## Priority Roadmap
 
@@ -94,8 +98,11 @@ Goal: remove the remaining production runtime degradation.
 
 Work:
 
-- Promote the `71f03516` API/admin/web build after staging smoke passes, or use
+- Promote the current API/admin/web build after staging smoke passes, or use
   an explicitly recorded break-glass bypass if an incident requires it.
+- Ensure the recurring-job cleanup source is live so invalid generic
+  `{ allSpaces: true }` / `{ syncAll: true }` repeatable jobs are removed and
+  no new concrete-ID-free queue failures are generated.
 - Inspect failed BullMQ jobs through the audited admin queue endpoints after the
   current queue-hardening build is live.
 - Retry safe failures first:
@@ -130,6 +137,11 @@ Work:
 - Keep the staging DNS CNAMEs created through Enclii on 2026-05-20 in place.
 - Re-run `deploy-staging.yml` until build, signature, overlay patch, reconcile,
   smoke, and soak all pass.
+- Keep staging production-safe: API/web overlays must override production
+  webhook fan-out, PhyndCRM, `WEB_URL`, `NEXTAUTH_URL`, and Paddle production
+  values.
+- Keep `deploy-staging.yml` from rebuilding on its own
+  `infra/k8s/overlays/staging/kustomization.yaml` digest commits.
 - Fix the confirmed 2026-05-20 route state:
   - `staging-api.dhan.am` has no tunnel route and returns 404.
   - `staging.dhan.am` has no tunnel route and returns 404.

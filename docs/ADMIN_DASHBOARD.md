@@ -6,7 +6,9 @@ The Dhanam Admin Dashboard provides comprehensive tools for system administrator
 
 ## Access Requirements
 
-- **Role**: User must have `admin` or `owner` role in at least one space
+- **Role**: User must be a platform admin (`User.isAdmin=true`) or present a
+  verified Janua `is_admin` claim. Space `owner` / `admin` roles are scoped to
+  spaces and do not grant platform-admin access.
 - **Production URL**: `https://admin.dhan.am/dashboard`
 - **Development URL**: `http://localhost:3400/dashboard` (standalone admin app)
 - **Authentication**: Cross-subdomain cookie (`auth-storage` with `Domain=.dhan.am`) — unauthenticated users redirected to `app.dhan.am/login`
@@ -231,9 +233,10 @@ All admin actions are logged with high severity:
 
 #### "Access Denied" Error
 
-- Verify user has admin/owner role: `SELECT * FROM user_spaces WHERE user_id = ?`
+- Verify user is a platform admin:
+  `SELECT is_admin FROM users WHERE id = ?`
 - Check JWT token hasn't expired
-- Confirm space membership is active
+- Confirm Janua tokens include `is_admin=true` when using Janua-admin access
 
 #### Statistics Not Updating
 

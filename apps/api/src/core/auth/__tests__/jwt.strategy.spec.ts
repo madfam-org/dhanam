@@ -21,6 +21,7 @@ describe('JwtStrategy', () => {
     totpEnabled: false,
     lastLoginAt: new Date(),
     subscriptionTier: 'community',
+    isAdmin: false,
   };
 
   beforeEach(async () => {
@@ -118,6 +119,7 @@ describe('JwtStrategy', () => {
           totpEnabled: true,
           lastLoginAt: true,
           subscriptionTier: true,
+          isAdmin: true,
         },
       });
       expect(result).toEqual({
@@ -129,6 +131,7 @@ describe('JwtStrategy', () => {
         timezone: 'America/New_York',
         totpEnabled: false,
         subscriptionTier: 'community',
+        isAdmin: false,
       });
     });
 
@@ -223,9 +226,31 @@ describe('JwtStrategy', () => {
         totpEnabled: true,
         lastLoginAt: true,
         subscriptionTier: true,
+        isAdmin: true,
       });
       // Verify passwordHash is NOT selected (security)
       expect(selectFields).not.toHaveProperty('passwordHash');
+    });
+
+    it('returns the platform admin flag for admin endpoints', async () => {
+      const payload: JwtPayload = {
+        sub: 'admin-user',
+        email: 'admin@example.com',
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + 900,
+        iss: 'dhanam-api',
+        aud: 'dhanam-web',
+      };
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        id: 'admin-user',
+        email: 'admin@example.com',
+        isAdmin: true,
+      } as any);
+
+      const result = await strategy.validate(payload);
+
+      expect(result.isAdmin).toBe(true);
     });
 
     it('should handle database errors gracefully', async () => {

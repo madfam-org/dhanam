@@ -21,42 +21,27 @@ export class AdminGuard implements CanActivate {
       throw new ForbiddenException('User not authenticated');
     }
 
-    // Check if user has admin privileges
-    // For now, we'll check if user has admin role in any space
-    // In production, you might want to have a separate admin flag on the User model
-    const adminSpaces = await this.prisma.userSpace.findMany({
-      where: {
-        userId: user.id,
-        role: 'admin',
-      },
-      include: {
-        space: true,
-      },
-    });
+    const userId = user.dhanamUserId || user.id;
+    let isAdmin = user.isAdmin === true;
 
-    // Also check if user owns any space (owners have implicit admin rights)
-    const ownedSpaces = await this.prisma.userSpace.findMany({
-      where: {
-        userId: user.id,
-        role: 'owner',
-      },
-      include: {
-        space: true,
-      },
-    });
-
-    const isAdmin = adminSpaces.length > 0 || ownedSpaces.length > 0;
+    if (!isAdmin && typeof userId === 'string' && userId.length > 0) {
+      const localUser = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { isAdmin: true },
+      });
+      isAdmin = localUser?.isAdmin === true;
+    }
 
     if (!isAdmin) {
       this.logger.warn(
-        `Non-admin user ${user.id} attempted to access admin endpoint`,
+        `Non-admin user ${userId || 'unknown'} attempted to access admin endpoint`,
         'AdminGuard'
       );
       throw new ForbiddenException('Admin access required');
     }
 
     // Log admin access for audit trail
-    this.logger.log(`Admin access granted to user ${user.id}`, 'AdminGuard');
+    this.logger.log(`Admin access granted to user ${userId}`, 'AdminGuard');
 
     return true;
   }

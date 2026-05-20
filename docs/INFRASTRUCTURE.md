@@ -195,12 +195,14 @@ pnpm test:e2e:cov
 @UseGuards(JwtAuthGuard, AdminGuard)
 @Controller('admin')
 export class AdminController {
-  // Only users with 'admin' or 'owner' roles can access
+  // Only platform admins can access
 }
 ```
 
 Navigate to `http://localhost:3400/dashboard` locally or
-`https://admin.dhan.am/dashboard` in production (requires admin/owner role).
+`https://admin.dhan.am/dashboard` in production. Access requires
+`User.isAdmin=true` or a verified Janua `is_admin` claim; space `owner` and
+`admin` roles are not platform-admin roles.
 
 ### Admin API Endpoints
 
@@ -220,9 +222,11 @@ POST /v1/admin/queues/:name/clear            # Whole-queue break-glass clear, co
 ```
 
 The failed-job inspection and `clear-failed` endpoint set is current-source
-truth from `71f03516`. It still needs a successful staging smoke and production
-promotion, or an explicitly recorded break-glass promotion, before it can be
-used against the live production queue failures.
+truth from `71f03516`. Current source also removes the obsolete generic
+repeatable queue schedules that were producing concrete-ID-free jobs. These
+changes still need a successful staging smoke and production promotion, or an
+explicitly recorded break-glass promotion, before they can be used against the
+live production queue failures.
 
 ## CI/CD Pipeline
 
@@ -306,7 +310,8 @@ curl http://localhost:4010/health/ready
 2. **Role-Based Access Control**
    - User roles: user, admin, owner
    - Space-specific permissions
-   - Admin operations require elevated privileges
+   - Platform admin operations require `User.isAdmin=true` or a verified Janua
+     `is_admin` claim
 
 3. **Audit Trail**
    - All admin actions logged
@@ -484,9 +489,9 @@ dhanam-documents/
    ```
 
 2. **Admin dashboard access denied**
-   - Verify user has admin/owner role
+   - Verify user has `User.isAdmin=true` or a verified Janua `is_admin` claim
    - Check JWT token expiration
-   - Confirm space membership
+   - Confirm the request is not relying on space membership alone
 
 3. **E2E tests timeout**
    - Increase Jest timeout in jest-e2e.json

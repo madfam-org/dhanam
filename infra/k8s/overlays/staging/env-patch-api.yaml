@@ -25,6 +25,8 @@ spec:
               value: "staging"
             - name: SENTRY_RELEASE
               value: "dhanam-api@staging"
+            - name: WEB_URL
+              value: "https://staging.dhan.am"
             # Billing: force test-mode. Livemode Stripe events are 200-ACK'd
             # with a warning per stripe-mx-spei-relay guardrails (CLAUDE.md).
             - name: FEATURE_STRIPE_MXN_LIVE
@@ -34,5 +36,9 @@ spec:
             # Staging CORS (superset of prod origins; includes staging-*)
             - name: CORS_ORIGINS
               value: "https://staging.dhan.am,https://staging-admin.dhan.am,https://staging-api.dhan.am"
-            # Webhook relay: staging fan-out to karafiel-staging if present.
-            # Operator populates PRODUCT_WEBHOOK_URLS in the staging Vault/ESO path.
+            # Webhook relay: disabled until downstream staging consumers are
+            # explicitly registered; never inherit production fan-out targets.
+            - name: PRODUCT_WEBHOOK_URLS
+              value: ""
+            - name: PHYNDCRM_API_URL
+              value: "https://staging-crm.madfam.io"

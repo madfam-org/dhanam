@@ -24,11 +24,15 @@ The execution roadmap for closing the remaining gap is maintained in
 Snapshot originally taken on 2026-05-19 and refreshed on 2026-05-20 after
 production/staging domain checks, Enclii route remediation attempts, staging
 promotion hardening, API GitOps deployment verification, and queue remediation
-path hardening.
+path hardening. A later 2026-05-20 source update also hardened platform-admin
+authorization, removed obsolete generic BullMQ repeatable schedules, made cron
+queue dispatch idempotent across API replicas, isolated staging env values from
+production, and prevented staging digest bot commits from self-triggering
+another staging deploy.
 
 | Area                      | Status               | Evidence                                                                                                                                                         |
 | ------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Code build and unit gates | Improved             | Local pre-push ran format, typecheck, lint, tests, build, and Prisma validation successfully; queue/admin remediation targeted Jest passed.                      |
+| Code build and unit gates | Improved             | Local pre-push ran format, typecheck, lint, tests, build, and Prisma validation successfully; latest admin/auth/job targeted Jest passed 5 suites / 71 tests.    |
 | API Docker build          | Improved             | API Enclii build issue was remediated by aligning Dockerfiles to repo `pnpm@9.15.0` and pruning Docker context noise.                                            |
 | Web Playwright            | Improved             | Auth helpers now use the current `/auth/guest` flow and seed the app stores/cookies expected by Next.js.                                                         |
 | Web accessibility gates   | Stable locally       | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.                     |
@@ -59,16 +63,18 @@ path hardening.
    `sync-transactions` and `categorize-transactions`. Banxico is now reported
    as optional/unconfigured and Belvo connectivity is up. The safer failed-job
    inspection and `clear-failed` endpoints were implemented in `71f03516` and
-   built into signed staging images, but they have not been promoted to
-   production because staging smoke is still red.
+   current source also removes the invalid generic repeat schedules likely to
+   keep producing concrete-ID-free failures. These changes still need a new
+   build/promotion plus live failed-job cleanup.
 5. The staging promotion safety gap is closed in code and verified in CI:
    `deploy-staging.yml` signs staging image digests, `promote-to-prod.yml`
    verifies the deploy-staging keyless signature before writing production
    digests, requires an explicit successful `Deploy to Staging` smoke run id
    unless break-glass is selected, and the staging overlay is refreshed by
-   signed `deploy(staging)` bot commits. The latest refresh is `28d42fcb`,
-   which records staging digests for source `71f03516`. Promotion still needs a
-   real staging smoke/soak signal.
+   signed `deploy(staging)` bot commits. Current source also ignores the
+   staging overlay digest file for the staging workflow, so those bot commits
+   do not retrigger the workflow. Promotion still needs a real staging
+   smoke/soak signal.
 6. Live production rollout proof still comes from the ArgoCD `dhanam-services`
    Application via `scripts/production-rollout-proof.js`, not Enclii `prod`
    deployment records, until the Enclii namespace mapping gap is repaired.

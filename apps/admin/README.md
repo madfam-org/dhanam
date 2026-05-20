@@ -143,7 +143,8 @@ Admin Playwright tests use a synthetic admin session in CI by default and mock a
 ## Security
 
 - **Cross-subdomain auth**: Cookie-based with `Domain=.dhan.am`
-- **Role check**: Admin/owner role required (checked in layout + middleware)
+- **Role check**: Platform admin required (`User.isAdmin=true` or verified
+  Janua `is_admin` claim); space owner/admin membership is not enough
 - **AdminGuard**: Backend guard validates admin access on all admin API endpoints
 - **Audit logging**: All admin actions logged server-side
 

@@ -54,44 +54,26 @@ export class EnhancedJobsService implements OnModuleInit {
 
   private async scheduleRecurringJobs() {
     try {
-      // Schedule hourly transaction categorization
-      await this.queueService.scheduleRecurringJob(
-        'categorize-transactions',
-        'hourly-categorization',
-        { allSpaces: true },
-        '0 * * * *' // Every hour
-      );
+      await Promise.all([
+        this.queueService.removeRecurringJob(
+          'categorize-transactions',
+          'hourly-categorization',
+          '0 * * * *'
+        ),
+        this.queueService.removeRecurringJob(
+          'sync-transactions',
+          'crypto-portfolio-sync',
+          '0 */4 * * *'
+        ),
+        this.queueService.removeRecurringJob('valuation-snapshots', 'daily-snapshots', '0 3 * * *'),
+        this.queueService.removeRecurringJob('esg-updates', 'esg-refresh', '0 6,18 * * *'),
+      ]);
 
-      // Schedule crypto portfolio sync every 4 hours
-      await this.queueService.scheduleRecurringJob(
-        'sync-transactions',
-        'crypto-portfolio-sync',
-        { provider: 'bitso', syncAll: true },
-        '0 */4 * * *' // Every 4 hours
+      this.logger.log(
+        'Obsolete generic recurring jobs removed; Nest cron dispatchers enqueue granular jobs'
       );
-
-      // Schedule daily valuation snapshots at 3 AM
-      await this.queueService.scheduleRecurringJob(
-        'valuation-snapshots',
-        'daily-snapshots',
-        { allSpaces: true },
-        '0 3 * * *' // Daily at 3 AM
-      );
-
-      // Schedule ESG data refresh twice daily
-      await this.queueService.scheduleRecurringJob(
-        'esg-updates',
-        'esg-refresh',
-        {
-          symbols: ['BTC', 'ETH', 'ADA', 'DOT', 'SOL', 'ALGO', 'MATIC', 'AVAX'],
-          forceRefresh: false,
-        },
-        '0 6,18 * * *' // Twice daily at 6 AM and 6 PM
-      );
-
-      this.logger.log('Recurring jobs scheduled successfully');
     } catch (error) {
-      this.logger.error('Failed to schedule recurring jobs:', error);
+      this.logger.error('Failed to clean up obsolete recurring jobs:', error);
     }
   }
 
@@ -173,6 +155,7 @@ export class EnhancedJobsService implements OnModuleInit {
   @Cron(CronExpression.EVERY_HOUR)
   async categorizeNewTransactions(): Promise<void> {
     this.logger.log('Cron: Starting automatic transaction categorization');
+    const bucket = this.getUtcHourBucket();
 
     const spaces = await this.prisma.space.findMany({
       select: { id: true },
@@ -184,7 +167,8 @@ export class EnhancedJobsService implements OnModuleInit {
         {
           spaceId: space.id,
         },
-        30
+        30,
+        `cron-categorize-${space.id}-${bucket}`
       );
     }
 
@@ -194,6 +178,7 @@ export class EnhancedJobsService implements OnModuleInit {
   @Cron('0 */4 * * *')
   async syncCryptoPortfolios(): Promise<void> {
     this.logger.log('Cron: Starting scheduled crypto portfolio sync');
+    const bucket = this.getUtcFourHourBucket();
 
     const connections = await this.prisma.providerConnection.findMany({
       where: { provider: 'bitso' },
@@ -210,7 +195,9 @@ export class EnhancedJobsService implements OnModuleInit {
           connectionId: connection.id,
           fullSync: false,
         },
-        50
+        50,
+        0,
+        `cron-sync-bitso-${connection.userId}-${connection.id}-${bucket}`
       );
     }
 
@@ -269,7 +256,8 @@ export class EnhancedJobsService implements OnModuleInit {
           symbols: Array.from(symbols),
           forceRefresh: false,
         },
-        25
+        25,
+        `cron-esg-refresh-${this.getUtcHourBucket()}`
       );
 
       this.logger.log(`Cron: Queued ESG refresh for ${symbols.size} symbols`);
@@ -320,5 +308,16 @@ export class EnhancedJobsService implements OnModuleInit {
     }
 
     this.logger.log('Retried all failed jobs across all queues');
+  }
+
+  private getUtcHourBucket(date = new Date()): string {
+    return date.toISOString().slice(0, 13);
+  }
+
+  private getUtcFourHourBucket(date = new Date()): string {
+    const bucketStart = new Date(date);
+    bucketStart.setUTCMinutes(0, 0, 0);
+    bucketStart.setUTCHours(Math.floor(bucketStart.getUTCHours() / 4) * 4);
+    return bucketStart.toISOString().slice(0, 13);
   }
 }

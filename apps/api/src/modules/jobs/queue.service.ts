@@ -429,7 +429,8 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   async addSyncTransactionsJob(
     data: SyncTransactionsJobData['payload'],
     priority: number = 50,
-    delay: number = 0
+    delay: number = 0,
+    jobId?: string
   ): Promise<Job | null> {
     const queue = this.getQueueOrSkip('sync-transactions');
     if (!queue) return null;
@@ -437,33 +438,35 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     return queue.add('sync-transactions', data, {
       priority,
       delay,
-      jobId: `sync-${data.provider}-${data.userId}-${Date.now()}`,
+      jobId: jobId ?? `sync-${data.provider}-${data.userId}-${Date.now()}`,
     });
   }
 
   async addCategorizeTransactionsJob(
     data: CategorizeTransactionsJobData['payload'],
-    priority: number = 30
+    priority: number = 30,
+    jobId?: string
   ): Promise<Job | null> {
     const queue = this.getQueueOrSkip('categorize-transactions');
     if (!queue) return null;
 
     return queue.add('categorize-transactions', data, {
       priority,
-      jobId: `categorize-${data.spaceId}-${Date.now()}`,
+      jobId: jobId ?? `categorize-${data.spaceId}-${Date.now()}`,
     });
   }
 
   async addESGUpdateJob(
     data: ESGUpdateJobData['payload'],
-    priority: number = 20
+    priority: number = 20,
+    jobId?: string
   ): Promise<Job | null> {
     const queue = this.getQueueOrSkip('esg-updates');
     if (!queue) return null;
 
     return queue.add('esg-update', data, {
       priority,
-      jobId: `esg-${data.symbols.join('-')}-${Date.now()}`,
+      jobId: jobId ?? `esg-${data.symbols.join('-')}-${Date.now()}`,
     });
   }
 
@@ -538,6 +541,48 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       repeat: { pattern: cronPattern },
       jobId: `recurring-${jobName}`,
     });
+  }
+
+  async removeRecurringJob(
+    queueName: string,
+    jobName: string,
+    cronPattern: string,
+    jobId: string = `recurring-${jobName}`
+  ): Promise<boolean> {
+    const queue = this.queues.get(queueName);
+    if (!queue) {
+      const isTestEnv = process.env.NODE_ENV === 'test';
+      if (isTestEnv) {
+        this.logger.warn(`Queue ${queueName} not initialized, skipping recurring job cleanup`);
+        return false;
+      }
+      throw new Error(`Queue ${queueName} not initialized`);
+    }
+
+    let removed = false;
+
+    try {
+      removed = await queue.removeRepeatable(jobName, { pattern: cronPattern }, jobId);
+    } catch (error) {
+      this.logger.warn(
+        `Legacy recurring job cleanup failed for ${queueName}/${jobName}: ${(error as Error).message}`
+      );
+    }
+
+    try {
+      const schedulerRemoved = await queue.removeJobScheduler(jobId);
+      removed = removed || schedulerRemoved;
+    } catch (error) {
+      this.logger.warn(
+        `Job scheduler cleanup failed for ${queueName}/${jobName}: ${(error as Error).message}`
+      );
+    }
+
+    if (removed) {
+      this.logger.log(`Removed recurring job ${queueName}/${jobName}`);
+    }
+
+    return removed;
   }
 
   // Queue management

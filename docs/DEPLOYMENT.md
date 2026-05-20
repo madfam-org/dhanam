@@ -266,6 +266,9 @@ into the Enclii-registered `enclii-dhanam-staging` namespace. The digest patch
 step resets to the latest `origin/main` before committing so a long image build
 does not fail or overwrite newer stabilization commits.
 
+The workflow ignores `infra/k8s/overlays/staging/kustomization.yaml` so the
+digest patch commit it creates does not trigger a second staging build.
+
 Current status as of the 2026-05-20 wrap-up: `Deploy to Staging` run
 `26146547918` built and signed all three images for `71f03516`, committed
 staging digest refresh `28d42fcb`, and failed only at the public API smoke
@@ -294,6 +297,12 @@ inspection (`op_1779260970221167708`) shows no routes for `staging-api.dhan.am`
 or `staging.dhan.am`; `staging-admin.dhan.am` points to the production admin
 service. Treat staging tunnel-route apply as an Enclii adapter gap until a
 namespace-aware route operation exists.
+
+Staging overlays must also stay production-safe while route work continues:
+the API overlay overrides production `WEB_URL`, disables `PRODUCT_WEBHOOK_URLS`
+fan-out, points `PHYNDCRM_API_URL` at staging CRM, and keeps Stripe/Paddle in
+test/sandbox mode. The web overlay overrides `NEXTAUTH_URL` and
+`NEXT_PUBLIC_PADDLE_ENVIRONMENT` to staging/sandbox values.
 
 ### Current Enclii Policy Blocker
 

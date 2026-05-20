@@ -49,10 +49,13 @@ All admin endpoints require:
 1. Valid JWT authentication (`JwtAuthGuard`)
 2. Admin privileges (`AdminGuard`)
 
-Admin privileges are granted to users who:
+Admin privileges are granted only to platform admins:
 
-- Have `admin` role in any space
-- Are `owner` of any space
+- Local Dhanam users with `User.isAdmin=true`
+- Janua-authenticated users with a verified `is_admin` claim
+
+Space-level `owner` and `admin` roles are intentionally scoped to user spaces
+and do not grant access to platform-admin endpoints.
 
 ## API Endpoints
 

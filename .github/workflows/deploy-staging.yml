@@ -17,6 +17,9 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'llms.txt'
+      - 'llms-full.txt'
+      - 'infra/k8s/overlays/staging/kustomization.yaml' # staging digest bot commits don't self-trigger
       - 'infra/k8s/production/kustomization.yaml'  # prod promotions don't rebuild
   workflow_dispatch:
 

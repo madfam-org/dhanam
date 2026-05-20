@@ -19,6 +19,10 @@ Prisma, AWS, or port assumptions.
 | API pricing-engine targeted Jest                            | Passed                                        |
 | API onboarding + pricing targeted Jest                      | 3 suites, 68 tests passed                     |
 | API admin queue remediation targeted Jest                   | 2 suites, 18 tests passed                     |
+| API admin guard/auth strategy/job scheduler targeted Jest   | 5 suites, 71 tests passed                     |
+| Admin auth hook targeted Jest                               | 1 suite, 3 tests passed                       |
+| Full monorepo `pnpm test`                                   | 13 tasks passed                               |
+| Full monorepo `pnpm build`                                  | 8 tasks passed                                |
 | API chaos health suite                                      | 11 suites, 102 tests passed                   |
 | Shared package build                                        | Passed                                        |
 | API build                                                   | Passed                                        |
@@ -90,6 +94,11 @@ These are not unit-test failures, but they block full-system stability:
   failed-job-only clear endpoint set is in `71f03516`; it is not live in
   production until the current build is promoted or explicitly break-glass
   deployed.
+- Current source also hardens `AdminGuard` to require platform-admin status
+  instead of any space owner/admin role, removes obsolete generic BullMQ
+  repeatable schedules, and makes cron-dispatched queue jobs idempotent across
+  API replicas. Targeted Jest and the full monorepo `pnpm test` / `pnpm build`
+  gates passed locally.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.
