@@ -62,9 +62,15 @@ export STRIPE_MX_SECRET_KEY="sk_live_..."
 ```
 
 Expected output: `[SYNC]` lines reporting Stripe product creation,
-price creation, DB upserts. Re-runs are idempotent — Stripe products
-with matching `metadata.madfam_slug` are updated in place rather
+price creation, DB upserts, and any stale DB catalogue rows pruned from
+products whose YAML definition changed. Re-runs are idempotent — Stripe
+products with matching `metadata.madfam_slug` are updated in place rather
 than duplicated.
+
+If production catalog drift must be corrected before Stripe product/price
+creation is safe, run the same command with only `DATABASE_URL` set. That
+DB-only mode is enough for `/v1/billing/catalog` truth, but it does not prove
+checkout price IDs.
 
 ## Verification after run
 
@@ -89,7 +95,7 @@ than duplicated.
    SELECT COUNT(*) FROM product_prices;
    ```
 
-   Should show 7 products, 24 tiers, and 48 price rows.
+   Should show 7 products, 24 tiers, and 42 active price rows.
 
 4. **Public Dhanam catalog:** `https://api.dhan.am/v1/billing/catalog`
    returns all 7 products and 24 tiers, including custom/free tiers with

@@ -116,7 +116,8 @@ async function findStripePrice(
   stripe: Stripe,
   productId: string,
   currency: string,
-  interval: string
+  interval: string,
+  tierSlug: string
 ): Promise<Stripe.Price | null> {
   const prices = await stripe.prices.list({
     product: productId,
@@ -129,9 +130,28 @@ async function findStripePrice(
     prices.data.find(
       (p) =>
         p.recurring?.interval === (interval === 'yearly' ? 'year' : 'month') &&
-        p.recurring?.interval_count === 1
+        p.recurring?.interval_count === 1 &&
+        p.metadata?.madfam_tier === tierSlug &&
+        p.metadata?.madfam_currency === currency &&
+        p.metadata?.madfam_interval === interval
     ) ?? null
   );
+}
+
+function catalogPriceKey(tierSlug: string, currency: string, interval: string): string {
+  return [tierSlug, currency, interval].join('\u0000');
+}
+
+function catalogFeatureKey(tierSlug: string, feature: string): string {
+  return [tierSlug, feature].join('\u0000');
+}
+
+function slugifyFeature(feature: string): string {
+  return feature
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '')
+    .slice(0, 80);
 }
 
 // ---------------------------------------------------------------------------
@@ -140,6 +160,10 @@ async function findStripePrice(
 
 async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
   log('Product', `--- ${slug}: ${config.name} ---`);
+  const desiredTierSlugs = new Set(Object.keys(config.tiers));
+  const desiredPriceKeys = new Set<string>();
+  const desiredFeatureKeys = new Set<string>();
+  const desiredCreditOps = new Set(Object.keys(config.credit_costs ?? {}));
 
   // 1. Upsert DB Product
   const dbProduct = DRY_RUN
@@ -236,6 +260,7 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
     for (const [currency, priceConfig] of Object.entries(tier.prices)) {
       for (const [interval, amount] of Object.entries(priceConfig)) {
         if (!amount || amount === 0) continue;
+        desiredPriceKeys.add(catalogPriceKey(tierSlug, currency, interval));
 
         // DB upsert
         if (!DRY_RUN) {
@@ -263,6 +288,7 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
               dhanamTier: tier.dhanam_tier as any,
               displayName: tier.display_name,
               metadata: tier.metadata,
+              status: 'active' as any,
             },
           });
 
@@ -270,7 +296,13 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
           const stripe = getStripeForCurrency(currency);
           const stripeProductId = stripeProductIds[currency];
           if (stripe && stripeProductId && !dbPrice.stripePriceId) {
-            let stripePrice = await findStripePrice(stripe, stripeProductId, currency, interval);
+            let stripePrice = await findStripePrice(
+              stripe,
+              stripeProductId,
+              currency,
+              interval,
+              tierSlug
+            );
 
             if (stripePrice) {
               log('Price', `Found ${slug}/${tierSlug} ${currency} ${interval}: ${stripePrice.id}`);
@@ -312,11 +344,8 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
     if (tier.features) {
       for (let i = 0; i < tier.features.length; i++) {
         const feature = tier.features[i];
-        const featureSlug = feature
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '_')
-          .replace(/^_|_$/g, '')
-          .slice(0, 80);
+        const featureSlug = slugifyFeature(feature);
+        desiredFeatureKeys.add(catalogFeatureKey(tierSlug, featureSlug));
 
         if (!DRY_RUN) {
           await prisma.productFeature.upsert({
@@ -361,6 +390,82 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
       }
       log('Credit', `${slug}/${operation}: ${credits} credits`);
     }
+  }
+
+  if (!DRY_RUN) {
+    await pruneProductCatalogRows(
+      dbProduct.id,
+      desiredTierSlugs,
+      desiredPriceKeys,
+      desiredFeatureKeys,
+      desiredCreditOps
+    );
+  } else {
+    log('Prune', `${slug}: would archive/delete rows absent from catalog.yaml`);
+  }
+}
+
+async function pruneProductCatalogRows(
+  productId: string,
+  desiredTierSlugs: Set<string>,
+  desiredPriceKeys: Set<string>,
+  desiredFeatureKeys: Set<string>,
+  desiredCreditOps: Set<string>
+): Promise<void> {
+  const activePrices = await prisma.productPrice.findMany({
+    where: { productId, status: 'active' as any },
+    select: { id: true, tierSlug: true, currency: true, interval: true },
+  });
+  const stalePriceIds = activePrices
+    .filter(
+      (price) =>
+        !desiredPriceKeys.has(catalogPriceKey(price.tierSlug, price.currency, price.interval))
+    )
+    .map((price) => price.id);
+  if (stalePriceIds.length > 0) {
+    await prisma.productPrice.updateMany({
+      where: { id: { in: stalePriceIds } },
+      data: { status: 'archived' as any },
+    });
+    log('Prune', `Archived ${stalePriceIds.length} stale price rows`);
+  }
+
+  const features = await prisma.productFeature.findMany({
+    where: { productId },
+    select: { id: true, tierSlug: true, feature: true },
+  });
+  const staleFeatureIds = features
+    .filter(
+      (feature) => !desiredFeatureKeys.has(catalogFeatureKey(feature.tierSlug, feature.feature))
+    )
+    .map((feature) => feature.id);
+  if (staleFeatureIds.length > 0) {
+    await prisma.productFeature.deleteMany({ where: { id: { in: staleFeatureIds } } });
+    log('Prune', `Deleted ${staleFeatureIds.length} stale feature rows`);
+  }
+
+  const tiers = await prisma.productTier.findMany({
+    where: { productId },
+    select: { id: true, tierSlug: true },
+  });
+  const staleTierIds = tiers
+    .filter((tier) => !desiredTierSlugs.has(tier.tierSlug))
+    .map((tier) => tier.id);
+  if (staleTierIds.length > 0) {
+    await prisma.productTier.deleteMany({ where: { id: { in: staleTierIds } } });
+    log('Prune', `Deleted ${staleTierIds.length} stale tier rows`);
+  }
+
+  const creditCosts = await prisma.productCreditCost.findMany({
+    where: { productId },
+    select: { id: true, operation: true },
+  });
+  const staleCreditCostIds = creditCosts
+    .filter((cost) => !desiredCreditOps.has(cost.operation))
+    .map((cost) => cost.id);
+  if (staleCreditCostIds.length > 0) {
+    await prisma.productCreditCost.deleteMany({ where: { id: { in: staleCreditCostIds } } });
+    log('Prune', `Deleted ${staleCreditCostIds.length} stale credit-cost rows`);
   }
 }
 
