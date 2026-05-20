@@ -192,7 +192,10 @@ The signed-image break-glass workflow then built and signed web digest
 committed it to production as `68caffde`. The workflow's direct
 `kubectl set image` step failed because the GitHub runner could not reach the
 cluster API, but ArgoCD reconciled the signed digest successfully into the live
-`dhanam` namespace.
+`dhanam` namespace. The manual K8s workflows now skip raw Kubernetes rollout
+by default and require `direct_k8s_deploy=true` for the break-glass direct
+step, so the default path remains signed digest commit plus ArgoCD
+reconciliation.
 
 Verified after ArgoCD sync:
 

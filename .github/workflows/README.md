@@ -4,18 +4,18 @@ This directory contains GitHub Actions workflows for CI/CD, quality checks, and 
 
 ## Workflow Overview
 
-| Workflow               | Trigger  | Purpose                                |
-| ---------------------- | -------- | -------------------------------------- |
-| `ci.yml`               | Push, PR | Core CI pipeline - lint, test, build   |
-| `lint.yml`             | Push, PR | Code quality checks (ESLint, Prettier) |
-| `test-coverage.yml`    | Push, PR | Test execution with coverage reporting |
-| `check-migrations.yml` | PR       | Database migration validation          |
-| `deploy-staging.yml`   | Main     | Build, sign, and patch staging digests |
-| `promote-to-prod.yml`  | Manual   | Promote signed staging digest to prod  |
-| `deploy-enclii.yml`    | Manual   | Trigger Enclii deployment fallback     |
-| `deploy-k8s.yml`       | Manual   | Break-glass API Kubernetes deploy      |
-| `deploy-web-k8s.yml`   | Manual   | Break-glass web Kubernetes deploy      |
-| `deploy-admin-k8s.yml` | Manual   | Break-glass admin Kubernetes deploy    |
+| Workflow               | Trigger  | Purpose                                    |
+| ---------------------- | -------- | ------------------------------------------ |
+| `ci.yml`               | Push, PR | Core CI pipeline - lint, test, build       |
+| `lint.yml`             | Push, PR | Code quality checks (ESLint, Prettier)     |
+| `test-coverage.yml`    | Push, PR | Test execution with coverage reporting     |
+| `check-migrations.yml` | PR       | Database migration validation              |
+| `deploy-staging.yml`   | Main     | Build, sign, and patch staging digests     |
+| `promote-to-prod.yml`  | Manual   | Promote signed staging digest to prod      |
+| `deploy-enclii.yml`    | Manual   | Trigger Enclii deployment fallback         |
+| `deploy-k8s.yml`       | Manual   | Break-glass API build/sign, optional K8s   |
+| `deploy-web-k8s.yml`   | Manual   | Break-glass web build/sign, optional K8s   |
+| `deploy-admin-k8s.yml` | Manual   | Break-glass admin build/sign, optional K8s |
 
 ## Primary Deployment
 
@@ -109,7 +109,8 @@ Manual Kubernetes deployment workflows.
 
 **Usage:**
 
-- Emergency deployments when Enclii/promotion is unavailable
+- Emergency image build/sign and digest commits when Enclii/promotion is unavailable
+- Raw Kubernetes rollout is opt-in via `direct_k8s_deploy=true` and requires runner network access to the cluster API
 - Documented incident response only
 - Record the missing Enclii adapter gap after use
 

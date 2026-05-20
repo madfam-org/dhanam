@@ -62,8 +62,9 @@ These are not unit-test failures, but they block full-system stability:
   `promote-to-prod.yml` verifies those signatures before writing production
   digests. Existing staging overlay digests that predate the signing change
   must be refreshed by the next staging build before promotion.
-- `deploy-web-k8s.yml` can build, sign, and commit a production web digest, but
-  its direct deploy step cannot reach the cluster API from the GitHub runner.
+- The manual K8s workflows can build, sign, and commit production digests. Raw
+  `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
+  because GitHub runners cannot currently reach the cluster API.
 - Production API health has reported queue/provider degradation.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD

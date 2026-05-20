@@ -57,10 +57,11 @@ and admin images with GitHub Actions keyless cosign signatures, and
 `deploy-staging.yml@refs/heads/main` before it writes a production commit.
 Staging digests that predate this change must be rebuilt by the staging
 workflow before they are promotable. The break-glass K8s workflows also sign
-their images before committing production digests; their direct
-`kubectl set image` steps currently fail from GitHub-hosted runners because
-the cluster API is not reachable, so ArgoCD reconciliation of the signed digest
-is the effective deployment mechanism.
+their images before committing production digests; their raw
+`kubectl set image` rollout is now opt-in through `direct_k8s_deploy` because
+GitHub-hosted runners currently cannot reach the cluster API. By default,
+ArgoCD reconciliation of the signed digest is the effective deployment
+mechanism.
 
 ---
 
@@ -102,8 +103,10 @@ enclii deploy --file infra/enclii/services/dhanam-web.yaml --env prod --wait \
 ### Manual Deploy via kubectl (Break-Glass Only)
 
 Use this only for platform bootstrap or documented incidents when Enclii is
-unavailable or lacks the required adapter. Record the actor, reason, commands,
-result, and follow-up Enclii adapter gap.
+unavailable or lacks the required adapter. The manual K8s GitHub workflows
+commit signed production digests by default and skip raw Kubernetes rollout
+unless `direct_k8s_deploy=true` is explicitly selected. Record the actor,
+reason, commands, result, and follow-up Enclii adapter gap.
 
 ```bash
 # Update image directly
@@ -116,16 +119,16 @@ kubectl -n dhanam set image deployment/dhanam-web \
 
 ### GitHub Actions Workflows
 
-| Workflow               | Trigger         | Purpose                                       |
-| ---------------------- | --------------- | --------------------------------------------- |
-| `ci.yml`               | All PRs         | Lint, test, typecheck                         |
-| `deploy-enclii.yml`    | Manual dispatch | Fallback Enclii deploy                        |
-| `deploy-staging.yml`   | Push to main    | Build/sign staging images and patch digests   |
-| `deploy-k8s.yml`       | Manual dispatch | Break-glass API K8s deploy                    |
-| `deploy-web-k8s.yml`   | Manual dispatch | Break-glass web image build/sign + K8s deploy |
-| `deploy-admin-k8s.yml` | Manual dispatch | Break-glass admin-only K8s deploy             |
-| `promote-to-prod.yml`  | Manual dispatch | Verify/signature-gate soaked staging digest   |
-| `publish-packages.yml` | Tag / manual    | npm publish to npm.madfam.io                  |
+| Workflow               | Trigger         | Purpose                                     |
+| ---------------------- | --------------- | ------------------------------------------- |
+| `ci.yml`               | All PRs         | Lint, test, typecheck                       |
+| `deploy-enclii.yml`    | Manual dispatch | Fallback Enclii deploy                      |
+| `deploy-staging.yml`   | Push to main    | Build/sign staging images and patch digests |
+| `deploy-k8s.yml`       | Manual dispatch | Break-glass API build/sign, optional K8s    |
+| `deploy-web-k8s.yml`   | Manual dispatch | Break-glass web build/sign, optional K8s    |
+| `deploy-admin-k8s.yml` | Manual dispatch | Break-glass admin build/sign, optional K8s  |
+| `promote-to-prod.yml`  | Manual dispatch | Verify/signature-gate soaked staging digest |
+| `publish-packages.yml` | Tag / manual    | npm publish to npm.madfam.io                |
 
 ---
 
