@@ -33,6 +33,7 @@ redirect and should not become the source of truth again.
 - `README.md`
 - `ECOSYSTEM.md`
 - `docs/`
+- `docs/STABILITY_WRAP_UP_2026-05-20.md`
 - `infra/`
 - `.github/workflows/`
 
@@ -398,35 +399,38 @@ pipeline defined in
 
 **Current state:** PP.2b + PP.2c shipped. Staging now lives at
 `infra/k8s/overlays/staging/` as a Kustomize overlay of the prod canonical
-base, digest-pinned, and reconciled by the `dhanam-staging` ArgoCD
-Application. Promote + rollback are manual workflows (Pattern B).
+base, with digest-pinned images patched by `deploy-staging.yml`. The
+`dhanam-staging` ArgoCD Application manifest exists, but the live staging
+environment is still blocked by Application/namespace/secrets bootstrap and
+namespace-aware Cloudflare tunnel routes. Promote + rollback are manual
+workflows (Pattern B).
 
 See [docs/PP_2_STAGING_AUDIT.md](docs/PP_2_STAGING_AUDIT.md) for the original
 row-by-row gap analysis that scoped this work.
 
 ### RFC 0001 alignment (post PP.2b + PP.2c)
 
-| Area                                                                     | Status                                                                                     |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| Staging overlay (`infra/k8s/overlays/staging/`) inherits from production | Aligned (PP.2b)                                                                            |
-| Staging images digest-pinned (`sha256:...`)                              | Aligned (PP.2b) — CI patches `infra/k8s/overlays/staging/kustomization.yaml` per push      |
-| Admin in staging                                                         | Aligned (PP.2b)                                                                            |
-| `dhanam-staging` ArgoCD Application                                      | Manifest shipped at `infra/argocd/dhanam-staging-application.yaml`; operator must register |
-| Staging ingress / DNS (`staging-api.dhan.am`)                            | Env vars + CORS updated; Cloudflare tunnel route is an ops action                          |
-| Staging secrets template                                                 | Aligned (PP.2b) — `infra/k8s/staging-secrets-template.yaml` covers all three secret groups |
-| HTTP smoke on staging                                                    | Aligned (PP.2b) — 6x20s retry in `deploy-staging.yml`                                      |
-| `promote-to-prod.yml` (manual gate)                                      | Aligned (PP.2c)                                                                            |
-| `rollback-prod.yml`                                                      | Aligned (PP.2c)                                                                            |
-| `.enclii.yml` `promotion:` key                                           | Aligned (PP.2c) — `pattern: manual`                                                        |
-| Nightly prod→staging masked DB refresh                                   | Deferred (RFC 0001 open question — masking tool TBD)                                       |
+| Area                                                                     | Status                                                                                                 |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Staging overlay (`infra/k8s/overlays/staging/`) inherits from production | Aligned (PP.2b)                                                                                        |
+| Staging images digest-pinned (`sha256:...`)                              | Aligned (PP.2b) — CI patches `infra/k8s/overlays/staging/kustomization.yaml` per push                  |
+| Admin in staging                                                         | Aligned (PP.2b)                                                                                        |
+| `dhanam-staging` ArgoCD Application                                      | Manifest shipped at `infra/argocd/dhanam-staging-application.yaml`; operator must register             |
+| Staging ingress / DNS (`staging-api.dhan.am`)                            | DNS exists; tunnel routes are missing or point at production and need a namespace-aware Enclii adapter |
+| Staging secrets template                                                 | Aligned (PP.2b) — `infra/k8s/staging-secrets-template.yaml` covers all three secret groups             |
+| HTTP smoke on staging                                                    | Workflow exists; latest smoke failed HTTP 404 because staging tunnel routes are not live               |
+| `promote-to-prod.yml` (manual gate)                                      | Aligned (PP.2c)                                                                                        |
+| `rollback-prod.yml`                                                      | Aligned (PP.2c)                                                                                        |
+| `.enclii.yml` `promotion:` key                                           | Aligned (PP.2c) — `pattern: manual`                                                                    |
+| Nightly prod→staging masked DB refresh                                   | Deferred (RFC 0001 open question — masking tool TBD)                                                   |
 
-### Promotion pattern (when PP.2c lands)
+### Promotion pattern
 
 Dhanam is **Pattern B — manual gate** per RFC 0001. Reasoning: Dhanam is the
 billing boundary for the MADFAM ecosystem (Stripe MX, SPEI, Paddle, webhook
 relay to Karafiel for CFDI issuance). A wrong promote is expensive.
 
-When PP.2c ships, `.enclii.yml` will declare:
+`.enclii.yml` declares:
 
 ```yaml
 promotion:
@@ -437,15 +441,15 @@ promotion:
 
 ### What ships on push to `main` (post PP.2b/PP.2c)
 
-| Workflow               | Trigger                    | Effect                                                                                                                |
-| ---------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `deploy-staging.yml`   | push to main               | Builds api/web/admin, patches digests into `infra/k8s/overlays/staging/kustomization.yaml`, ArgoCD reconciles staging |
-| `promote-to-prod.yml`  | workflow_dispatch (manual) | Promotes a soaked staging digest (one component or all) into `infra/k8s/production/kustomization.yaml`                |
-| `rollback-prod.yml`    | workflow_dispatch (manual) | Restores a previous prod digest; defaults to the previous git-history entry                                           |
-| `deploy-enclii.yml`    | workflow_dispatch (manual) | Manual Enclii fallback; production routine still goes through Enclii web/API/CLI or promotion                         |
-| `deploy-k8s.yml` (API) | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                      |
-| `deploy-web-k8s.yml`   | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                      |
-| `deploy-admin-k8s.yml` | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                      |
+| Workflow               | Trigger                    | Effect                                                                                                                            |
+| ---------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `deploy-staging.yml`   | push to main               | Builds/signs api/web/admin, patches digests into `infra/k8s/overlays/staging/kustomization.yaml`, then smoke-tests public staging |
+| `promote-to-prod.yml`  | workflow_dispatch (manual) | Promotes a soaked staging digest (one component or all) into `infra/k8s/production/kustomization.yaml`                            |
+| `rollback-prod.yml`    | workflow_dispatch (manual) | Restores a previous prod digest; defaults to the previous git-history entry                                                       |
+| `deploy-enclii.yml`    | workflow_dispatch (manual) | Manual Enclii fallback; production routine still goes through Enclii web/API/CLI or promotion                                     |
+| `deploy-k8s.yml` (API) | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
+| `deploy-web-k8s.yml`   | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
+| `deploy-admin-k8s.yml` | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
 
 The legacy `deploy-{k8s,web-k8s,admin-k8s}.yml` workflows no longer run on
 push to `main`; they are manual break-glass paths only.
@@ -726,11 +730,15 @@ argocd` and the finalizer takes care of the namespace.
 
 - **Janua SDK**: Using `@janua/react-sdk@0.1.4`. PKCE exports and `useMFA`/`MFAChallenge` are now available. Auth state fix: `signIn()` parses JWT for immediate user state instead of blocking on `getCurrentUser()`. SSR safety: components loaded via `next/dynamic` + `JanuaErrorBoundary`; `SSRSafeJanuaProvider` in `providers.tsx` handles the dynamic import.
 - **API CORS for local dev**: `.env` `CORS_ORIGINS` must include the web dev port (e.g. `http://localhost:3040`).
-- **API PORT**: Local API runs on port from `.env` (`PORT=8500`), not 4010. Set `NEXT_PUBLIC_API_URL=http://localhost:8500/v1` for the web app.
+- **API PORT**: Local API runs on port `4010` through the current package
+  scripts. Set `NEXT_PUBLIC_API_URL=http://localhost:4010/v1` for the web app.
 - **Prisma migration**: After schema changes, run `npx prisma db push` against a running database before the API starts.
 - **SMTP env var**: The canonical name is `SMTP_PASSWORD` (not `SMTP_PASS`). K8s mounts `SMTP_PASSWORD`, and `email.service.ts` reads it directly via `configService.get('SMTP_PASSWORD')`.
 
-## Known Issues — Audit 2026-04-23
+## Historical Known Issues — Audit 2026-04-23
+
+This legacy section is preserved for context only. Verify each item against
+current source and the 2026-05-20 stability docs before treating it as active.
 
 See `/Users/aldoruizluna/labspace/claudedocs/ECOSYSTEM_AUDIT_2026-04-23.md` for the full ecosystem audit.
 

@@ -1,5 +1,12 @@
 # Test Implementation Status Report
 
+> [!NOTE]
+> Historical test-session report from 2025. This is not current production or
+> coverage status. For current test evidence and known blockers, read
+> [TEST_RESULTS.md](TEST_RESULTS.md),
+> [TEST_SUMMARY.md](TEST_SUMMARY.md), and
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+
 **Date:** November 17, 2025
 **Session:** Codebase Audit & Stability Improvements
 **Branch:** `claude/codebase-audit-01UPsfA3XHMe5zykTNQsHGYF`
@@ -334,9 +341,11 @@ Total:                 4,960 lines
 
 ## 🔗 Related Documents
 
-- [TEST_COVERAGE_GUIDE.md](./apps/api/TEST_COVERAGE_GUIDE.md) - Detailed testing guide
-- [COMPREHENSIVE_AUDIT_REPORT_2025.md](./COMPREHENSIVE_AUDIT_REPORT_2025.md) - Full codebase audit
-- [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) - Feature roadmap
+- [TEST_COVERAGE_GUIDE.md](../../apps/api/TEST_COVERAGE_GUIDE.md) - Detailed
+  testing guide
+- [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md) - current
+  stability audit
+- [Roadmap](../ROADMAP.md) - current stability roadmap
 
 ---
 

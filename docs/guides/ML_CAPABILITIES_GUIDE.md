@@ -283,12 +283,12 @@ interface SpaceMLSettings {
 
 ## Related Documentation
 
-- [Transaction Management](./TRANSACTIONS_GUIDE.md)
+- [Transaction Source](../../apps/api/src/modules/transactions)
 - [Provider Integration](./MULTI_PROVIDER_REDUNDANCY.md)
-- [Categories & Rules](./CATEGORIES_RULES_GUIDE.md)
+- [Categories Source](../../apps/api/src/modules/categories)
 
 ---
 
 **Module**: `apps/api/src/modules/ml/`
-**Status**: Production
-**Last Updated**: January 2025
+**Status**: Implemented; production availability follows current stability gates
+**Last Updated**: 2026-05-20

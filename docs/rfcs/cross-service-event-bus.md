@@ -261,6 +261,6 @@ Other MADFAM services (Janua for entitlement sync, admin dashboard for real-time
 ## Related Documents
 
 - [RFC: Belvo Payments Evaluation](./belvo-payments-evaluation.md)
-- [PravaraMES Outbox Migration](../../pravara-mes/apps/pravara-api/internal/db/migrations/022_event_outbox.up.sql) (reference implementation)
+- [PravaraMES Outbox Migration](../../../pravara-mes/apps/pravara-api/internal/db/migrations/022_event_outbox.up.sql) (reference implementation)
 - [Dhanam Webhook Utility](../../apps/api/src/core/utils/webhook.util.ts) (current webhook handling)
 - [Cotiza Webhook Controller](../../apps/api/src/modules/billing/cotiza-webhook.controller.ts) (current cross-service integration)

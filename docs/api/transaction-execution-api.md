@@ -108,7 +108,7 @@ POST /v1/spaces/:spaceId/orders
 #### Buy Cryptocurrency (Bitso)
 
 ```bash
-curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders \
+curl -X POST https://api.dhan.am/v1/spaces/space-123/orders \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -126,7 +126,7 @@ curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders \
 #### Transfer via ACH (Plaid)
 
 ```bash
-curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders \
+curl -X POST https://api.dhan.am/v1/spaces/space-123/orders \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -145,7 +145,7 @@ curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders \
 #### SPEI Transfer (Belvo)
 
 ```bash
-curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders \
+curl -X POST https://api.dhan.am/v1/spaces/space-123/orders \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -199,7 +199,7 @@ POST /v1/spaces/:spaceId/orders/:orderId/verify
 ### Example
 
 ```bash
-curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders/order-789/verify \
+curl -X POST https://api.dhan.am/v1/spaces/space-123/orders/order-789/verify \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -240,7 +240,7 @@ No body required.
 ### Example
 
 ```bash
-curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders/order-789/execute \
+curl -X POST https://api.dhan.am/v1/spaces/space-123/orders/order-789/execute \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -293,7 +293,7 @@ GET /v1/spaces/:spaceId/orders
 ### Example
 
 ```bash
-curl -X GET "https://api.dhanam.io/v1/spaces/space-123/orders?status=completed&limit=10" \
+curl -X GET "https://api.dhan.am/v1/spaces/space-123/orders?status=completed&limit=10" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -325,7 +325,7 @@ GET /v1/spaces/:spaceId/orders/:orderId
 ### Example
 
 ```bash
-curl -X GET https://api.dhanam.io/v1/spaces/space-123/orders/order-789 \
+curl -X GET https://api.dhan.am/v1/spaces/space-123/orders/order-789 \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -366,7 +366,7 @@ PATCH /v1/spaces/:spaceId/orders/:orderId
 ### Example
 
 ```bash
-curl -X PATCH https://api.dhanam.io/v1/spaces/space-123/orders/order-789 \
+curl -X PATCH https://api.dhan.am/v1/spaces/space-123/orders/order-789 \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -407,7 +407,7 @@ No body required.
 ### Example
 
 ```bash
-curl -X POST https://api.dhanam.io/v1/spaces/space-123/orders/order-789/cancel \
+curl -X POST https://api.dhan.am/v1/spaces/space-123/orders/order-789/cancel \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -456,7 +456,7 @@ GET /v1/spaces/:spaceId/orders/:orderId/executions
 ### Example
 
 ```bash
-curl -X GET https://api.dhanam.io/v1/spaces/space-123/orders/order-789/executions \
+curl -X GET https://api.dhan.am/v1/spaces/space-123/orders/order-789/executions \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -652,6 +652,6 @@ _Coming soon_ - Configure webhooks to receive real-time updates on order status 
 
 For questions or issues:
 
-- Email: support@dhanam.io
-- GitHub: https://github.com/madfam-io/dhanam/issues
-- Documentation: https://docs.dhanam.io
+- Email: support@dhan.am
+- GitHub: https://github.com/madfam-org/dhanam/issues
+- Documentation: https://github.com/madfam-org/dhanam/tree/main/docs

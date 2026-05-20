@@ -18,11 +18,12 @@ Prisma, AWS, or port assumptions.
 | API typecheck                                               | Passed                                        |
 | API pricing-engine targeted Jest                            | Passed                                        |
 | API onboarding + pricing targeted Jest                      | 3 suites, 68 tests passed                     |
-| API admin queue remediation targeted Jest                   | 2 suites, 12 tests passed                     |
+| API admin queue remediation targeted Jest                   | 2 suites, 18 tests passed                     |
+| API chaos health suite                                      | 11 suites, 102 tests passed                   |
 | Shared package build                                        | Passed                                        |
 | API build                                                   | Passed                                        |
 | Web production build                                        | Passed with blank public URL env vars         |
-| Admin production build                                      | Passed after Google Fonts network access      |
+| Admin production build                                      | Passed                                        |
 | Web Playwright accessibility + subscription slice           | 41 passed                                     |
 | Web Playwright auth + upgrade + visual harness slice        | 18 passed, 19 skipped by design               |
 | Lint                                                        | Passed with existing warnings                 |
@@ -31,6 +32,10 @@ Prisma, AWS, or port assumptions.
 | Local compiled API liveness smoke                           | Passed                                        |
 | Local MX pricing API smoke                                  | Passed                                        |
 | Production preflight                                        | Passed, including `www` apex redirect         |
+| Production rollout proof                                    | Passed at ArgoCD revision `28d42fcb`          |
+| Hosted CI for `71f03516`                                    | Passed                                        |
+| Hosted lint/typecheck for `71f03516`                        | Passed                                        |
+| Hosted test coverage for `71f03516`                         | Passed                                        |
 
 ## Recently Fixed In This Stabilization Pass
 
@@ -56,16 +61,19 @@ These are not unit-test failures, but they block full-system stability:
 
 - Staging DNS now exists and Enclii marks the three staging domains verified,
   but the ArgoCD Application/namespace are absent and Enclii junctions are not
-  namespace-aware for staging tunnel routes.
+  namespace-aware for staging tunnel routes. The latest staging run
+  `26146547918` built and signed all images for `71f03516`, committed
+  `28d42fcb`, and failed because `https://staging-api.dhan.am/health` returned
+  HTTP 404 on all six attempts.
 - Enclii API/admin deployment records show a Kyverno image-signature annotation
   mutation denial.
 - `deploy-staging.yml` now signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
   digests. Staging overlay digest refreshes now land as signed
-  `deploy(staging)` bot commits; `18fb956d` is the latest observed during this
-  audit. Promotion now also requires an explicit successful staging smoke run
-  id unless break-glass is selected. Live promotion still needs staging
-  smoke/soak evidence.
+  `deploy(staging)` bot commits; `28d42fcb` is the latest observed during this
+  audit. Promotion now also requires an explicit successful staging smoke run id
+  unless break-glass is selected. Live promotion still needs staging smoke/soak
+  evidence.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
   because GitHub runners cannot currently reach the cluster API. Their digest
@@ -78,7 +86,10 @@ These are not unit-test failures, but they block full-system stability:
   as `f97ae247`, and ArgoCD synced it to production.
 - Admin queue remediation endpoints now read BullMQ directly, retry failed jobs
   through `QueueService`, and require server-side `{ "confirm": true }` before
-  destructive queue clearing.
+  destructive queue clearing. The newest failed-job inspection and
+  failed-job-only clear endpoint set is in `71f03516`; it is not live in
+  production until the current build is promoted or explicitly break-glass
+  deployed.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.

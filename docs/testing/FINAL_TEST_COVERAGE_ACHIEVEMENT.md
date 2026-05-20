@@ -1,5 +1,12 @@
 # Final Test Coverage Achievement Report 🎯
 
+> [!NOTE]
+> Historical test-session report from 2025. This is not current production or
+> coverage status. For current test evidence and known blockers, read
+> [TEST_RESULTS.md](TEST_RESULTS.md),
+> [TEST_SUMMARY.md](TEST_SUMMARY.md), and
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+
 **Date:** 2025-11-20
 **Branch:** claude/codebase-audit-01ErwLffCdKT96WKvDscCXgf
 **Session Objective:** Achieve maximum test coverage for Dhanam Ledger

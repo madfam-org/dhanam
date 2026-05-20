@@ -1,5 +1,11 @@
 # Phase 2: Autonomous Transaction Execution - Complete Implementation Summary
 
+> [!NOTE]
+> Historical implementation report from 2025. This is not current production
+> status. For current stability, deployment, domains, and blockers, read
+> [STABILITY_WRAP_UP_2026-05-20.md](STABILITY_WRAP_UP_2026-05-20.md),
+> [ROADMAP.md](ROADMAP.md), and [testing/TEST_RESULTS.md](testing/TEST_RESULTS.md).
+
 ## Overview
 
 Phase 2 transforms Dhanam from a budget tracker into an **Autonomous Family Office** with real money movement capabilities. Users can now create, verify, and execute financial transactions across multiple providers with enterprise-grade security.

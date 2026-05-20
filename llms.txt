@@ -10,6 +10,8 @@ Compact LLM context index for this repository.
 - `docs/ROADMAP.md` — current stability roadmap and execution order.
 - `docs/STABILITY_AUDIT_2026-05-19.md` — current stability, production,
   staging, DNS, health, and Enclii rollout status.
+- `docs/STABILITY_WRAP_UP_2026-05-20.md` — concise latest stability wrap-up,
+  verification state, blockers, and next order of work.
 - `docs/TECH_DEBT.md` — current active technical debt and historical debt
   archive pointers.
 - `docs/DOCUMENTATION_AUDIT_2026-05-19.md` — docs accuracy, organization, and

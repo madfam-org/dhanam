@@ -1,5 +1,10 @@
 # Dhanam Ledger - Complete Implementation Roadmap
 
+> [!NOTE]
+> Historical implementation roadmap. For current production-stability work, use
+> [../ROADMAP.md](../ROADMAP.md) and
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+
 **Status**: In Progress
 **Last Updated**: 2025-11-17
 **Target Completion**: 4 weeks

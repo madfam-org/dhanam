@@ -1,10 +1,18 @@
 # Dhanam "Blue Ocean Pivot" - Implementation Summary
 
+> [!NOTE]
+> Historical implementation report from 2025. This is not current production
+> status. For current stability, deployment, domains, and blockers, read
+> [STABILITY_WRAP_UP_2026-05-20.md](STABILITY_WRAP_UP_2026-05-20.md),
+> [STABILITY_AUDIT_2026-05-19.md](STABILITY_AUDIT_2026-05-19.md), and
+> [DEPLOYMENT.md](DEPLOYMENT.md).
+
 **Project**: Dhanam Ledger
 **Implementation**: Q1 Strategic Pivot + Enhancements
 **Date Completed**: 2025-11-19
 **Branch**: `claude/audit-strategy-pivot-016qmW2iALtwYzNLcpwtKzNLcpwtKzUq`
-**Status**: ✅ Production Ready
+**Historical status claimed**: Production Ready (superseded by current
+stability docs)
 
 ---
 
@@ -457,7 +465,7 @@ Create Stripe checkout session for premium upgrade.
 
 ```json
 {
-  "returnUrl": "https://app.dhanam.io/dashboard"
+  "returnUrl": "https://app.dhan.am/dashboard"
 }
 ```
 

@@ -269,11 +269,11 @@ The estate planning feature is intended for **informational and organizational p
 ## Related Documentation
 
 - [API Reference](../API.md)
-- [Household Management](./HOUSEHOLD_GUIDE.md)
-- [Security & Compliance](./SECURITY_GUIDE.md)
+- [Household Management](./HOUSEHOLD_FEATURES_GUIDE.md)
+- [Security & Compliance](../ADMIN_DASHBOARD.md)
 
 ---
 
 **Module**: `apps/api/src/modules/estate-planning/`
-**Status**: Production
-**Last Updated**: January 2025
+**Status**: Implemented; production availability follows current stability gates
+**Last Updated**: 2026-05-20

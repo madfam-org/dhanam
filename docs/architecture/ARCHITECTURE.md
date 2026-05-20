@@ -1,6 +1,6 @@
 # Dhanam Architecture
 
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 
 Dhanam is a Turborepo + pnpm monorepo that serves two related products:
 
@@ -139,10 +139,13 @@ Current production deploys to MADFAM bare-metal Kubernetes via Enclii:
 - Domain manifest: `enclii.yaml`
 - GitHub workflows: `.github/workflows`
 
-Staging and production status as of 2026-05-19 is documented in
+Staging and production status as of 2026-05-20 is documented in
 [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md). In short:
-images build and releases can be created, but staging DNS/tunnel routing and an
-Enclii/Kyverno rollout blocker remain unresolved.
+hosted CI is green and production rollout proof passes through ArgoCD, but
+staging smoke fails at HTTP 404 because staging tunnel routes are missing or
+point at production. Full production API health remains `degraded` until the
+retained BullMQ failures are inspected, retried, or cleared through the audited
+admin path after the current queue-hardening build is promoted.
 
 ## Observability
 

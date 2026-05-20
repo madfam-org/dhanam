@@ -1,6 +1,6 @@
 # Dhanam Infrastructure & Testing Guide
 
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 
 Current production infrastructure is Enclii-managed bare-metal Kubernetes with
 Cloudflare Tunnel ingress. For deploy/runbook truth, read
@@ -219,6 +219,11 @@ POST /v1/admin/queues/:name/clear-failed     # Clear only failed jobs, confirm=t
 POST /v1/admin/queues/:name/clear            # Whole-queue break-glass clear, confirm=true
 ```
 
+The failed-job inspection and `clear-failed` endpoint set is current-source
+truth from `71f03516`. It still needs a successful staging smoke and production
+promotion, or an explicitly recorded break-glass promotion, before it can be
+used against the live production queue failures.
+
 ## CI/CD Pipeline
 
 ### GitHub Actions Workflow
@@ -386,7 +391,7 @@ R2_ACCOUNT_ID=...
 R2_ACCESS_KEY_ID=...
 R2_SECRET_ACCESS_KEY=...
 R2_BUCKET_NAME=dhanam-documents
-R2_PUBLIC_URL=https://docs.dhanam.io  # Optional: for public asset URLs
+R2_PUBLIC_URL=https://github.com/madfam-org/dhanam/tree/main/docs  # Optional: for public asset URLs
 ```
 
 ## Cloudflare R2 Storage
@@ -511,4 +516,4 @@ For more information, see:
 
 - [API Documentation](./API.md)
 - [Development Guide](./DEVELOPMENT.md)
-- [Security Policy](./SECURITY.md)
+- [Security Policy](../SECURITY.md)

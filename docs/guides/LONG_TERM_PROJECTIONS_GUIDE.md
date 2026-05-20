@@ -390,12 +390,13 @@ MONTE_CARLO_PARALLEL_WORKERS=4
 
 - [Monte Carlo Guide](./MONTE_CARLO_GUIDE.md) - Simulation engine details
 - [Goal Tracking](./GOAL_TRACKING_GUIDE.md) - Financial goal setting
-- [Wealth Dashboard](./WEALTH_GUIDE.md) - Net worth tracking
+- [Simulations Package](../../packages/simulations/README.md) - Projection and
+  simulation engines
 - [API Reference](../API.md) - Projection API endpoints
 
 ---
 
 **Module**: `apps/api/src/modules/projections/`
 **Package**: `@dhanam/simulations`
-**Status**: Production
-**Last Updated**: January 2025
+**Status**: Implemented; production availability follows current stability gates
+**Last Updated**: 2026-05-20

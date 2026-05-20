@@ -179,6 +179,11 @@ Available actions:
   for break-glass cleanup. It removes waiting, active, completed, failed, and
   delayed jobs, so prefer inspect, retry, then failed-job-only cleanup.
 
+Production note: the failed-job inspection and failed-job-only clear path is in
+current source commit `71f03516`. It is not available on live production until
+that build is promoted after a green staging smoke, or through a documented
+break-glass promotion.
+
 ## Admin Actions Audit Trail
 
 All admin actions are logged with high severity:

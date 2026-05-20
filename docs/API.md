@@ -1531,7 +1531,7 @@ import { DhanamAPI } from '@dhanam/sdk';
 
 const dhanam = new DhanamAPI({
   apiKey: 'your_api_key',
-  baseURL: 'https://api.dhanam.io/v1',
+  baseURL: 'https://api.dhan.am/v1',
 });
 
 // Get spaces
@@ -1555,7 +1555,7 @@ from dhanam import DhanamAPI
 
 dhanam = DhanamAPI(
     api_key='your_api_key',
-    base_url='https://api.dhanam.io/v1'
+    base_url='https://api.dhan.am/v1'
 )
 
 # Get spaces
@@ -1574,7 +1574,7 @@ transactions = dhanam.transactions.list(
 
 Test API endpoints in sandbox mode:
 
-**Base URL**: `https://api-sandbox.dhanam.io/v1`
+**Base URL**: `https://staging-api.dhan.am/v1`
 
 ### Test Credentials
 
@@ -1596,12 +1596,12 @@ The sandbox environment includes:
 
 ## Support
 
-- **API Status**: [status.dhanam.io](https://status.dhanam.io)
-- **Documentation**: [docs.dhanam.io](https://docs.dhanam.io)
-- **Developer Support**: [dev@dhanam.io](mailto:dev@dhanam.io)
+- **API Status**: `https://api.dhan.am/v1/monitoring/health`
+- **Documentation**: [repository docs](https://github.com/madfam-org/dhanam/tree/main/docs)
+- **Developer Support**: [dev@dhan.am](mailto:dev@dhan.am)
 - **Discord Community**: [discord.gg/dhanam](https://discord.gg/dhanam)
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: 2026-05-20
 **API Version**: v1.1.0

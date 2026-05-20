@@ -299,11 +299,11 @@ import { DefiPositionDetails } from '@/components/defi/position-details';
 
 - [API Reference](../API.md) - Full DeFi API documentation
 - [Wealth Management](./GOAL_TRACKING_GUIDE.md) - Goal tracking with DeFi
-- [ESG Scoring](./ESG_METHODOLOGY.md) - ESG scores for crypto assets
+- [ESG Scoring](../../packages/esg/README.md) - ESG scores for crypto assets
 
 ---
 
 **Module**: `apps/api/src/modules/defi/`
 **Package**: `@dhanam/defi-adapter`
-**Status**: Production
-**Last Updated**: January 2025
+**Status**: Implemented; production availability follows current stability gates
+**Last Updated**: 2026-05-20

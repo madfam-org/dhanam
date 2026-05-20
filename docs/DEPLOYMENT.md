@@ -58,9 +58,10 @@ and admin images with GitHub Actions keyless cosign signatures, and
 also requires the operator to provide a successful `Deploy to Staging` run id
 whose smoke job passed for the staged source commit, unless the operator
 selects the explicit break-glass smoke bypass. Staging digest refreshes now land
-as signed `deploy(staging)` bot commits; `18fb956d` is the latest observed
-during this audit. Future promotions must use signed staging digests with
-smoke/soak evidence. The break-glass K8s workflows also sign
+as signed `deploy(staging)` bot commits; `28d42fcb` is the latest observed
+refresh and records signed staging digests for source commit `71f03516`. Future
+promotions must use signed staging digests with smoke/soak evidence. The
+break-glass K8s workflows also sign
 their images before committing production digests; their raw
 `kubectl set image` rollout is now opt-in through `direct_k8s_deploy` because
 GitHub-hosted runners currently cannot reach the cluster API. By default,
@@ -265,6 +266,12 @@ into the Enclii-registered `enclii-dhanam-staging` namespace. The digest patch
 step resets to the latest `origin/main` before committing so a long image build
 does not fail or overwrite newer stabilization commits.
 
+Current status as of the 2026-05-20 wrap-up: `Deploy to Staging` run
+`26146547918` built and signed all three images for `71f03516`, committed
+staging digest refresh `28d42fcb`, and failed only at the public API smoke
+because `https://staging-api.dhan.am/health` returned HTTP 404 on all six
+attempts. Do not use that failed smoke run as production-promotion evidence.
+
 Required staging hostnames:
 
 | Service | Host                            |
@@ -282,9 +289,11 @@ As of 2026-05-20, Enclii custom-domain verification and Cloudflare DNS CNAMEs
 exist for all three staging hostnames. Staging is still not production-grade:
 the ArgoCD Application is not registered in-cluster, the
 `enclii-dhanam-staging` namespace is absent, staging Vault/ESO paths must be
-populated, and Enclii `junctions add` currently maps hostnames to production
-namespace services instead of staging. Treat staging tunnel-route apply as an
-Enclii adapter gap until a namespace-aware route operation exists.
+populated, and public tunnel routing is wrong. Enclii read-only tunnel
+inspection (`op_1779260970221167708`) shows no routes for `staging-api.dhan.am`
+or `staging.dhan.am`; `staging-admin.dhan.am` points to the production admin
+service. Treat staging tunnel-route apply as an Enclii adapter gap until a
+namespace-aware route operation exists.
 
 ### Current Enclii Policy Blocker
 
@@ -336,6 +345,10 @@ not staging. Required staging routes are:
 Do not leave staging hostnames pointed at production services. Use an Enclii
 namespace-aware tunnel-route adapter when available; raw Cloudflare edits are
 break-glass only.
+
+The current `enclii providers cloudflare tunnels` command can inspect or plan
+tunnel changes, but this Enclii build exposes no apply flag for these
+namespace-aware staging routes.
 
 ---
 

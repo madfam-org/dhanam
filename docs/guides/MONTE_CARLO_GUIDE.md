@@ -1,8 +1,8 @@
 # Monte Carlo Simulation Guide
 
 **Version**: 1.0
-**Last Updated**: 2025-11-19
-**Status**: Production Ready
+**Last Updated**: 2026-05-20
+**Status**: Implemented; production availability follows current stability gates
 
 ## Overview
 
@@ -115,7 +115,7 @@ Where:
 #### Example Request
 
 ```bash
-curl -X POST https://api.dhanam.io/simulations/monte-carlo \
+curl -X POST https://api.dhan.am/simulations/monte-carlo \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -199,7 +199,7 @@ Calculates the probability of achieving a specific financial goal.
 #### Example Request
 
 ```bash
-curl -X POST https://api.dhanam.io/simulations/goal-probability \
+curl -X POST https://api.dhan.am/simulations/goal-probability \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -285,7 +285,7 @@ Two-phase retirement planning:
 #### Example Request
 
 ```bash
-curl -X POST https://api.dhanam.io/simulations/retirement \
+curl -X POST https://api.dhan.am/simulations/retirement \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -377,7 +377,7 @@ Compare baseline simulation against historical market crash scenarios.
 #### Request
 
 ```bash
-curl -X POST https://api.dhanam.io/simulations/scenarios/GREAT_RECESSION \
+curl -X POST https://api.dhan.am/simulations/scenarios/GREAT_RECESSION \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -429,7 +429,7 @@ Get recommended portfolio parameters based on risk tolerance.
 #### Example Request
 
 ```bash
-curl -X POST https://api.dhanam.io/simulations/recommended-allocation \
+curl -X POST https://api.dhan.am/simulations/recommended-allocation \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1032,9 +1032,9 @@ npm test simulations
 
 For questions or issues:
 
-- **GitHub Issues**: https://github.com/madfam-io/dhanam/issues
-- **Documentation**: https://docs.dhanam.io/simulations
-- **Email**: support@dhanam.io
+- **GitHub Issues**: https://github.com/madfam-org/dhanam/issues
+- **Documentation**: https://github.com/madfam-org/dhanam/tree/main/docs/simulations
+- **Email**: support@dhan.am
 
 ---
 

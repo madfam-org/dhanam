@@ -336,12 +336,14 @@ ML_VALIDATION_SPLIT=0.2
 ## Related Documentation
 
 - [API Reference](../API.md) - ML API endpoints
-- [Budget Rules](./BUDGET_GUIDE.md) - Category-based budgeting
-- [Transaction Management](./TRANSACTION_GUIDE.md) - Transaction handling
+- [Budget Rules Source](../../apps/api/src/modules/budgets) - Category-based
+  budgeting
+- [Transaction Source](../../apps/api/src/modules/transactions) - Transaction
+  handling
 
 ---
 
 **Module**: `apps/api/src/modules/ml/`
 **Queue**: `ml-retrain`
-**Status**: Production
-**Last Updated**: January 2025
+**Status**: Implemented; production availability follows current stability gates
+**Last Updated**: 2026-05-20

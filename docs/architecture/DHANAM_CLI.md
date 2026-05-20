@@ -1,5 +1,11 @@
 # Dhanam CLI - One-Line Platform Management
 
+> [!NOTE]
+> Historical local-CLI concept doc. Verify commands against
+> [../DEVELOPMENT.md](../DEVELOPMENT.md) and current package scripts before
+> using. Current local API port is `4010`, and production operations are
+> Enclii-first.
+
 ## Quick Start
 
 ```bash

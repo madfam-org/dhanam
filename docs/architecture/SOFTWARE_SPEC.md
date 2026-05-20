@@ -1,5 +1,11 @@
 # MADFAM Budget & Wealth Tracker — Software Specification (v0.1)
 
+> [!NOTE]
+> Historical product specification. Infrastructure references in this file may
+> predate the current Enclii/ArgoCD/Cloudflare deployment model. For current
+> operations, read [../DEPLOYMENT.md](../DEPLOYMENT.md) and
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+
 **Project Codename:** Dhanam Ledger
 **Owner:** Innovaciones MADFAM S.A.S. de C.V. (Aldo Ruiz Luna)
 **Last Updated:** 2025-08-23

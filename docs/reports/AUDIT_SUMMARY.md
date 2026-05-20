@@ -1,5 +1,10 @@
 # Dhanam Ledger - Comprehensive Codebase Audit Summary
 
+> [!NOTE]
+> Historical audit report from 2025. It is preserved for context and may mention
+> superseded infrastructure. Current stability truth lives in
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+
 **Audit Date:** 2025-11-20
 **Auditor:** Claude Code (Sonnet 4.5)
 **Branch:** claude/codebase-audit-01ErwLffCdKT96WKvDscCXgf

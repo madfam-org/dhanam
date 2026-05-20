@@ -1,5 +1,10 @@
 # Dhanam Dogfooding Quickstart
 
+> [!NOTE]
+> Historical internal dogfooding guide. Verify commands against
+> [DEVELOPMENT.md](DEVELOPMENT.md) before use; current local API port is
+> `4010`, and LocalStack is not part of the current default quick start.
+
 > **Internal MADFAM guide for using Dhanam to track MADFAM finances**
 
 ## Quick Start (5 minutes)

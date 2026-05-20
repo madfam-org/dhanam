@@ -1,9 +1,17 @@
 # CI/CD Implementation Summary
 
+> [!NOTE]
+> Historical CI implementation report from 2025. This is not current production
+> status. For current stability, deployment, domains, and blockers, read
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md),
+> [../ROADMAP.md](../ROADMAP.md), and
+> [../testing/TEST_RESULTS.md](../testing/TEST_RESULTS.md).
+
 **Date:** November 17, 2025
 **Session:** CI/CD Automation Setup
 **Branch:** `claude/codebase-audit-01UPsfA3XHMe5zykTNQsHGYF`
-**Status:** ✅ Complete & Ready for Production
+**Historical status claimed:** Complete and ready for production (superseded by
+current stability docs)
 
 ---
 
@@ -484,9 +492,10 @@ Everything above, PLUS:
 
 **Internal:**
 
-- [CICD_SETUP.md](.github/CICD_SETUP.md) - Detailed setup guide
-- [TEST_COVERAGE_GUIDE.md](apps/api/TEST_COVERAGE_GUIDE.md) - Testing guide
-- [TEST_IMPLEMENTATION_STATUS.md](TEST_IMPLEMENTATION_STATUS.md) - Current status
+- [CICD_SETUP.md](../../.github/CICD_SETUP.md) - Detailed setup guide
+- [TEST_COVERAGE_GUIDE.md](../../apps/api/TEST_COVERAGE_GUIDE.md) - Testing guide
+- [TEST_IMPLEMENTATION_STATUS.md](../testing/TEST_IMPLEMENTATION_STATUS.md) -
+  historical test implementation status
 
 ---
 
@@ -521,13 +530,16 @@ After CI/CD is fully set up and running, we can move to:
 **Time to Set Up:** ~2 hours
 **Time to Run:** 10-15 minutes per push
 **Coverage Target:** 80%+
-**Status:** ✅ Production Ready
+**Historical status claimed:** Production ready (superseded by current
+stability docs)
 
 **Commit:** `bc2168f`
 **Branch:** `claude/codebase-audit-01UPsfA3XHMe5zykTNQsHGYF`
 
 ---
 
-**The CI/CD infrastructure is now complete and ready for production use! 🚀**
+**Historical conclusion:** the CI/CD infrastructure was considered complete for
+that 2025 branch; current gate status is tracked in
+[../testing/TEST_RESULTS.md](../testing/TEST_RESULTS.md).
 
 Next recommended action: Set up Codecov token and verify first workflow run.

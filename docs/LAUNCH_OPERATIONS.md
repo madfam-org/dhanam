@@ -466,7 +466,7 @@ Mexico's Ley para Regular las Instituciones de Tecnologia Financiera (Ley Fintec
 
 ### 5.11 PostHog (Analytics)
 
-**URL:** Self-hosted at `https://analytics.madfam.io` (see [POSTHOG_INTEGRATION.md](../guides/POSTHOG_INTEGRATION.md))
+**URL:** Self-hosted at `https://analytics.madfam.io` (see [POSTHOG_INTEGRATION.md](guides/POSTHOG_INTEGRATION.md))
 
 **Steps:**
 

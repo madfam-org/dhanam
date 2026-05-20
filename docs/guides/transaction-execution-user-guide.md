@@ -372,9 +372,9 @@ Configure limits based on your needs:
 
 **A:** Contact support:
 
-- Email: support@dhanam.io
+- Email: support@dhan.am
 - In-app chat
-- Help Center: https://help.dhanam.io
+- Help Center: https://dhan.am
 
 ---
 

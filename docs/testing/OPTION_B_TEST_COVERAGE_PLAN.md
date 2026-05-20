@@ -416,9 +416,9 @@ Based on:
 
 ## Resources
 
-- [TEST_COVERAGE_GUIDE.md](apps/api/TEST_COVERAGE_GUIDE.md)
+- [TEST_COVERAGE_GUIDE.md](../../apps/api/TEST_COVERAGE_GUIDE.md)
 - [TEST_IMPLEMENTATION_STATUS.md](TEST_IMPLEMENTATION_STATUS.md)
-- [CICD_SETUP.md](.github/CICD_SETUP.md)
+- [CICD_SETUP.md](../../.github/CICD_SETUP.md)
 
 ---
 

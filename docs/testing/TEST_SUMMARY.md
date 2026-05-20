@@ -1,6 +1,6 @@
 # Testing Overview
 
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 
 Dhanam uses layered tests across API, web, admin, mobile, contracts, and
 Playwright journeys. Prefer focused checks while developing and run the broader
@@ -57,6 +57,12 @@ contracts, and Playwright coverage. Staging deployment is a separate workflow on
 push to `main`; see [Deployment Guide](../DEPLOYMENT.md) and
 [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md) for current
 deployment caveats.
+
+Latest wrap-up: hosted CI, lint/typecheck, and test coverage passed for
+`71f03516`; `Deploy to Staging` built and signed images but failed public API
+smoke at HTTP 404 due the staging tunnel-route gap. See
+[Verification Snapshot](TEST_RESULTS.md) and
+[Stability Wrap-Up 2026-05-20](../STABILITY_WRAP_UP_2026-05-20.md).
 
 ## Local Playwright Notes
 

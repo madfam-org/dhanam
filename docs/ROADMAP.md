@@ -9,6 +9,7 @@ codebase and production implementation across `dhan.am`, `www.dhan.am`,
 Read this with:
 
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)
+- [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)
 - [Tech Debt Register](TECH_DEBT.md)
 - [Deployment Guide](DEPLOYMENT.md)
 - [Testing Overview](testing/TEST_SUMMARY.md)
@@ -33,14 +34,34 @@ Dhanam is considered fully stable only when all of these are true:
 
 ## Current Position
 
-| Area                      | Current estimate | Status                                                                                        |
-| ------------------------- | ---------------- | --------------------------------------------------------------------------------------------- |
-| Codebase and CI           | 96%              | Hosted lint/typecheck, coverage, CI, build, and Playwright are green.                         |
-| Public production surface | 90%              | Public DNS and health checks pass for apex, `www`, app, admin, and API liveness.              |
-| API runtime health        | 82%              | DB, Redis, Belvo, and optional external checks are up; queue health remains degraded.         |
-| Release and staging path  | 74%              | Images build/sign and staging overlay patches; staging DNS is restored but tunnel routes lag. |
-| Ops control plane         | 80%              | ArgoCD production app is Healthy/Synced; Enclii `prod` is not yet live rollout truth.         |
-| Overall stability         | 87%              | Mostly stable production with unresolved operational debt, not a finished stability mission.  |
+| Area                      | Current estimate | Status                                                                                            |
+| ------------------------- | ---------------- | ------------------------------------------------------------------------------------------------- |
+| Codebase and CI           | 96%              | Hosted lint/typecheck, coverage, CI, build, and Playwright are green.                             |
+| Public production surface | 90%              | Public DNS and health checks pass for apex, `www`, app, admin, and API liveness.                  |
+| API runtime health        | 82%              | DB, Redis, Belvo, and optional external checks are up; production queue health remains degraded.  |
+| Release and staging path  | 74%              | Images build/sign and staging overlay patches; latest staging smoke fails 404 due tunnel routing. |
+| Ops control plane         | 80%              | ArgoCD production app is Healthy/Synced; Enclii `prod` is not yet live rollout truth.             |
+| Overall stability         | 87%              | Mostly stable production with unresolved operational debt, not a finished stability mission.      |
+
+## Current Verification Snapshot
+
+As of 2026-05-20:
+
+- Current `main` head is `28d42fcb deploy(staging): update digests to 71f0351`.
+- The implementation commit is `71f03516 fix(stability): harden production queue remediation`.
+- Hosted `CI` (`26146547824`), `Lint & Type Check` (`26146547856`), and
+  `Test Coverage` (`26146547825`) passed for `71f03516`.
+- `Deploy to Staging` (`26146547918`) built and signed API, web, and admin
+  images and committed staging digests, but failed the API smoke because
+  `https://staging-api.dhan.am/health` returned HTTP 404 on all six attempts.
+- `scripts/production-preflight.sh` passes for production DNS, liveness, app,
+  admin, apex, and `www -> apex` redirect checks.
+- `scripts/production-rollout-proof.js` passes: ArgoCD `dhanam-services` is
+  Healthy/Synced at revision `28d42fcb`, and live production images match
+  `infra/k8s/production/kustomization.yaml`.
+- Full production health still returns `status: "degraded"` because there are
+  100 retained failed jobs: 50 in `sync-transactions` and 50 in
+  `categorize-transactions`.
 
 ## Priority Roadmap
 
@@ -70,7 +91,10 @@ Goal: remove the remaining production runtime degradation.
 
 Work:
 
-- Inspect failed BullMQ jobs through the audited admin queue endpoints.
+- Promote the `71f03516` API/admin/web build after staging smoke passes, or use
+  an explicitly recorded break-glass bypass if an incident requires it.
+- Inspect failed BullMQ jobs through the audited admin queue endpoints after the
+  current queue-hardening build is live.
 - Retry safe failures first:
   - `POST /v1/admin/queues/sync-transactions/retry-failed`
   - `POST /v1/admin/queues/categorize-transactions/retry-failed`
@@ -103,6 +127,11 @@ Work:
 - Keep the staging DNS CNAMEs created through Enclii on 2026-05-20 in place.
 - Re-run `deploy-staging.yml` until build, signature, overlay patch, reconcile,
   smoke, and soak all pass.
+- Fix the confirmed 2026-05-20 route state:
+  - `staging-api.dhan.am` has no tunnel route and returns 404.
+  - `staging.dhan.am` has no tunnel route and returns 404.
+  - `staging-admin.dhan.am` points at the production admin service and is not a
+    valid staging proof.
 
 Acceptance:
 
@@ -223,12 +252,14 @@ Acceptance:
 
 ## Execution Order
 
-1. Drain or deliberately clear production queue failures.
-2. Make staging smoke pass.
-3. Repair or formalize production rollout truth.
-4. Wire Enclii policy waiver apply.
-5. Encode provider health semantics.
-6. Tighten lower-severity code and documentation debt.
+1. Make staging smoke pass for the signed `71f03516` images.
+2. Promote the current queue-hardening build through the manual gate, or record
+   an explicit break-glass bypass if production queue remediation is urgent.
+3. Drain, retry, or deliberately clear production queue failures through the
+   audited admin path.
+4. Repair or formalize production rollout truth.
+5. Wire Enclii policy waiver apply and namespace-aware tunnel-route apply.
+6. Encode provider health semantics and tighten lower-severity code/docs debt.
 
 ## Stability Milestones
 

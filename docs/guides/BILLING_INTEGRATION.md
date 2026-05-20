@@ -441,11 +441,11 @@ All billing operations are logged:
 ## Related Documentation
 
 - [API Reference](../API.md)
-- [Authentication Guide](./AUTH_GUIDE.md)
-- [Janua SSO Integration](./JANUA_INTEGRATION.md)
+- [Authentication ADR](../adr/004-janua-auth-integration.md)
+- [Janua Billing Dependency](../adr/conekta-janua-dependency.md)
 
 ---
 
 **Module**: `apps/api/src/modules/billing/`
-**Status**: Production
-**Last Updated**: February 2026
+**Status**: Implemented; production availability follows current stability gates
+**Last Updated**: 2026-05-20

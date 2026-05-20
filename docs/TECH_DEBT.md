@@ -22,16 +22,16 @@ For execution order and milestone targets, read the [Roadmap](ROADMAP.md).
 
 ## Active Debt
 
-| ID      | Area                      | Severity | Status   | Current impact                                                                                                             | Primary reference                                        |
-| ------- | ------------------------- | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| TD-1001 | Production queue health   | High     | Active   | API full health is HTTP 200 but `degraded` because retained BullMQ failures still need operator action.                    | [Stability Audit](STABILITY_AUDIT_2026-05-19.md)         |
-| TD-1002 | Staging activation        | High     | Active   | Staging DNS is restored, but ArgoCD app, namespace, secrets, and namespace-aware tunnel routes lag.                        | [Deployment Guide](DEPLOYMENT.md)                        |
-| TD-1003 | Production rollout truth  | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth. | [Stability Audit](STABILITY_AUDIT_2026-05-19.md)         |
-| TD-1004 | Enclii adapter coverage   | Medium   | Active   | Policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.                       | [Stability Audit](STABILITY_AUDIT_2026-05-19.md)         |
-| TD-1005 | Provider health semantics | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                              | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)        |
-| TD-1006 | React 18 global pin       | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                          | [package.json](../package.json)                          |
-| TD-1007 | Mobile test depth         | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                 | [Mobile Guide](MOBILE.md)                                |
-| TD-1008 | Historical docs cleanup   | Low      | Active   | Some reports and secondary guides still mention old AWS/Fargate, ports, hosts, or test counts.                             | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-19.md) |
+| ID      | Area                      | Severity | Status   | Current impact                                                                                                                                      | Primary reference                                        |
+| ------- | ------------------------- | -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| TD-1001 | Production queue health   | High     | Active   | API full health is HTTP 200 but `degraded` because retained BullMQ failures still need operator action after the queue-hardening build is promoted. | [Stability Audit](STABILITY_AUDIT_2026-05-19.md)         |
+| TD-1002 | Staging activation        | High     | Active   | Staging DNS is restored; latest staging smoke failed 404 because tunnel routes are absent or point at production.                                   | [Deployment Guide](DEPLOYMENT.md)                        |
+| TD-1003 | Production rollout truth  | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth.                          | [Stability Audit](STABILITY_AUDIT_2026-05-19.md)         |
+| TD-1004 | Enclii adapter coverage   | Medium   | Active   | Policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.                                                | [Stability Audit](STABILITY_AUDIT_2026-05-19.md)         |
+| TD-1005 | Provider health semantics | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                                                       | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)        |
+| TD-1006 | React 18 global pin       | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                                                   | [package.json](../package.json)                          |
+| TD-1007 | Mobile test depth         | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                                          | [Mobile Guide](MOBILE.md)                                |
+| TD-1008 | Historical docs cleanup   | Low      | Active   | Some reports and secondary guides still mention old AWS/Fargate, ports, hosts, or test counts.                                                      | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-19.md) |
 
 ## Remediation Notes
 
@@ -52,6 +52,10 @@ whether the jobs are stale or retryable. Prefer `clear-failed` over whole-queue
 `clear`; whole-queue clear removes waiting, active, completed, failed, and
 delayed jobs.
 
+Current status: the safer `failed` inspection and failed-job-only cleanup path
+was implemented in `71f03516` and built into signed staging images, but it is
+not yet live in production because staging smoke for that build failed.
+
 ### TD-1002: Staging Activation
 
 Staging requires a real reconciled environment before promotion can be treated
@@ -63,6 +67,9 @@ as fully safe:
 - Add namespace-aware Cloudflare tunnel routes for staging hosts. DNS CNAMEs
   were restored through Enclii on 2026-05-20; tunnel route apply is the
   remaining Cloudflare adapter gap.
+- Fix the current route state: `staging-api.dhan.am` and `staging.dhan.am`
+  have no tunnel route and return 404; `staging-admin.dhan.am` points at the
+  production admin service.
 - Re-run staging deploy until build, digest patch, sync, smoke, and soak all
   pass.
 
@@ -112,6 +119,7 @@ test counts. Current docs should stay linked from [docs/README.md](README.md).
 | Area                           | Closed by                                                                      |
 | ------------------------------ | ------------------------------------------------------------------------------ |
 | Admin queue remediation stubs  | `fcbceed8 fix(admin): wire queue remediation to bullmq`                        |
+| Safer queue cleanup API/UI     | `71f03516 fix(stability): harden production queue remediation`                 |
 | Final queue rollout docs       | `ef5cb7c8 docs: record final queue remediation rollout`                        |
 | Production promotion hardening | `3c8e4116 ci: harden production promotion gates`                               |
 | March enterprise-hardening log | Archived as [reports/TECH_DEBT_2026-03-21.md](reports/TECH_DEBT_2026-03-21.md) |

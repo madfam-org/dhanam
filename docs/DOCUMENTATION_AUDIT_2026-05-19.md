@@ -1,5 +1,7 @@
 # Documentation Audit - 2026-05-19
 
+Last refreshed: 2026-05-20
+
 ## Scope
 
 This audit reviewed the documentation entrypoints, root LLM context, app/package
@@ -25,6 +27,9 @@ Authoritative current docs:
 
 Historical/session docs remain useful context, but they should not override
 current source, manifests, Enclii specs, `AGENTS.md`, or the stability audit.
+The 2026-05-20 wrap-up updated the primary status docs to reflect green hosted
+CI, staging smoke failure at HTTP 404, production health degradation from
+retained queue failures, and the current Enclii tunnel-route adapter gap.
 
 ## Findings
 

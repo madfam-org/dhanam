@@ -4,6 +4,13 @@
 
 **Accepted** - January 2025
 
+> [!NOTE]
+> Current production remains Enclii-first, but public production rollout truth is
+> presently verified through ArgoCD `dhanam-services` and
+> `scripts/production-rollout-proof.js` until the Enclii `prod` namespace
+> mapping gap is repaired. There is no active AWS/ECS/Fargate fallback in this
+> repository.
+
 ## Context
 
 Dhanam requires a deployment platform that supports:
@@ -167,7 +174,8 @@ Secrets are:
 
 ### Mitigations
 
-- Terraform configs in `infra/terraform/` for AWS fallback
+- Containerized app boundaries and Kubernetes manifests remain portable; no
+  active AWS/Terraform fallback is maintained in this repo.
 - Docker-based deployments are portable
 - Standard Kubernetes manifests exportable
 - Disaster recovery plan includes cloud failover

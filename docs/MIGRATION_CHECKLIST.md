@@ -1,5 +1,11 @@
 # Dhanam Migration Checklist
 
+> [!NOTE]
+> Historical migration checklist. It preserves the Janua/domain migration
+> context and may mention old `dhanam.io` hosts. For current domains and
+> deployment status, read [DEPLOYMENT.md](DEPLOYMENT.md) and
+> [STABILITY_WRAP_UP_2026-05-20.md](STABILITY_WRAP_UP_2026-05-20.md).
+
 > [!IMPORTANT]
 > MADFAM-ENCLII-FIRST-LEGACY-RAW v1: This document contains legacy raw infrastructure command examples.
 > Routine production operations must use Enclii web, API, or CLI. Treat raw
@@ -22,7 +28,7 @@
   Client ID: dhanam-api
   Client Type: Confidential
   Redirect URIs:
-    - https://app.dhanam.io/api/auth/callback/janua
+    - https://app.dhan.am/api/auth/callback/janua
     - http://localhost:3040/api/auth/callback/janua (dev)
   Allowed Scopes: openid profile email
   Token Endpoint Auth: client_secret_basic
@@ -52,7 +58,7 @@
   - STRIPE_MX_SECRET_KEY: `sk_live_____________`
 
 - [ ] **Configure Webhook**
-  - Endpoint: `https://api.dhanam.io/billing/webhooks/stripe`
+  - Endpoint: `https://api.dhan.am/billing/webhooks/stripe`
   - Events: `checkout.session.completed`, `invoice.paid`, `customer.subscription.*`
   - STRIPE_MX_WEBHOOK_SECRET: `whsec_____________`
 
@@ -72,7 +78,7 @@
   - PADDLE_CLIENT_TOKEN: `_______________`
 
 - [ ] **Configure Webhook**
-  - Endpoint: `https://api.dhanam.io/billing/webhooks/paddle`
+  - Endpoint: `https://api.dhan.am/billing/webhooks/paddle`
   - PADDLE_WEBHOOK_SECRET: `_______________`
 
 - [ ] **Configure Products in Paddle**
@@ -231,12 +237,12 @@ Edit `cloudflared-unified.yaml` in cloudflare-tunnel namespace:
 
 ```yaml
 # Add to ingress section:
-- hostname: app.dhanam.io
+- hostname: app.dhan.am
   service: http://dhanam-web.dhanam.svc.cluster.local:80
   originRequest:
     noTLSVerify: true
 
-- hostname: api.dhanam.io
+- hostname: api.dhan.am
   service: http://dhanam-api.dhanam.svc.cluster.local:80
   originRequest:
     noTLSVerify: true
@@ -252,7 +258,7 @@ kubectl rollout restart deployment/cloudflared -n cloudflare-tunnel
 
 1. Navigate to Zero Trust → Networks → Tunnels
 2. Select your tunnel
-3. Add public hostnames for app.dhanam.io and api.dhanam.io
+3. Add public hostnames for app.dhan.am and api.dhan.am
 
 ---
 
@@ -273,7 +279,7 @@ In Cloudflare Dashboard for dhanam.io:
 
 ```bash
 # OIDC Discovery
-curl -s https://api.dhanam.io/health | jq .
+curl -s https://api.dhan.am/health | jq .
 
 # Should return:
 # {
@@ -293,7 +299,7 @@ TOKEN=$(curl -s -X POST https://auth.madfam.io/oauth/token \
   | jq -r .access_token)
 
 # Verify token works with Dhanam API
-curl -H "Authorization: Bearer $TOKEN" https://api.dhanam.io/users/me
+curl -H "Authorization: Bearer $TOKEN" https://api.dhan.am/users/me
 ```
 
 ### Billing Webhooks
@@ -302,12 +308,12 @@ curl -H "Authorization: Bearer $TOKEN" https://api.dhanam.io/users/me
 # Stripe webhook test (from Stripe Dashboard)
 # Paddle webhook test (from Paddle Dashboard)
 # Or use Stripe CLI:
-stripe listen --forward-to https://api.dhanam.io/billing/webhooks/stripe
+stripe listen --forward-to https://api.dhan.am/billing/webhooks/stripe
 ```
 
 ### Web Application
 
-1. Navigate to https://app.dhanam.io
+1. Navigate to https://app.dhan.am
 2. Click "Sign In with Galaxy Account"
 3. Authenticate via Janua
 4. Verify redirect back to Dhanam dashboard
@@ -371,7 +377,7 @@ Configure alerts for:
 - [ ] Secrets stored in K8s secrets (not environment files)
 - [ ] NetworkPolicy restricts secret access to dhanam-api pods only
 - [ ] TLS terminated at Cloudflare edge
-- [ ] CORS configured for app.dhanam.io only
+- [ ] CORS configured for app.dhan.am only
 - [ ] Rate limiting enabled on billing webhooks
 - [ ] Audit logging enabled for billing operations
 - [ ] Janua tokens validated via JWKS (not shared secret)
@@ -402,10 +408,10 @@ Configure alerts for:
 
 ### Endpoints
 
-| Service | Internal                               | External      |
-| ------- | -------------------------------------- | ------------- |
-| API     | dhanam-api.dhanam.svc.cluster.local:80 | api.dhanam.io |
-| Web     | dhanam-web.dhanam.svc.cluster.local:80 | app.dhanam.io |
+| Service | Internal                               | External    |
+| ------- | -------------------------------------- | ----------- |
+| API     | dhanam-api.dhanam.svc.cluster.local:80 | api.dhan.am |
+| Web     | dhanam-web.dhanam.svc.cluster.local:80 | app.dhan.am |
 
 ### Ports (MADFAM Block)
 

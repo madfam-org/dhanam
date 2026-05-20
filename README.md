@@ -48,17 +48,18 @@
 
 ## Production Status
 
-Snapshot: 2026-05-19. Public web/admin surfaces respond, but full-system
-stability is not yet 100%. See
+Snapshot: 2026-05-20. Public production routes respond, hosted CI is green, and
+ArgoCD production rollout proof passes, but full-system stability is not yet
+100%. See
 [docs/STABILITY_AUDIT_2026-05-19.md](docs/STABILITY_AUDIT_2026-05-19.md) for
 the current production, staging, DNS, health, and Enclii rollout blockers.
 
-| Service      | Domain          | Status                   |
-| ------------ | --------------- | ------------------------ |
-| Web App      | `app.dhan.am`   | Running on Enclii        |
-| Landing Page | `dhan.am`       | Running on Enclii        |
-| API Backend  | `api.dhan.am`   | Degraded health observed |
-| Admin Panel  | `admin.dhan.am` | Running on Enclii        |
+| Service      | Domain          | Status                                        |
+| ------------ | --------------- | --------------------------------------------- |
+| Web App      | `app.dhan.am`   | Public health passing                         |
+| Landing Page | `dhan.am`       | Public health passing                         |
+| API Backend  | `api.dhan.am`   | HTTP 200, full health degraded by queues only |
+| Admin Panel  | `admin.dhan.am` | Public health passing                         |
 
 **Authentication**: Janua SSO via `@janua/react-sdk` (OIDC with PKCE, handled by SDK)
 
@@ -328,8 +329,8 @@ For detailed testing documentation, see:
 
 The application is deployed via **Enclii** to bare metal K8s (GitOps with ArgoCD):
 
-1. **Staging**: Push to `main` → `deploy-staging.yml` patches digest-pinned staging images and ArgoCD reconciles.
-2. **Production**: `promote-to-prod.yml` manually promotes a soaked staging digest, or Enclii auto-deploys when configured.
+1. **Staging**: Push to `main` → `deploy-staging.yml` builds/signs images and patches digest-pinned staging images. Current blocker: public staging smoke returns 404 until namespace-aware tunnel routes are repaired.
+2. **Production**: `promote-to-prod.yml` manually promotes a soaked staging digest after a successful staging smoke run, unless an explicit break-glass bypass is recorded.
 3. **Break glass**: `deploy-enclii.yml` / `deploy-{k8s,web-k8s,admin-k8s}.yml` are manual emergency paths only.
 
 ```bash

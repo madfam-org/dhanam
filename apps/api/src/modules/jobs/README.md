@@ -188,6 +188,11 @@ Use inspect, then retry, then failed-job-only cleanup. Whole-queue clearing
 removes waiting, active, completed, failed, and delayed jobs and is reserved for
 break-glass cleanup.
 
+Production note: the failed-job inspection and failed-job-only clear path is in
+current source commit `71f03516`. It is not available on live production until
+that build is promoted after a green staging smoke, or through a documented
+break-glass promotion.
+
 ### Graceful Shutdown
 
 The module supports graceful shutdown with queue draining:

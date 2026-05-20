@@ -502,16 +502,16 @@ pnpm test:e2e:android   # E2E tests on Android
 #### Development
 
 ```env
-API_BASE_URL=http://localhost:4000
-EXPO_PUBLIC_API_URL=http://localhost:4000
+API_BASE_URL=http://localhost:4010/v1
+EXPO_PUBLIC_API_URL=http://localhost:4010/v1
 EXPO_PUBLIC_POSTHOG_KEY=phc-dev-key
 ```
 
 #### Production
 
 ```env
-API_BASE_URL=https://api.dhanam.io/v1
-EXPO_PUBLIC_API_URL=https://api.dhanam.io/v1
+API_BASE_URL=https://api.dhan.am/v1
+EXPO_PUBLIC_API_URL=https://api.dhan.am/v1
 EXPO_PUBLIC_POSTHOG_KEY=phc-prod-key
 ```
 
@@ -585,12 +585,12 @@ pnpm start
 
 ### Support
 
-- **Technical Support**: [mobile@dhanam.io](mailto:mobile@dhanam.io)
+- **Technical Support**: [mobile@dhan.am](mailto:mobile@dhan.am)
 - **Bug Reports**: [GitHub Issues](https://github.com/aldoruizluna/dhanam/issues)
 - **Feature Requests**: [GitHub Discussions](https://github.com/aldoruizluna/dhanam/discussions)
 
 ---
 
-**Last Updated**: January 2024  
-**App Version**: v1.0.0  
+**Last Updated**: 2026-05-20
+**App Version**: v1.0.0
 **Minimum OS**: iOS 12.0, Android 6.0 (API level 23)
