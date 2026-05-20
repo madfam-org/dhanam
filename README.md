@@ -54,12 +54,12 @@ ArgoCD production rollout proof passes, but full-system stability is not yet
 [docs/STABILITY_AUDIT_2026-05-19.md](docs/STABILITY_AUDIT_2026-05-19.md) for
 the current production, staging, DNS, health, and Enclii rollout blockers.
 
-| Service      | Domain          | Status                                        |
-| ------------ | --------------- | --------------------------------------------- |
-| Web App      | `app.dhan.am`   | Public health passing                         |
-| Landing Page | `dhan.am`       | Public health passing                         |
-| API Backend  | `api.dhan.am`   | HTTP 200, full health degraded by queues only |
-| Admin Panel  | `admin.dhan.am` | Public health passing                         |
+| Service      | Domain          | Status                        |
+| ------------ | --------------- | ----------------------------- |
+| Web App      | `app.dhan.am`   | Public health passing         |
+| Landing Page | `dhan.am`       | Public health passing         |
+| API Backend  | `api.dhan.am`   | HTTP 200, full health passing |
+| Admin Panel  | `admin.dhan.am` | Public health passing         |
 
 **Authentication**: Janua SSO via `@janua/react-sdk` (OIDC with PKCE, handled by SDK)
 
@@ -329,7 +329,7 @@ For detailed testing documentation, see:
 
 The application is deployed via **Enclii** to bare metal K8s (GitOps with ArgoCD):
 
-1. **Staging**: Push to `main` → `deploy-staging.yml` builds/signs images and patches digest-pinned staging images. Current blocker: public staging smoke returns 404 until namespace-aware tunnel routes are repaired.
+1. **Staging**: Push to `main` → `deploy-staging.yml` builds/signs images and patches digest-pinned staging images. API smoke is currently green; web/admin staging smoke and staging-admin API/env proof still need to be added.
 2. **Production**: `promote-to-prod.yml` manually promotes a soaked staging digest after a successful staging smoke run, unless an explicit break-glass bypass is recorded.
 3. **Break glass**: `deploy-enclii.yml` / `deploy-{k8s,web-k8s,admin-k8s}.yml` are manual emergency paths only.
 

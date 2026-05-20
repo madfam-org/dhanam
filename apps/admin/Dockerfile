@@ -34,6 +34,14 @@ RUN pnpm --filter @dhanam/shared build || true
 RUN pnpm --filter @dhanam/config build || true
 RUN pnpm --filter @dhanam/ui build || true
 
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_OIDC_ISSUER
+
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_OIDC_ISSUER=$NEXT_PUBLIC_OIDC_ISSUER
+
 WORKDIR /app/apps/admin
 RUN pnpm build
 

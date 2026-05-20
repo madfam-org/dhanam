@@ -131,28 +131,27 @@ export class PriceResolverService {
    * Legacy env-var-based price resolution (backwards compatibility).
    */
   private getPriceIdFromEnv(tier: string): string | undefined {
-    switch (tier) {
+    const coreTier = tier.toLowerCase().replace(/_(yearly|annual|monthly)$/, '');
+
+    switch (coreTier) {
       case 'essentials':
-      case 'essentials_yearly':
         return this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID');
       case 'pro':
-      case 'pro_yearly':
         return this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
       case 'premium':
-      case 'premium_yearly':
         return this.config.get<string>('STRIPE_PREMIUM_PLAN_PRICE_ID');
       default:
         // Try product-prefixed plans (e.g., enclii_pro)
-        if (tier.includes('_pro')) {
+        if (coreTier.endsWith('_pro')) {
           return this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
         }
-        if (tier.includes('_essentials')) {
+        if (coreTier.endsWith('_essentials')) {
           return this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID');
         }
-        if (tier.includes('_premium')) {
+        if (coreTier.endsWith('_premium')) {
           return this.config.get<string>('STRIPE_PREMIUM_PLAN_PRICE_ID');
         }
-        return this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
+        return undefined;
     }
   }
 

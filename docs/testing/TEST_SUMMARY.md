@@ -63,15 +63,16 @@ push to `main`; see [Deployment Guide](../DEPLOYMENT.md) and
 [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md) for current
 deployment caveats.
 
-Latest wrap-up: hosted CI, lint/typecheck, and test coverage passed for
-`71f03516`; `Deploy to Staging` built and signed images but failed public API
-smoke at HTTP 404 due the staging tunnel-route gap. See
-[Verification Snapshot](TEST_RESULTS.md) and
+Latest wrap-up: hosted CI (`26189667372`), lint/typecheck (`26189667024`),
+test coverage (`26189667253`), and `Deploy to Staging` (`26189667025`) passed
+for `3acdeea4`. Production rollout proof passes at ArgoCD revision `6717d0fb`,
+and production full health is `status: "healthy"` with `failedJobs: 0`.
+
+The current follow-up commit changes only docs plus the type-adaptive
+`product_tiers` migration source; rerun local format, Prisma validation,
+targeted API tests, and any required hosted gates before treating it as final.
+See [Verification Snapshot](TEST_RESULTS.md) and
 [Stability Wrap-Up 2026-05-20](../STABILITY_WRAP_UP_2026-05-20.md).
-After that hosted snapshot, local targeted Jest passed for the admin
-authorization hardening, auth strategy admin-claim propagation, queue recurring
-cleanup, cron job idempotency, Stripe fail-closed behavior, and the admin
-operations E2E platform-admin fixture.
 
 ## Local Playwright Notes
 

@@ -40,10 +40,12 @@ Prisma, AWS, or port assumptions.
 | Local compiled API liveness smoke                           | Passed                                        |
 | Local MX pricing API smoke                                  | Passed                                        |
 | Production preflight                                        | Passed, including `www` apex redirect         |
-| Production rollout proof                                    | Passed at ArgoCD revision `28d42fcb`          |
-| Hosted CI for `71f03516`                                    | Passed                                        |
-| Hosted lint/typecheck for `71f03516`                        | Passed                                        |
-| Hosted test coverage for `71f03516`                         | Passed                                        |
+| Production rollout proof                                    | Passed at ArgoCD revision `6717d0fb`          |
+| Production full health                                      | Healthy, `failedJobs: 0`                      |
+| Staging API smoke                                           | Passed for `3acdeea4` / run `26189667025`     |
+| Hosted CI for `3acdeea4`                                    | Passed, run `26189667372`                     |
+| Hosted lint/typecheck for `3acdeea4`                        | Passed, run `26189667024`                     |
+| Hosted test coverage for `3acdeea4`                         | Passed, run `26189667253`                     |
 
 ## Recently Fixed In This Stabilization Pass
 
@@ -67,37 +69,31 @@ Prisma, AWS, or port assumptions.
 
 These are not unit-test failures, but they block full-system stability:
 
-- Staging DNS now exists and Enclii marks the three staging domains verified,
-  but the ArgoCD Application/namespace are absent and Enclii junctions are not
-  namespace-aware for staging tunnel routes. The latest staging run
-  `26146547918` built and signed all images for `71f03516`, committed
-  `28d42fcb`, and failed because `https://staging-api.dhan.am/health` returned
-  HTTP 404 on all six attempts.
+- Staging API smoke is now green. Run `26189667025` built and signed all images
+  for `3acdeea4`, committed `6717d0fb`, and passed
+  `https://staging-api.dhan.am/health`.
+- Staging web/admin hostnames are reachable. This follow-up source adds
+  web/admin route and staging API-origin smoke checks; the next hosted staging
+  run must pass them before staging is a complete promotion gate.
 - Enclii API/admin deployment records show a Kyverno image-signature annotation
   mutation denial.
-- `deploy-staging.yml` now signs newly built staging images and
+- `deploy-staging.yml` signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
-  digests. Staging overlay digest refreshes now land as signed
-  `deploy(staging)` bot commits; `28d42fcb` is the latest observed during this
-  audit. Promotion now also requires an explicit successful staging smoke run id
-  unless break-glass is selected. Live promotion still needs staging smoke/soak
-  evidence.
+  digests. Staging overlay digest refreshes land as signed `deploy(staging)`
+  bot commits; `6717d0fb` is the latest observed here. Promotion requires an
+  explicit successful staging smoke run id unless break-glass is selected.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
   because GitHub runners cannot currently reach the cluster API. Their digest
   patch step no longer downloads the volatile upstream kustomize installer.
-- Production API liveness passes and the signed API digest from workflow run
-  `26141540713` was reconciled by ArgoCD as commit `df5d30fc`. Full health now
-  returns HTTP 200 with `status: degraded` because 100 retained failed BullMQ
-  jobs remain across `sync-transactions` and `categorize-transactions`.
+- Production API liveness and full health pass. Full health returns
+  `status: "healthy"` with `failedJobs: 0`.
 - The admin app client change was built/signed by run `26141639932`, committed
   as `f97ae247`, and ArgoCD synced it to production.
 - Admin queue remediation endpoints now read BullMQ directly, retry failed jobs
   through `QueueService`, and require server-side `{ "confirm": true }` before
-  destructive queue clearing. The newest failed-job inspection and
-  failed-job-only clear endpoint set is in `71f03516`; it is not live in
-  production until the current build is promoted or explicitly break-glass
-  deployed.
+  destructive queue clearing. The failed-job inspection endpoint is live and
+  auth-gated in production: unauthenticated calls return HTTP 401.
 - Current source also hardens `AdminGuard` to require platform-admin status
   instead of any space owner/admin role, removes obsolete generic BullMQ
   repeatable schedules, and makes cron-dispatched queue jobs idempotent across
@@ -110,6 +106,9 @@ These are not unit-test failures, but they block full-system stability:
   against disposable Postgres/Redis.
 - Current source also makes the Stripe wrapper fail closed when unconfigured,
   returning a controlled service-unavailable error instead of a raw TypeError.
+- Current source also makes the `product_tiers` migration derive
+  `product_id` type from `products.id`, preventing the production UUID drift
+  failure from recurring in future environments.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.

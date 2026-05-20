@@ -153,6 +153,10 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.ADMIN_IMAGE }}:staging-${{ steps.sha.outputs.short }}
             ${{ env.REGISTRY }}/${{ env.ADMIN_IMAGE }}:staging-latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.STAGING_ADMIN_API_URL || vars.STAGING_WEB_API_URL || 'https://staging-api.dhan.am/v1' }}
+            NEXT_PUBLIC_APP_URL=${{ vars.STAGING_WEB_URL || 'https://staging.dhan.am' }}
+            NEXT_PUBLIC_OIDC_ISSUER=${{ vars.STAGING_OIDC_ISSUER || '' }}
           cache-from: type=gha,scope=admin
           cache-to: type=gha,scope=admin,mode=max
       - name: Sign Admin staging image
@@ -249,4 +253,38 @@ jobs:
             sleep 20
           done
           echo "::error::Staging API failed health check after 6 attempts ($URL/health)"
+          exit 1
+
+      - name: Web route and API env check
+        run: |
+          URL="${{ vars.STAGING_WEB_URL || 'https://staging.dhan.am' }}"
+          API_URL="${{ vars.STAGING_WEB_API_URL || 'https://staging-api.dhan.am/v1' }}"
+          API_ORIGIN="${API_URL%/v1}"
+          for i in 1 2 3 4 5 6; do
+            HEADERS="$(curl -fsSI --max-time 10 "$URL" || true)"
+            if printf '%s' "$HEADERS" | grep -F "$API_ORIGIN" > /dev/null; then
+              echo "Web smoke passed on attempt $i"
+              exit 0
+            fi
+            echo "attempt $i web route/env not ready, retrying"
+            sleep 20
+          done
+          echo "::error::Staging web did not expose expected API origin $API_ORIGIN"
+          exit 1
+
+      - name: Admin route and API env check
+        run: |
+          URL="${{ vars.STAGING_ADMIN_URL || 'https://staging-admin.dhan.am' }}"
+          API_URL="${{ vars.STAGING_ADMIN_API_URL || vars.STAGING_WEB_API_URL || 'https://staging-api.dhan.am/v1' }}"
+          API_ORIGIN="${API_URL%/v1}"
+          for i in 1 2 3 4 5 6; do
+            HEADERS="$(curl -fsSI --max-time 10 "$URL/login" || true)"
+            if printf '%s' "$HEADERS" | grep -F "$API_ORIGIN" > /dev/null; then
+              echo "Admin smoke passed on attempt $i"
+              exit 0
+            fi
+            echo "attempt $i admin route/env not ready, retrying"
+            sleep 20
+          done
+          echo "::error::Staging admin did not expose expected API origin $API_ORIGIN"
           exit 1

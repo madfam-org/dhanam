@@ -28,16 +28,16 @@ Authoritative current docs:
 Historical/session docs remain useful context, but they should not override
 current source, manifests, Enclii specs, `AGENTS.md`, or the stability audit.
 The 2026-05-20 wrap-up updated the primary status docs to reflect green hosted
-CI, staging smoke failure at HTTP 404, production health degradation from
-retained queue failures, and the current Enclii tunnel-route adapter gap.
+CI, green staging API smoke, production full health with zero failed queue
+backlog, and the remaining Enclii adapter gaps.
 
 ## Findings
 
 ### Fixed In This Pass
 
-- Root README status was overconfident and implied all production surfaces were
-  green. It now links to the stability audit and calls out degraded API and
-  rollout blockers.
+- Root README status was refreshed after production remediation. It now links
+  to the stability audit and separates green live health from the remaining
+  rollout and Enclii adapter blockers.
 - Root README and development docs referenced stale repository, ports, scripts,
   env files, and test commands. They now align with `package.json`,
   app package scripts, and local ports `4010`, `3040`, and `3400`.

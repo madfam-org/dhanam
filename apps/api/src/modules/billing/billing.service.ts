@@ -10,6 +10,7 @@ import { PostHogService } from '../analytics/posthog.service';
 
 import { JanuaWebhookPayloadDto } from './dto/janua-webhook.dto';
 import { JanuaBillingService } from './janua-billing.service';
+import { PriceResolverService } from './services/price-resolver.service';
 import { SubscriptionLifecycleService } from './services/subscription-lifecycle.service';
 import { UsageTrackingService } from './services/usage-tracking.service';
 import { WebhookProcessorService } from './services/webhook-processor.service';
@@ -79,7 +80,9 @@ export class BillingService {
         this.januaBilling,
         this.audit,
         this.config,
-        this.posthog
+        this.posthog,
+        undefined,
+        new PriceResolverService(this.config, this.prisma)
       );
     this.webhooks =
       webhooks ??

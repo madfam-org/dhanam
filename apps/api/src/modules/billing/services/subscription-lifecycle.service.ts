@@ -9,6 +9,7 @@ import { PostHogService } from '../../analytics/posthog.service';
 import { BillingProvider, JanuaBillingService } from '../janua-billing.service';
 import { StripeService } from '../stripe.service';
 
+import { PriceResolverService } from './price-resolver.service';
 import { WebhookDlqService } from './webhook-dlq.service';
 
 /**
@@ -66,7 +67,8 @@ export class SubscriptionLifecycleService {
     // Optional so existing call sites that build this service manually
     // (older specs) don't have to construct a DLQ stub. When absent,
     // the legacy "log + forget" failure path is preserved.
-    @Optional() private dlq?: WebhookDlqService
+    @Optional() private dlq?: WebhookDlqService,
+    @Optional() private priceResolver?: PriceResolverService
   ) {}
 
   // ─── Upgrade flows ───────────────────────────────────────────────────
@@ -230,18 +232,8 @@ export class SubscriptionLifecycleService {
       });
     }
 
-    // Route to correct Stripe price based on plan
     const plan = options.plan || 'pro';
-    const priceId =
-      plan === 'essentials'
-        ? this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID')
-        : plan === 'premium'
-          ? this.config.get<string>('STRIPE_PREMIUM_PLAN_PRICE_ID')
-          : this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
-
-    if (!priceId) {
-      throw new Error(`No Stripe price configured for plan: ${plan}`);
-    }
+    const priceId = await this.resolveStripePriceId(plan, options.product);
 
     // Build metadata including orgId for external app linking
     const metadata: Record<string, string> = { userId: user.id, plan };
@@ -356,13 +348,7 @@ export class SubscriptionLifecycleService {
       });
     }
 
-    // Route to correct Stripe price based on plan
-    const priceId =
-      plan === 'essentials'
-        ? this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID')
-        : plan === 'premium'
-          ? this.config.get<string>('STRIPE_PREMIUM_PLAN_PRICE_ID')
-          : this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
+    const priceId = await this.resolveStripePriceId(plan, product);
 
     const session = await this.stripe.createCheckoutSession({
       customerId,
@@ -410,10 +396,7 @@ export class SubscriptionLifecycleService {
       throw new Error(`User not found: ${userId}`);
     }
 
-    const priceId = this.config.get<string>(`STRIPE_${planId.toUpperCase()}_PRICE_ID`);
-    if (!priceId) {
-      throw new Error(`Unknown plan: ${planId}`);
-    }
+    const priceId = await this.resolveStripePriceId(planId);
 
     const defaultSuccessUrl = this.config.get<string>('FRONTEND_URL', 'https://app.dhan.am');
     const session = await this.stripe.createCheckoutSession({
@@ -436,6 +419,67 @@ export class SubscriptionLifecycleService {
       checkoutUrl: session.url || '',
       sessionId: session.id,
     };
+  }
+
+  private normalizeCatalogPlanId(plan: string, product?: string): string {
+    const normalizedPlan = plan.toLowerCase();
+    const normalizedProduct = product?.toLowerCase();
+    if (!normalizedProduct || normalizedPlan.startsWith(`${normalizedProduct}_`)) {
+      return normalizedPlan;
+    }
+    return `${normalizedProduct}_${normalizedPlan}`;
+  }
+
+  private getSupportedTierSlug(catalogPlanId: string): string | undefined {
+    const corePlan = catalogPlanId.replace(/_(yearly|annual|monthly)$/, '');
+    const parts = corePlan.split('_');
+    const tierSlug = parts.length >= 2 ? parts.slice(1).join('_') : corePlan;
+    return PLAN_TIER_MAP[tierSlug] ? tierSlug : undefined;
+  }
+
+  private legacyEnvPriceId(plan: string): string | undefined {
+    const tierSlug = this.getSupportedTierSlug(plan);
+
+    switch (plan) {
+      case 'essentials':
+      case 'essentials_yearly':
+        return this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID');
+      case 'premium':
+      case 'premium_yearly':
+        return this.config.get<string>('STRIPE_PREMIUM_PLAN_PRICE_ID');
+      case 'pro':
+      case 'pro_yearly':
+        return this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
+      default:
+        if (tierSlug === 'essentials') {
+          return this.config.get<string>('STRIPE_ESSENTIALS_PRICE_ID');
+        }
+        if (tierSlug === 'premium') {
+          return this.config.get<string>('STRIPE_PREMIUM_PLAN_PRICE_ID');
+        }
+        if (tierSlug === 'pro') {
+          return this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
+        }
+        return this.config.get<string>(`STRIPE_${plan.toUpperCase()}_PRICE_ID`);
+    }
+  }
+
+  private async resolveStripePriceId(plan: string, product?: string): Promise<string> {
+    const catalogPlanId = this.normalizeCatalogPlanId(plan, product);
+    if (!this.getSupportedTierSlug(catalogPlanId)) {
+      throw new Error(`Unknown plan: ${catalogPlanId}`);
+    }
+
+    if (this.priceResolver) {
+      const resolved = await this.priceResolver.resolve(catalogPlanId, 1, false);
+      return resolved.priceId;
+    }
+
+    const priceId = this.legacyEnvPriceId(catalogPlanId);
+    if (!priceId) {
+      throw new Error(`No Stripe price configured for plan: ${catalogPlanId}`);
+    }
+    return priceId;
   }
 
   // ─── Billing history ─────────────────────────────────────────────────

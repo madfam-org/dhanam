@@ -181,10 +181,10 @@ Available actions:
   for break-glass cleanup. It removes waiting, active, completed, failed, and
   delayed jobs, so prefer inspect, retry, then failed-job-only cleanup.
 
-Production note: the failed-job inspection and failed-job-only clear path is in
-current source commit `71f03516`. It is not available on live production until
-that build is promoted after a green staging smoke, or through a documented
-break-glass promotion.
+Production note: the failed-job inspection and failed-job-only clear path is
+live and auth-gated. Production queue health is currently green with
+`failedJobs: 0`. Use these actions for future incidents when an admin token is
+available; direct BullMQ access is break-glass only.
 
 ## Admin Actions Audit Trail
 

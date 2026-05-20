@@ -269,7 +269,7 @@ describe('SubscriptionLifecycleService', () => {
         countryCode: 'US',
       } as any);
 
-      // ConfigService.get for unknown plan returns undefined
+      // Unknown catalog plans must fail before falling back to Stripe price env vars.
       await expect(service.createFederatedCheckout('user-1', 'unknown_plan')).rejects.toThrow(
         'Unknown plan: unknown_plan'
       );

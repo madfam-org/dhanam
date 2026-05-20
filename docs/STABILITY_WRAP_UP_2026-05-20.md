@@ -1,103 +1,107 @@
 # Dhanam Stability Wrap-Up - 2026-05-20
 
-This is the concise end-state from the production-stability push on
-2026-05-20. Read it with [Roadmap](ROADMAP.md),
-[Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md),
-[Deployment Guide](DEPLOYMENT.md), and [Tech Debt Register](TECH_DEBT.md).
+This is the current production-stability snapshot for `dhan.am`,
+`www.dhan.am`, `app.dhan.am`, `admin.dhan.am`, and `api.dhan.am`.
+Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
+[Deployment Guide](DEPLOYMENT.md), and
+[Verification Snapshot](testing/TEST_RESULTS.md).
 
-## Recorded Verification Git State
+## Current Verified State
 
-- Verified deployment base before this documentation wrap-up:
-  `28d42fcb deploy(staging): update digests to 71f0351`
-- Stability implementation: `71f03516 fix(stability): harden production queue remediation`
-- Current staging digest base observed during this follow-up:
-  `43ff639e deploy(staging): update digests to 12375bc`
-- This document is maintained as a status snapshot; `main` may advance through
-  documentation-only commits or staging digest bot commits after the snapshot.
+- Production ArgoCD app `dhanam-services` is `Healthy` / `Synced` at
+  `6717d0fb deploy(staging): update digests to 3acdeea`.
+- Live production images match `infra/k8s/production/kustomization.yaml`:
+  - API `sha256:73676d24e60f3da055757efb1a1ff36d34fcd3be4c47f1057bb506a131f5d665`
+  - Web `sha256:d8258c3df3ed28b7fbd0c377c6bfac29e1f4a2087f082fbb5a6844ac0e5a6b42`
+  - Admin `sha256:349904cde052194c6e544c01618bba581ba4f25758cff7676e59625970cb22bf`
+- Production full health is `status: "healthy"`:
+  database up, Redis up, queues up, `failedJobs: 0`, Belvo up, Banxico/Plaid/Bitso
+  intentionally unconfigured or optional.
+- Production liveness returns `{"alive":true}`.
+- Admin queue remediation routes are live and auth-gated. Unauthenticated
+  `GET /v1/admin/queues/sync-transactions/failed?limit=1` returns HTTP 401,
+  proving the route exists and is protected.
+- Staging API smoke is now green:
+  `https://staging-api.dhan.am/health` returns HTTP 200 / healthy.
+- Staging web and admin hostnames are reachable. This follow-up source adds
+  web/admin smoke and staging API-origin checks to `deploy-staging.yml`; the
+  next hosted staging run must prove them before staging is a complete
+  promotion proof.
 
-## What Is Done
+## Implementation Landed
 
-- Added safe failed-job inspection and failed-job-only cleanup for BullMQ queues.
-- Updated admin/web queue controls to clear failed jobs only.
-- Hardened platform-admin authorization so space `owner` / `admin` membership
-  no longer grants global admin API access.
-- Removed obsolete generic BullMQ repeatable schedules on startup; the existing
-  cron dispatchers now enqueue concrete per-space/per-connection jobs with
-  stable IDs to avoid duplicate work across API replicas.
-- Hardened staging overlays so staging does not inherit production webhook
-  fan-out, PhyndCRM, `WEB_URL`, NextAuth, or Paddle production values.
-- Prevented staging digest bot commits from self-triggering another staging
-  deploy workflow.
-- Seeded the product catalog in API E2E app startup so billing/catalog-backed
-  tests do not depend on out-of-band database state.
-- Reconciled `ProductCategory` with the canonical catalog by adding the
-  `travel` enum value required by Routecraft.
-- Reconciled the admin E2E fixture with the hardened platform-admin model:
-  admin journey tests now create `User.isAdmin=true` instead of relying on
-  space ownership.
-- Hardened the Stripe SDK wrapper to fail closed with a service-unavailable
-  error when Stripe is intentionally unconfigured, instead of surfacing a raw
-  `undefined.customers` TypeError in E2E and runtime paths.
-- Clarified provider health semantics for required, optional, and unconfigured
-  providers.
-- Fixed the API chaos test command.
-- Added `scripts/production-rollout-proof.js` to compare live ArgoCD images
-  with the production manifest.
-- Updated primary stability, deployment, roadmap, tech debt, testing, and
-  module docs.
+- Platform-admin authorization now requires `User.isAdmin=true` or verified
+  Janua platform-admin claims.
+- BullMQ recurring work no longer uses obsolete generic repeat schedules;
+  schedulers enqueue concrete per-space/per-connection jobs with stable IDs.
+- Admin queue operations support failed-job inspection, failed-job retry, and
+  failed-only cleanup. Whole-queue clear remains break-glass.
+- Staging overlays isolate production-only webhook fan-out, PhyndCRM, `WEB_URL`,
+  NextAuth, and Paddle values.
+- Staging digest bot commits no longer self-trigger the staging deploy workflow.
+- API E2E startup seeds the product catalog, including `ProductCategory.travel`.
+- Admin E2E fixtures create true platform admins.
+- Stripe integration fails closed when unconfigured.
+- Product-catalog sync now prunes stale rows when catalog entries are removed.
+- `scripts/production-rollout-proof.js` verifies live ArgoCD images against the
+  production manifest.
+- The `product_tiers` migration now derives `product_id` type from
+  `products.id`, so clean text-backed databases and historically drifted
+  UUID-backed production databases both migrate safely.
+
+## Production Break-Glass Actions
+
+Routine production operations remain Enclii-first. Two narrow break-glass
+actions were required because Enclii does not yet expose database migration
+repair or BullMQ failed-job remediation adapters:
+
+- Repaired the failed production Prisma migration
+  `20260520000000_add_product_tiers` after PostgreSQL rejected a `TEXT` to
+  `UUID` foreign key. The table was created with `product_id UUID`, 10 tiers
+  were backfilled from `product_prices`, and Prisma migration state was
+  resolved as applied.
+- Removed only retained failed jobs from BullMQ:
+  50 from `sync-transactions` and 50 from `categorize-transactions`. Waiting,
+  active, delayed, and completed jobs were left untouched.
+
+Required Enclii adapter gaps are tracked in [Tech Debt](TECH_DEBT.md):
+database migration repair, queue inspection/retry/failed-cleanup, and
+namespace-aware staging route apply.
 
 ## Verified Green
 
-- Local pre-push hook passed format, typecheck, lint, tests, build, and Prisma
-  validation.
-- Full local `pnpm test` passed across 13 monorepo tasks.
-- Full local `pnpm build` passed across 8 monorepo tasks.
-- Local Prisma client generation, API typecheck, and repo formatting passed
-  after the `ProductCategory.travel` schema migration.
-- API admin operations E2E passed locally against disposable Postgres/Redis:
-  18 tests passed.
-- API Stripe/admin auth targeted Jest passed: 4 suites, 51 tests.
-- Hosted `CI` run `26146547824` passed.
-- Hosted `Lint & Type Check` run `26146547856` passed.
-- Hosted `Test Coverage` run `26146547825` passed.
-- `scripts/production-preflight.sh` passed for production DNS, liveness, app,
-  admin, apex, and `www -> apex`.
-- `scripts/production-rollout-proof.js` passed with ArgoCD
-  `dhanam-services` Healthy/Synced at revision `28d42fcb`.
+- Hosted `CI` for `3acdeea4 fix(catalog): prune stale sync rows`: run
+  `26189667372`, success.
+- Hosted `Lint & Type Check` for `3acdeea4`: run `26189667024`, success.
+- Hosted `Test Coverage` for `3acdeea4`: run `26189667253`, success.
+- Hosted `Deploy to Staging` for `3acdeea4`: run `26189667025`, success,
+  including build/sign for API, web, admin, staging digest patch, and API smoke.
+- Scheduled `Promote staging -> prod` validation: run `26190740392`, success;
+  write job skipped because there was no digest change to write.
+- Production rollout proof passed at revision `6717d0fb`.
+- Production full health passed with `status: "healthy"`.
 
-## Still Blocked
+Local gates for the follow-up migration/doc fix must be rerun before pushing
+that final commit.
 
-- `Deploy to Staging` run `26146547918` built and signed API, web, and admin
-  images and committed staging digests, but failed smoke because
-  `https://staging-api.dhan.am/health` returned HTTP 404 on all six attempts.
-- Enclii tunnel inspection operation `op_1779260970221167708` showed no routes
-  for `staging-api.dhan.am` or `staging.dhan.am`, and showed
-  `staging-admin.dhan.am` routed to production.
-- Full production health is HTTP 200 but `status: "degraded"` because 100
-  retained failed jobs remain: 50 in `sync-transactions` and 50 in
-  `categorize-transactions`.
-- The new queue-safe production remediation path and the recurring-job source
-  fix are in current source, but production still needs a new build/promotion
-  and a failed-job cleanup. The live API currently returns 401 for
-  `GET /v1/admin/queues` and `POST /v1/admin/queues/:name/retry-failed`, but
-  404 for the safer `failed` and `clear-failed` endpoints, proving those
-  endpoints are not live yet.
+## Remaining Roadmap
 
-## Next Order Of Work
-
-1. Create namespace-aware Cloudflare tunnel routes through Enclii for
-   `staging-api.dhan.am`, `staging.dhan.am`, and `staging-admin.dhan.am`.
-2. Register/sync `infra/argocd/dhanam-staging-application.yaml` and populate
-   staging Vault/ESO values.
-3. Re-run `deploy-staging.yml` until the smoke job passes.
-4. Build and promote the current source through staging with the successful
-   smoke run id, or record an explicit break-glass bypass if the queue incident
-   requires earlier production remediation.
-5. Inspect, retry, and only then clear retained production queue failures
-   through the audited admin queue path.
+1. Run and pass the new full staging web/admin smoke and prove staging admin
+   uses staging API/env, not production API values.
+2. Make Enclii the complete routine operation plane for migration repair,
+   queue remediation, and namespace-aware tunnel route apply.
+3. Decide and encode final provider launch semantics for Plaid, Bitso, and
+   Banxico in runbooks and product readiness.
+4. Keep production green over repeated deploy/rollback cycles with no
+   undocumented manual path.
+5. Expand lower-risk coverage, especially mobile and end-to-end provider
+   journeys.
 
 ## Stability Estimate
 
-Overall full-system stability remains about 88 percent. The remaining gap is
-operational: staging routing, production queue cleanup, production rollout truth
-alignment, and Enclii adapter coverage.
+Current expert estimate: about 94 percent production-stable.
+
+Production is healthy and the codebase gates are green for the latest pushed
+source, but the system is not 100 percent stable until staging web/admin proof,
+Enclii adapter coverage, provider launch semantics, and repeated clean
+deploy/rollback evidence are complete.

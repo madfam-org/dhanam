@@ -2,19 +2,64 @@
 -- sales-led custom tiers. Before this table, the public catalog could only
 -- reconstruct tiers from product_prices, so `prices: {}` tiers disappeared.
 
-CREATE TABLE IF NOT EXISTS "product_tiers" (
-  "id" TEXT NOT NULL,
-  "product_id" TEXT NOT NULL,
-  "tier_slug" TEXT NOT NULL,
-  "dhanam_tier" "SubscriptionTier" NOT NULL,
-  "display_name" TEXT,
-  "description" TEXT,
-  "metadata" JSONB,
-  "sort_order" INTEGER NOT NULL DEFAULT 0,
-  "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at" TIMESTAMP(3) NOT NULL,
-  CONSTRAINT "product_tiers_pkey" PRIMARY KEY ("id")
-);
+DO $$
+DECLARE
+  products_id_type TEXT;
+  product_tiers_product_id_type TEXT;
+BEGIN
+  SELECT format_type(a.atttypid, a.atttypmod)
+    INTO products_id_type
+  FROM pg_attribute a
+  JOIN pg_class c ON c.oid = a.attrelid
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public'
+    AND c.relname = 'products'
+    AND a.attname = 'id'
+    AND NOT a.attisdropped;
+
+  IF products_id_type IS NULL THEN
+    RAISE EXCEPTION 'products.id must exist before creating product_tiers';
+  END IF;
+
+  IF to_regclass('public.product_tiers') IS NULL THEN
+    EXECUTE format(
+      'CREATE TABLE "product_tiers" (
+        "id" TEXT NOT NULL,
+        "product_id" %s NOT NULL,
+        "tier_slug" TEXT NOT NULL,
+        "dhanam_tier" "SubscriptionTier" NOT NULL,
+        "display_name" TEXT,
+        "description" TEXT,
+        "metadata" JSONB,
+        "sort_order" INTEGER NOT NULL DEFAULT 0,
+        "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updated_at" TIMESTAMP(3) NOT NULL,
+        CONSTRAINT "product_tiers_pkey" PRIMARY KEY ("id")
+      )',
+      products_id_type
+    );
+  ELSE
+    SELECT format_type(a.atttypid, a.atttypmod)
+      INTO product_tiers_product_id_type
+    FROM pg_attribute a
+    JOIN pg_class c ON c.oid = a.attrelid
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname = 'product_tiers'
+      AND a.attname = 'product_id'
+      AND NOT a.attisdropped;
+
+    IF product_tiers_product_id_type IS DISTINCT FROM products_id_type THEN
+      EXECUTE format(
+        'ALTER TABLE "product_tiers"
+          ALTER COLUMN "product_id" TYPE %s
+          USING "product_id"::%s',
+        products_id_type,
+        products_id_type
+      );
+    END IF;
+  END IF;
+END $$;
 
 DO $$
 BEGIN
@@ -49,7 +94,7 @@ INSERT INTO "product_tiers" (
   "updated_at"
 )
 SELECT DISTINCT ON ("product_id", "tier_slug")
-  "product_id" || ':' || "tier_slug",
+  "product_id"::TEXT || ':' || "tier_slug",
   "product_id",
   "tier_slug",
   "dhanam_tier",

@@ -141,11 +141,10 @@ Current production deploys to MADFAM bare-metal Kubernetes via Enclii:
 
 Staging and production status as of 2026-05-20 is documented in
 [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md). In short:
-hosted CI is green and production rollout proof passes through ArgoCD, but
-staging smoke fails at HTTP 404 because staging tunnel routes are missing or
-point at production. Full production API health remains `degraded` until the
-retained BullMQ failures are inspected, retried, or cleared through the audited
-admin path after the current queue-hardening build is promoted.
+hosted CI is green, staging API smoke passes, production rollout proof passes
+through ArgoCD, and full production API health is `healthy`. The remaining
+stability work is full staging web/admin smoke, staging-admin API/env proof,
+and Enclii adapter coverage for routine operations.
 
 ## Observability
 

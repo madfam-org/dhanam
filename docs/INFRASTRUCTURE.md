@@ -221,12 +221,13 @@ POST /v1/admin/queues/:name/clear-failed     # Clear only failed jobs, confirm=t
 POST /v1/admin/queues/:name/clear            # Whole-queue break-glass clear, confirm=true
 ```
 
-The failed-job inspection and `clear-failed` endpoint set is current-source
-truth from `71f03516`. Current source also removes the obsolete generic
-repeatable queue schedules that were producing concrete-ID-free jobs. These
-changes still need a successful staging smoke and production promotion, or an
-explicitly recorded break-glass promotion, before they can be used against the
-live production queue failures.
+The failed-job inspection and `clear-failed` endpoint set is live and
+auth-gated in production; unauthenticated calls return HTTP 401. Current source
+also removes the obsolete generic repeatable queue schedules that were
+producing concrete-ID-free jobs. Production queue health is currently green
+with `failedJobs: 0`; future failed-job cleanup should use these endpoints when
+an admin token is available, with direct BullMQ access reserved for documented
+break-glass only.
 
 ## CI/CD Pipeline
 

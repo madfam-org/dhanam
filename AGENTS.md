@@ -400,29 +400,29 @@ pipeline defined in
 **Current state:** PP.2b + PP.2c shipped. Staging now lives at
 `infra/k8s/overlays/staging/` as a Kustomize overlay of the prod canonical
 base, with digest-pinned images patched by `deploy-staging.yml`. The
-`dhanam-staging` ArgoCD Application manifest exists, but the live staging
-environment is still blocked by Application/namespace/secrets bootstrap and
-namespace-aware Cloudflare tunnel routes. Promote + rollback are manual
-workflows (Pattern B).
+`dhanam-staging` ArgoCD Application is registered and Healthy/Synced in the
+`enclii-dhanam-staging` namespace, and staging API smoke is green. The remaining
+staging gap is full web/admin smoke plus staging-admin API/env proof. Promote +
+rollback are manual workflows (Pattern B).
 
 See [docs/PP_2_STAGING_AUDIT.md](docs/PP_2_STAGING_AUDIT.md) for the original
 row-by-row gap analysis that scoped this work.
 
 ### RFC 0001 alignment (post PP.2b + PP.2c)
 
-| Area                                                                     | Status                                                                                                 |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| Staging overlay (`infra/k8s/overlays/staging/`) inherits from production | Aligned (PP.2b)                                                                                        |
-| Staging images digest-pinned (`sha256:...`)                              | Aligned (PP.2b) — CI patches `infra/k8s/overlays/staging/kustomization.yaml` per push                  |
-| Admin in staging                                                         | Aligned (PP.2b)                                                                                        |
-| `dhanam-staging` ArgoCD Application                                      | Manifest shipped at `infra/argocd/dhanam-staging-application.yaml`; operator must register             |
-| Staging ingress / DNS (`staging-api.dhan.am`)                            | DNS exists; tunnel routes are missing or point at production and need a namespace-aware Enclii adapter |
-| Staging secrets template                                                 | Aligned (PP.2b) — `infra/k8s/staging-secrets-template.yaml` covers all three secret groups             |
-| HTTP smoke on staging                                                    | Workflow exists; latest smoke failed HTTP 404 because staging tunnel routes are not live               |
-| `promote-to-prod.yml` (manual gate)                                      | Aligned (PP.2c)                                                                                        |
-| `rollback-prod.yml`                                                      | Aligned (PP.2c)                                                                                        |
-| `.enclii.yml` `promotion:` key                                           | Aligned (PP.2c) — `pattern: manual`                                                                    |
-| Nightly prod→staging masked DB refresh                                   | Deferred (RFC 0001 open question — masking tool TBD)                                                   |
+| Area                                                                     | Status                                                                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Staging overlay (`infra/k8s/overlays/staging/`) inherits from production | Aligned (PP.2b)                                                                            |
+| Staging images digest-pinned (`sha256:...`)                              | Aligned (PP.2b) — CI patches `infra/k8s/overlays/staging/kustomization.yaml` per push      |
+| Admin in staging                                                         | Aligned (PP.2b)                                                                            |
+| `dhanam-staging` ArgoCD Application                                      | Registered and Healthy/Synced in `argocd`, targeting `enclii-dhanam-staging`               |
+| Staging ingress / DNS (`staging-api.dhan.am`)                            | DNS and API route are live; web/admin route/env smoke should be promoted into the workflow |
+| Staging secrets template                                                 | Aligned (PP.2b) — `infra/k8s/staging-secrets-template.yaml` covers all three secret groups |
+| HTTP smoke on staging                                                    | API smoke passes; web/admin smoke is being added as the remaining staging proof gap        |
+| `promote-to-prod.yml` (manual gate)                                      | Aligned (PP.2c)                                                                            |
+| `rollback-prod.yml`                                                      | Aligned (PP.2c)                                                                            |
+| `.enclii.yml` `promotion:` key                                           | Aligned (PP.2c) — `pattern: manual`                                                        |
+| Nightly prod→staging masked DB refresh                                   | Deferred (RFC 0001 open question — masking tool TBD)                                       |
 
 ### Promotion pattern
 

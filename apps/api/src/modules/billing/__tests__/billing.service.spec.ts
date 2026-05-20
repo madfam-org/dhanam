@@ -94,6 +94,8 @@ describe('BillingService', () => {
           useValue: {
             get: jest.fn((key: string, defaultValue?: any) => {
               if (key === 'STRIPE_PREMIUM_PRICE_ID') return 'price_premium123';
+              if (key === 'STRIPE_ESSENTIALS_PRICE_ID') return 'price_essentials123';
+              if (key === 'STRIPE_PREMIUM_PLAN_PRICE_ID') return 'price_premium_plan123';
               if (key === 'WEB_URL') return 'http://localhost:3000';
               return defaultValue;
             }),
