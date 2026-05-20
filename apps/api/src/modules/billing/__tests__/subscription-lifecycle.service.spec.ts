@@ -250,6 +250,38 @@ describe('SubscriptionLifecycleService', () => {
 
       expect(result).toBe('https://checkout.stripe.com/cs_ext');
     });
+
+    it('should resolve product-specific catalog plans before legacy env fallback', async () => {
+      const priceResolver = {
+        resolve: jest.fn().mockResolvedValue({ priceId: 'price_karafiel_contador' }),
+      };
+      (service as any).priceResolver = priceResolver;
+
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        countryCode: 'MX',
+      } as any);
+
+      stripe.createCustomer.mockResolvedValue({ id: 'cus_catalog' } as any);
+      stripe.createCheckoutSession.mockResolvedValue({
+        id: 'cs_catalog',
+        url: 'https://checkout.stripe.com/cs_catalog',
+      } as any);
+      prisma.user.update.mockResolvedValue({} as any);
+
+      const result = await service.createExternalCheckout(
+        'user-123',
+        'contador',
+        'https://karafiel.mx/billing',
+        'karafiel'
+      );
+
+      expect(priceResolver.resolve).toHaveBeenCalledWith('karafiel_contador', 1, false);
+      expect(stripe.createCheckoutSession).toHaveBeenCalledWith(
+        expect.objectContaining({ priceId: 'price_karafiel_contador' })
+      );
+      expect(result).toBe('https://checkout.stripe.com/cs_catalog');
+    });
   });
 
   describe('createFederatedCheckout', () => {
@@ -269,9 +301,8 @@ describe('SubscriptionLifecycleService', () => {
         countryCode: 'US',
       } as any);
 
-      // Unknown catalog plans must fail before falling back to Stripe price env vars.
       await expect(service.createFederatedCheckout('user-1', 'unknown_plan')).rejects.toThrow(
-        'Unknown plan: unknown_plan'
+        'No Stripe price configured for plan: unknown_plan'
       );
     });
   });

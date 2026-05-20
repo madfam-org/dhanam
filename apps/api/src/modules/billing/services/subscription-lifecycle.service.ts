@@ -460,15 +460,12 @@ export class SubscriptionLifecycleService {
         if (tierSlug === 'pro') {
           return this.config.get<string>('STRIPE_PREMIUM_PRICE_ID');
         }
-        return this.config.get<string>(`STRIPE_${plan.toUpperCase()}_PRICE_ID`);
+        return undefined;
     }
   }
 
   private async resolveStripePriceId(plan: string, product?: string): Promise<string> {
     const catalogPlanId = this.normalizeCatalogPlanId(plan, product);
-    if (!this.getSupportedTierSlug(catalogPlanId)) {
-      throw new Error(`Unknown plan: ${catalogPlanId}`);
-    }
 
     if (this.priceResolver) {
       const resolved = await this.priceResolver.resolve(catalogPlanId, 1, false);
