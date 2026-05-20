@@ -8,6 +8,7 @@ Historical implementation logs are preserved under [reports](reports/).
 
 For full production and staging context, read this with
 [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md).
+For execution order and milestone targets, read the [Roadmap](ROADMAP.md).
 
 ## Operating Rules
 

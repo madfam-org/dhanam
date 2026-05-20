@@ -7,6 +7,7 @@ Compact LLM context index for this repository.
 - `AGENTS.md` — canonical agent operating instructions.
 - `README.md` — human/product overview when present.
 - `docs/README.md` — canonical documentation map.
+- `docs/ROADMAP.md` — current stability roadmap and execution order.
 - `docs/STABILITY_AUDIT_2026-05-19.md` — current stability, production,
   staging, DNS, health, and Enclii rollout status.
 - `docs/TECH_DEBT.md` — current active technical debt and historical debt

@@ -16,6 +16,9 @@ staging is reachable and smoke-tested, promotion is manual and auditable,
 runtime health is explainable, Enclii is the primary production control plane,
 and break-glass raw Kubernetes/provider access is exceptional and recorded.
 
+The execution roadmap for closing the remaining gap is maintained in
+[Roadmap](ROADMAP.md).
+
 ## Current Status
 
 Snapshot originally taken on 2026-05-19 and refreshed on 2026-05-20 after

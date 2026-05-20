@@ -141,6 +141,7 @@
     "llmsTxt": "llms.txt",
     "llmsFullTxt": "llms-full.txt",
     "docsIndex": "docs/README.md",
+    "roadmap": "docs/ROADMAP.md",
     "stabilityAudit": "docs/STABILITY_AUDIT_2026-05-19.md",
     "techDebt": "docs/TECH_DEBT.md",
     "documentationAudit": "docs/DOCUMENTATION_AUDIT_2026-05-19.md",

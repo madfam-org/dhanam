@@ -11,6 +11,7 @@ file over older phase summaries when choosing what to read first.
 | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | [Repository README](../README.md)                                   | Product overview, local quick start, common commands                               |
 | [Development Guide](DEVELOPMENT.md)                                 | Local setup, ports, env files, testing workflow                                    |
+| [Roadmap](ROADMAP.md)                                               | Current stability roadmap and path to 100 percent production confidence            |
 | [Deployment Guide](DEPLOYMENT.md)                                   | Enclii-first deploy, staging, rollback, current rollout blockers                   |
 | [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)         | Current truth about production, staging, DNS, health, and remaining stability gaps |
 | [Tech Debt Register](TECH_DEBT.md)                                  | Current technical debt, active stability gaps, and historical debt archive         |
