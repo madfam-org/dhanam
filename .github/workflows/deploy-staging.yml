@@ -179,7 +179,19 @@ jobs:
         run: |
           set -euo pipefail
           FILE="infra/k8s/overlays/staging/kustomization.yaml"
-          python3 <<PY
+
+          git config user.name "madfam-deploy-bot"
+          git config user.email "deploy-bot@madfam.io"
+
+          # Builds run in parallel and can outlive another push to main. Reset
+          # to the latest main before each patch attempt so the digest commit
+          # stays fast-forwardable and does not discard newer stabilization work.
+          for ATTEMPT in 1 2 3; do
+            echo "Staging digest push attempt $ATTEMPT/3"
+            git fetch origin main
+            git reset --hard origin/main
+
+            python3 <<PY
           import os, re, pathlib
           path = pathlib.Path("$FILE")
           text = path.read_text()
@@ -197,14 +209,22 @@ jobs:
           path.write_text(text)
           PY
 
-          git config user.name "madfam-deploy-bot"
-          git config user.email "deploy-bot@madfam.io"
-          git add "$FILE"
-          git commit -m "deploy(staging): update digests to $SHORT" || {
-            echo "No digest change — skipping push"
-            exit 0
-          }
-          git push
+            git add "$FILE"
+            git diff --staged --quiet && {
+              echo "No digest change — skipping push"
+              exit 0
+            }
+            git commit -m "deploy(staging): update digests to $SHORT"
+
+            if git push origin main; then
+              echo "Staging digest push succeeded on attempt $ATTEMPT"
+              exit 0
+            fi
+            echo "Staging digest push failed, retrying..."
+            sleep $((ATTEMPT * 2))
+          done
+          echo "ERROR: Failed to push staging digests after 3 attempts"
+          exit 1
 
   smoke:
     name: Staging smoke test

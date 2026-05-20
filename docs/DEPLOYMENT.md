@@ -55,9 +55,10 @@ Production digests must be signed. `deploy-staging.yml` now signs API, web,
 and admin images with GitHub Actions keyless cosign signatures, and
 `promote-to-prod.yml` verifies the candidate digest was signed by
 `deploy-staging.yml@refs/heads/main` before it writes a production commit.
-Staging digests that predate this change must be rebuilt by the staging
-workflow before they are promotable. The break-glass K8s workflows also sign
-their images before committing production digests; their raw
+The first signed staging digest refresh landed in `1af02bc2`; future
+promotions must use signed staging digests with smoke/soak evidence. The
+break-glass K8s workflows also sign their images before committing production
+digests; their raw
 `kubectl set image` rollout is now opt-in through `direct_k8s_deploy` because
 GitHub-hosted runners currently cannot reach the cluster API. By default,
 ArgoCD reconciliation of the signed digest is the effective deployment
@@ -244,7 +245,9 @@ production base with staging-specific env, single replicas, disabled HPAs,
 staging-scoped Vault/ESO paths, and digest-pinned images. `deploy-staging.yml`
 builds and signs API, web, and admin images, patches their digests into the
 staging overlay, and lets the `dhanam-staging` ArgoCD Application reconcile
-into the Enclii-registered `enclii-dhanam-staging` namespace.
+into the Enclii-registered `enclii-dhanam-staging` namespace. The digest patch
+step resets to the latest `origin/main` before committing so a long image build
+does not fail or overwrite newer stabilization commits.
 
 Required staging hostnames:
 

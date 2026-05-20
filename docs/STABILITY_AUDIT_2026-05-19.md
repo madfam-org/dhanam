@@ -30,7 +30,7 @@ staging promotion hardening.
 | Web accessibility gates   | Stable locally       | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.          |
 | Admin Playwright          | Improved             | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                      |
 | API production build      | Improved             | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                      |
-| Staging image pipeline    | Improved             | API, web, and admin images build, sign with cosign, and patch the staging overlay; staging smoke is still blocked by missing runtime infrastructure.  |
+| Staging image pipeline    | Improved             | API, web, and admin images build, sign with cosign, and patch the staging overlay; signed digests were refreshed in `1af02bc2`.                       |
 | Staging smoke             | Blocked              | Enclii verifies staging domains and DNS CNAMEs exist, but the ArgoCD Application/namespace are absent and tunnel routes are not namespace-aware.      |
 | Production API health     | Unstable             | Public health reported DB/Redis up, but queues down, Banxico 404, Belvo 502, Plaid/Bitso unconfigured.                                                |
 | Production domain routing | Fixed and verified   | `scripts/production-preflight.sh` passes; `www.dhan.am` redirects to `https://dhan.am/` without leaking `:4200`.                                      |
@@ -50,11 +50,11 @@ staging promotion hardening.
    not have an Enclii-first remediation path for the Kyverno block.
 4. Production health is not green: queue failures and external provider checks
    are surfacing as unhealthy.
-5. The staging promotion safety gap is closed in code: `deploy-staging.yml`
-   signs new staging image digests and `promote-to-prod.yml` verifies the
-   deploy-staging keyless signature before writing production digests. The
-   currently pinned staging digests still need to be refreshed by the next
-   staging build before they are promotable.
+5. The staging promotion safety gap is closed in code and verified in CI:
+   `deploy-staging.yml` signs staging image digests, `promote-to-prod.yml`
+   verifies the deploy-staging keyless signature before writing production
+   digests, and the staging overlay was refreshed with signed digests in
+   `1af02bc2`. Promotion still needs a real staging smoke/soak signal.
 6. Production appears to be serving older releases than the latest pushed
    code and GitHub-built images.
 7. Web Docker builds must not depend on external font downloads; the app now
@@ -138,13 +138,13 @@ Working estimate after this audit:
 
 - Codebase and CI stability: about 94 percent after local typecheck, unit,
   build, admin Playwright, and targeted web Playwright gates passed.
-- Staging and release pipeline stability: about 72 percent because images build,
+- Staging and release pipeline stability: about 75 percent because images build,
   sign, digests patch, and DNS verifies, but ArgoCD/namespace/secrets/tunnel
   routing are not live.
 - Production implementation stability: about 70 percent because live web/admin
   surfaces respond, API liveness is up, and public routing is clean, but API
   full health and rollout control-plane state are not fully clean.
-- Overall full-system stability: about 79 percent. The remaining gap is mostly
+- Overall full-system stability: about 80 percent. The remaining gap is mostly
   operational control-plane, domain, and runtime-health remediation rather than
   ordinary application code.
 
@@ -213,5 +213,6 @@ Actions keyless cosign signatures. `promote-to-prod.yml` verifies that each
 candidate digest has a valid signature from
 `deploy-staging.yml@refs/heads/main` before it checks soak time or commits a
 production digest. This prevents the unsigned-staging-digest failure class from
-reaching ArgoCD/Kyverno again; older staging digests become promotable only
-after the next successful staging build refreshes them with signatures.
+reaching ArgoCD/Kyverno again. The first signed staging build refreshed the
+staging overlay in `1af02bc2`; live promotion remains blocked by missing
+staging runtime infrastructure and smoke evidence.

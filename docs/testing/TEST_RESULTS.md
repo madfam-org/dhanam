@@ -60,8 +60,8 @@ These are not unit-test failures, but they block full-system stability:
   mutation denial.
 - `deploy-staging.yml` now signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
-  digests. Existing staging overlay digests that predate the signing change
-  must be refreshed by the next staging build before promotion.
+  digests. The staging overlay was refreshed with signed digests in
+  `1af02bc2`; promotion still needs live staging smoke/soak evidence.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
   because GitHub runners cannot currently reach the cluster API.
