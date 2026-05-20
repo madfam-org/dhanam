@@ -10,6 +10,8 @@ This directory contains GitHub Actions workflows for CI/CD, quality checks, and 
 | `lint.yml`             | Push, PR | Code quality checks (ESLint, Prettier) |
 | `test-coverage.yml`    | Push, PR | Test execution with coverage reporting |
 | `check-migrations.yml` | PR       | Database migration validation          |
+| `deploy-staging.yml`   | Main     | Build, sign, and patch staging digests |
+| `promote-to-prod.yml`  | Manual   | Promote signed staging digest to prod  |
 | `deploy-enclii.yml`    | Manual   | Trigger Enclii deployment fallback     |
 | `deploy-k8s.yml`       | Manual   | Break-glass API Kubernetes deploy      |
 | `deploy-web-k8s.yml`   | Manual   | Break-glass web Kubernetes deploy      |
@@ -22,9 +24,9 @@ This directory contains GitHub Actions workflows for CI/CD, quality checks, and 
 When you push to `main`:
 
 1. CI validates the change
-2. `deploy-staging.yml` builds api/web/admin and patches digest-pinned staging images
+2. `deploy-staging.yml` builds and signs api/web/admin, then patches digest-pinned staging images
 3. ArgoCD reconciles staging
-4. `promote-to-prod.yml` manually promotes a soaked staging digest to production
+4. `promote-to-prod.yml` verifies the deploy-staging cosign signature and manually promotes a soaked staging digest to production
 
 The raw K8s deployment workflows here are **break-glass options** for manual intervention when Enclii or promotion is unavailable.
 

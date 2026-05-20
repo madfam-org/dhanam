@@ -27,7 +27,8 @@ need a namespace-aware Enclii adapter.
 
 1. Staging manifests now inherit from production through
    `infra/k8s/overlays/staging/`.
-2. Staging images are digest-pinned in git.
+2. Staging images are digest-pinned in git and newly built staging images are
+   signed with GitHub Actions keyless cosign signatures.
 3. Manual promote and rollback workflows exist; Dhanam remains a manual-gate
    service because it owns ecosystem billing.
 4. The current desired path is GitOps: `deploy-staging.yml` patches the
@@ -45,8 +46,8 @@ operational bootstrap needed to make the already-renderable staging tier live.
 | **Layout**                        | `infra/k8s/base/` + `overlays/{staging,production}/`                                                          | `infra/k8s/production/` remains the canonical base and `infra/k8s/overlays/staging/` imports it.                                                                            | Aligned enough    | Keep until the whole ecosystem is ready for a `base/` rename.                                                                                 |
 | **Staging manifests**             | Overlay imports base + patches (replicas, env, ingress, secrets, HPA, digest)                                 | Staging overlay imports production, patches env, caps replicas, disables HPAs, pins digests, and includes all three apps.                                                   | Aligned           | Validate with `kubectl kustomize infra/k8s/overlays/staging`.                                                                                 |
 | **Admin in staging**              | All three apps (api, web, admin) deploy to staging                                                            | API, web, and admin render in the staging overlay.                                                                                                                          | Aligned           | Keep admin in staging smoke once routes are live.                                                                                             |
-| **Image pinning**                 | Digest (`sha256:...`) patched into `overlays/staging/kustomization.yaml` by CI                                | `deploy-staging.yml` patches digest-pinned API, web, and admin images.                                                                                                      | Aligned           | Keep staging digests reviewable in git.                                                                                                       |
-| **Promotion**                     | `promote-to-prod.yml` (`workflow_dispatch`) takes staging digest -> production                                | Manual promote workflow exists and Dhanam remains Pattern B due billing blast radius.                                                                                       | Aligned           | Prefer promote workflow after a green staging smoke.                                                                                          |
+| **Image pinning**                 | Digest (`sha256:...`) patched into `overlays/staging/kustomization.yaml` by CI                                | `deploy-staging.yml` patches digest-pinned API, web, and admin images and signs newly built digests.                                                                        | Aligned           | Keep staging digests reviewable in git; refresh pre-signing digests with the next staging build.                                              |
+| **Promotion**                     | `promote-to-prod.yml` (`workflow_dispatch`) takes staging digest -> production                                | Manual promote workflow exists, verifies deploy-staging cosign signatures, and Dhanam remains Pattern B due billing blast radius.                                           | Aligned           | Prefer promote workflow after a green staging smoke.                                                                                          |
 | **Rollback**                      | `rollback-prod.yml` workflow, RTO <5 min                                                                      | Rollback workflow exists.                                                                                                                                                   | Aligned           | Use workflow or Enclii rollback; raw `kubectl rollout undo` is break-glass only.                                                              |
 | **ArgoCD staging Application**    | `dhanam-staging` App watches `infra/k8s/overlays/staging/`                                                    | Application manifest exists but is not registered in-cluster.                                                                                                               | Blocked           | Register `infra/argocd/dhanam-staging-application.yaml` after staging Vault/ESO values and namespace-aware tunnel routes are ready.           |
 | **Deploy trigger mechanism**      | Commit digest -> ArgoCD reconciles (pull)                                                                     | Workflow patches digests and expects ArgoCD reconcile, but the staging Application is missing.                                                                              | Partially aligned | Register the Application; do not reintroduce push-based `kubectl apply -k` from CI.                                                           |
@@ -63,7 +64,8 @@ operational bootstrap needed to make the already-renderable staging tier live.
 ## Summary
 
 - **Aligned or aligned enough**: layout, manifests, admin coverage, image
-  pinning, promotion/rollback workflows, promotion policy, replica counts.
+  pinning/signing, promotion signature validation, rollback workflows,
+  promotion policy, replica counts.
 - **Partially aligned**: deploy trigger, namespace, staging secrets.
 - **Blocked operationally**: staging ArgoCD registration, HTTP smoke, and
   namespace-aware tunnel routes.

@@ -1,10 +1,10 @@
 # PP.2b (RFC 0001 Phase 2) — Dhanam staging deploy.
 #
 # Replaces the previous `kubectl apply -k` push-based deploy with a GitOps
-# flow: CI builds the three images (api/web/admin), patches their digests
-# into infra/k8s/overlays/staging/kustomization.yaml, commits, and lets the
-# dhanam-staging ArgoCD Application reconcile. Post-reconcile smoke hits
-# https://staging-api.dhan.am/health with 6 retries x 20s like Karafiel.
+# flow: CI builds and signs the three images (api/web/admin), patches their
+# digests into infra/k8s/overlays/staging/kustomization.yaml, commits, and
+# lets the dhanam-staging ArgoCD Application reconcile. Post-reconcile smoke
+# hits https://staging-api.dhan.am/health with 6 retries x 20s like Karafiel.
 #
 # Triggered on every push to main. Does NOT touch production — that's the
 # promote-to-prod workflow's job (PP.2c).
@@ -37,6 +37,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     outputs:
       digest: ${{ steps.push.outputs.digest }}
       short: ${{ steps.sha.outputs.short }}
@@ -48,6 +49,9 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
       - id: sha
         run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
       - id: push
@@ -61,6 +65,11 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:staging-latest
           cache-from: type=gha,scope=api
           cache-to: type=gha,scope=api,mode=max
+      - name: Sign API staging image
+        if: steps.push.outcome == 'success'
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.API_IMAGE }}@${{ steps.push.outputs.digest }}
 
   build-web:
     name: Build Web staging image
@@ -68,6 +77,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     outputs:
       digest: ${{ steps.push.outputs.digest }}
       short: ${{ steps.sha.outputs.short }}
@@ -79,6 +89,9 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
       - id: sha
         run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
       - id: push
@@ -99,6 +112,11 @@ jobs:
             NEXT_PUBLIC_JANUA_API_URL=${{ vars.STAGING_JANUA_API_URL || '' }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,scope=web,mode=max
+      - name: Sign Web staging image
+        if: steps.push.outcome == 'success'
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.WEB_IMAGE }}@${{ steps.push.outputs.digest }}
 
   build-admin:
     name: Build Admin staging image
@@ -106,6 +124,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     outputs:
       digest: ${{ steps.push.outputs.digest }}
       short: ${{ steps.sha.outputs.short }}
@@ -117,6 +136,9 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
       - id: sha
         run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
       - id: push
@@ -130,6 +152,11 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.ADMIN_IMAGE }}:staging-latest
           cache-from: type=gha,scope=admin
           cache-to: type=gha,scope=admin,mode=max
+      - name: Sign Admin staging image
+        if: steps.push.outcome == 'success'
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.ADMIN_IMAGE }}@${{ steps.push.outputs.digest }}
 
   update-staging-overlay:
     name: Patch staging overlay digests

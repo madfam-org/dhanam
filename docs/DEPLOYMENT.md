@@ -51,11 +51,14 @@ ArgoCD digest and public HTTP behavior. Use GitOps digest promotion into
 `infra/k8s/production/kustomization.yaml` as the auditable production path;
 raw `kubectl set image` remains break-glass only.
 
-Production digests must be signed. `deploy-staging.yml` currently builds and
-pushes staging images without cosign signing, so promoting those staging
-digests directly can be blocked by Kyverno. The web-only break-glass workflow
-does sign its image before committing the production digest; its direct
-`kubectl set image` step currently fails from GitHub-hosted runners because
+Production digests must be signed. `deploy-staging.yml` now signs API, web,
+and admin images with GitHub Actions keyless cosign signatures, and
+`promote-to-prod.yml` verifies the candidate digest was signed by
+`deploy-staging.yml@refs/heads/main` before it writes a production commit.
+Staging digests that predate this change must be rebuilt by the staging
+workflow before they are promotable. The break-glass K8s workflows also sign
+their images before committing production digests; their direct
+`kubectl set image` steps currently fail from GitHub-hosted runners because
 the cluster API is not reachable, so ArgoCD reconciliation of the signed digest
 is the effective deployment mechanism.
 
@@ -117,11 +120,11 @@ kubectl -n dhanam set image deployment/dhanam-web \
 | ---------------------- | --------------- | --------------------------------------------- |
 | `ci.yml`               | All PRs         | Lint, test, typecheck                         |
 | `deploy-enclii.yml`    | Manual dispatch | Fallback Enclii deploy                        |
-| `deploy-staging.yml`   | Push to main    | Auto-deploy staging (1 replica, `:main` tags) |
+| `deploy-staging.yml`   | Push to main    | Build/sign staging images and patch digests   |
 | `deploy-k8s.yml`       | Manual dispatch | Break-glass API K8s deploy                    |
 | `deploy-web-k8s.yml`   | Manual dispatch | Break-glass web image build/sign + K8s deploy |
 | `deploy-admin-k8s.yml` | Manual dispatch | Break-glass admin-only K8s deploy             |
-| `promote-to-prod.yml`  | Manual dispatch | Promote soaked staging digest to production   |
+| `promote-to-prod.yml`  | Manual dispatch | Verify/signature-gate soaked staging digest   |
 | `publish-packages.yml` | Tag / manual    | npm publish to npm.madfam.io                  |
 
 ---
@@ -236,9 +239,9 @@ All monitoring manifests live in `infra/k8s/monitoring/`.
 Staging manifests are in `infra/k8s/overlays/staging/` and import the
 production base with staging-specific env, single replicas, disabled HPAs,
 staging-scoped Vault/ESO paths, and digest-pinned images. `deploy-staging.yml`
-builds API, web, and admin images, patches their digests into the staging
-overlay, and lets the `dhanam-staging` ArgoCD Application reconcile into the
-Enclii-registered `enclii-dhanam-staging` namespace.
+builds and signs API, web, and admin images, patches their digests into the
+staging overlay, and lets the `dhanam-staging` ArgoCD Application reconcile
+into the Enclii-registered `enclii-dhanam-staging` namespace.
 
 Required staging hostnames:
 

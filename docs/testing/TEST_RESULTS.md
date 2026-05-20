@@ -58,9 +58,10 @@ These are not unit-test failures, but they block full-system stability:
   namespace-aware for staging tunnel routes.
 - Enclii API/admin deployment records show a Kyverno image-signature annotation
   mutation denial.
-- `deploy-staging.yml` currently publishes unsigned image digests; direct
-  promotion of those digests is blocked by Kyverno until staging image signing
-  or promotion-time signature validation is added.
+- `deploy-staging.yml` now signs newly built staging images and
+  `promote-to-prod.yml` verifies those signatures before writing production
+  digests. Existing staging overlay digests that predate the signing change
+  must be refreshed by the next staging build before promotion.
 - `deploy-web-k8s.yml` can build, sign, and commit a production web digest, but
   its direct deploy step cannot reach the cluster API from the GitHub runner.
 - Production API health has reported queue/provider degradation.
