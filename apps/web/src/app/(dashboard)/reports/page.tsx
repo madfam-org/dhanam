@@ -552,11 +552,17 @@ export default function ReportsPage() {
               <div className="flex items-center gap-2">
                 <Input
                   type="date"
+                  aria-label={t('quickExport.startDate')}
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
                 <span className="text-muted-foreground">to</span>
-                <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                <Input
+                  type="date"
+                  aria-label={t('quickExport.endDate')}
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -626,6 +632,7 @@ export default function ReportsPage() {
                   <Button
                     variant="ghost"
                     size="sm"
+                    aria-label={`Download ${report.name}`}
                     onClick={() => handleQuickExport(report.type as 'pdf' | 'csv')}
                   >
                     <Download className="h-4 w-4" />

@@ -1,6 +1,6 @@
 # Dhanam Full LLM Context
 
-Generated: 2026-05-13
+Generated: 2026-05-19
 
 ## Purpose
 
@@ -11,8 +11,11 @@ repository without depending on vendor-specific instruction files.
 
 1. `AGENTS.md`
 2. `README.md` if present
-3. `ECOSYSTEM.md` if present
-4. Relevant files under `docs/`, `infra/`, `.github/workflows/`, and source
+3. `docs/README.md` for the current documentation map
+4. `docs/STABILITY_AUDIT_2026-05-19.md` for current stability state
+5. `docs/DOCUMENTATION_AUDIT_2026-05-19.md` for documentation status
+6. `ECOSYSTEM.md` if present
+7. Relevant files under `docs/`, `infra/`, `.github/workflows/`, and source
    directories for the specific task
 
 ## Agent compatibility
@@ -36,10 +39,31 @@ gap or incident link.
 ## Repo entrypoints detected
 
 - `README.md`
+- `docs/README.md`
+- `docs/STABILITY_AUDIT_2026-05-19.md`
+- `docs/DOCUMENTATION_AUDIT_2026-05-19.md`
 - `ECOSYSTEM.md`
 - `docs/`
 - `infra/`
 - `.github/workflows/`
+
+## Current runtime map
+
+- API: `apps/api`, local `http://localhost:4010`, production
+  `https://api.dhan.am`, production container port `4300`.
+- Web: `apps/web`, local `http://localhost:3040`, production
+  `https://app.dhan.am` and `https://dhan.am`, production container port
+  `4200`.
+- Admin: `apps/admin`, local `http://localhost:3400`, production
+  `https://admin.dhan.am`, production container port `3400`.
+
+## Documentation contract
+
+Use `docs/README.md` as the canonical docs index. Treat older phase summaries
+and session reports as historical unless they are explicitly linked from that
+index as current. If a historical report conflicts with current source,
+manifests, `AGENTS.md`, `DEPLOYMENT.md`, or the stability audit, current source
+and current operational docs win.
 
 ## Maintenance
 

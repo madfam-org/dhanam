@@ -26,11 +26,16 @@ Dhanam is the ecosystem's billing backbone: 6 payment gateways (Stripe, Mercado 
 
 ### Deployed services
 
-| Service        | Public domain        | Container port |
-| -------------- | -------------------- | -------------- |
-| `dhanam-web`   | dhan.am, app.dhan.am | 3000           |
-| `dhanam-api`   | api.dhan.am          | 8000           |
-| `dhanam-admin` | admin.dhan.am        | 3001           |
+| Service        | Public domain        | Production container port |
+| -------------- | -------------------- | ------------------------- |
+| `dhanam-web`   | dhan.am, app.dhan.am | 4200                      |
+| `dhanam-api`   | api.dhan.am          | 4300                      |
+| `dhanam-admin` | admin.dhan.am        | 3400                      |
+
+Current runtime caveat: the 2026-05-19 stability audit found staging DNS and
+Enclii/Kyverno rollout blockers plus degraded public API health. Treat
+`docs/STABILITY_AUDIT_2026-05-19.md` as the current operational status record
+until those blockers are cleared.
 
 **Kubernetes namespace**: `dhanam`
 **Cluster**: bare-metal k3s on Hetzner (see topology section below).

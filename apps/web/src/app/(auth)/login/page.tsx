@@ -4,6 +4,7 @@ import { useTranslation } from '@dhanam/shared';
 import {
   Card,
   CardContent,
+  CardFooter,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -114,6 +115,17 @@ export default function LoginPage() {
             {guestLoginMutation.isPending ? t('accessingDemo') : t('tryDemo')}
           </Button>
         </CardContent>
+        <CardFooter className="flex flex-col gap-3 text-sm text-muted-foreground">
+          <Link href="/forgot-password" className="text-primary hover:underline">
+            {t('forgotPassword')}
+          </Link>
+          <div className="text-center">
+            {t('noAccount')}{' '}
+            <Link href="/register" className="text-primary hover:underline">
+              {t('signUp')}
+            </Link>
+          </div>
+        </CardFooter>
       </Card>
     </div>
   );

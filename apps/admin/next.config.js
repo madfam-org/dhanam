@@ -1,5 +1,17 @@
 const { withSentryConfig } = require('@sentry/nextjs');
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am/v1';
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.dhan.am';
+const oidcIssuer = process.env.NEXT_PUBLIC_OIDC_ISSUER || 'https://auth.madfam.io';
+
+function originForCsp(value) {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return value;
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
@@ -12,8 +24,8 @@ const nextConfig = {
   transpilePackages: ['@dhanam/shared', '@dhanam/ui', '@janua/ui', '@janua/react-sdk'],
 
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am/v1',
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://app.dhan.am',
+    NEXT_PUBLIC_API_URL: apiUrl,
+    NEXT_PUBLIC_APP_URL: appUrl,
     NEXT_PUBLIC_OIDC_ISSUER: process.env.NEXT_PUBLIC_OIDC_ISSUER,
     NEXT_PUBLIC_OIDC_CLIENT_ID: process.env.NEXT_PUBLIC_OIDC_CLIENT_ID,
   },
@@ -45,7 +57,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https:",
               "font-src 'self' data:",
-              `connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am'} ${process.env.NEXT_PUBLIC_OIDC_ISSUER || 'https://auth.madfam.io'} https://*.ingest.sentry.io`,
+              `connect-src 'self' ${originForCsp(apiUrl)} ${originForCsp(oidcIssuer)} https://*.ingest.sentry.io`,
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

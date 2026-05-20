@@ -1,486 +1,247 @@
 # Development Guide
 
-This guide will help you set up and run the Dhanam project locally.
+Last updated: 2026-05-19
+
+This guide describes the current local developer workflow for the Dhanam
+monorepo.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+- Node.js 20 or newer
+- pnpm 9.15.0, matching `packageManager` in the root `package.json`
+- Docker with Docker Compose
+- Git
 
-- **Node.js** 18+ (recommend using [nvm](https://github.com/nvm-sh/nvm))
-- **pnpm** 8+ (`npm install -g pnpm`)
-- **Docker** and **Docker Compose**
-- **Git**
+Optional tools:
 
-### Optional but recommended:
+- PostgreSQL client (`psql`) for local DB inspection
+- Redis CLI for local queue/cache inspection
+- Playwright browsers via `pnpm --dir apps/web exec playwright install`
 
-- **AWS CLI** (for LocalStack interaction)
-- **PostgreSQL client** (for database access)
-- **Redis CLI** (for cache inspection)
+## Local Ports
 
-### NPM Registry Configuration
+| Service     | Local URL                                      |
+| ----------- | ---------------------------------------------- |
+| API         | `http://localhost:4010`                        |
+| API v1      | `http://localhost:4010/v1`                     |
+| API Swagger | `http://localhost:4010/docs` in non-production |
+| Web app     | `http://localhost:3040`                        |
+| Admin app   | `http://localhost:3400`                        |
+| Postgres    | `localhost:5432`                               |
+| Redis       | `localhost:6379`                               |
+| Mailhog     | `http://localhost:8025`                        |
 
-Dhanam uses MADFAM's private npm registry (`npm.madfam.io`) for internal packages. Configure your `.npmrc` before running `pnpm install`:
+Production domains use `dhan.am`:
+
+- Web app: `https://app.dhan.am`
+- Landing page: `https://dhan.am`
+- Admin: `https://admin.dhan.am`
+- API: `https://api.dhan.am`
+
+## Registry Setup
+
+Dhanam uses MADFAM's private npm registry for internal packages. Configure
+`.npmrc` or your user-level npm config before installing dependencies:
 
 ```bash
-# Add to your project's .npmrc or ~/.npmrc
 @madfam:registry=https://npm.madfam.io
 @dhanam:registry=https://npm.madfam.io
 @janua:registry=https://npm.madfam.io
 //npm.madfam.io/:_authToken=${NPM_MADFAM_TOKEN}
 ```
 
-**Get your token:** Contact the MADFAM team or generate one from the registry admin panel.
+## Environment Files
 
-**For CI/CD:** Add `NPM_MADFAM_TOKEN` as a secret in your GitHub Actions or CI platform.
-
-## Quick Start
+Copy the example files, then replace secrets with local development values:
 
 ```bash
-# Clone the repository
-git clone https://github.com/madfam-io/dhanam.git
-cd dhanam
-
-# Run the setup script
-./scripts/dev-setup.sh
-
-# Start the development servers
-pnpm dev
-```
-
-This will:
-
-1. Set up Docker containers (PostgreSQL, Redis, LocalStack, etc.)
-2. Install all dependencies
-3. Run database migrations
-4. Seed the database with sample data
-5. Build shared packages
-
-## Project Structure
-
-```
-dhanam/
-├── apps/
-│   ├── api/          # NestJS backend API
-│   ├── web/          # Next.js web application
-│   └── mobile/       # React Native mobile app
-├── packages/
-│   ├── shared/       # Shared types and utilities
-│   ├── ui/           # Shared UI components
-│   ├── esg/          # ESG scoring logic
-│   └── config/       # Shared configuration
-├── infra/
-│   ├── docker/       # Docker configurations
-│   └── terraform/    # AWS infrastructure as code
-├── scripts/          # Development and deployment scripts
-└── docs/            # Documentation
-```
-
-## Environment Setup
-
-### 1. Environment Variables
-
-Copy the example environment files:
-
-```bash
-# API
 cp apps/api/.env.example apps/api/.env
-
-# Web
 cp apps/web/.env.example apps/web/.env.local
-
-# Mobile
-cp apps/mobile/.env.example apps/mobile/.env
+cp apps/admin/.env.example apps/admin/.env.local
 ```
 
-### 2. Docker Services
+Important local defaults:
 
-Start the required services:
+- `apps/api/.env`: set `PORT=4010`, `WEB_URL=http://localhost:3040`, and
+  `API_URL=http://localhost:4010/v1`.
+- `apps/web/.env.local`: set `NEXT_PUBLIC_API_URL=http://localhost:4010/v1`
+  and `NEXT_PUBLIC_BASE_URL=http://localhost:3040`.
+- `apps/admin/.env.local`: set `NEXT_PUBLIC_API_URL=http://localhost:4010/v1`
+  and `NEXT_PUBLIC_APP_URL=http://localhost:3040`.
 
-```bash
-# Start all services
-docker-compose up -d
+Seed scripts require explicit passwords:
 
-# Start with development tools (PgAdmin, Redis Commander)
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+- `DEMO_USER_PASSWORD`
+- `ADMIN_PASSWORD`
+- `MADFAM_ADMIN_PASSWORD` for the MADFAM internal finance seed
 
-# Check service status
-docker-compose ps
-```
-
-Available services:
-
-- **PostgreSQL**: `localhost:5432`
-- **Redis**: `localhost:6379`
-- **LocalStack**: `localhost:4566`
-- **Mailhog**: `localhost:8025` (Web UI)
-- **PgAdmin**: `localhost:5050` (admin@dhanam.local / admin)
-- **Redis Commander**: `localhost:8081`
-
-### 3. Database Setup
+## Install And Bootstrap
 
 ```bash
-cd apps/api
-
-# Generate Prisma client
-pnpm prisma generate
-
-# Run migrations
-pnpm prisma migrate dev
-
-# Seed database
+pnpm install
+pnpm dev:infra
+pnpm db:generate
+pnpm db:migrate:dev
 pnpm db:seed
-
-# Open Prisma Studio (GUI)
-pnpm prisma studio
 ```
 
-## Development Workflow
+`pnpm dev:infra` starts the Compose file at
+`infra/docker/docker-compose.yml`, which currently includes Postgres, Redis,
+and Mailhog.
 
-### Running Applications
+## Run Apps
+
+From the repo root:
 
 ```bash
-# Run all apps in development mode
 pnpm dev
+```
 
-# Run specific apps
-pnpm dev:api    # Backend API (http://localhost:4010)
-pnpm dev:web    # Web app (http://localhost:3040)
-pnpm dev:mobile # Mobile app (Expo)
+Or run a single app:
 
-# Build packages
+```bash
+pnpm dev:api
+pnpm dev:web
+pnpm dev:admin
+pnpm dev:mobile
+```
+
+Equivalent filtered commands:
+
+```bash
+pnpm --filter @dhanam/api dev
+pnpm --filter @dhanam/web dev
+pnpm --filter @dhanam/admin dev
+pnpm --filter @dhanam/mobile dev
+```
+
+## Build
+
+```bash
 pnpm build:packages
-```
-
-### Code Quality
-
-```bash
-# Linting
-pnpm lint
-pnpm lint:fix
-
-# Type checking
-pnpm typecheck
-
-# Testing
-pnpm test
-pnpm test:watch
-pnpm test:coverage
-
-# Format code
-pnpm format
-```
-
-### Database Management
-
-```bash
-cd apps/api
-
-# Create a new migration
-pnpm prisma migrate dev --name your_migration_name
-
-# Reset database
-pnpm prisma migrate reset
-
-# View database in GUI
-pnpm prisma studio
-```
-
-## API Development
-
-### Swagger Documentation
-
-The API documentation is available at:
-
-- Local: http://localhost:4010/api
-- Staging: https://api-staging.dhanam.io/api
-- Production: https://api.dhanam.io/api
-
-### Authentication
-
-The API uses JWT authentication with refresh tokens:
-
-```bash
-# Login
-curl -X POST http://localhost:4010/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "password"}'
-
-# Use the access token in subsequent requests
-curl http://localhost:4010/users/me \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-### Provider Integrations
-
-#### Belvo (Mexico)
-
-- Sandbox credentials are pre-configured
-- Test institutions: `sandbox_mx`
-- Test user: `test_user` / `test_password`
-
-#### Plaid (US)
-
-- Sandbox credentials are pre-configured
-- Test institutions: Chase, Bank of America
-- Test user: `user_good` / `pass_good`
-
-#### Bitso (Crypto)
-
-- Requires API key configuration
-- Sandbox mode available
-
-## Frontend Development
-
-### Web Application
-
-The web app uses Next.js 14 with App Router:
-
-```bash
-cd apps/web
-
-# Development server
-pnpm dev
-
-# Build for production
+pnpm --filter @dhanam/api build
+pnpm --filter @dhanam/web build
+pnpm --filter @dhanam/admin build
 pnpm build
-
-# Run production build locally
-pnpm start
 ```
 
-Key features:
-
-- Server-side rendering
-- API route handlers
-- Tailwind CSS styling
-- Radix UI components
-
-### Mobile Application
-
-The mobile app uses React Native with Expo:
+Next.js builds require the public env vars used at build time. For local CI-like
+builds, set at least:
 
 ```bash
-cd apps/mobile
-
-# Start Expo development server
-pnpm start
-
-# Run on iOS simulator
-pnpm ios
-
-# Run on Android emulator
-pnpm android
+NEXT_PUBLIC_API_URL=http://localhost:4010/v1
+NEXT_PUBLIC_BASE_URL=http://localhost:3040
+NEXT_PUBLIC_ADMIN_URL=http://localhost:3400
+NEXT_PUBLIC_POSTHOG_HOST=https://analytics.madfam.io
+NEXT_PUBLIC_SENTRY_DSN=https://public@example.com/1
 ```
 
-## Testing
+## Test And Check
 
-### Unit Tests
+Common repo checks:
 
 ```bash
-# Run all tests
+pnpm format:check
+pnpm lint
+pnpm typecheck
 pnpm test
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Run tests with coverage
-pnpm test:coverage
+pnpm lint:file-sizes
 ```
 
-### E2E Tests
+Focused app checks:
 
 ```bash
-# Install Playwright
-pnpm playwright install
+pnpm --filter @dhanam/api typecheck
+pnpm --filter @dhanam/api test
+pnpm --filter @dhanam/api test:cov
+pnpm --filter @dhanam/api test:chaos
 
-# Run E2E tests
-pnpm test:e2e
+pnpm --filter @dhanam/web typecheck
+pnpm --dir apps/web test -- --runInBand
 
-# Run E2E tests in UI mode
-pnpm test:e2e:ui
+pnpm --filter @dhanam/admin typecheck
+pnpm --dir apps/admin test -- --runInBand
 ```
+
+Playwright checks require app servers and, for API-backed journeys, local
+Postgres and Redis:
+
+```bash
+pnpm --dir apps/web exec playwright test --project=chromium
+pnpm --dir apps/admin exec playwright test --project=chromium
+```
+
+Visual regression is opt-in:
+
+```bash
+RUN_VISUAL_REGRESSION=true pnpm --dir apps/web exec playwright test e2e/visual-regression.spec.ts
+```
+
+## Database
+
+```bash
+pnpm db:generate
+pnpm db:migrate:dev
+pnpm db:migrate:deploy
+pnpm db:migrate:status
+pnpm db:seed
+pnpm db:studio
+```
+
+Local Compose Postgres uses:
+
+```text
+postgresql://dhanam:localdev@localhost:5432/dhanam
+```
+
+Use a database with `test` in the name for destructive integration/e2e tests.
 
 ## Debugging
 
-### API Debugging
-
-1. Use VS Code debugger with the provided launch configuration
-2. Set breakpoints in your code
-3. Press F5 to start debugging
-
-### Database Queries
-
-Monitor database queries:
+Check local infra:
 
 ```bash
-# Connect to PostgreSQL
-docker exec -it dhanam-postgres psql -U dhanam -d dhanam_dev
-
-# View recent queries
-SELECT query, calls, mean_exec_time
-FROM pg_stat_statements
-ORDER BY mean_exec_time DESC
-LIMIT 10;
+docker compose -f infra/docker/docker-compose.yml ps
+docker compose -f infra/docker/docker-compose.yml logs postgres
+docker compose -f infra/docker/docker-compose.yml logs redis
 ```
 
-### Redis Monitoring
+Inspect ports:
 
 ```bash
-# Connect to Redis CLI
-docker exec -it dhanam-redis redis-cli
-
-# Monitor commands in real-time
-MONITOR
-
-# View all keys
-KEYS *
+lsof -i :4010
+lsof -i :3040
+lsof -i :3400
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-#### Port already in use
+Reset local infra:
 
 ```bash
-# Find process using port
-lsof -i :3000  # or :4000 for API
-
-# Kill process
-kill -9 <PID>
+pnpm dev:infra:down
+pnpm dev:infra
 ```
 
-#### Docker issues
+## Production Operations
+
+Routine production operations are Enclii-first. Use Enclii web, API, or CLI for
+deployment, observability, domains, secrets, scaling, rollback, and remediation.
+Raw Kubernetes, Helm, SSH, provider CLIs, `docker exec`, and direct container
+access are for bootstrap or documented break-glass only.
+
+Start with:
 
 ```bash
-# Reset Docker environment
-docker-compose down -v
-docker system prune -a
-./scripts/dev-setup.sh
+enclii ps dhanam-api --env production
+enclii logs dhanam-api --env production --since 1h
+enclii releases dhanam-api --latest --output json
 ```
 
-#### Database connection issues
+See [Deployment Guide](DEPLOYMENT.md) and
+[Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md) before changing
+production.
 
-```bash
-# Check PostgreSQL logs
-docker logs dhanam-postgres
+## Documentation
 
-# Verify connection
-psql postgresql://dhanam:dhanam_dev_password@localhost:5432/dhanam_dev
-```
-
-#### Dependency issues
-
-```bash
-# Clear all caches
-pnpm store prune
-rm -rf node_modules
-rm -rf .turbo
-pnpm install
-```
-
-## Git Workflow
-
-### Branch Naming
-
-- `feat/` - New features
-- `fix/` - Bug fixes
-- `docs/` - Documentation updates
-- `refactor/` - Code refactoring
-- `test/` - Test additions/updates
-- `chore/` - Maintenance tasks
-
-### Commit Messages
-
-Follow conventional commits:
-
-```
-type(scope): description
-
-feat(api): add transaction categorization
-fix(web): resolve login redirect issue
-docs(readme): update installation steps
-```
-
-### Pull Request Process
-
-1. Create a feature branch
-2. Make your changes
-3. Run tests and linting
-4. Push to GitHub
-5. Create a pull request
-6. Wait for CI checks
-7. Request review
-8. Merge after approval
-
-## Performance Optimization
-
-### Database Optimization
-
-```sql
--- Add indexes for common queries
-CREATE INDEX idx_transactions_user_date ON transactions(user_id, date DESC);
-CREATE INDEX idx_accounts_space_id ON accounts(space_id);
-```
-
-### API Performance
-
-- Use DataLoader for N+1 query prevention
-- Implement response caching with Redis
-- Use pagination for large datasets
-- Enable compression
-
-### Frontend Performance
-
-- Implement code splitting
-- Use React.memo for expensive components
-- Optimize images with next/image
-- Enable ISR for static pages
-
-## Security Best Practices
-
-1. **Never commit secrets** - Use environment variables
-2. **Validate all inputs** - Use class-validator DTOs
-3. **Sanitize outputs** - Prevent XSS attacks
-4. **Use HTTPS** - Even in development with mkcert
-5. **Keep dependencies updated** - Run `pnpm audit` regularly
-
-## Deployment
-
-### Local Production Build
-
-```bash
-# Build all apps
-pnpm build
-
-# Run production builds locally
-cd apps/api && pnpm start:prod
-cd apps/web && pnpm start
-```
-
-### Docker Deployment
-
-```bash
-# Build Docker images
-docker build -t dhanam-api apps/api
-docker build -t dhanam-web apps/web
-
-# Run containers
-docker run -p 4000:4000 dhanam-api
-docker run -p 3000:3000 dhanam-web
-```
-
-## Additional Resources
-
-- [NestJS Documentation](https://docs.nestjs.com)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [React Native Documentation](https://reactnative.dev/docs/getting-started)
-- [Turborepo Documentation](https://turbo.build/repo/docs)
-
-## Getting Help
-
-- Check existing [GitHub Issues](https://github.com/madfam-io/dhanam/issues)
-- Join our [Discord Server](https://discord.gg/dhanam)
-- Read the [FAQ](./FAQ.md)
-- Contact the team at dev@dhanam.io
+Use [docs/README.md](README.md) as the canonical documentation map. When adding
+durable docs, link them there and mark historical/session-specific reports as
+historical if they should not be treated as current operational truth.

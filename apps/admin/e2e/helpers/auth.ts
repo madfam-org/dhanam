@@ -10,6 +10,11 @@ type AdminE2EUser = {
   spaces: Array<{ id: string; role: string }>;
 };
 
+function seedAdminStorage({ storageState }: { storageState: unknown }) {
+  localStorage.setItem('auth-storage', JSON.stringify(storageState));
+  document.cookie = 'auth-storage=true; path=/; max-age=604800; SameSite=Lax';
+}
+
 async function installAdminSession(page: Page, token: string, user: AdminE2EUser): Promise<void> {
   const storageState = {
     state: {
@@ -30,25 +35,13 @@ async function installAdminSession(page: Page, token: string, user: AdminE2EUser
     },
   ]);
 
-  await page.addInitScript(
-    ({ storageState }) => {
-      localStorage.setItem('auth-storage', JSON.stringify(storageState));
-      document.cookie = 'auth-storage=true; path=/; max-age=604800; SameSite=Lax';
-    },
-    { storageState }
-  );
+  await page.context().addInitScript(seedAdminStorage, { storageState });
+  await page.addInitScript(seedAdminStorage, { storageState });
 
-  await page
-    .evaluate(
-      ({ storageState }) => {
-        localStorage.setItem('auth-storage', JSON.stringify(storageState));
-        document.cookie = 'auth-storage=true; path=/; max-age=604800; SameSite=Lax';
-      },
-      { storageState }
-    )
-    .catch(() => {
-      // The page may still be about:blank when the fixture seeds auth.
-    });
+  // Materialize localStorage on the admin origin before protected routes mount.
+  // On about:blank the init script is not enough for the first dashboard load.
+  await page.goto('/login', { waitUntil: 'domcontentloaded' });
+  await page.evaluate(seedAdminStorage, { storageState });
 }
 
 function syntheticAdminUser(email = 'admin@dhanam.demo'): AdminE2EUser {

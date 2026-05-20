@@ -1,23 +1,53 @@
 import { test as base, expect, Page, Route } from '@playwright/test';
 import { adminLogin, adminLogout } from './auth';
 
+function corsHeaders(route: Route): Record<string, string> {
+  return {
+    'access-control-allow-origin': route.request().headers().origin || 'http://localhost:3400',
+    'access-control-allow-credentials': 'true',
+    'access-control-allow-headers': 'authorization,content-type',
+    'access-control-allow-methods': 'GET,POST,PATCH,DELETE,OPTIONS',
+    vary: 'Origin',
+  };
+}
+
+async function fulfillPreflight(route: Route): Promise<void> {
+  await route.fulfill({
+    status: 204,
+    headers: corsHeaders(route),
+  });
+}
+
 async function fulfillJson(route: Route, body: unknown): Promise<void> {
   await route.fulfill({
     status: 200,
     contentType: 'application/json',
-    headers: {
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'authorization,content-type',
-      'access-control-allow-methods': 'GET,POST,PATCH,DELETE,OPTIONS',
-    },
+    headers: corsHeaders(route),
     body: JSON.stringify(body),
   });
+}
+
+function isAdminMockPath(path: string): boolean {
+  return [
+    '/admin/stats',
+    '/admin/feature-flags',
+    '/admin/health',
+    '/admin/metrics',
+    '/admin/queues',
+    '/admin/users',
+    '/admin/spaces',
+  ].some((adminPath) => path.endsWith(adminPath));
 }
 
 async function installAdminApiMocks(page: Page): Promise<void> {
   await page.context().route('**/*', async (route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
+
+    if (route.request().method() === 'OPTIONS' && isAdminMockPath(path)) {
+      await fulfillPreflight(route);
+      return;
+    }
 
     if (path.endsWith('/admin/stats')) {
       await fulfillJson(route, {

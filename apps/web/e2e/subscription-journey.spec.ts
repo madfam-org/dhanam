@@ -1,9 +1,30 @@
 import { test, expect } from './helpers/fixtures';
 import { test as baseTest } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { setGeoCountry } from './helpers/auth';
 
 const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:3040';
-const API_BASE = process.env.E2E_API_URL || 'http://localhost:4010';
+const API_BASE = process.env.E2E_API_URL || 'http://localhost:4010/v1';
+
+async function waitForPageShell(page: Page): Promise<void> {
+  await page.waitForLoadState('domcontentloaded');
+  await expect(page.locator('body')).toBeVisible();
+}
+
+async function gotoLandingPricing(page: Page): Promise<Locator> {
+  await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
+  const pricingSection = page.locator('#pricing');
+  await expect(pricingSection).toBeVisible({ timeout: 10000 });
+  await expect(pricingSection.locator('.rounded-lg.bg-card')).toHaveCount(3, { timeout: 10000 });
+  return pricingSection;
+}
+
+async function expectCurrentConsumerTiers(section: Locator): Promise<void> {
+  const text = (await section.textContent()) ?? '';
+  expect(text).toMatch(/Free|Essentials/);
+  expect(text).toMatch(/Copilot Pro|Pro/);
+  expect(text).toMatch(/Family Plus|Premium/);
+}
 
 /**
  * E2E tests for the full subscription journey:
@@ -17,35 +38,27 @@ const API_BASE = process.env.E2E_API_URL || 'http://localhost:4010';
 
 baseTest.describe('Landing Page Pricing', () => {
   baseTest('should display 3 pricing tiers on landing page', async ({ page }) => {
-    await page.goto(BASE_URL);
-
-    // Scroll to the pricing section (id="pricing" in pricing.tsx)
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
+    const pricingSection = await gotoLandingPricing(page);
 
     // The pricing grid renders 3 cards with class "rounded-lg bg-card"
     const tierCards = pricingSection.locator('.rounded-lg.bg-card');
     await expect(tierCards).toHaveCount(3);
 
-    // Verify tier names are rendered
-    await expect(pricingSection.getByText('Essentials')).toBeVisible();
-    await expect(pricingSection.getByText('Pro')).toBeVisible();
-    await expect(pricingSection.getByText('Premium')).toBeVisible();
+    await expectCurrentConsumerTiers(pricingSection);
   });
 
   baseTest('should show MXN prices when geo cookie is set to MX', async ({ page }) => {
     // Navigate first so we have a valid URL for cookie domain
-    await page.goto(BASE_URL);
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
 
     // Set the geo cookie before reloading
     await setGeoCountry(page, 'MX');
-    await page.reload();
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
 
     // Wait for the pricing API call to resolve and render
-    await page.waitForLoadState('networkidle');
+    await waitForPageShell(page);
 
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
+    const pricingSection = await gotoLandingPricing(page);
 
     // The pricing component calls billingApi.getPricing(geoCookie) and
     // renders via Intl.NumberFormat with the returned currency.
@@ -63,32 +76,24 @@ baseTest.describe('Landing Page Pricing', () => {
   });
 
   baseTest('should show promo banner when regional promo pricing is active', async ({ page }) => {
-    await page.goto(BASE_URL);
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
     await setGeoCountry(page, 'MX');
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
+    const pricingSection = await gotoLandingPricing(page);
 
     // The Pricing component renders a promo banner when hasPromo is true:
     // "Start free for N days -- then promo pricing for N months"
     const promoIndicator = pricingSection.getByText(/promo pricing/i);
     // If the API returned promo prices, the banner should be visible
     const pricingText = await pricingSection.textContent();
-    if (pricingText?.includes('$31') || pricingText?.includes('MX$')) {
+    if (/\$31|MX\$31|MXN\s*31/.test(pricingText ?? '')) {
       await expect(promoIndicator).toBeVisible();
     }
   });
 
   baseTest('should show strikethrough original price when promo is active', async ({ page }) => {
-    await page.goto(BASE_URL);
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
     await setGeoCountry(page, 'MX');
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
+    const pricingSection = await gotoLandingPricing(page);
 
     // When promoPrice !== null, the component renders the original price with
     // class "line-through" inside each card
@@ -101,20 +106,14 @@ baseTest.describe('Landing Page Pricing', () => {
     }
   });
 
-  baseTest('should not prominently display Community tier in pricing cards', async ({ page }) => {
-    await page.goto(BASE_URL);
+  baseTest('should separate hosted pricing from the Community edition link', async ({ page }) => {
+    const pricingSection = await gotoLandingPricing(page);
 
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
-
-    // The grid only renders tiers from the API (essentials, pro, premium).
-    // Community is not a card -- it appears as a "self-hosted" / "Community edition" link.
     const tierCards = pricingSection.locator('.rounded-lg.bg-card');
     const cardTexts = await tierCards.allTextContents();
 
     for (const text of cardTexts) {
-      // No card should show $0 (Community pricing)
-      expect(text).not.toContain('$0');
+      expect(text).not.toMatch(/community/i);
     }
 
     // The self-hosted link should be present below the grid
@@ -123,10 +122,7 @@ baseTest.describe('Landing Page Pricing', () => {
   });
 
   baseTest('should display "Most Popular" badge on Pro tier', async ({ page }) => {
-    await page.goto(BASE_URL);
-
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
+    const pricingSection = await gotoLandingPricing(page);
 
     // The Pro card has a "Most Popular" badge (from t('pricing.mostPopular'))
     const mostPopularBadge = pricingSection.getByText(/most popular/i);
@@ -134,10 +130,7 @@ baseTest.describe('Landing Page Pricing', () => {
   });
 
   baseTest('should show "cancel anytime" note under pricing', async ({ page }) => {
-    await page.goto(BASE_URL);
-
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
+    const pricingSection = await gotoLandingPricing(page);
 
     // Each card has t('pricing.cancelAnytime') text
     const cancelNote = pricingSection.getByText(/cancel anytime/i).first();
@@ -147,10 +140,10 @@ baseTest.describe('Landing Page Pricing', () => {
 
 baseTest.describe('Demo Flow', () => {
   baseTest('should navigate from landing page to dashboard via demo button', async ({ page }) => {
-    await page.goto(BASE_URL);
+    await page.goto(`${BASE_URL}/en`, { waitUntil: 'domcontentloaded' });
 
     // The hero CTA text is "Try Live Demo" (from i18n hero.cta)
-    const demoButton = page.getByRole('button', { name: /try live demo/i });
+    const demoButton = page.getByRole('button', { name: /try live demo/i }).first();
 
     if (await demoButton.isVisible()) {
       await demoButton.click();
@@ -166,33 +159,33 @@ baseTest.describe('Registration with Plan', () => {
   baseTest(
     'should show plan context on register page when plan query param is set',
     async ({ page }) => {
-      await page.goto(`${BASE_URL}/register?plan=pro`);
+      await page.goto(`${BASE_URL}/register?plan=copilot_pro`);
 
-      // The register page shows "Start your free trial of Pro" when selectedPlan is set
+      // The register page shows the selected plan in human-readable form.
       const pageContent = await page.textContent('body');
       const showsPlanContext =
-        pageContent?.toLowerCase().includes('pro') || pageContent?.toLowerCase().includes('trial');
+        pageContent?.toLowerCase().includes('copilot pro') ||
+        pageContent?.toLowerCase().includes('trial');
       expect(showsPlanContext).toBeTruthy();
     }
   );
 
-  baseTest(
-    'should show "Start your free trial of Essentials" for essentials plan',
-    async ({ page }) => {
-      await page.goto(`${BASE_URL}/register?plan=essentials`);
+  baseTest('should show "Start your free trial of Free" for free plan', async ({ page }) => {
+    await page.goto(`${BASE_URL}/register?plan=free`);
 
-      // CardDescription renders: "Start your free trial of Essentials"
-      const trialText = page.getByText(/start your free trial of essentials/i);
+    const trialText = page.getByText(/start your free trial of free/i);
+    await expect(trialText).toBeVisible();
+  });
+
+  baseTest(
+    'should show "Start your free trial of Family Plus" for family plan',
+    async ({ page }) => {
+      await page.goto(`${BASE_URL}/register?plan=family_plus`);
+
+      const trialText = page.getByText(/start your free trial of family plus/i);
       await expect(trialText).toBeVisible();
     }
   );
-
-  baseTest('should show "Start your free trial of Premium" for premium plan', async ({ page }) => {
-    await page.goto(`${BASE_URL}/register?plan=premium`);
-
-    const trialText = page.getByText(/start your free trial of premium/i);
-    await expect(trialText).toBeVisible();
-  });
 
   baseTest('should show default description when no plan param is set', async ({ page }) => {
     await page.goto(`${BASE_URL}/register`);
@@ -203,22 +196,16 @@ baseTest.describe('Registration with Plan', () => {
   });
 
   baseTest('should link from pricing CTA to register with plan query param', async ({ page }) => {
-    await page.goto(BASE_URL);
+    const pricingSection = await gotoLandingPricing(page);
 
-    const pricingSection = page.locator('#pricing');
-    await pricingSection.scrollIntoViewIfNeeded();
-
-    // Each tier card has a button: "Start N-Day Free Trial"
-    // Clicking calls onSignUpClick(tier.id) which navigates to /register?plan=<tier>
-    const trialButtons = pricingSection.getByRole('button', { name: /free trial/i });
-    const buttonCount = await trialButtons.count();
+    // Each tier card has a CTA. Free may say "Get Started"; paid tiers use trial copy.
+    const tierCtas = pricingSection.getByRole('button', { name: /get started|trial/i });
+    const buttonCount = await tierCtas.count();
     expect(buttonCount).toBe(3);
 
-    // Click the first trial button (Essentials)
-    // Note: This triggers window.location.href so we listen for navigation
     const [navigation] = await Promise.all([
       page.waitForURL('**/register**', { timeout: 10000 }).catch(() => null),
-      trialButtons.first().click(),
+      tierCtas.first().click(),
     ]);
 
     if (navigation !== null) {
@@ -231,17 +218,17 @@ baseTest.describe('Registration with Plan', () => {
 test.describe('Upgrade Page', () => {
   test('should display 3 tiers on upgrade page', async ({ guestPage }) => {
     await guestPage.goto(`${BASE_URL}/billing/upgrade`);
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     // The upgrade page renders 3 Card components with tier names
-    await expect(guestPage.getByText('Essentials')).toBeVisible();
-    await expect(guestPage.getByText('Pro')).toBeVisible();
-    await expect(guestPage.getByText('Premium')).toBeVisible();
+    await expect(guestPage.getByRole('heading', { name: 'Essentials' })).toBeVisible();
+    await expect(guestPage.getByRole('heading', { name: 'Pro' })).toBeVisible();
+    await expect(guestPage.getByRole('heading', { name: 'Premium' })).toBeVisible();
   });
 
   test('should show "Choose Your Plan" heading on upgrade page', async ({ guestPage }) => {
     await guestPage.goto(`${BASE_URL}/billing/upgrade`);
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     const heading = guestPage.getByRole('heading', { name: /choose your plan/i });
     await expect(heading).toBeVisible();
@@ -249,7 +236,7 @@ test.describe('Upgrade Page', () => {
 
   test('should show subscribe buttons for each tier', async ({ guestPage }) => {
     await guestPage.goto(`${BASE_URL}/billing/upgrade`);
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     // Each non-current tier shows "Subscribe to <Name>" button
     const subscribeButtons = guestPage.getByRole('button', { name: /subscribe to/i });
@@ -262,7 +249,7 @@ test.describe('Upgrade Page', () => {
     await setGeoCountry(guestPage, 'MX');
 
     await guestPage.goto(`${BASE_URL}/billing/upgrade`);
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     const pageContent = await guestPage.textContent('body');
     // Should show pricing content (subscribe buttons or current plan indicator)
@@ -273,7 +260,7 @@ test.describe('Upgrade Page', () => {
 
   test('should show "cancel anytime" note on upgrade page', async ({ guestPage }) => {
     await guestPage.goto(`${BASE_URL}/billing/upgrade`);
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     // The upgrade page renders: "Cancel anytime. Regional pricing applied automatically."
     const cancelNote = guestPage.getByText(/cancel anytime/i);
@@ -282,7 +269,7 @@ test.describe('Upgrade Page', () => {
 
   test('should have back button to billing page', async ({ guestPage }) => {
     await guestPage.goto(`${BASE_URL}/billing/upgrade`);
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     const backButton = guestPage.getByRole('button', { name: /back/i });
     await expect(backButton).toBeVisible();

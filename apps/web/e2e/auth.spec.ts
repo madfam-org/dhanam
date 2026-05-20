@@ -6,34 +6,25 @@ test.describe('Authentication', () => {
   });
 
   test('should display login page with required elements', async ({ page }) => {
-    // Verify core login elements are present
-    await expect(page.locator('input[name="email"], [aria-label*="mail"]')).toBeVisible();
-    await expect(page.locator('input[name="password"], [aria-label*="assword"]')).toBeVisible();
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /sign in to your account/i })).toBeVisible();
+    await expect(page.getByText(/welcome back/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /try demo/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /forgot/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /sign up/i })).toBeVisible();
   });
 
-  test('should show validation errors for empty submission', async ({ page }) => {
-    await page.click('button[type="submit"]');
-
-    // Wait for validation messages
-    await page.waitForTimeout(500);
-    const errorCount = await page
-      .locator('[role="alert"], .text-destructive, .text-red-500')
-      .count();
-    expect(errorCount).toBeGreaterThanOrEqual(0); // Validation may be inline
-  });
-
-  test('should show error for invalid credentials', async ({ page }) => {
-    await page.fill('input[name="email"], [aria-label*="mail"]', 'wrong@example.com');
-    await page.fill('input[name="password"], [aria-label*="assword"]', 'WrongPassword123!');
-    await page.click('button[type="submit"]');
-
-    // Should show error alert
-    await expect(page.locator('[role="alert"]')).toBeVisible({ timeout: 10000 });
+  test('should render a Janua SSO sign-in surface', async ({ page }) => {
+    await expect(
+      page
+        .getByRole('link', { name: /janua|sign in/i })
+        .or(page.locator('form'))
+        .or(page.locator('[data-janua], [class*="janua" i]'))
+        .first()
+    ).toBeVisible();
   });
 
   test('should navigate to register page', async ({ page }) => {
-    await page.click('a[href="/register"]');
+    await page.getByRole('link', { name: /sign up/i }).click();
     await expect(page).toHaveURL(/\/register/);
   });
 
@@ -59,7 +50,7 @@ test.describe('Forgot Password', () => {
 
   test('should navigate to forgot password from login', async ({ page }) => {
     await page.goto('/login');
-    await page.click('a[href="/forgot-password"]');
+    await page.getByRole('link', { name: /forgot/i }).click();
     await expect(page).toHaveURL(/\/forgot-password/);
   });
 

@@ -92,18 +92,7 @@ export function ProbabilisticGoalCard({
   const targetAmount = goal.targetAmount;
 
   return (
-    <Card
-      className={`cursor-pointer hover:border-primary transition-colors ${onClick ? 'hover:shadow-md' : ''}`}
-      onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={(e: React.KeyboardEvent) => {
-        if (onClick && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-    >
+    <Card className={onClick ? 'hover:shadow-md transition-shadow' : undefined}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -199,22 +188,29 @@ export function ProbabilisticGoalCard({
             )}
 
             {/* Actions */}
-            {showActions && (
+            {(showActions || onClick) && (
               <div className="flex gap-2 pt-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  onClick={handleRefresh}
-                  disabled={updating}
-                >
-                  {updating ? (
-                    <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-3 w-3 mr-1.5" />
-                  )}
-                  Recalculate
-                </Button>
+                {showActions && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={handleRefresh}
+                    disabled={updating}
+                  >
+                    {updating ? (
+                      <Loader2 className="h-3 w-3 mr-1.5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3 w-3 mr-1.5" />
+                    )}
+                    Recalculate
+                  </Button>
+                )}
+                {onClick && (
+                  <Button variant="outline" size="sm" className="flex-1" onClick={onClick}>
+                    View goal
+                  </Button>
+                )}
               </div>
             )}
           </>

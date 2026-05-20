@@ -4,6 +4,13 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
+    "assets": [
+      {
+        "include": "modules/email/templates/**/*",
+        "outDir": "dist"
+      }
+    ],
+    "watchAssets": true,
     "webpack": false,
     "tsConfigPath": "./tsconfig.json"
   }

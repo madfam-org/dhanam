@@ -42,6 +42,24 @@
 #     originRequest:
 #       noTLSVerify: true
 #
+#   # =========================================================================
+#   # Dhanam staging - RFC 0001 PP.2b GitOps tier
+#   # =========================================================================
+#   - hostname: staging.dhan.am
+#     service: http://dhanam-web.dhanam-staging.svc.cluster.local:80
+#     originRequest:
+#       noTLSVerify: true
+#
+#   - hostname: staging-api.dhan.am
+#     service: http://dhanam-api.dhanam-staging.svc.cluster.local:80
+#     originRequest:
+#       noTLSVerify: true
+#
+#   - hostname: staging-admin.dhan.am
+#     service: http://dhanam-admin.dhanam-staging.svc.cluster.local:80
+#     originRequest:
+#       noTLSVerify: true
+#
 # -----------------------------------------------------------------------------
 
 ---
@@ -57,6 +75,9 @@
 # | CNAME | admin | <tunnel-id>.cfargotunnel.com     | Yes   |
 # | CNAME | @     | <tunnel-id>.cfargotunnel.com     | Yes   |
 # | CNAME | www   | <tunnel-id>.cfargotunnel.com     | Yes   |
+# | CNAME | staging       | <tunnel-id>.cfargotunnel.com | Yes   |
+# | CNAME | staging-api   | <tunnel-id>.cfargotunnel.com | Yes   |
+# | CNAME | staging-admin | <tunnel-id>.cfargotunnel.com | Yes   |
 #
 # Domain: dhan.am
 # =============================================================================

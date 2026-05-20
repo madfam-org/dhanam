@@ -8,7 +8,7 @@ The Dhanam Admin Dashboard provides comprehensive tools for system administrator
 
 - **Role**: User must have `admin` or `owner` role in at least one space
 - **Production URL**: `https://admin.dhan.am/dashboard`
-- **Development URL**: `http://localhost:3400/dashboard` (standalone) or `http://localhost:3040/admin/dashboard` (web-embedded)
+- **Development URL**: `http://localhost:3400/dashboard` (standalone admin app)
 - **Authentication**: Cross-subdomain cookie (`auth-storage` with `Domain=.dhan.am`) — unauthenticated users redirected to `app.dhan.am/login`
 
 ## Dashboard Sections

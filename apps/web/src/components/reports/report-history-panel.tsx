@@ -145,6 +145,9 @@ export function ReportHistoryPanel({ reportId, onGenerate }: ReportHistoryPanelP
                 <Button
                   variant="ghost"
                   size="sm"
+                  aria-label={`Download ${report.format.toUpperCase()} report generated ${new Date(
+                    report.createdAt
+                  ).toLocaleDateString()}`}
                   onClick={() => handleDownload(report.id)}
                   disabled={downloadingId === report.id}
                 >

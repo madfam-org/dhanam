@@ -666,18 +666,7 @@ export default function DashboardPage() {
 
       {/* Persona-Aware Feature Widget */}
       {(user?.email === 'diego@dhanam.demo' || isGuestDemo) && (
-        <Card
-          className="cursor-pointer hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          role="button"
-          tabIndex={0}
-          onClick={() => router.push('/gaming')}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              router.push('/gaming');
-            }
-          }}
-        >
+        <Card className="hover:shadow-md transition-shadow">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -687,14 +676,7 @@ export default function DashboardPage() {
                 </CardTitle>
                 <CardDescription>{t('overview.gamingDescription')}</CardDescription>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push('/gaming');
-                }}
-              >
+              <Button variant="outline" size="sm" onClick={() => router.push('/gaming')}>
                 {t('overview.viewDashboard')}
               </Button>
             </div>

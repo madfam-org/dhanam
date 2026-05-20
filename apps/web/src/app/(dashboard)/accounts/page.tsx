@@ -307,6 +307,7 @@ export default function AccountsPage() {
                             <Button
                               variant="ghost"
                               className="h-8 w-8 p-0"
+                              aria-label={`Open actions for ${account.name}`}
                               onClick={(e) => e.stopPropagation()}
                             >
                               <MoreVertical className="h-4 w-4" />

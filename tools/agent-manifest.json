@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "name": "dhanam",
-  "version": "1.0.0",
-  "description": "Dhanam - MADFAM Personal Finance App",
-  "lastUpdated": "2026-01-21",
+  "version": "0.1.0",
+  "description": "Dhanam - MADFAM billing ledger boundary and LATAM-first personal finance app",
+  "lastUpdated": "2026-05-19",
 
   "domains": {
     "production": {
@@ -41,7 +41,7 @@
     "api": {
       "path": "apps/api/src/main.ts",
       "framework": "NestJS/Fastify",
-      "healthCheck": "/health"
+      "healthCheck": "/v1/monitoring/health"
     },
     "web": {
       "path": "apps/web/src/app/page.tsx",
@@ -57,8 +57,8 @@
 
   "criticalConfiguration": {
     "ssoIntegration": {
-      "path": "apps/web/src/providers/JanuaAuthBridge.tsx",
-      "description": "Janua SDK bridge syncs SSO state with Dhanam Zustand auth store. Login/register use @janua/react-sdk SignIn/SignUp components."
+      "path": "apps/web/src/lib/providers.tsx",
+      "description": "JanuaProvider and JanuaAuthSync sync Janua SDK state with Dhanam's Zustand auth store. Login/register use @janua/react-sdk SignIn/SignUp components."
     },
     "oidcConfig": {
       "issuer": "https://auth.madfam.io",
@@ -72,15 +72,17 @@
   },
 
   "buildCommands": {
-    "api": "pnpm --filter api build",
-    "web": "pnpm --filter web build",
-    "admin": "pnpm --filter admin build",
+    "api": "pnpm --filter @dhanam/api build",
+    "web": "pnpm --filter @dhanam/web build",
+    "admin": "pnpm --filter @dhanam/admin build",
     "all": "turbo build"
   },
 
   "testCommands": {
     "unit": "pnpm test",
-    "e2e": "pnpm test:e2e",
+    "apiE2e": "pnpm --filter @dhanam/api test:e2e",
+    "webE2e": "pnpm --dir apps/web exec playwright test --project=chromium",
+    "adminE2e": "pnpm --dir apps/admin exec playwright test --project=chromium",
     "lint": "pnpm lint"
   },
 
@@ -132,12 +134,16 @@
     "default": "janua",
     "options": ["local", "janua"],
     "interfaces": ["AuthProvider", "MfaProvider"],
-    "frontendSdk": "@janua/react-sdk@0.1.1"
+    "frontendSdk": "@janua/react-sdk@0.1.3"
   },
 
   "llmContext": {
     "llmsTxt": "llms.txt",
     "llmsFullTxt": "llms-full.txt",
+    "docsIndex": "docs/README.md",
+    "stabilityAudit": "docs/STABILITY_AUDIT_2026-05-19.md",
+    "documentationAudit": "docs/DOCUMENTATION_AUDIT_2026-05-19.md",
+    "agentsMd": "AGENTS.md",
     "claudeMd": "CLAUDE.md",
     "spec": "https://llmstxt.org/",
     "webUrls": {

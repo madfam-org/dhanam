@@ -1,92 +1,120 @@
-# Documentation Index
+# Dhanam Documentation
 
-This directory contains comprehensive documentation for the Dhanam Ledger project.
+Last updated: 2026-05-19
 
-## Quick Links
+This is the canonical human and agent documentation map for Dhanam. Prefer this
+file over older phase summaries when choosing what to read first.
 
-- [Development Guide](DEVELOPMENT.md) - Local development setup and workflows
-- [API Documentation](API.md) - Backend API architecture and endpoints
-- [Deployment Guide](DEPLOYMENT.md) - Production deployment instructions
-- [Mobile App Guide](MOBILE.md) - React Native mobile app development
+## Start Here
 
-## Architecture
+| Document                                                            | Use                                                                                |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [Repository README](../README.md)                                   | Product overview, local quick start, common commands                               |
+| [Development Guide](DEVELOPMENT.md)                                 | Local setup, ports, env files, testing workflow                                    |
+| [Deployment Guide](DEPLOYMENT.md)                                   | Enclii-first deploy, staging, rollback, current rollout blockers                   |
+| [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)         | Current truth about production, staging, DNS, health, and remaining stability gaps |
+| [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md) | Docs accuracy, organization, link hygiene, and remaining documentation debt        |
+| [API Reference](API.md)                                             | REST API overview and endpoint examples                                            |
+| [Mobile Guide](MOBILE.md)                                           | React Native and Expo app notes                                                    |
 
-- [Architecture Overview](architecture/ARCHITECTURE.md) - Full system architecture
-- [Software Specification](architecture/SOFTWARE_SPEC.md) - Detailed technical specifications
-- [Infrastructure Setup](INFRASTRUCTURE.md) - Infrastructure components and configuration
-- [Dhanam CLI](architecture/DHANAM_CLI.md) - Command-line interface documentation
+## Architecture And Operations
 
-## Development Guides
+| Document                                                | Use                                                                               |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| [Architecture Overview](architecture/ARCHITECTURE.md)   | Current system shape: Next.js, NestJS, Postgres, Redis, Enclii, Cloudflare Tunnel |
+| [Software Specification](architecture/SOFTWARE_SPEC.md) | Product and technical specification; some infrastructure sections are historical  |
+| [Infrastructure Guide](INFRASTRUCTURE.md)               | Monitoring, admin, and infrastructure notes                                       |
+| [Launch Operations](LAUNCH_OPERATIONS.md)               | Launch checklist and operator tasks                                               |
+| [Backup And Restore](BACKUP_RESTORE.md)                 | Backup and restore runbooks                                                       |
+| [Sentry Setup](SENTRY_SETUP.md)                         | Error monitoring setup                                                            |
+| [Credential Onboarding](CREDENTIAL_ONBOARDING.md)       | Provider credential activation runbook                                            |
 
-- [CI/CD Implementation](guides/CICD_IMPLEMENTATION_SUMMARY.md) - Continuous integration/deployment setup
-- [Implementation Roadmap](guides/IMPLEMENTATION_ROADMAP.md) - Project roadmap and milestones
-- [PostHog Integration](guides/POSTHOG_INTEGRATION.md) - Analytics integration guide
-- [Spanish UI Integration](guides/SPANISH_UI_INTEGRATION.md) - Internationalization guide
-- [Remediation Plan](guides/REMEDIATION_PLAN.md) - Technical debt remediation
-- [Priority 3 Completion](guides/PRIORITY_3_COMPLETION_SUMMARY.md) - Phase 3 completion summary
-- [Priority 4 Part 1](guides/PRIORITY_4_PART_1_SUMMARY.md) - Phase 4 progress
+Production operations are Enclii-first. Raw `kubectl`, `helm`, provider CLIs,
+SSH, `docker exec`, or direct container access are break-glass/bootstrap only;
+record the missing Enclii adapter gap when raw access is unavoidable.
 
-## Testing Documentation
+## Development And Testing
 
-- [Test Summary](testing/TEST_SUMMARY.md) - Overall testing approach
-- [Test Results](testing/TEST_RESULTS.md) - Latest test results
-- [Test Implementation Status](testing/TEST_IMPLEMENTATION_STATUS.md) - Test coverage status
-- [Test Coverage Plan](testing/OPTION_B_TEST_COVERAGE_PLAN.md) - Coverage improvement plan
-- [Test Coverage Session Summary](testing/TEST_COVERAGE_SESSION_SUMMARY.md) - Latest session
-- [Test Execution Summary](testing/TEST_EXECUTION_SUMMARY.md) - Execution details
+| Document                                                      | Use                                                              |
+| ------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Testing Overview](testing/TEST_SUMMARY.md)                   | Current test layers and how to run them                          |
+| [Latest Verification Snapshot](testing/TEST_RESULTS.md)       | Most recent local verification summary                           |
+| [API Test Coverage Guide](../apps/api/TEST_COVERAGE_GUIDE.md) | API Jest, coverage, chaos, and DB-backed test notes              |
+| [Migration Checklist](MIGRATION_CHECKLIST.md)                 | Historical Janua/domain migration notes                          |
+| [Dogfooding Quickstart](DOGFOODING_QUICKSTART.md)             | Historical internal dogfooding guide; verify commands before use |
 
-## Audit Reports
+## Product And Feature Guides
 
-### Comprehensive Audits
+| Document                                                                       | Use                                        |
+| ------------------------------------------------------------------------------ | ------------------------------------------ |
+| [Billing Integration](guides/BILLING_INTEGRATION.md)                           | Billing and subscription integration notes |
+| [AI Categorization](guides/AI_CATEGORIZATION_GUIDE.md)                         | Transaction categorization workflow        |
+| [Goal Tracking](guides/GOAL_TRACKING_GUIDE.md)                                 | Goal tracking UX and behavior              |
+| [Manual Assets](guides/MANUAL_ASSETS.md)                                       | Manual asset tracking                      |
+| [Estate Planning](guides/ESTATE_PLANNING_GUIDE.md)                             | Life Beat and executor workflows           |
+| [Household Features](guides/HOUSEHOLD_FEATURES_GUIDE.md)                       | Household ownership and sharing            |
+| [Long-Term Projections](guides/LONG_TERM_PROJECTIONS_GUIDE.md)                 | Projection workflows                       |
+| [Monte Carlo](guides/MONTE_CARLO_GUIDE.md)                                     | Simulation API and UX details              |
+| [DeFi/Web3](guides/DEFI_WEB3_GUIDE.md)                                         | DeFi and crypto portfolio tracking         |
+| [Multi-Provider Redundancy](guides/MULTI_PROVIDER_REDUNDANCY.md)               | Provider failover approach                 |
+| [Transaction Execution User Guide](guides/transaction-execution-user-guide.md) | Transaction execution feature guide        |
+| [Transaction Execution API](api/transaction-execution-api.md)                  | Transaction execution endpoint reference   |
 
-- [Comprehensive Audit Report 2025](audits/COMPREHENSIVE_AUDIT_REPORT_2025.md) - Latest full audit
-- [Comprehensive Codebase Audit](audits/COMPREHENSIVE_CODEBASE_AUDIT.md) - Code quality audit
-- [Codebase Quality Audit](audits/CODEBASE_QUALITY_AUDIT_REPORT.md) - Quality metrics
-- [Code Quality Audit](audits/CODE_QUALITY_AUDIT_REPORT.md) - Code analysis
+## ADRs
 
-### Specialized Audits
+| ADR                                                         | Decision                               |
+| ----------------------------------------------------------- | -------------------------------------- |
+| [ADR-001](adr/001-nestjs-fastify.md)                        | NestJS with Fastify                    |
+| [ADR-002](adr/002-prisma-orm.md)                            | Prisma ORM                             |
+| [ADR-003](adr/003-multi-provider-strategy.md)               | Multi-provider financial data strategy |
+| [ADR-004](adr/004-janua-auth-integration.md)                | Janua authentication                   |
+| [ADR-005](adr/005-enclii-deployment.md)                     | Enclii deployment                      |
+| [ADR-006](adr/006-mobile-state-management.md)               | Mobile state management                |
+| [Conekta/Janua Dependency](adr/conekta-janua-dependency.md) | Billing dependency notes               |
 
-- [Database Architecture Audit](audits/DATABASE_ARCHITECTURE_AUDIT.md) - Database schema review
-- [Schema Audit Report](audits/SCHEMA_AUDIT_REPORT.md) - Schema analysis
-- [Provider Integrations Audit](audits/PROVIDER_INTEGRATIONS_AUDIT.md) - Third-party integrations
-- [I18N Audit Report](audits/I18N_AUDIT_REPORT.md) - Internationalization audit
-- [I18N Implementation Gaps](audits/I18N_IMPLEMENTATION_GAPS.md) - I18N gaps
-- [Dependency Analysis](audits/DEPENDENCY_ANALYSIS_INDEX.md) - Dependency audit
+## App, Package, And Module Docs
 
-### Audit Summaries
+| Area                  | Docs                                                                                                              |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Admin app             | [apps/admin/README.md](../apps/admin/README.md)                                                                   |
+| API e2e               | [apps/api/test/e2e/README.md](../apps/api/test/e2e/README.md)                                                     |
+| Billing API module    | [apps/api/src/modules/billing/README.md](../apps/api/src/modules/billing/README.md)                               |
+| Provider orchestrator | [apps/api/src/modules/providers/orchestrator/README.md](../apps/api/src/modules/providers/orchestrator/README.md) |
+| API modules           | Module-local `README.md` files under [apps/api/src/modules](../apps/api/src/modules/)                             |
+| UI package            | [packages/ui/README.md](../packages/ui/README.md)                                                                 |
+| Shared package        | [packages/shared/README.md](../packages/shared/README.md)                                                         |
+| Billing SDK           | [packages/billing-sdk/README.md](../packages/billing-sdk/README.md)                                               |
+| ESG package           | [packages/esg/README.md](../packages/esg/README.md)                                                               |
+| Simulations package   | [packages/simulations/README.md](../packages/simulations/README.md)                                               |
 
-- [Audit Index](audits/AUDIT_INDEX.md) - Index of all audits
-- [Audit README](audits/AUDIT_README.md) - Audit documentation guide
-- [Executive Summary](audits/AUDIT_EXECUTIVE_SUMMARY.md) - High-level overview
-- [Quick Summary](audits/AUDIT_QUICK_SUMMARY.md) - Quick reference
-- [Action Items](audits/AUDIT_ACTION_ITEMS.md) - Action items from audits
-- [Dependency Fixes Checklist](audits/DEPENDENCY_FIXES_CHECKLIST.md) - Dependency fixes
-- [Schema Action Items](audits/SCHEMA_AUDIT_ACTION_ITEMS.md) - Schema improvements
+## AI-Agent And LLM Context
 
-### Additional Resources
+| Document                                            | Use                                 |
+| --------------------------------------------------- | ----------------------------------- |
+| [AGENTS.md](../AGENTS.md)                           | Canonical agent operating contract  |
+| [CLAUDE.md](../CLAUDE.md)                           | Compatibility redirect to AGENTS.md |
+| [llms.txt](../llms.txt)                             | Compact LLM context index           |
+| [llms-full.txt](../llms-full.txt)                   | Expanded LLM context map            |
+| [agent-manifest.json](../tools/agent-manifest.json) | Machine-readable repo metadata      |
 
-- [Codebase Structure Map](audits/CODEBASE_STRUCTURE_MAP.md) - Project structure overview
-- [Dependency Summary](audits/DEPENDENCY_SUMMARY.md) - Dependencies overview
+For agents: read `AGENTS.md`, this index, `STABILITY_AUDIT_2026-05-19.md`,
+and the specific source/module docs for the files you are touching.
 
-## Additional Setup
+## Historical Reports
 
-- [Admin Dashboard](ADMIN_DASHBOARD.md) - Admin features and setup
-- [Sentry Setup](SENTRY_SETUP.md) - Error tracking configuration
-- [Reset Command](RESET_COMMAND.md) - Database reset utility
-
-## Contributing
-
-When adding new documentation:
-
-1. Place files in the appropriate subdirectory
-2. Update this index with a brief description
-3. Ensure cross-references between related documents
-4. Follow the existing naming conventions
+The `docs/reports/`, `docs/testing/`, `docs/guides/*SUMMARY*.md`, and phase
+summary files preserve implementation history. They are useful for context, but
+they may mention superseded AWS/Fargate, `dhanam.io`, old ports, or earlier test
+counts. When a historical report conflicts with this index, `AGENTS.md`,
+`DEPLOYMENT.md`, current manifests, or source code, treat the current files as
+authoritative and update the report only if it is still used operationally.
 
 ## Documentation Standards
 
-- Use clear, descriptive filenames in SCREAMING_SNAKE_CASE
-- Include a table of contents for documents >500 lines
-- Add code examples where applicable
-- Keep documentation up-to-date with code changes
-- Use relative links for internal documentation references
+- Put durable operational and developer docs under `docs/`.
+- Put module-local implementation docs beside the module.
+- Link from this index when adding a durable doc.
+- Mark historical or session-specific docs explicitly.
+- Use relative links for internal references.
+- Keep production operations Enclii-first and record any missing Enclii adapter
+  rather than normalizing raw infrastructure access.

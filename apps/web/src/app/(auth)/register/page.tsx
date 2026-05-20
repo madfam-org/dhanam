@@ -22,6 +22,26 @@ const SignUp = dynamic(() => import('@janua/react-sdk').then((mod) => mod.SignUp
   loading: () => <div className="h-10 animate-pulse bg-muted rounded" />,
 });
 
+function formatPlanName(plan: string): string {
+  const knownPlans: Record<string, string> = {
+    free: 'Free',
+    copilot_pro: 'Copilot Pro',
+    family_plus: 'Family Plus',
+    essentials: 'Essentials',
+    pro: 'Pro',
+    premium: 'Premium',
+  };
+
+  return (
+    knownPlans[plan] ??
+    plan
+      .split(/[_-]+/)
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ')
+  );
+}
+
 /** Catches errors from Janua SDK components without crashing the page */
 class JanuaErrorBoundary extends Component<
   { children: ReactNode; fallback?: ReactNode },
@@ -62,7 +82,7 @@ export default function RegisterPage() {
           <CardTitle>{t('register.title') || 'Create an account'}</CardTitle>
           <CardDescription>
             {selectedPlan
-              ? `Start your free trial of ${selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}`
+              ? `Start your free trial of ${formatPlanName(selectedPlan)}`
               : t('register.description') || 'Start managing your finances with Dhanam'}
           </CardDescription>
         </CardHeader>

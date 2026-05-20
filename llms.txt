@@ -6,8 +6,14 @@ Compact LLM context index for this repository.
 
 - `AGENTS.md` — canonical agent operating instructions.
 - `README.md` — human/product overview when present.
+- `docs/README.md` — canonical documentation map.
+- `docs/STABILITY_AUDIT_2026-05-19.md` — current stability, production,
+  staging, DNS, health, and Enclii rollout status.
+- `docs/DOCUMENTATION_AUDIT_2026-05-19.md` — docs accuracy, organization, and
+  link hygiene audit.
 - `ECOSYSTEM.md` — MADFAM ecosystem and Enclii deployment context when present.
 - `llms-full.txt` — full context map and durable operating contract.
+- `tools/agent-manifest.json` — machine-readable repo metadata.
 
 ## Production operations
 

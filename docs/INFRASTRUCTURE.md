@@ -1,5 +1,12 @@
 # Dhanam Infrastructure & Testing Guide
 
+Last updated: 2026-05-19
+
+Current production infrastructure is Enclii-managed bare-metal Kubernetes with
+Cloudflare Tunnel ingress. For deploy/runbook truth, read
+[DEPLOYMENT.md](DEPLOYMENT.md) and
+[STABILITY_AUDIT_2026-05-19.md](STABILITY_AUDIT_2026-05-19.md) first.
+
 ## Overview
 
 This document outlines the critical infrastructure components, testing strategies, and admin dashboard features implemented in the Dhanam Ledger project.
@@ -96,7 +103,7 @@ apps/api/
 pnpm test
 
 # Run with coverage
-pnpm test:cov
+pnpm --filter @dhanam/api test:cov
 
 # Run in watch mode
 pnpm test:watch
@@ -192,7 +199,8 @@ export class AdminController {
 }
 ```
 
-Navigate to `/admin/dashboard` in the web app (requires admin/owner role).
+Navigate to `http://localhost:3400/dashboard` locally or
+`https://admin.dhan.am/dashboard` in production (requires admin/owner role).
 
 ### Admin API Endpoints
 
@@ -486,7 +494,7 @@ redis-cli
 > KEYS *
 
 # Check API logs
-pnpm dev:api --verbose
+pnpm dev:api
 
 # Inspect build output
 pnpm build --verbose

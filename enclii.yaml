@@ -43,6 +43,12 @@ spec:
       environment: production
     - name: app.dhan.am
       environment: production
+    - name: staging-api.dhan.am
+      environment: staging
+    - name: staging-admin.dhan.am
+      environment: staging
+    - name: staging.dhan.am
+      environment: staging
   network:
     services:
       - name: dhanam-web

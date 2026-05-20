@@ -444,18 +444,7 @@ export default function TransactionsPage() {
                         transform: `translateY(${virtualItem.start}px)`,
                       }}
                     >
-                      <div
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors mx-1 my-1 cursor-pointer"
-                        onClick={() => setDetailTransaction(transaction)}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            setDetailTransaction(transaction);
-                          }
-                        }}
-                      >
+                      <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors mx-1 my-1">
                         <div className="flex items-center gap-4">
                           {/* Merchant Icon instead of generic Receipt */}
                           <MerchantIcon
@@ -481,8 +470,9 @@ export default function TransactionsPage() {
                           {/* Category Badge */}
                           {transaction.category ? (
                             <button
+                              type="button"
                               onClick={() => setCorrectionTransaction(transaction)}
-                              className="cursor-pointer"
+                              className="rounded-full"
                             >
                               <Badge
                                 variant="secondary"
@@ -497,8 +487,9 @@ export default function TransactionsPage() {
                             </button>
                           ) : (
                             <button
+                              type="button"
                               onClick={() => setCorrectionTransaction(transaction)}
-                              className="cursor-pointer"
+                              className="rounded-full"
                             >
                               <Badge variant="outline" className="text-xs text-muted-foreground">
                                 + Categorize
@@ -519,9 +510,20 @@ export default function TransactionsPage() {
                               {account?.name || t('list.unknownAccount')}
                             </p>
                           </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setDetailTransaction(transaction)}
+                          >
+                            View
+                          </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
+                              <Button
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                aria-label={`Open actions for ${transaction.description}`}
+                              >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>

@@ -1,5 +1,11 @@
 import { test, expect } from './helpers/fixtures';
 import { test as baseTest } from '@playwright/test';
+import type { Page } from '@playwright/test';
+
+async function waitForPageShell(page: Page): Promise<void> {
+  await page.waitForLoadState('domcontentloaded');
+  await expect(page.locator('body')).toBeVisible();
+}
 
 /**
  * Upgrade Journey E2E Tests
@@ -15,7 +21,7 @@ import { test as baseTest } from '@playwright/test';
 test.describe('Upgrade Journey', () => {
   test('community user sees upgrade page', async ({ guestPage }) => {
     await guestPage.goto('/billing/upgrade');
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     // The upgrade page renders a "Choose Your Plan" heading
     const heading = guestPage.getByRole('heading', { name: /choose your plan/i });
@@ -24,12 +30,12 @@ test.describe('Upgrade Journey', () => {
 
   test('upgrade page shows tier cards', async ({ guestPage }) => {
     await guestPage.goto('/billing/upgrade');
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     // All three paid tiers should be visible
-    await expect(guestPage.getByText('Essentials')).toBeVisible();
-    await expect(guestPage.getByText('Pro')).toBeVisible();
-    await expect(guestPage.getByText('Premium')).toBeVisible();
+    await expect(guestPage.getByRole('heading', { name: 'Essentials' })).toBeVisible();
+    await expect(guestPage.getByRole('heading', { name: 'Pro' })).toBeVisible();
+    await expect(guestPage.getByRole('heading', { name: 'Premium' })).toBeVisible();
   });
 
   test('premium feature shows gate for free user', async ({ guestPage }) => {
@@ -58,7 +64,7 @@ test.describe('Upgrade Journey', () => {
 
   test('settings page shows billing section', async ({ guestPage }) => {
     await guestPage.goto('/settings');
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     // The settings page renders a CreditCard-icon card with billing title.
     // The i18n key is section.billing.title; look for common billing terms.
@@ -68,7 +74,7 @@ test.describe('Upgrade Journey', () => {
 
   test('billing page renders for authenticated user', async ({ guestPage }) => {
     await guestPage.goto('/billing');
-    await guestPage.waitForLoadState('networkidle');
+    await waitForPageShell(guestPage);
 
     // The billing page should render at least a heading
     await expect(guestPage.locator('h1, h2').first()).toBeVisible();

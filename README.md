@@ -2,9 +2,9 @@
 
 > **A comprehensive budget and wealth tracking application with ESG crypto insights, targeting LATAM-first users with multilingual support.**
 
-[![Test Coverage](https://github.com/madfam-io/dhanam/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/madfam-io/dhanam/actions/workflows/test-coverage.yml)
-[![Lint](https://github.com/madfam-io/dhanam/actions/workflows/lint.yml/badge.svg)](https://github.com/madfam-io/dhanam/actions/workflows/lint.yml)
-[![codecov](https://codecov.io/gh/madfam-io/dhanam/branch/main/graph/badge.svg)](https://codecov.io/gh/madfam-io/dhanam)
+[![Test Coverage](https://github.com/madfam-org/dhanam/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/madfam-org/dhanam/actions/workflows/test-coverage.yml)
+[![Lint](https://github.com/madfam-org/dhanam/actions/workflows/lint.yml/badge.svg)](https://github.com/madfam-org/dhanam/actions/workflows/lint.yml)
+[![codecov](https://codecov.io/gh/madfam-org/dhanam/branch/main/graph/badge.svg)](https://codecov.io/gh/madfam-org/dhanam)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.2-blue.svg)](https://reactjs.org/)
@@ -48,12 +48,17 @@
 
 ## Production Status
 
-| Service      | Domain          | Status               |
-| ------------ | --------------- | -------------------- |
-| Web App      | `app.dhan.am`   | ✅ Running on Enclii |
-| Landing Page | `dhan.am`       | ✅ Running on Enclii |
-| API Backend  | `api.dhan.am`   | ✅ Running on Enclii |
-| Admin Panel  | `admin.dhan.am` | ✅ Running on Enclii |
+Snapshot: 2026-05-19. Public web/admin surfaces respond, but full-system
+stability is not yet 100%. See
+[docs/STABILITY_AUDIT_2026-05-19.md](docs/STABILITY_AUDIT_2026-05-19.md) for
+the current production, staging, DNS, health, and Enclii rollout blockers.
+
+| Service      | Domain          | Status                   |
+| ------------ | --------------- | ------------------------ |
+| Web App      | `app.dhan.am`   | Running on Enclii        |
+| Landing Page | `dhan.am`       | Running on Enclii        |
+| API Backend  | `api.dhan.am`   | Degraded health observed |
+| Admin Panel  | `admin.dhan.am` | Running on Enclii        |
 
 **Authentication**: Janua SSO via `@janua/react-sdk` (OIDC with PKCE, handled by SDK)
 
@@ -62,25 +67,25 @@
 - Social logins: GitHub, Google via Janua
 - Auth mode: `AUTH_MODE=janua` (production default)
 
-**Infrastructure**: 2-Node Hetzner Cluster via [Enclii PaaS](https://github.com/madfam-org/enclii)
+**Infrastructure**: Hetzner bare-metal Kubernetes via Enclii PaaS
 
-- Production workloads on "The Sanctuary" (AX41-NVMe)
-- CI/CD builds on "The Forge" (CPX11)
 - Zero-trust ingress via Cloudflare Tunnel
+- Production operations are Enclii-first. Raw Kubernetes, Helm, SSH, provider
+  CLIs, and direct container access are break-glass/bootstrap only.
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15/16, React Native + Expo
-- **Backend**: NestJS (Fastify), PostgreSQL, Redis
-- **Infrastructure**: Docker, Enclii PaaS (bare metal K8s)
-- **Build**: Turborepo, pnpm monorepo
+- **Frontend**: Next.js 15.5.x, React 18, React Native + Expo
+- **Backend**: NestJS 11 (Fastify), PostgreSQL, Redis, BullMQ
+- **Infrastructure**: Enclii PaaS on bare-metal Kubernetes, Cloudflare Tunnel
+- **Build**: Turborepo, pnpm 9.15 monorepo
 
 ## Quick Start
 
 ### Prerequisites
 
 - Node.js 20+
-- pnpm 8+
+- pnpm 9.15.0
 - Docker & Docker Compose
 - PostgreSQL 15 (via Docker)
 - Redis 7 (via Docker)
@@ -90,7 +95,7 @@
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/dhanam.git
+   git clone https://github.com/madfam-org/dhanam.git
    cd dhanam
    ```
 
@@ -127,13 +132,15 @@
    ```bash
    # Copy example env files
    cp apps/api/.env.example apps/api/.env
-   cp apps/web/.env.example apps/web/.env
+   cp apps/web/.env.example apps/web/.env.local
+   cp apps/admin/.env.example apps/admin/.env.local
    ```
 
 6. **Run database migrations**
 
    ```bash
-   pnpm db:push
+   pnpm db:generate
+   pnpm db:migrate:dev
    ```
 
 7. **Seed the database (optional)**
@@ -142,7 +149,8 @@
    pnpm db:seed
    ```
 
-   This creates a demo user (demo@dhanam.app / demo123) with sample data.
+   Seed scripts require explicit `DEMO_USER_PASSWORD` and `ADMIN_PASSWORD`
+   values in `apps/api/.env`.
 
 8. **Start development servers**
 
@@ -153,6 +161,7 @@
    This starts:
    - API server at http://localhost:4010
    - Web dashboard at http://localhost:3040
+   - Admin dashboard at http://localhost:3400
    - API documentation at http://localhost:4010/docs
 
 ## Project Structure
@@ -172,14 +181,16 @@ dhanam/
 │   └── ui/           # Reusable UI components (shadcn-ui)
 ├── infra/
 │   ├── docker/       # Local dev docker-compose
-│   ├── k8s/          # Kubernetes manifests (production, staging, monitoring, argocd)
-│   └── monitoring/   # Alert rules (deprecated — see k8s/monitoring/)
+│   ├── k8s/          # Kubernetes manifests (production, overlays, monitoring, argocd)
 └── scripts/          # Development scripts
 ```
 
 ## Available Scripts
 
 - `pnpm dev` - Start all apps in development mode
+- `pnpm dev:api` - Start the API at http://localhost:4010
+- `pnpm dev:web` - Start the web app at http://localhost:3040
+- `pnpm dev:admin` - Start the admin app at http://localhost:3400
 - `pnpm build` - Build all apps and packages
 - `pnpm test` - Run tests across the monorepo
 - `pnpm lint` - Lint all code
@@ -261,7 +272,7 @@ export default function LoginPage() {
 
 ## Security
 
-- **Authentication**: JWT with refresh token rotation
+- **Authentication**: Janua SSO in production, with JWT/session support retained for API/test compatibility
 - **2FA**: TOTP-based two-factor authentication
 - **Encryption**: AES-256-GCM for sensitive data
 - **Password**: Argon2id hashing
@@ -282,28 +293,28 @@ We maintain 90%+ test coverage on the API with comprehensive unit, integration, 
 pnpm test
 
 # Run tests with coverage report
-pnpm test:cov
+pnpm --filter @dhanam/api test:cov
 
 # Run E2E tests (requires DB + Redis)
-pnpm test:e2e
+pnpm --filter @dhanam/api test:e2e
 
 # Run contract tests (no services needed)
-cd apps/api && pnpm test:contract
+pnpm --filter @dhanam/api test:contract
 
 # Run Playwright E2E (starts dev server automatically)
-cd apps/web && npx playwright test
+pnpm --dir apps/web exec playwright test
 
 # Run tests in watch mode
-pnpm test:watch
+pnpm --filter @dhanam/api test:watch
 ```
 
 ### Test Infrastructure
 
-- **API**: 3500+ unit tests, E2E journey tests, contract tests for Stripe/Plaid/Belvo
+- **API**: unit tests, E2E journey tests, contract tests for Stripe/Plaid/Belvo, and dedicated chaos tests
 - **Web**: 500+ unit tests across 65 suites, 9 Playwright E2E specs including accessibility (WCAG AA)
 - **Admin**: 22 test suites covering all 11 components and 11 pages
 - **Mobile**: 6 test suites with jest-expo
-- **CI/CD**: 6 parallel test jobs (API, web, mobile, admin, contract, Playwright) on every PR
+- **CI/CD**: parallel test jobs for API, web, mobile, admin, contracts, and Playwright
 - **Coverage Target**: 95%+ on API, 80%+ on frontend
 - **Coverage Reporting**: Integrated with Codecov for trend tracking
 
@@ -338,7 +349,7 @@ For complete deployment instructions, see [Deployment Guide](docs/DEPLOYMENT.md)
 
 ## Admin Panel (SRE Ops Center)
 
-The admin panel at `apps/web/(admin)/admin/` provides:
+The standalone admin panel at `apps/admin` provides:
 
 - System health monitoring (DB, Redis, queues, providers)
 - Queue management (stats, retry failed, clear)
@@ -358,11 +369,10 @@ Comprehensive documentation is available in the [`docs/`](docs/) directory:
 
 ### Architecture & Design
 
-- [Architecture Overview](ARCHITECTURE.md) - High-level system design
+- [Architecture Overview](docs/architecture/ARCHITECTURE.md) - High-level system design
 - [Full Architecture Details](docs/architecture/ARCHITECTURE.md) - Complete architecture
 - [Software Specification](docs/architecture/SOFTWARE_SPEC.md) - Technical specs
 - [Infrastructure Guide](docs/INFRASTRUCTURE.md) - Infrastructure setup
-- [API Specification](API_SPECIFICATION.yaml) - OpenAPI spec
 
 ### Operations & Deployment
 
@@ -382,7 +392,8 @@ This project provides machine-readable context files for LLM agents:
 
 - [`llms.txt`](llms.txt) — Concise project overview with documentation links ([llmstxt.org spec](https://llmstxt.org/))
 - [`llms-full.txt`](llms-full.txt) — Expanded version with inlined critical content
-- [`CLAUDE.md`](CLAUDE.md) — Agent guidance for Claude Code
+- [`AGENTS.md`](AGENTS.md) — Canonical agent operating instructions
+- [`CLAUDE.md`](CLAUDE.md) — Compatibility redirect for Claude Code
 - [`tools/agent-manifest.json`](tools/agent-manifest.json) — Machine-readable project metadata
 
 These files are also served at `https://dhan.am/llms.txt` and `https://dhan.am/llms-full.txt`.

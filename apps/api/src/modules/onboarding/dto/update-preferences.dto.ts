@@ -3,7 +3,7 @@ import { IsString, IsOptional, IsIn, IsBoolean } from 'class-validator';
 
 import { Currency } from '@db';
 
-export class UpdatePreferencesDto {
+export class OnboardingUpdatePreferencesDto {
   @ApiProperty({
     description: 'User preferred language',
     example: 'es',

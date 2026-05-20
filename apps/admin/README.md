@@ -154,8 +154,9 @@ Deployed via Enclii PaaS to bare metal K8s:
 
 ## Related
 
-- [CLAUDE.md](../../CLAUDE.md) - Project overview and guidelines
-- [Web Admin (dev fallback)](<../web/src/app/(admin)/>) - Web-embedded admin (redirects to standalone in production)
+- [AGENTS.md](../../AGENTS.md) - Canonical agent operating instructions
+- [Documentation Index](../../docs/README.md) - Current documentation map
+- Web-embedded admin fallback source: `../web/src/app/(admin)/`
 - [API Admin Module](../api/src/modules/admin/) - Backend admin endpoints
 
 ---

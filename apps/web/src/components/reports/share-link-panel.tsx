@@ -165,7 +165,12 @@ export function ShareLinkPanel({ reportId, onUpdate }: ShareLinkPanelProps) {
                   </div>
 
                   <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => handleCopy(token)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Copy share link"
+                      onClick={() => handleCopy(token)}
+                    >
                       {copiedId === token.id ? (
                         <Check className="h-4 w-4 text-success" />
                       ) : (
@@ -175,6 +180,7 @@ export function ShareLinkPanel({ reportId, onUpdate }: ShareLinkPanelProps) {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Revoke share link"
                       onClick={() => {
                         setSelectedTokenId(token.id);
                         setRevokeDialogOpen(true);

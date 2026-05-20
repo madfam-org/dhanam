@@ -12,6 +12,10 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "turbo dev",
+    "dev:api": "pnpm --filter @dhanam/api dev",
+    "dev:web": "pnpm --filter @dhanam/web dev",
+    "dev:admin": "pnpm --filter @dhanam/admin dev",
+    "dev:mobile": "pnpm --filter @dhanam/mobile dev",
     "build": "turbo build",
     "build:packages": "turbo build --filter='./packages/*'",
     "test": "turbo test",

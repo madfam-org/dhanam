@@ -162,7 +162,7 @@ packages/
 infra/
 ├─ docker/        # Local dev docker-compose
 ├─ k8s/production/  # K8s manifests (kustomize)
-├─ k8s/staging/     # Staging overlay (1 replica, :main tags)
+├─ k8s/overlays/staging/  # Staging overlay (1 replica, digest-pinned images)
 ├─ k8s/monitoring/  # ServiceMonitor, PrometheusRule, Alertmanager, Grafana dashboards
 └─ k8s/argocd/      # ArgoCD Application CRD for GitOps
 ```
@@ -387,7 +387,7 @@ Uses the Dhanam package (https://github.com/aldoruizluna/Dhanam) for:
 - **Prometheus**: ServiceMonitor scrapes `/metrics` on port 4300; PrometheusRule CRD wraps alert rules
 - **Alertmanager**: Critical alerts (1h repeat), warnings (12h repeat); receivers for Slack/PagerDuty
 - **Grafana**: Auto-provisioned dashboards for request rate, error rate, p95 latency, auth failures, queue depth, DB/Redis health, pod restarts
-- **Staging**: `infra/k8s/staging/` — 1 replica, `:main` image tags, auto-deployed on push to main
+- **Staging**: `infra/k8s/overlays/staging/` — 1 replica, digest-pinned images, auto-deployed on push to main
 - **ArgoCD**: GitOps sync from `infra/k8s/production/` with auto-sync, prune, and self-heal
 
 ## Deployment Pipeline (dev → staging → prod)

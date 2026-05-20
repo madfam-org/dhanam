@@ -153,35 +153,33 @@ In CI/production, the `pnpm db:migrate:deploy` script handles this.
 
 ## Secrets Management
 
-### K8s Secrets
+### Secrets
 
-The secrets template is at `infra/k8s/production/secrets-template.yaml`. Two Secret resources:
+Routine secret reads and writes must go through Enclii/Lockbox/Vault/ESO, not
+raw Kubernetes. The production template is kept for bootstrap and review at
+`infra/k8s/production/secrets-template.yaml`.
+
+Key secret resources:
 
 | Secret                   | Contents                                                                                                                                                    |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `dhanam-secrets`         | `DATABASE_URL`, `REDIS_URL`, `ENCRYPTION_KEY`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, provider keys |
 | `dhanam-billing-secrets` | `STRIPE_MX_*`, `PADDLE_*`                                                                                                                                   |
 
-```bash
-# Create from template
-cp infra/k8s/production/secrets-template.yaml infra/k8s/production/secrets.yaml
-# Fill in values (DO NOT commit secrets.yaml)
-kubectl apply -f infra/k8s/production/secrets.yaml
+Use Enclii for routine updates:
 
-# Patch individual values
-kubectl -n dhanam patch secret dhanam-secrets --type merge -p \
-  '{"stringData":{"BELVO_SECRET_KEY_ID":"<value>"}}'
+```bash
+enclii secrets list dhanam-api --env production
+enclii secrets set BELVO_SECRET_KEY_ID=<value> --service dhanam-api --secret --env production
 ```
+
+If Enclii lacks an adapter for a required secret operation, record the adapter
+gap before using any raw Kubernetes bootstrap/break-glass path.
 
 ### Image Pull Secret
 
-```bash
-kubectl -n dhanam create secret docker-registry ghcr-credentials \
-  --docker-server=ghcr.io \
-  --docker-username=<github-username> \
-  --docker-password=<github-pat-with-read-packages> \
-  --docker-email=<email>
-```
+Create or rotate image pull secrets through Enclii/Lockbox when available. Raw
+`kubectl create secret docker-registry` is bootstrap/break-glass only.
 
 ---
 
@@ -198,7 +196,43 @@ All monitoring manifests live in `infra/k8s/monitoring/`.
 
 ### Staging
 
-Staging manifests are in `infra/k8s/staging/` — 1 replica, `:main` image tags. Auto-deployed on push to main via `deploy-staging.yml`.
+Staging manifests are in `infra/k8s/overlays/staging/` and import the
+production base with staging-specific env, single replicas, disabled HPAs, and
+digest-pinned images. `deploy-staging.yml` builds API, web, and admin images,
+patches their digests into the staging overlay, and lets the
+`dhanam-staging` ArgoCD Application reconcile.
+
+Required staging hostnames:
+
+| Service | Host                            |
+| ------- | ------------------------------- |
+| Web     | `https://staging.dhan.am`       |
+| Admin   | `https://staging-admin.dhan.am` |
+| API     | `https://staging-api.dhan.am`   |
+
+The root `enclii.yaml` declares these hostnames for Enclii domain
+reconciliation. The Cloudflare tunnel must route them to the
+`dhanam-staging` namespace services; see
+`infra/k8s/production/_cloudflare-routes-reference.yaml`.
+
+As of 2026-05-19, the staging smoke check fails before application traffic
+because `staging-api.dhan.am` has no DNS answer. Treat that as an Enclii
+domain/tunnel reconciliation blocker, not an app build failure.
+
+### Current Enclii Policy Blocker
+
+On 2026-05-19, Enclii deployment records for `dhanam-api` and `dhanam-admin`
+showed failed roll-forward attempts blocked by Kyverno:
+
+```text
+verify-image-signatures:
+  autogen-check-signature: kyverno.io/verify-images annotation cannot be changed
+```
+
+`enclii ops policy waiver-plan` can plan a waiver, but apply is currently
+blocked because the concrete adapter is not wired in this Enclii build. Until
+that adapter or the Enclii deployment reconciler is fixed, do not treat a
+ready release as proof that production has rolled forward.
 
 ---
 
@@ -207,16 +241,15 @@ Staging manifests are in `infra/k8s/staging/` — 1 replica, `:main` image tags.
 ### Application Rollback
 
 ```bash
-# Roll back to previous revision
-kubectl -n dhanam rollout undo deployment/dhanam-api
-kubectl -n dhanam rollout undo deployment/dhanam-web
-
-# Roll back to specific revision
-kubectl -n dhanam rollout undo deployment/dhanam-api --to-revision=<N>
-
-# Verify
-kubectl -n dhanam rollout status deployment/dhanam-api
+enclii rollback dhanam-api --env production
+enclii rollback dhanam-web --env production
+enclii rollback dhanam-admin --env production
+enclii ps --env production
 ```
+
+Raw `kubectl rollout undo` is break-glass only and must be recorded with the
+actor, reason, target deployment, commands executed, result, and follow-up
+Enclii adapter gap or incident link.
 
 ### Database Migration Rollback
 
@@ -250,11 +283,14 @@ eas build --platform android --profile production
 
 ## Health Checks
 
-| Endpoint                | Description                                  |
-| ----------------------- | -------------------------------------------- |
-| `GET /health`           | Basic liveness check                         |
-| `GET /health/database`  | PostgreSQL connectivity and connection count |
-| `GET /health/providers` | Status of Plaid, Belvo, Bitso integrations   |
+| Endpoint                          | Description                             |
+| --------------------------------- | --------------------------------------- |
+| `GET /health`                     | Root basic health for external monitors |
+| `GET /health/full`                | Full root health with queues/providers  |
+| `GET /v1/monitoring/health`       | Versioned full API health               |
+| `GET /v1/monitoring/health/live`  | API liveness probe                      |
+| `GET /v1/monitoring/health/ready` | API readiness probe                     |
+| `GET /api/health`                 | Web/admin Next.js health endpoint       |
 
 ---
 
@@ -263,26 +299,19 @@ eas build --platform android --profile production
 ### Pod Issues
 
 ```bash
-# Check pod status
-kubectl -n dhanam get pods
-kubectl -n dhanam describe pod <pod-name>
-
-# View logs
-kubectl -n dhanam logs deployment/dhanam-api --tail=100
-kubectl -n dhanam logs deployment/dhanam-api --previous  # crashed container
-
-# Resource usage
-kubectl -n dhanam top pods
+enclii ps --env production --wide
+enclii logs dhanam-api --env production --since 1h --level error
+enclii observe dhanam-api --env production
 ```
+
+If direct pod inspection is unavoidable because Enclii lacks the needed adapter,
+document it as break-glass and record the Enclii adapter gap.
 
 ### Database Connection Issues
 
 ```bash
-# Verify secret is mounted
-kubectl -n dhanam exec deployment/dhanam-api -- env | grep DATABASE_URL
-
-# Check PgBouncer status (if applicable)
-kubectl -n data logs deployment/pgbouncer --tail=50
+enclii secrets list dhanam-api --env production
+enclii logs dhanam-api --env production --since 30m --level error
 ```
 
 ### Provider API Issues
@@ -317,6 +346,6 @@ enclii logs --app dhanam --build latest
 ### Kubernetes
 
 - `infra/k8s/production/` — production manifests (kustomize)
-- `infra/k8s/staging/` — staging overlay
+- `infra/k8s/overlays/staging/` — staging overlay
 - `infra/k8s/monitoring/` — Prometheus, Grafana, Alertmanager
 - `infra/k8s/argocd/` — ArgoCD Application CRD

@@ -63,6 +63,34 @@ const COUNTRY_CURRENCY: Record<string, string> = {
   NO: 'NOK',
 };
 
+const STATIC_COUNTRY_REGION: Record<string, number> = {
+  US: 1,
+  CA: 1,
+  GB: 1,
+  AU: 1,
+  NZ: 1,
+  JP: 1,
+  KR: 1,
+  CH: 1,
+  SE: 1,
+  DK: 1,
+  NO: 1,
+  MX: 3,
+  BR: 3,
+  CO: 3,
+  AR: 3,
+  CL: 3,
+  PE: 3,
+  IN: 4,
+};
+
+const STATIC_REGION_DEFAULTS: Record<string, { discount: number; currency: string }> = {
+  tier1: { discount: 0, currency: 'USD' },
+  tier2: { discount: 0.25, currency: 'USD' },
+  latam: { discount: 0.45, currency: 'USD' },
+  emerging: { discount: 0.65, currency: 'USD' },
+};
+
 const TIER_FEATURES: Record<string, string[]> = {
   essentials: [
     'AI transaction categorization',
@@ -112,10 +140,6 @@ export class PricingEngineService {
       where: { countries: { has: code } },
     });
 
-    if (!region) {
-      return 1; // Default to tier1
-    }
-
     // Map name to region number
     const regionMap: Record<string, number> = {
       tier1: 1,
@@ -124,7 +148,11 @@ export class PricingEngineService {
       emerging: 4,
     };
 
-    return regionMap[region.name] ?? 1;
+    if (region) {
+      return regionMap[region.name] ?? 1;
+    }
+
+    return STATIC_COUNTRY_REGION[code] ?? 1;
   }
 
   /**
@@ -142,8 +170,9 @@ export class PricingEngineService {
       where: { name: regionName },
     });
 
-    const discount = region?.discount ?? 0;
-    const currency = region?.currency ?? 'USD';
+    const staticDefaults = STATIC_REGION_DEFAULTS[regionName] ?? STATIC_REGION_DEFAULTS.tier1;
+    const discount = region?.discount ?? staticDefaults.discount;
+    const currency = region?.currency ?? staticDefaults.currency;
 
     const applyDiscount = (base: number): number => Math.round(base * (1 - discount) * 100) / 100;
 
