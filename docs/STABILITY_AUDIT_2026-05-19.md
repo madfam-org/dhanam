@@ -38,7 +38,7 @@ hardening, production migration recovery, and failed-job cleanup.
 | Staging smoke             | Improved           | Deploy run `26194485016` passed API, web, admin, and staging API-origin smoke.                                                                                |
 | Production API health     | Healthy            | Full production health returns HTTP 200 with `status: "healthy"` and `failedJobs: 0`.                                                                         |
 | Production domain routing | Fixed and verified | `scripts/production-preflight.sh` passes; `www.dhan.am` redirects to `https://dhan.am/` without leaking `:4200`.                                              |
-| Enclii production rollout | Inconsistent       | `scripts/production-rollout-proof.js` proves ArgoCD live digests at revision `7a848a2c`, but Enclii `prod` still does not own public rollout truth.           |
+| Enclii production rollout | Partially improved | `scripts/production-rollout-proof.js` proves ArgoCD live digests at revision `593953ca`, but Enclii `prod` still does not own public rollout truth.           |
 | Enclii policy remediation | Adapter gap        | `enclii ops policy waiver-plan` is planned only; apply is blocked because adapter execution is not wired.                                                     |
 
 ## Shortcomings Blocking Full Stability
@@ -178,7 +178,9 @@ Final evidence from the latest stabilization pass:
 - `d1f8ccf0 fix(stability): harden staging smoke and migration drift` was
   pushed to `main`.
 - The staging digest bot committed `7a848a2c` for `d1f8ccf0`.
-- Local `main` is fast-forwarded to that commit.
+- Manual API `Promote staging -> prod` run `26195552704` succeeded after the
+  30-minute soak gate elapsed and committed `593953ca`.
+- Local `main` is fast-forwarded to the production promotion commit.
 - Hosted `CI` for `d1f8ccf0`: run `26194485015`, success.
 - Hosted `Lint & Type Check` for `d1f8ccf0`: run `26194485017`, success.
 - Hosted `Test Coverage` for `d1f8ccf0`: run `26194484988`, success.
@@ -190,7 +192,7 @@ Final evidence from the latest stabilization pass:
   passed web/admin route checks that prove the staging API origin.
 - `scripts/production-preflight.sh` passed for production.
 - `scripts/production-rollout-proof.js` passed for production with ArgoCD
-  health `Healthy`, sync `Synced`, revision `7a848a2c`, and live images matching
+  health `Healthy`, sync `Synced`, revision `593953ca`, and live images matching
   the production manifest.
 - `https://api.dhan.am/v1/monitoring/health` returns HTTP 200 with
   `status: "healthy"` and `failedJobs: 0`.
@@ -254,6 +256,13 @@ Run `scripts/production-rollout-proof.js` after promotions to prove
 `dhanam-services` is Healthy/Synced and the live API, web, and admin images
 match the intended production digests.
 
+On 2026-05-20, manual API promotion run `26195552704` promoted the signed
+staging API digest after the 30-minute soak gate elapsed and committed
+`593953ca`. Only the API digest was promoted from the staging build; web and
+admin intentionally remained on their existing production digests because their
+Next.js public API/app/OIDC values are build-time bound and the staging images
+target staging origins.
+
 ### Web Routing Closure
 
 The first GitOps promotion attempt used the unsigned staging web image digest
@@ -308,9 +317,11 @@ reported HTTP 503 even though database, Redis, and liveness were up.
 
 Before staging recovered, manual `deploy-k8s.yml` was used with
 `direct_k8s_deploy=false` to build and sign current API images, commit only
-production digests, and let ArgoCD reconcile from Git. Later, the signed
-staging/promotion path moved production to API digest
-`sha256:73676d24e60f3da055757efb1a1ff36d34fcd3be4c47f1057bb506a131f5d665`.
+production digests, and let ArgoCD reconcile from Git. Later, signed
+staging/promotion runs moved production forward. The current production API
+digest is
+`sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`,
+promoted by commit `593953ca`.
 
 The admin client change was deployed by `deploy-admin-k8s.yml` run
 `26141639932`, which committed `f97ae247` and synced admin digest

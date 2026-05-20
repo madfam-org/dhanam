@@ -9,9 +9,9 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 ## Current Verified State
 
 - Production ArgoCD app `dhanam-services` is `Healthy` / `Synced` at
-  `7a848a2c deploy(staging): update digests to d1f8ccf`.
+  `593953ca deploy(prod): promote ccd6c8f`.
 - Live production images match `infra/k8s/production/kustomization.yaml`:
-  - API `sha256:73676d24e60f3da055757efb1a1ff36d34fcd3be4c47f1057bb506a131f5d665`
+  - API `sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`
   - Web `sha256:d8258c3df3ed28b7fbd0c377c6bfac29e1f4a2087f082fbb5a6844ac0e5a6b42`
   - Admin `sha256:349904cde052194c6e544c01618bba581ba4f25758cff7676e59625970cb22bf`
 - Production full health is `status: "healthy"`:
@@ -78,9 +78,11 @@ namespace-aware staging route apply.
 - Hosted `Deploy to Staging` for `d1f8ccf0`: run `26194485016`, success,
   including build/sign for API, web, admin, staging digest patch, API smoke,
   web route/API-origin smoke, and admin route/API-origin smoke.
+- Manual API `Promote staging -> prod`: run `26195552704`, success after the
+  30-minute soak gate elapsed; committed `593953ca`.
 - Scheduled `Promote staging -> prod` validation: run `26190740392`, success;
   write job skipped because there was no digest change to write.
-- Production rollout proof passed at revision `7a848a2c`.
+- Production rollout proof passed at revision `593953ca`.
 - Production full health passed with `status: "healthy"`.
 
 ## Remaining Roadmap

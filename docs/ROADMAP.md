@@ -47,9 +47,11 @@ Dhanam is considered fully stable only when all of these are true:
 
 As of 2026-05-20:
 
-- Current deployment base is
+- Current production deployment base is
+  `593953ca deploy(prod): promote ccd6c8f`.
+- Current staging digest base is
   `7a848a2c deploy(staging): update digests to d1f8ccf`.
-- Latest stability source commit before this roadmap update is
+- Latest code stability source commit before this roadmap update is
   `d1f8ccf0 fix(stability): harden staging smoke and migration drift`.
 - Hosted `CI` for `d1f8ccf0`: run `26194485015`, success.
 - Hosted `Lint & Type Check` for `d1f8ccf0`: run `26194485017`, success.
@@ -59,14 +61,19 @@ As of 2026-05-20:
 - `Deploy to Staging` (`26194485016`) built and signed API, web, and admin
   images, committed staging digests as `7a848a2c`, passed API health, and
   passed web/admin route checks that prove the staging API origin.
+- Manual API `Promote staging -> prod` (`26195552704`) succeeded after the
+  30-minute soak gate elapsed and committed `593953ca`.
 - `https://staging-api.dhan.am/health` returns HTTP 200 / healthy.
 - `https://staging.dhan.am` and `https://staging-admin.dhan.am` are reachable
   and proved by hosted staging smoke.
 - `scripts/production-preflight.sh` passes for production DNS, liveness, app,
   admin, apex, and `www -> apex` redirect checks.
 - `scripts/production-rollout-proof.js` passes: ArgoCD `dhanam-services` is
-  Healthy/Synced at revision `7a848a2c`, and live production images match
-  `infra/k8s/production/kustomization.yaml`.
+  Healthy/Synced at revision `593953ca`, and live production images match
+  `infra/k8s/production/kustomization.yaml`. The API image is now
+  `sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`;
+  web and admin remain on their existing production digests because their
+  Next.js public runtime values are build-time bound.
 - Full production health returns `status: "healthy"` with `failedJobs: 0`.
 - The retained failed queue jobs were inspected and removed with a narrow
   break-glass BullMQ failed-only cleanup because Enclii does not yet expose a

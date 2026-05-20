@@ -40,9 +40,10 @@ Prisma, AWS, or port assumptions.
 | Local compiled API liveness smoke                           | Passed                                        |
 | Local MX pricing API smoke                                  | Passed                                        |
 | Production preflight                                        | Passed, including `www` apex redirect         |
-| Production rollout proof                                    | Passed at ArgoCD revision `7a848a2c`          |
+| Production rollout proof                                    | Passed at ArgoCD revision `593953ca`          |
 | Production full health                                      | Healthy, `failedJobs: 0`                      |
 | Staging API/web/admin smoke                                 | Passed for `d1f8ccf0` / run `26194485016`     |
+| Manual API production promotion                             | Passed, run `26195552704`, commit `593953ca`  |
 | Hosted CI for `d1f8ccf0`                                    | Passed, run `26194485015`                     |
 | Hosted lint/typecheck for `d1f8ccf0`                        | Passed, run `26194485017`                     |
 | Hosted test coverage for `d1f8ccf0`                         | Passed, run `26194484988`                     |
@@ -81,6 +82,10 @@ These are not unit-test failures, but they block full-system stability:
   digests. Staging overlay digest refreshes land as signed `deploy(staging)`
   bot commits; `7a848a2c` is the latest observed here. Promotion requires an
   explicit successful staging smoke run id unless break-glass is selected.
+- Manual API promotion run `26195552704` used that path after the 30-minute
+  soak gate elapsed and committed production revision `593953ca`. Web and admin
+  were not promoted from staging images because their public API/app/OIDC values
+  are build-time bound.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
   because GitHub runners cannot currently reach the cluster API. Their digest
