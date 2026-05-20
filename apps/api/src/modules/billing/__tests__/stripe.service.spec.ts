@@ -60,6 +60,24 @@ describe('StripeService', () => {
       const unconfiguredService = module.get<StripeService>(StripeService);
       expect(unconfiguredService.isConfigured()).toBe(false);
     });
+
+    it('should fail closed when Stripe is not configured', async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          StripeService,
+          {
+            provide: ConfigService,
+            useValue: { get: jest.fn().mockReturnValue(null) },
+          },
+        ],
+      }).compile();
+
+      const unconfiguredService = module.get<StripeService>(StripeService);
+
+      await expect(
+        unconfiguredService.createCustomer({ email: 'test@example.com' })
+      ).rejects.toThrow('Stripe integration is not configured');
+    });
   });
 
   describe('createCustomer', () => {

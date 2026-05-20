@@ -1,10 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
 @Injectable()
 export class StripeService {
-  private stripe: Stripe;
+  private stripe?: Stripe;
   private readonly logger = new Logger(StripeService.name);
 
   constructor(private config: ConfigService) {
@@ -23,6 +23,14 @@ export class StripeService {
     this.logger.log('Stripe service initialized');
   }
 
+  private client(): Stripe {
+    if (!this.stripe) {
+      throw new ServiceUnavailableException('Stripe integration is not configured');
+    }
+
+    return this.stripe;
+  }
+
   /**
    * Create a new Stripe customer
    */
@@ -33,7 +41,7 @@ export class StripeService {
   }): Promise<Stripe.Customer> {
     this.logger.log('Creating Stripe customer');
 
-    return await this.stripe.customers.create({
+    return await this.client().customers.create({
       email: params.email,
       name: params.name,
       metadata: params.metadata || {},
@@ -53,7 +61,7 @@ export class StripeService {
   }): Promise<Stripe.Checkout.Session> {
     this.logger.log(`Creating checkout session for customer: ${params.customerId}`);
 
-    return await this.stripe.checkout.sessions.create({
+    return await this.client().checkout.sessions.create({
       customer: params.customerId,
       mode: 'subscription',
       line_items: [
@@ -81,7 +89,7 @@ export class StripeService {
     sessionId: string,
     params?: Stripe.Checkout.SessionRetrieveParams
   ): Promise<Stripe.Checkout.Session> {
-    return await this.stripe.checkout.sessions.retrieve(sessionId, params);
+    return await this.client().checkout.sessions.retrieve(sessionId, params);
   }
 
   /**
@@ -93,7 +101,7 @@ export class StripeService {
   }): Promise<Stripe.BillingPortal.Session> {
     this.logger.log(`Creating portal session for customer: ${params.customerId}`);
 
-    return await this.stripe.billingPortal.sessions.create({
+    return await this.client().billingPortal.sessions.create({
       customer: params.customerId,
       return_url: params.returnUrl,
     });
@@ -105,7 +113,7 @@ export class StripeService {
   async cancelSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
     this.logger.log(`Cancelling subscription: ${subscriptionId}`);
 
-    return await this.stripe.subscriptions.cancel(subscriptionId);
+    return await this.client().subscriptions.cancel(subscriptionId);
   }
 
   /**
@@ -117,21 +125,21 @@ export class StripeService {
   ): Promise<Stripe.Subscription> {
     this.logger.log(`Updating subscription: ${subscriptionId}`);
 
-    return await this.stripe.subscriptions.update(subscriptionId, params);
+    return await this.client().subscriptions.update(subscriptionId, params);
   }
 
   /**
    * Retrieve a subscription
    */
   async getSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
-    return await this.stripe.subscriptions.retrieve(subscriptionId);
+    return await this.client().subscriptions.retrieve(subscriptionId);
   }
 
   /**
    * Retrieve a customer
    */
   async getCustomer(customerId: string): Promise<Stripe.Customer> {
-    return (await this.stripe.customers.retrieve(customerId)) as Stripe.Customer;
+    return (await this.client().customers.retrieve(customerId)) as Stripe.Customer;
   }
 
   /**
@@ -139,7 +147,7 @@ export class StripeService {
    */
   constructWebhookEvent(payload: string | Buffer, signature: string, secret: string): Stripe.Event {
     try {
-      return this.stripe.webhooks.constructEvent(payload, signature, secret);
+      return this.client().webhooks.constructEvent(payload, signature, secret);
     } catch (error) {
       this.logger.error(`Webhook signature verification failed: ${error.message}`);
       throw error;
@@ -150,7 +158,7 @@ export class StripeService {
    * Get upcoming invoice for customer
    */
   async getUpcomingInvoice(customerId: string): Promise<Stripe.Invoice> {
-    return await (this.stripe.invoices as any).upcoming({
+    return await (this.client().invoices as any).upcoming({
       customer: customerId,
     });
   }
@@ -159,7 +167,7 @@ export class StripeService {
    * List customer invoices
    */
   async listInvoices(customerId: string, limit = 10): Promise<Stripe.ApiList<Stripe.Invoice>> {
-    return await this.stripe.invoices.list({
+    return await this.client().invoices.list({
       customer: customerId,
       limit,
     });
@@ -169,21 +177,21 @@ export class StripeService {
 
   /** Pause subscription billing for a period. User retains access but isn't charged. */
   async pauseSubscription(subscriptionId: string, resumesAt: number): Promise<Stripe.Subscription> {
-    return this.stripe.subscriptions.update(subscriptionId, {
+    return this.client().subscriptions.update(subscriptionId, {
       pause_collection: { behavior: 'void', resumes_at: resumesAt },
     });
   }
 
   /** Resume a paused subscription. */
   async resumeSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
-    return this.stripe.subscriptions.update(subscriptionId, {
+    return this.client().subscriptions.update(subscriptionId, {
       pause_collection: '' as any, // clears pause
     });
   }
 
   /** Cancel subscription at the end of the current billing period (never immediate). */
   async cancelAtPeriodEnd(subscriptionId: string): Promise<Stripe.Subscription> {
-    return this.stripe.subscriptions.update(subscriptionId, {
+    return this.client().subscriptions.update(subscriptionId, {
       cancel_at_period_end: true,
     });
   }
@@ -195,7 +203,7 @@ export class StripeService {
   ): Promise<Stripe.Subscription> {
     // Modern Stripe SDK removed the `coupon` shortcut on SubscriptionUpdateParams.
     // Use the `discounts` array instead (single coupon mirrors prior behaviour).
-    return this.stripe.subscriptions.update(subscriptionId, {
+    return this.client().subscriptions.update(subscriptionId, {
       discounts: [{ coupon: couponId }],
     });
   }
@@ -209,7 +217,7 @@ export class StripeService {
     currency: string;
     description: string;
   }): Promise<Stripe.InvoiceItem> {
-    return this.stripe.invoiceItems.create({
+    return this.client().invoiceItems.create({
       customer: params.customerId,
       amount: Math.round(params.amount * 100), // convert to cents
       currency: params.currency,
@@ -219,7 +227,7 @@ export class StripeService {
 
   /** Create and auto-advance an invoice for pending invoice items. */
   async createInvoice(customerId: string): Promise<Stripe.Invoice> {
-    return this.stripe.invoices.create({
+    return this.client().invoices.create({
       customer: customerId,
       auto_advance: true, // auto-finalize and attempt payment
     });

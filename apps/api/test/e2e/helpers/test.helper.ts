@@ -12,6 +12,7 @@ export interface CreateUserData {
   locale?: string;
   timezone?: string;
   emailVerified?: boolean;
+  isAdmin?: boolean;
   subscriptionTier?: 'community' | 'essentials' | 'pro';
 }
 
@@ -102,6 +103,7 @@ export class TestHelper {
         locale: data.locale || 'es',
         timezone: data.timezone || 'America/Mexico_City',
         emailVerified: data.emailVerified || false,
+        isAdmin: data.isAdmin ?? false,
         onboardingStep: 'welcome',
         onboardingCompleted: false,
         subscriptionTier: data.subscriptionTier || 'community',
@@ -201,6 +203,7 @@ export class TestHelper {
     const payload = {
       sub: user.id,
       email: user.email,
+      isAdmin: user.isAdmin,
       type: 'access',
     };
 
@@ -232,6 +235,7 @@ export class TestHelper {
     password: string;
     name: string;
     spaceName?: string;
+    isAdmin?: boolean;
     subscriptionTier?: 'community' | 'essentials' | 'pro';
   }): Promise<{
     user: User;
@@ -240,6 +244,7 @@ export class TestHelper {
   }> {
     const user = await this.createUser({
       ...data,
+      isAdmin: data.isAdmin,
       subscriptionTier: data.subscriptionTier,
     });
     const space = await this.createSpace(user.id, {

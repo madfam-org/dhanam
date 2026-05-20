@@ -10,6 +10,8 @@ This is the concise end-state from the production-stability push on
 - Verified deployment base before this documentation wrap-up:
   `28d42fcb deploy(staging): update digests to 71f0351`
 - Stability implementation: `71f03516 fix(stability): harden production queue remediation`
+- Current staging digest base observed during this follow-up:
+  `43ff639e deploy(staging): update digests to 12375bc`
 - This document is maintained as a status snapshot; `main` may advance through
   documentation-only commits or staging digest bot commits after the snapshot.
 
@@ -30,6 +32,12 @@ This is the concise end-state from the production-stability push on
   tests do not depend on out-of-band database state.
 - Reconciled `ProductCategory` with the canonical catalog by adding the
   `travel` enum value required by Routecraft.
+- Reconciled the admin E2E fixture with the hardened platform-admin model:
+  admin journey tests now create `User.isAdmin=true` instead of relying on
+  space ownership.
+- Hardened the Stripe SDK wrapper to fail closed with a service-unavailable
+  error when Stripe is intentionally unconfigured, instead of surfacing a raw
+  `undefined.customers` TypeError in E2E and runtime paths.
 - Clarified provider health semantics for required, optional, and unconfigured
   providers.
 - Fixed the API chaos test command.
@@ -46,6 +54,9 @@ This is the concise end-state from the production-stability push on
 - Full local `pnpm build` passed across 8 monorepo tasks.
 - Local Prisma client generation, API typecheck, and repo formatting passed
   after the `ProductCategory.travel` schema migration.
+- API admin operations E2E passed locally against disposable Postgres/Redis:
+  18 tests passed.
+- API Stripe/admin auth targeted Jest passed: 4 suites, 51 tests.
 - Hosted `CI` run `26146547824` passed.
 - Hosted `Lint & Type Check` run `26146547856` passed.
 - Hosted `Test Coverage` run `26146547825` passed.

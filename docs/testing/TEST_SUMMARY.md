@@ -8,7 +8,8 @@ gates before merging to `main`.
 
 Current 2026-05-20 stabilization state: full monorepo `pnpm test` and
 `pnpm build` both pass locally after the admin authorization, queue scheduler,
-staging overlay, E2E catalog-seeding, and product-category enum sync updates.
+staging overlay, E2E catalog-seeding, product-category enum sync, admin E2E
+fixture, and Stripe fail-closed updates.
 
 ## Main Commands
 
@@ -69,7 +70,8 @@ smoke at HTTP 404 due the staging tunnel-route gap. See
 [Stability Wrap-Up 2026-05-20](../STABILITY_WRAP_UP_2026-05-20.md).
 After that hosted snapshot, local targeted Jest passed for the admin
 authorization hardening, auth strategy admin-claim propagation, queue recurring
-cleanup, and cron job idempotency changes.
+cleanup, cron job idempotency, Stripe fail-closed behavior, and the admin
+operations E2E platform-admin fixture.
 
 ## Local Playwright Notes
 

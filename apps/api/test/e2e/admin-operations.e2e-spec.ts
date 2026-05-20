@@ -18,8 +18,8 @@ import { TestHelper } from './helpers/test.helper';
  *   GDPR compliance (export, delete) ->
  *   Security boundary enforcement
  *
- * Note: AdminGuard checks for userSpace role='admin' or role='owner',
- * so admin users must own or admin a space.
+ * Note: AdminGuard checks the platform-admin boundary. Space owner/admin roles
+ * do not grant access to global operations.
  */
 describe('Admin Operations Journey', () => {
   let app: INestApplication<NestFastifyApplication>;
@@ -53,15 +53,14 @@ describe('Admin Operations Journey', () => {
   // ──────────────────────────────────────────────
 
   describe('Admin Access Control', () => {
-    it('should create an admin user with a space (owner role grants admin)', async () => {
+    it('should create a platform admin user with a space', async () => {
       const adminEmail = TestHelper.generateUniqueEmail('admin');
 
-      // AdminGuard checks for userSpace role=admin|owner, so creating
-      // a user with a space (which assigns role=owner) grants admin access.
       const { user, space, authToken } = await testHelper.createCompleteUserWithSpace({
         email: adminEmail,
         password: 'AdminSecure123!',
         name: 'Admin User',
+        isAdmin: true,
       });
 
       await testHelper.verifyUserEmail(user.id);
@@ -71,6 +70,8 @@ describe('Admin Operations Journey', () => {
 
       expect(adminUserId).toBeTruthy();
       expect(adminToken).toBeTruthy();
+      expect(user.isAdmin).toBe(true);
+      expect(space.id).toBeTruthy();
     });
 
     it('should allow admin to access GET /admin/users', async () => {

@@ -20,6 +20,8 @@ Prisma, AWS, or port assumptions.
 | API onboarding + pricing targeted Jest                      | 3 suites, 68 tests passed                     |
 | API admin queue remediation targeted Jest                   | 2 suites, 18 tests passed                     |
 | API admin guard/auth strategy/job scheduler targeted Jest   | 5 suites, 71 tests passed                     |
+| API Stripe/admin auth targeted Jest                         | 4 suites, 51 tests passed                     |
+| API admin operations E2E with local Postgres/Redis          | 18 tests passed                               |
 | Admin auth hook targeted Jest                               | 1 suite, 3 tests passed                       |
 | Full monorepo `pnpm test`                                   | 13 tasks passed                               |
 | Full monorepo `pnpm build`                                  | 8 tasks passed                                |
@@ -103,6 +105,11 @@ These are not unit-test failures, but they block full-system stability:
   gates passed locally.
 - Current source also adds `ProductCategory.travel`, matching the Routecraft
   entry in `catalog.yaml` and unblocking catalog-seeded API E2E startup.
+- Current source also updates the admin operations E2E fixture to create a
+  real platform admin (`User.isAdmin=true`) and verifies that journey locally
+  against disposable Postgres/Redis.
+- Current source also makes the Stripe wrapper fail closed when unconfigured,
+  returning a controlled service-unavailable error instead of a raw TypeError.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.
