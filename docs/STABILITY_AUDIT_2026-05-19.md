@@ -31,9 +31,9 @@ path hardening.
 | Web accessibility gates   | Stable locally       | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.                      |
 | Admin Playwright          | Improved             | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                                  |
 | API production build      | Improved             | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                                  |
-| Staging image pipeline    | Improved             | API, web, and admin images build, sign with cosign, and patch the staging overlay; signed digests were refreshed in `ed6466b7`.                                   |
+| Staging image pipeline    | Improved             | API, web, and admin images build, sign with cosign, and patch the staging overlay; recent signed digest refreshes include `18fb956d`.                             |
 | Staging smoke             | Blocked              | Enclii has a `staging` environment record for `enclii-dhanam-staging`, but the ArgoCD Application/namespace are absent and tunnel routes are not namespace-aware. |
-| Production API health     | Improved/degraded    | Signed API digest `sha256:480faa10194f...` was committed in `906916e6` and ArgoCD synced it. Full health now returns HTTP 200 with queue-only `degraded` status.  |
+| Production API health     | Improved/degraded    | Signed API digest `sha256:678c05963201...` was committed in `df5d30fc` and ArgoCD synced it. Full health now returns HTTP 200 with queue-only `degraded` status.  |
 | Production domain routing | Fixed and verified   | `scripts/production-preflight.sh` passes; `www.dhan.am` redirects to `https://dhan.am/` without leaking `:4200`.                                                  |
 | Enclii production rollout | Blocked/inconsistent | Enclii `prod` can build web releases, but the live public route still serves the ArgoCD `dhanam` namespace and the Enclii `prod` namespace is absent.             |
 | Enclii policy remediation | Adapter gap          | `enclii ops policy waiver-plan` is planned only; apply is blocked because adapter execution is not wired.                                                         |
@@ -57,8 +57,8 @@ path hardening.
    `deploy-staging.yml` signs staging image digests, `promote-to-prod.yml`
    verifies the deploy-staging keyless signature before writing production
    digests, requires an explicit successful `Deploy to Staging` smoke run id
-   unless break-glass is selected, and the staging overlay was refreshed with
-   signed digests in `ed6466b7`. Promotion still needs a real staging
+   unless break-glass is selected, and the staging overlay is refreshed by
+   signed `deploy(staging)` bot commits such as `18fb956d`. Promotion still needs a real staging
    smoke/soak signal.
 6. Live production rollout proof still comes from the ArgoCD `dhanam-services`
    Application, not Enclii `prod` deployment records, until the Enclii namespace
@@ -241,9 +241,10 @@ Actions keyless cosign signatures. `promote-to-prod.yml` verifies that each
 candidate digest has a valid signature from
 `deploy-staging.yml@refs/heads/main` before it checks soak time or commits a
 production digest. This prevents the unsigned-staging-digest failure class from
-reaching ArgoCD/Kyverno again. The latest signed staging build refreshed the
-staging overlay in `ed6466b7`; live promotion remains blocked by missing
-staging runtime infrastructure and smoke evidence.
+reaching ArgoCD/Kyverno again. Signed staging builds now refresh the staging
+overlay through `deploy(staging)` bot commits; the latest observed during this
+audit was `18fb956d`. Live promotion remains blocked by missing staging runtime
+infrastructure and smoke evidence.
 
 The promotion workflow now also enforces the smoke policy declared in
 `.enclii.yml`: operators must provide a successful `Deploy to Staging` run id
@@ -262,9 +263,15 @@ reported HTTP 503 even though database, Redis, and liveness were up.
 Because staging is not externally live enough to produce a green smoke run, the
 manual `deploy-k8s.yml` workflow was run with `direct_k8s_deploy=false` to
 build and sign a current API image, commit only the production digest, and let
-ArgoCD reconcile from Git. Workflow run `26140806721` succeeded, committed
-`906916e6`, and ArgoCD synced `dhanam-services` to API digest
-`sha256:480faa10194ff0e47c74ea312cbd044860fc26af8394b314fc08ad662cb9b22d`.
+ArgoCD reconcile from Git. The first health-fix run `26140806721` restored full
+health from HTTP 503 to HTTP 200/degraded. After the audited queue remediation
+patch landed, run `26141540713` succeeded, committed `df5d30fc`, and ArgoCD
+synced `dhanam-services` to API digest
+`sha256:678c05963201abd31b749fa850308665b889c35ea3bbbd417c2febabaf26d975`.
+
+The admin client change was deployed by `deploy-admin-k8s.yml` run
+`26141639932`, which committed `f97ae247` and synced admin digest
+`sha256:252948253a410ce1fbf1829513ca73f694ae97097568294746dafe162f6f0d36`.
 
 Verified after ArgoCD sync:
 

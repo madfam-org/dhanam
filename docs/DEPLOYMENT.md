@@ -57,9 +57,10 @@ and admin images with GitHub Actions keyless cosign signatures, and
 `deploy-staging.yml@refs/heads/main` before it writes a production commit. It
 also requires the operator to provide a successful `Deploy to Staging` run id
 whose smoke job passed for the staged source commit, unless the operator
-selects the explicit break-glass smoke bypass. The latest signed staging digest
-refresh landed in `ed6466b7`; future promotions must use signed staging
-digests with smoke/soak evidence. The break-glass K8s workflows also sign
+selects the explicit break-glass smoke bypass. Staging digest refreshes now land
+as signed `deploy(staging)` bot commits; `18fb956d` is the latest observed
+during this audit. Future promotions must use signed staging digests with
+smoke/soak evidence. The break-glass K8s workflows also sign
 their images before committing production digests; their raw
 `kubectl set image` rollout is now opt-in through `direct_k8s_deploy` because
 GitHub-hosted runners currently cannot reach the cluster API. By default,

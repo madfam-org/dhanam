@@ -61,18 +61,21 @@ These are not unit-test failures, but they block full-system stability:
   mutation denial.
 - `deploy-staging.yml` now signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
-  digests. The staging overlay was refreshed with signed digests in
-  `ed6466b7`; promotion now also requires an explicit successful staging
-  smoke run id unless break-glass is selected. Live promotion still needs
-  staging smoke/soak evidence.
+  digests. Staging overlay digest refreshes now land as signed
+  `deploy(staging)` bot commits; `18fb956d` is the latest observed during this
+  audit. Promotion now also requires an explicit successful staging smoke run
+  id unless break-glass is selected. Live promotion still needs staging
+  smoke/soak evidence.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
   because GitHub runners cannot currently reach the cluster API. Their digest
   patch step no longer downloads the volatile upstream kustomize installer.
 - Production API liveness passes and the signed API digest from workflow run
-  `26140806721` was reconciled by ArgoCD as commit `906916e6`. Full health now
+  `26141540713` was reconciled by ArgoCD as commit `df5d30fc`. Full health now
   returns HTTP 200 with `status: degraded` because 100 retained failed BullMQ
   jobs remain across `sync-transactions` and `categorize-transactions`.
+- The admin app client change was built/signed by run `26141639932`, committed
+  as `f97ae247`, and ArgoCD synced it to production.
 - Admin queue remediation endpoints now read BullMQ directly, retry failed jobs
   through `QueueService`, and require server-side `{ "confirm": true }` before
   destructive queue clearing.
