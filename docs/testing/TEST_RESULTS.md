@@ -18,6 +18,7 @@ Prisma, AWS, or port assumptions.
 | API typecheck                                               | Passed                                        |
 | API pricing-engine targeted Jest                            | Passed                                        |
 | API onboarding + pricing targeted Jest                      | 3 suites, 68 tests passed                     |
+| API admin queue remediation targeted Jest                   | 2 suites, 12 tests passed                     |
 | Shared package build                                        | Passed                                        |
 | API build                                                   | Passed                                        |
 | Web production build                                        | Passed with blank public URL env vars         |
@@ -61,17 +62,20 @@ These are not unit-test failures, but they block full-system stability:
 - `deploy-staging.yml` now signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
   digests. The staging overlay was refreshed with signed digests in
-  `1af02bc2`; promotion now also requires an explicit successful staging
+  `ed6466b7`; promotion now also requires an explicit successful staging
   smoke run id unless break-glass is selected. Live promotion still needs
   staging smoke/soak evidence.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
   because GitHub runners cannot currently reach the cluster API. Their digest
   patch step no longer downloads the volatile upstream kustomize installer.
-- Production API liveness passes, but full health has reported HTTP 503 on the
-  older deployed API image. A manual signed API digest rebuild was started on
-  2026-05-20 with direct raw K8s rollout disabled so ArgoCD remains the
-  production reconciler.
+- Production API liveness passes and the signed API digest from workflow run
+  `26140806721` was reconciled by ArgoCD as commit `906916e6`. Full health now
+  returns HTTP 200 with `status: degraded` because 100 retained failed BullMQ
+  jobs remain across `sync-transactions` and `categorize-transactions`.
+- Admin queue remediation endpoints now read BullMQ directly, retry failed jobs
+  through `QueueService`, and require server-side `{ "confirm": true }` before
+  destructive queue clearing.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.

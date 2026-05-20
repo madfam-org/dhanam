@@ -38,6 +38,7 @@ import {
   UpdateFeatureFlagDto,
   PaginatedResponseDto,
   CacheFlushDto,
+  ClearQueueDto,
   SpaceSearchDto,
   UserActionDto,
 } from './dto';
@@ -200,8 +201,12 @@ export class AdminController {
   @ApiOperation({ summary: 'Clear a queue' })
   @ApiParam({ name: 'name', description: 'Queue name' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Queue cleared' })
-  async clearQueue(@Param('name') name: string, @Request() req: AuthenticatedRequest) {
-    return this.adminOpsService.clearQueue(name, req.user.id);
+  async clearQueue(
+    @Param('name') name: string,
+    @Body() dto: ClearQueueDto,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminOpsService.clearQueue(name, dto.confirm, req.user.id);
   }
 
   @Get('spaces')

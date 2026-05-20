@@ -573,15 +573,20 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     this.logger.log(`Queue ${queueName} resumed`);
   }
 
-  async clearQueue(queueName: string): Promise<void> {
+  async clearQueue(queueName: string): Promise<number> {
     const queue = this.queues.get(queueName);
     if (!queue) throw new Error(`Queue ${queueName} not found`);
 
+    const stats = await this.getQueueStats(queueName);
+    const clearedCount =
+      stats.waiting + stats.active + stats.completed + stats.failed + stats.delayed;
+
     await queue.obliterate({ force: true });
-    this.logger.log(`Queue ${queueName} cleared`);
+    this.logger.log(`Queue ${queueName} cleared (${clearedCount} jobs removed)`);
+    return clearedCount;
   }
 
-  async retryFailedJobs(queueName: string): Promise<void> {
+  async retryFailedJobs(queueName: string): Promise<number> {
     const queue = this.queues.get(queueName);
     if (!queue) throw new Error(`Queue ${queueName} not found`);
 
@@ -592,6 +597,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     }
 
     this.logger.log(`Retried ${failedJobs.length} failed jobs in queue ${queueName}`);
+    return failedJobs.length;
   }
 
   registerWorker(queueName: string, processor: (job: Job) => Promise<any>): Worker {

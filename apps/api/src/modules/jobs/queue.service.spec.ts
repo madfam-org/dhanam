@@ -8,6 +8,14 @@ import { QueueService } from './queue.service';
 const createMockQueue = (name: string) => ({
   name,
   add: jest.fn().mockResolvedValue({ id: 'job-id', data: {} }),
+  getWaiting: jest.fn().mockResolvedValue([]),
+  getActive: jest.fn().mockResolvedValue([]),
+  getCompleted: jest.fn().mockResolvedValue([]),
+  getFailed: jest.fn().mockResolvedValue([]),
+  getDelayed: jest.fn().mockResolvedValue([]),
+  pause: jest.fn().mockResolvedValue(undefined),
+  resume: jest.fn().mockResolvedValue(undefined),
+  obliterate: jest.fn().mockResolvedValue(undefined),
   close: jest.fn().mockResolvedValue(undefined),
 });
 
@@ -125,6 +133,56 @@ describe('QueueService', () => {
 
       expect(result).toBeDefined();
       expect(result.id).toBe('job-id');
+    });
+  });
+
+  describe('queue management', () => {
+    it('should return queue stats from BullMQ', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const queue = queues.get('sync-transactions');
+      queue.getWaiting.mockResolvedValue([{}]);
+      queue.getActive.mockResolvedValue([{}, {}]);
+      queue.getCompleted.mockResolvedValue([{}, {}, {}]);
+      queue.getFailed.mockResolvedValue([{}]);
+      queue.getDelayed.mockResolvedValue([{}, {}]);
+
+      const result = await service.getQueueStats('sync-transactions');
+
+      expect(result).toEqual({
+        name: 'sync-transactions',
+        waiting: 1,
+        active: 2,
+        completed: 3,
+        failed: 1,
+        delayed: 2,
+      });
+    });
+
+    it('should retry failed jobs and return the retried count', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const retry = jest.fn().mockResolvedValue(undefined);
+      const queue = queues.get('categorize-transactions');
+      queue.getFailed.mockResolvedValue([{ retry }, { retry }]);
+
+      const result = await service.retryFailedJobs('categorize-transactions');
+
+      expect(result).toBe(2);
+      expect(retry).toHaveBeenCalledTimes(2);
+    });
+
+    it('should clear a queue and return the number of removed jobs', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const queue = queues.get('sync-transactions');
+      queue.getWaiting.mockResolvedValue([{}]);
+      queue.getActive.mockResolvedValue([{}]);
+      queue.getCompleted.mockResolvedValue([{}, {}]);
+      queue.getFailed.mockResolvedValue([{}]);
+      queue.getDelayed.mockResolvedValue([{}, {}]);
+
+      const result = await service.clearQueue('sync-transactions');
+
+      expect(result).toBe(7);
+      expect(queue.obliterate).toHaveBeenCalledWith({ force: true });
     });
   });
 });

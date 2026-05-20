@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { AuditService } from '@core/audit/audit.service';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { RedisService } from '@core/redis/redis.service';
 import { Prisma } from '@db';
+import { QueueService } from '@modules/jobs/queue.service';
 
 import { CacheFlushDto, PaginatedResponseDto, SpaceSearchDto, UserActionDto } from './dto';
 
@@ -14,7 +15,8 @@ export class AdminOpsService {
     private prisma: PrismaService,
     private logger: LoggerService,
     private redis: RedisService,
-    private auditService: AuditService
+    private auditService: AuditService,
+    private queueService: QueueService
   ) {}
 
   async getSystemHealth(adminUserId: string): Promise<{
@@ -133,34 +135,18 @@ export class AdminOpsService {
       failedJobs: number;
     }>;
   }> {
-    const queueNames = ['sync', 'snapshot', 'notification', 'retention', 'gdpr'];
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const stats = await this.queueService.getAllQueueStats();
+    const queues = stats.map((queue) => {
+      const liveJobs = queue.waiting + queue.active + queue.delayed;
+      const recentJobs = liveJobs + queue.completed;
 
-    const queues = await Promise.all(
-      queueNames.map(async (name) => {
-        const [recentJobs, failedJobs] = await Promise.all([
-          this.prisma.auditLog.count({
-            where: {
-              action: { startsWith: `job.${name}` },
-              timestamp: { gte: oneHourAgo },
-            },
-          }),
-          this.prisma.auditLog.count({
-            where: {
-              action: `job.${name}_failed`,
-              timestamp: { gte: oneHourAgo },
-            },
-          }),
-        ]);
-
-        return {
-          name,
-          status: failedJobs > 0 ? 'error' : recentJobs > 0 ? 'active' : 'idle',
-          recentJobs,
-          failedJobs,
-        };
-      })
-    );
+      return {
+        name: queue.name,
+        status: queue.failed > 0 ? 'error' : liveJobs > 0 ? 'active' : 'idle',
+        recentJobs,
+        failedJobs: queue.failed,
+      };
+    });
 
     this.auditService.logEvent({
       userId: adminUserId,
@@ -173,37 +159,51 @@ export class AdminOpsService {
   }
 
   async retryFailedJobs(queueName: string, adminUserId: string): Promise<{ retriedCount: number }> {
+    const retriedCount = await this.queueService.retryFailedJobs(queueName);
+
     await this.auditService.logEvent({
       userId: adminUserId,
       action: 'admin.queue_retry_failed',
       resource: 'Queue',
       resourceId: queueName,
+      metadata: { retriedCount },
       severity: 'high',
     });
 
     this.logger.log(
-      `Retry failed jobs requested for queue "${queueName}" by admin ${adminUserId}`,
+      `Retried ${retriedCount} failed jobs in queue "${queueName}" by admin ${adminUserId}`,
       'AdminOpsService'
     );
 
-    return { retriedCount: 0 };
+    return { retriedCount };
   }
 
-  async clearQueue(queueName: string, adminUserId: string): Promise<{ clearedCount: number }> {
+  async clearQueue(
+    queueName: string,
+    confirm: boolean,
+    adminUserId: string
+  ): Promise<{ clearedCount: number }> {
+    if (confirm !== true) {
+      throw new BadRequestException('Queue clear must be explicitly confirmed');
+    }
+
+    const clearedCount = await this.queueService.clearQueue(queueName);
+
     await this.auditService.logEvent({
       userId: adminUserId,
       action: 'admin.queue_clear',
       resource: 'Queue',
       resourceId: queueName,
+      metadata: { clearedCount },
       severity: 'high',
     });
 
     this.logger.log(
-      `Queue clear requested for "${queueName}" by admin ${adminUserId}`,
+      `Cleared ${clearedCount} jobs from queue "${queueName}" by admin ${adminUserId}`,
       'AdminOpsService'
     );
 
-    return { clearedCount: 0 };
+    return { clearedCount };
   }
 
   async searchSpaces(dto: SpaceSearchDto): Promise<PaginatedResponseDto<any>> {

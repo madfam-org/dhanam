@@ -170,11 +170,20 @@ await queueService.pauseQueue('sync-transactions');
 await queueService.resumeQueue('sync-transactions');
 
 // Clear all jobs from queue
-await queueService.clearQueue('sync-transactions');
+const clearedCount = await queueService.clearQueue('sync-transactions');
 
 // Retry failed jobs
-await queueService.retryFailedJobs('sync-transactions');
+const retriedCount = await queueService.retryFailedJobs('sync-transactions');
 ```
+
+Admin queue operations use these methods through audited endpoints:
+
+- `GET /v1/admin/queues`
+- `POST /v1/admin/queues/:name/retry-failed`
+- `POST /v1/admin/queues/:name/clear` with `{ "confirm": true }`
+
+Use retry before clear. Clearing removes all retained jobs from the queue and is
+reserved for confirmed stale failures.
 
 ### Graceful Shutdown
 
@@ -232,34 +241,35 @@ Located in `__tests__/` and `queue.service.spec.ts`:
 4. Monitor queue stats:
 
 ```bash
-# Redis CLI monitoring
-redis-cli MONITOR | grep bull
+# Audited admin endpoint
+curl "https://api.dhan.am/v1/admin/queues" \
+  -H "Authorization: Bearer <admin-token>"
 ```
 
 ### Queue Health Check
 
 ```bash
 # Check queue depths
-curl "https://api.dhan.am/admin/queues/stats" \
+curl "https://api.dhan.am/v1/admin/queues" \
   -H "Authorization: Bearer <admin-token>"
 ```
 
 **Response:**
 
 ```json
-[
-  {
-    "name": "sync-transactions",
-    "waiting": 5,
-    "active": 2,
-    "completed": 1543,
-    "failed": 12,
-    "delayed": 0
-  }
-]
+{
+  "queues": [
+    {
+      "name": "sync-transactions",
+      "status": "error",
+      "recentJobs": 1548,
+      "failedJobs": 12
+    }
+  ]
+}
 ```
 
 ---
 
 **Module**: `jobs`
-**Last Updated**: January 2025
+**Last Updated**: May 2026

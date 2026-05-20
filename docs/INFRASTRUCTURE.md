@@ -205,13 +205,16 @@ Navigate to `http://localhost:3400/dashboard` locally or
 ### Admin API Endpoints
 
 ```
-GET  /api/admin/stats                 # System statistics
-GET  /api/admin/users                 # User search
-GET  /api/admin/users/:id             # User details
-GET  /api/admin/audit-logs            # Audit log search
-GET  /api/admin/analytics/onboarding  # Onboarding funnel
-GET  /api/admin/feature-flags         # List feature flags
-POST /api/admin/feature-flags/:key    # Update feature flag
+GET  /v1/admin/stats                         # System statistics
+GET  /v1/admin/users                         # User search
+GET  /v1/admin/users/:id                     # User details
+GET  /v1/admin/audit-logs                    # Audit log search
+GET  /v1/admin/analytics/onboarding-funnel   # Onboarding funnel
+GET  /v1/admin/feature-flags                 # List feature flags
+POST /v1/admin/feature-flags/:key            # Update feature flag
+GET  /v1/admin/queues                        # Live BullMQ queue stats
+POST /v1/admin/queues/:name/retry-failed     # Retry retained failed jobs
+POST /v1/admin/queues/:name/clear            # Clear queue, requires confirm=true
 ```
 
 ## CI/CD Pipeline

@@ -256,7 +256,9 @@ export const adminApi = {
   },
 
   async clearQueue(queueName: string): Promise<{ clearedCount: number }> {
-    return apiClient.post<{ clearedCount: number }>(`/admin/queues/${queueName}/clear`);
+    return apiClient.post<{ clearedCount: number }>(`/admin/queues/${queueName}/clear`, {
+      confirm: true,
+    });
   },
 
   async searchSpaces(params: SpaceSearchParams = {}): Promise<PaginatedResponse<SpaceInfo>> {

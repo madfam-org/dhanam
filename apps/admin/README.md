@@ -83,7 +83,7 @@ apps/admin/
 │   ├── components/                 # 11 admin UI components
 │   ├── contexts/                   # AdminContext provider
 │   ├── lib/
-│   │   ├── api/                    # Typed API client (31 endpoints)
+│   │   ├── api/                    # Typed API client for admin endpoints
 │   │   ├── hooks/                  # Auth store (Zustand + persist)
 │   │   └── utils.ts                # cn() utility
 │   ├── middleware.ts               # Auth cookie check
@@ -120,18 +120,21 @@ NEXT_PUBLIC_SENTRY_DSN=                        # Optional: Sentry error tracking
 
 ## API Client
 
-The admin app includes a fully typed API client (`src/lib/api/admin.ts`) with 31 endpoints covering:
+The admin app includes a fully typed API client (`src/lib/api/admin.ts`) covering:
 
 - System stats and health checks
 - User and space management (search, details, suspend/unsuspend)
 - Feature flag CRUD operations
 - Audit log queries with filtering
-- Queue management (pause, resume, clean)
+- Queue management (live stats, retry failed jobs, confirmed destructive clear)
 - Cache operations (flush, stats)
 - Compliance actions (GDPR export/delete, retention)
 - Billing event queries
 
 All requests include the auth token from the Zustand store and target the API at `NEXT_PUBLIC_API_URL`.
+
+Queue clearing sends `{ "confirm": true }` after the UI confirmation dialog;
+server-side confirmation is required before the API removes retained jobs.
 
 ## Playwright E2E
 

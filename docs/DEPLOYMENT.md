@@ -57,8 +57,8 @@ and admin images with GitHub Actions keyless cosign signatures, and
 `deploy-staging.yml@refs/heads/main` before it writes a production commit. It
 also requires the operator to provide a successful `Deploy to Staging` run id
 whose smoke job passed for the staged source commit, unless the operator
-selects the explicit break-glass smoke bypass. The first signed staging digest
-refresh landed in `1af02bc2`; future promotions must use signed staging
+selects the explicit break-glass smoke bypass. The latest signed staging digest
+refresh landed in `ed6466b7`; future promotions must use signed staging
 digests with smoke/soak evidence. The break-glass K8s workflows also sign
 their images before committing production digests; their raw
 `kubectl set image` rollout is now opt-in through `direct_k8s_deploy` because
@@ -422,7 +422,26 @@ Check provider status pages:
 - Belvo: https://status.belvo.co/
 - Bitso: https://status.bitso.com/
 
-The provider orchestrator (`apps/api/src/modules/providers/orchestrator/`) handles failover automatically. Check BullMQ queue status in the admin panel at `/admin`.
+The provider orchestrator (`apps/api/src/modules/providers/orchestrator/`)
+handles failover automatically. Check BullMQ queue status in the admin panel at
+`/queues`, backed by `GET /v1/admin/queues`.
+
+Queue remediation is audited through admin endpoints:
+
+```bash
+# Retry failed jobs after confirming the underlying provider/config issue is fixed.
+curl -X POST "https://api.dhan.am/v1/admin/queues/sync-transactions/retry-failed" \
+  -H "Authorization: Bearer <admin-token>"
+
+# Destructive cleanup requires explicit confirmation in the request body.
+curl -X POST "https://api.dhan.am/v1/admin/queues/sync-transactions/clear" \
+  -H "Authorization: Bearer <admin-token>" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm":true}'
+```
+
+Prefer retry over clear. Use raw Redis/BullMQ scripts only as documented
+break-glass when the admin surface or Enclii adapter is unavailable.
 
 ### Enclii Issues
 

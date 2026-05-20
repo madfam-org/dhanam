@@ -63,7 +63,8 @@ Search and view user information (read-only):
 - Recent Activity
 - Audit Trail (last 50 actions)
 
-**Note**: User data is read-only. No modification capabilities are provided through the admin dashboard for security reasons.
+Sensitive user actions are intentionally narrow and audited: deactivate a user,
+reset TOTP, force logout sessions, and run GDPR export/delete workflows.
 
 ### 3. Audit Logs
 
@@ -158,6 +159,24 @@ Manage feature rollouts and A/B tests:
 - User-specific targeting for beta testing
 - Audit trail for all changes
 
+### 6. Queue Management
+
+The Queues page shows live BullMQ state from `QueueService`, not audit-log
+proxies:
+
+- **Status**: `error` when retained failed jobs exist, `active` when jobs are
+  waiting/active/delayed, otherwise `idle`
+- **Recent Jobs**: retained completed jobs plus live waiting/active/delayed jobs
+- **Failed**: retained BullMQ failed jobs
+
+Available actions:
+
+- **Retry Failed**: calls `POST /v1/admin/queues/:name/retry-failed` and
+  returns the actual retried job count.
+- **Clear**: calls `POST /v1/admin/queues/:name/clear` with
+  `{ "confirm": true }`. This is destructive; prefer retry unless the failed
+  jobs are confirmed stale and safe to remove.
+
 ## Admin Actions Audit Trail
 
 All admin actions are logged with high severity:
@@ -179,7 +198,7 @@ All admin actions are logged with high severity:
 
 ### Security
 
-1. **Principle of Least Privilege**: Admin dashboard is read-only for user data
+1. **Principle of Least Privilege**: Admin actions are narrow and role-gated
 2. **Audit Everything**: All admin actions are logged
 3. **Session Security**: Admin sessions expire after 1 hour of inactivity
 4. **Two-Factor**: Admins should have 2FA enabled
@@ -211,8 +230,8 @@ All admin actions are logged with high severity:
 
 #### Statistics Not Updating
 
-- Check Redis connection: `redis-cli ping`
-- Clear cache: `redis-cli FLUSHDB`
+- Check Redis connection through Enclii/admin health first
+- Clear only targeted cache keys through the audited admin cache endpoint
 - Verify background jobs are running
 
 #### Feature Flags Not Working
@@ -258,13 +277,16 @@ ORDER BY created_at DESC;
 ### Endpoints
 
 ```
-GET  /api/admin/stats
-GET  /api/admin/users?page=1&limit=20&search=john
-GET  /api/admin/users/:id
-GET  /api/admin/audit-logs?page=1&severity=high
-GET  /api/admin/analytics/onboarding?period=7d
-GET  /api/admin/feature-flags
-POST /api/admin/feature-flags/:key
+GET  /v1/admin/stats
+GET  /v1/admin/users?page=1&limit=20&search=john
+GET  /v1/admin/users/:id
+GET  /v1/admin/audit-logs?page=1&severity=high
+GET  /v1/admin/analytics/onboarding-funnel
+GET  /v1/admin/feature-flags
+POST /v1/admin/feature-flags/:key
+GET  /v1/admin/queues
+POST /v1/admin/queues/:name/retry-failed
+POST /v1/admin/queues/:name/clear
 ```
 
 ### Response Formats
@@ -296,6 +318,21 @@ POST /api/admin/feature-flags/:key
   "enabled": true,
   "rolloutPercentage": 25,
   "targetUsers": ["user-123", "user-456"]
+}
+```
+
+#### Queue Stats
+
+```json
+{
+  "queues": [
+    {
+      "name": "sync-transactions",
+      "status": "error",
+      "recentJobs": 350,
+      "failedJobs": 50
+    }
+  ]
 }
 ```
 
