@@ -12,6 +12,8 @@ open `docs/INDEX.md`.
 - [Deployment Guide](DEPLOYMENT.md) - Enclii-first deployment and operations
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md) - current
   production/staging stability truth
+- [Catalog Truth 2026-05-20](CATALOG_TRUTH_2026-05-20.md) - product catalog
+  drift gate and production sync truth
 - [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md) -
   documentation accuracy and organization audit
 - [Architecture Overview](architecture/ARCHITECTURE.md) - system architecture

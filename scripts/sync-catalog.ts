@@ -74,6 +74,7 @@ interface YamlProduct {
 interface YamlTier {
   dhanam_tier: string;
   display_name?: string;
+  description?: string;
   prices: Record<string, { monthly?: number; yearly?: number }>;
   metadata?: Record<string, unknown>;
   features?: string[];
@@ -202,7 +203,35 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
   }
 
   // 3. Sync tiers (prices + features)
-  for (const [tierSlug, tier] of Object.entries(config.tiers)) {
+  for (const [tierIndex, [tierSlug, tier]] of Object.entries(config.tiers).entries()) {
+    if (!DRY_RUN) {
+      await prisma.productTier.upsert({
+        where: {
+          productId_tierSlug: {
+            productId: dbProduct.id,
+            tierSlug,
+          },
+        },
+        create: {
+          productId: dbProduct.id,
+          tierSlug,
+          dhanamTier: tier.dhanam_tier as any,
+          displayName: tier.display_name,
+          description: tier.description,
+          metadata: tier.metadata,
+          sortOrder: tierIndex,
+        },
+        update: {
+          dhanamTier: tier.dhanam_tier as any,
+          displayName: tier.display_name,
+          description: tier.description,
+          metadata: tier.metadata,
+          sortOrder: tierIndex,
+        },
+      });
+    }
+    log('Tier', `${slug}/${tierSlug}: ${tier.display_name ?? tierSlug}`);
+
     // Sync prices
     for (const [currency, priceConfig] of Object.entries(tier.prices)) {
       for (const [interval, amount] of Object.entries(priceConfig)) {

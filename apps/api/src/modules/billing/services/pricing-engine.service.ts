@@ -1,6 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 
 import { PrismaService } from '@core/prisma/prisma.service';
+
+import { CatalogProduct, ProductCatalogService } from './product-catalog.service';
 
 interface RegionalPrice {
   monthlyPrice: number;
@@ -29,22 +31,9 @@ export interface PricingResponse {
   };
 }
 
-// Base USD prices (Tier 1)
-const BASE_PRICES = {
-  essentials: 4.99,
-  pro: 11.99,
-  premium: 19.99,
-};
-
-// Mexico promo override prices (MXN)
-const MX_PROMO_PRICES: Record<string, number> = {
-  essentials: 31,
-  pro: 32,
-  premium: 33,
-};
-
 // Currency mapping by country
 const COUNTRY_CURRENCY: Record<string, string> = {
+  US: 'USD',
   MX: 'MXN',
   BR: 'BRL',
   CO: 'COP',
@@ -91,43 +80,17 @@ const STATIC_REGION_DEFAULTS: Record<string, { discount: number; currency: strin
   emerging: { discount: 0.65, currency: 'USD' },
 };
 
-const TIER_FEATURES: Record<string, string[]> = {
-  essentials: [
-    'AI transaction categorization',
-    'Bank sync (Belvo + Bitso)',
-    '2 financial spaces',
-    '10 simulations/day',
-    '60-day cashflow forecast',
-    'ESG crypto scoring',
-    '500 MB document storage',
-  ],
-  pro: [
-    'Everything in Essentials, plus:',
-    'Unlimited provider connections',
-    'Unlimited simulations',
-    '5 financial spaces',
-    'Estate planning & Life Beat',
-    'Household views',
-    'Collectibles valuation',
-    '5 GB storage',
-    'Priority support',
-  ],
-  premium: [
-    'Everything in Pro, plus:',
-    '10 financial spaces',
-    '50,000 Monte Carlo iterations',
-    '24 stress scenarios',
-    '25 GB storage',
-    'Dedicated priority support',
-    'Advanced analytics',
-  ],
-};
+const DHANAM_PRODUCT_SLUG = 'dhanam';
+type DhanamTierSlug = 'essentials' | 'pro' | 'premium';
 
 @Injectable()
 export class PricingEngineService {
   private readonly logger = new Logger(PricingEngineService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private catalog: ProductCatalogService
+  ) {}
 
   /**
    * Get the pricing region number for a country code.
@@ -171,27 +134,53 @@ export class PricingEngineService {
     });
 
     const staticDefaults = STATIC_REGION_DEFAULTS[regionName] ?? STATIC_REGION_DEFAULTS.tier1;
-    const discount = region?.discount ?? staticDefaults.discount;
     const currency = region?.currency ?? staticDefaults.currency;
+    const catalogCurrency = currency === 'MXN' ? 'MXN' : 'USD';
 
-    const applyDiscount = (base: number): number => Math.round(base * (1 - discount) * 100) / 100;
+    return this.getCatalogPrices(catalogCurrency);
+  }
+
+  private async getCatalogProduct(): Promise<CatalogProduct> {
+    try {
+      return await this.catalog.getProductBySlug(DHANAM_PRODUCT_SLUG);
+    } catch (error) {
+      this.logger.error('Dhanam product catalog is unavailable for regional pricing', error);
+      throw new ServiceUnavailableException(
+        'Dhanam product catalog is unavailable; refusing to serve static fallback prices'
+      );
+    }
+  }
+
+  private async getCatalogPrices(currency: string): Promise<{
+    essentials: RegionalPrice;
+    pro: RegionalPrice;
+    premium: RegionalPrice;
+  }> {
+    const product = await this.getCatalogProduct();
+    const byTier = new Map(product.tiers.map((tier) => [tier.tierSlug, tier]));
+
+    const resolveTier = (tierSlug: DhanamTierSlug): RegionalPrice => {
+      const tier = byTier.get(tierSlug);
+      const price = tier?.prices[currency] ?? tier?.prices.USD;
+      const priceCurrency = tier?.prices[currency]?.monthly ? currency : 'USD';
+      const monthlyCents = price?.monthly;
+      if (!tier || monthlyCents === null || monthlyCents === undefined) {
+        throw new ServiceUnavailableException(
+          `Dhanam catalog is missing ${currency} monthly price for ${tierSlug}`
+        );
+      }
+
+      return {
+        monthlyPrice: monthlyCents / 100,
+        promoPrice: null,
+        currency: priceCurrency,
+      };
+    };
 
     return {
-      essentials: {
-        monthlyPrice: applyDiscount(BASE_PRICES.essentials),
-        promoPrice: null,
-        currency,
-      },
-      pro: {
-        monthlyPrice: applyDiscount(BASE_PRICES.pro),
-        promoPrice: null,
-        currency,
-      },
-      premium: {
-        monthlyPrice: applyDiscount(BASE_PRICES.premium),
-        promoPrice: null,
-        currency,
-      },
+      essentials: resolveTier('essentials'),
+      pro: resolveTier('pro'),
+      premium: resolveTier('premium'),
     };
   }
 
@@ -201,28 +190,29 @@ export class PricingEngineService {
   async getPricingForCountry(countryCode: string): Promise<PricingResponse> {
     const code = countryCode.toUpperCase();
     const regionNumber = await this.getRegionForCountry(code);
-    const prices = await this.getPricesForRegion(regionNumber);
+    const preferredCurrency = COUNTRY_CURRENCY[code] ?? 'USD';
+    const prices = await this.getCatalogPrices(preferredCurrency);
 
     const regionNames = ['tier1', 'tier2', 'latam', 'emerging'];
     const regionName = regionNames[regionNumber - 1] || 'tier1';
 
-    // Apply Mexico promo overrides
-    const isMexico = code === 'MX';
-    const displayCurrency = COUNTRY_CURRENCY[code] || prices.essentials.currency;
+    const displayCurrency = prices.essentials.currency;
+    const product = await this.getCatalogProduct();
+    const catalogTier = new Map(product.tiers.map((tier) => [tier.tierSlug, tier]));
 
     const buildTier = (id: string, name: string, price: RegionalPrice): PricingTier => ({
       id,
       name,
       monthlyPrice: price.monthlyPrice,
-      promoPrice: isMexico ? (MX_PROMO_PRICES[id] ?? null) : price.promoPrice,
-      currency: isMexico ? 'MXN' : displayCurrency,
-      features: TIER_FEATURES[id] || [],
+      promoPrice: price.promoPrice,
+      currency: price.currency,
+      features: catalogTier.get(id)?.features ?? [],
     });
 
     return {
       region: regionNumber,
       regionName,
-      currency: isMexico ? 'MXN' : displayCurrency,
+      currency: displayCurrency,
       tiers: [
         buildTier('essentials', 'Essentials', prices.essentials),
         buildTier('pro', 'Pro', prices.pro),

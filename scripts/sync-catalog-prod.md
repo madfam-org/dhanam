@@ -28,6 +28,15 @@ Keys in Vault under `secret/dhanam/prod`. Grab via:
 vault kv get -format=json secret/dhanam/prod | jq -r '.data.data'
 ```
 
+The production DB must also have the current Prisma migrations applied before
+syncing. The catalogue endpoint now depends on `product_tiers` so free/custom
+tiers with no Stripe price still appear in `/v1/billing/catalog`.
+
+```sh
+cd /Users/aldoruizluna/labspace/dhanam
+pnpm --filter @dhanam/api db:migrate:deploy
+```
+
 ## Dry-run first (always)
 
 ```sh
@@ -37,8 +46,9 @@ DATABASE_URL="postgresql://dummy:dummy@localhost:9999/dummy" \
 ```
 
 Expected output: one `[DRY RUN]` line per price + feature + credit for
-all 7 products. No Stripe API calls. Confirm the numbers match what's
-in `catalog.yaml`.
+all 7 products, plus one `[Tier]` line for each of the 24 tiers in
+`catalog.yaml`. No Stripe API calls. Confirm the numbers match what's
+in `catalog.yaml`, including free/custom tiers whose `prices` object is empty.
 
 ## Production run
 
@@ -58,23 +68,32 @@ than duplicated.
 
 ## Verification after run
 
-1. **Stripe dashboard (USD + MXN accounts):** 7 products appear with
+1. **Drift gate:**
+
+   ```sh
+   pnpm catalog:drift -- --json
+   ```
+
+   This must return `"ok": true`. API health is not enough: a healthy Dhanam
+   process can still serve stale product/tier/price data.
+
+2. **Stripe dashboard (USD + MXN accounts):** 7 products appear with
    `madfam_slug` metadata. Count prices per product matches the
    tier × currency × interval count in `catalog.yaml`.
 
-2. **Dhanam DB:**
+3. **Dhanam DB:**
 
    ```sql
-   SELECT slug, stripe_product_id FROM "Product" ORDER BY sort_order;
-   SELECT COUNT(*) FROM "ProductPrice";
+   SELECT slug, stripe_product_id FROM products ORDER BY sort_order;
+   SELECT COUNT(*) FROM product_tiers;
+   SELECT COUNT(*) FROM product_prices;
    ```
 
-   Should show 7 products and N prices (where N is the sum of tier ×
-   currency × interval rows in the YAML).
+   Should show 7 products, 24 tiers, and 48 price rows.
 
-3. **selva.town/catalog:** Loads and renders all 7 products without
-   errors. Unpriced section shows 5 products (Rondelio, Sim4D, Zavlo,
-   Forj, Pravara-MES).
+4. **Public Dhanam catalog:** `https://api.dhan.am/v1/billing/catalog`
+   returns all 7 products and 24 tiers, including custom/free tiers with
+   empty `prices` objects.
 
 ## Rollback
 

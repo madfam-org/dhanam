@@ -76,6 +76,7 @@ export class ProductCatalogService {
       where: { active: true },
       orderBy: { sortOrder: 'asc' },
       include: {
+        tiers: { orderBy: { sortOrder: 'asc' } },
         prices: { where: { status: 'active' }, orderBy: { amountCents: 'asc' } },
         features: { orderBy: { sortOrder: 'asc' } },
         creditCosts: { orderBy: { operation: 'asc' } },
@@ -95,6 +96,7 @@ export class ProductCatalogService {
     const product = await this.prisma.product.findUnique({
       where: { slug },
       include: {
+        tiers: { orderBy: { sortOrder: 'asc' } },
         prices: { where: { status: 'active' }, orderBy: { amountCents: 'asc' } },
         features: { orderBy: { sortOrder: 'asc' } },
         creditCosts: { orderBy: { operation: 'asc' } },
@@ -230,6 +232,49 @@ export class ProductCatalogService {
   }
 
   /**
+   * Upsert a tier even when it has no Stripe-backed prices.
+   */
+  async upsertTier(
+    productId: string,
+    data: {
+      tierSlug: string;
+      dhanamTier: string;
+      displayName?: string;
+      description?: string;
+      metadata?: Record<string, unknown>;
+      sortOrder?: number;
+    }
+  ) {
+    const result = await this.prisma.productTier.upsert({
+      where: {
+        productId_tierSlug: {
+          productId,
+          tierSlug: data.tierSlug,
+        },
+      },
+      create: {
+        productId,
+        tierSlug: data.tierSlug,
+        dhanamTier: data.dhanamTier as any,
+        displayName: data.displayName,
+        description: data.description,
+        metadata: data.metadata as Prisma.InputJsonValue,
+        sortOrder: data.sortOrder ?? 0,
+      },
+      update: {
+        dhanamTier: data.dhanamTier as any,
+        displayName: data.displayName,
+        description: data.description,
+        metadata: data.metadata as Prisma.InputJsonValue,
+        ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
+      },
+    });
+
+    this.invalidateCache();
+    return result;
+  }
+
+  /**
    * Upsert a feature for a product tier (used by sync-catalog.ts).
    */
   async upsertFeature(
@@ -291,6 +336,18 @@ export class ProductCatalogService {
   private mapProduct(p: any): CatalogProduct {
     // Group prices by tier and currency
     const tierMap = new Map<string, CatalogTier>();
+
+    for (const productTier of p.tiers ?? []) {
+      tierMap.set(productTier.tierSlug, {
+        tierSlug: productTier.tierSlug,
+        dhanamTier: productTier.dhanamTier,
+        displayName: productTier.displayName,
+        description: productTier.description,
+        metadata: productTier.metadata as Record<string, unknown> | null,
+        prices: {},
+        features: [],
+      });
+    }
 
     for (const price of p.prices) {
       let tier = tierMap.get(price.tierSlug);

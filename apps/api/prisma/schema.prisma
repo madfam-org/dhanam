@@ -2399,11 +2399,33 @@ model Product {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   prices      ProductPrice[]
+  tiers       ProductTier[]
   features    ProductFeature[]
   creditCosts ProductCreditCost[]
 
   @@index([active, sortOrder])
   @@map("products")
+}
+
+model ProductTier {
+  id          String           @id @default(uuid())
+  productId   String           @map("product_id")
+  tierSlug    String           @map("tier_slug")
+  dhanamTier  SubscriptionTier @map("dhanam_tier")
+  displayName String?          @map("display_name")
+  description String?
+  metadata    Json?
+  sortOrder   Int              @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, tierSlug])
+  @@index([productId, sortOrder])
+  @@index([dhanamTier])
+  @@map("product_tiers")
 }
 
 model ProductPrice {

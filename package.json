@@ -24,6 +24,7 @@
     "test:precommit": "turbo test --filter='./apps/api' -- --bail --maxWorkers=2",
     "lint": "turbo lint",
     "lint:file-sizes": "node scripts/check-file-sizes.js",
+    "catalog:drift": "./node_modules/.pnpm/node_modules/.bin/tsx scripts/check-catalog-drift.ts",
     "typecheck": "turbo typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",

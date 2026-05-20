@@ -8,6 +8,7 @@ describe('ProductCatalogService', () => {
   let service: ProductCatalogService;
   let prisma: {
     product: { findMany: jest.Mock; findUnique: jest.Mock; upsert: jest.Mock; update: jest.Mock };
+    productTier: { upsert: jest.Mock };
     productPrice: { upsert: jest.Mock };
     productFeature: { upsert: jest.Mock };
     productCreditCost: { findMany: jest.Mock; findFirst: jest.Mock; upsert: jest.Mock };
@@ -25,6 +26,24 @@ describe('ProductCatalogService', () => {
     websiteUrl: 'https://karafiel.mx',
     stripeProductId: 'prod_stripe_123',
     metadata: null,
+    tiers: [
+      {
+        tierSlug: 'contador',
+        dhanamTier: 'essentials',
+        displayName: 'Contador',
+        description: null,
+        metadata: { rfc_limit: 10 },
+        sortOrder: 0,
+      },
+      {
+        tierSlug: 'firma',
+        dhanamTier: 'premium',
+        displayName: 'Firma',
+        description: null,
+        metadata: { rfc_limit: 9999 },
+        sortOrder: 1,
+      },
+    ],
     prices: [
       {
         id: 'price-1',
@@ -76,6 +95,7 @@ describe('ProductCatalogService', () => {
         upsert: jest.fn(),
         update: jest.fn(),
       },
+      productTier: { upsert: jest.fn() },
       productPrice: { upsert: jest.fn() },
       productFeature: { upsert: jest.fn() },
       productCreditCost: { findMany: jest.fn(), findFirst: jest.fn(), upsert: jest.fn() },
@@ -97,11 +117,16 @@ describe('ProductCatalogService', () => {
       expect(catalog).toHaveLength(1);
       expect(catalog[0].slug).toBe('karafiel');
       expect(catalog[0].name).toBe('Karafiel');
-      expect(catalog[0].tiers).toHaveLength(1); // one tier (contador) with two prices
+      expect(catalog[0].tiers).toHaveLength(2); // priced tier + custom tier without prices
       expect(catalog[0].tiers[0].tierSlug).toBe('contador');
       expect(catalog[0].tiers[0].prices['MXN'].monthly).toBe(129900);
       expect(catalog[0].tiers[0].prices['MXN'].yearly).toBe(99900);
       expect(catalog[0].tiers[0].features).toHaveLength(2);
+      expect(catalog[0].tiers[1]).toMatchObject({
+        tierSlug: 'firma',
+        displayName: 'Firma',
+        prices: {},
+      });
       expect(catalog[0].creditCosts).toHaveLength(2);
       expect(catalog[0].creditCosts[0]).toEqual({
         operation: 'cfdi_stamp',
