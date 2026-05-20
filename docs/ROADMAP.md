@@ -47,7 +47,10 @@ Dhanam is considered fully stable only when all of these are true:
 
 As of 2026-05-20:
 
-- Current `main` head is `28d42fcb deploy(staging): update digests to 71f0351`.
+- Verified deployment base before the 2026-05-20 documentation wrap-up was
+  `28d42fcb deploy(staging): update digests to 71f0351`. `main` may advance
+  through documentation-only commits or staging digest bot commits after this
+  snapshot.
 - The implementation commit is `71f03516 fix(stability): harden production queue remediation`.
 - Hosted `CI` (`26146547824`), `Lint & Type Check` (`26146547856`), and
   `Test Coverage` (`26146547825`) passed for `71f03516`.

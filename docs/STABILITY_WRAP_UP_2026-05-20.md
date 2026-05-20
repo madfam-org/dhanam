@@ -5,11 +5,13 @@ This is the concise end-state from the production-stability push on
 [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md),
 [Deployment Guide](DEPLOYMENT.md), and [Tech Debt Register](TECH_DEBT.md).
 
-## Current Git State
+## Recorded Verification Git State
 
-- Current `main`: `28d42fcb deploy(staging): update digests to 71f0351`
+- Verified deployment base before this documentation wrap-up:
+  `28d42fcb deploy(staging): update digests to 71f0351`
 - Stability implementation: `71f03516 fix(stability): harden production queue remediation`
-- Local branch: fast-forwarded to `origin/main`
+- This document is maintained as a status snapshot; `main` may advance through
+  documentation-only commits or staging digest bot commits after the snapshot.
 
 ## What Is Done
 
