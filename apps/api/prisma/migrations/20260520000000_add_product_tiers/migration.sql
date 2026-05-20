@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "product_tiers" (
   "metadata" JSONB,
   "sort_order" INTEGER NOT NULL DEFAULT 0,
   "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP(3) NOT NULL,
   CONSTRAINT "product_tiers_pkey" PRIMARY KEY ("id")
 );
 
@@ -45,7 +45,8 @@ INSERT INTO "product_tiers" (
   "display_name",
   "description",
   "metadata",
-  "sort_order"
+  "sort_order",
+  "updated_at"
 )
 SELECT DISTINCT ON ("product_id", "tier_slug")
   "product_id" || ':' || "tier_slug",
@@ -55,6 +56,7 @@ SELECT DISTINCT ON ("product_id", "tier_slug")
   "display_name",
   "description",
   "metadata",
-  0
+  0,
+  COALESCE("updated_at", CURRENT_TIMESTAMP)
 FROM "product_prices"
 ON CONFLICT ("product_id", "tier_slug") DO NOTHING;
