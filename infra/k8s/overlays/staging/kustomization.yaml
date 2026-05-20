@@ -8,11 +8,11 @@
 # peer.
 #
 # What staging differs from prod on:
-#   - namespace: dhanam-staging
+#   - namespace: enclii-dhanam-staging
 #   - replicas: 1 per deploy (vs 2 in prod)
 #   - hostnames: staging-api.dhan.am, staging.dhan.am, staging-admin.dhan.am
-#   - secrets: dhanam-secrets lives in dhanam-staging namespace (distinct K8s
-#     object from the prod one; a future RFC 0010 cutover will rename to
+#   - secrets: dhanam-secrets lives in enclii-dhanam-staging namespace
+#     (distinct K8s object from prod; a future RFC 0010 cutover may rename to
 #     dhanam-staging-secrets / dhanam-staging-billing-secrets / ...)
 #   - image digests: updated by deploy-staging.yml on every main-branch merge
 #   - HPAs disabled — staging doesn't need horizontal scaling
@@ -22,10 +22,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: dhanam-staging
+namespace: enclii-dhanam-staging
 
 resources:
   - ../../production
+  - external-secrets-staging.yaml
 
 # Staging replicas: 1 everywhere. HPAs are pinned min=max=1 via patch — the
 # deployments ignore HPA when they're at max.
@@ -81,3 +82,10 @@ patches:
   - path: hpa-disable-patch.yaml
     target:
       kind: HorizontalPodAutoscaler
+
+  # Keep staging on staging-scoped Vault paths. Without this patch, the
+  # production ExternalSecret base would read secret/dhanam in staging too.
+  - path: external-secret-core-patch.yaml
+    target:
+      kind: ExternalSecret
+      name: dhanam-secrets

@@ -1,6 +1,6 @@
 # Verification Snapshot
 
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 
 This file records the current stabilization-session verification state. Older
 test result reports in this directory are historical and may mention stale
@@ -48,13 +48,15 @@ Prisma, AWS, or port assumptions.
 
 These are not unit-test failures, but they block full-system stability:
 
-- `staging-api.dhan.am` has no DNS answer, so staging smoke fails before app
-  traffic reaches Dhanam.
+- Staging DNS now exists and Enclii marks the three staging domains verified,
+  but the ArgoCD Application/namespace are absent and Enclii junctions are not
+  namespace-aware for staging tunnel routes.
 - Enclii API/admin deployment records show a Kyverno image-signature annotation
   mutation denial.
 - Production API health has reported queue/provider degradation.
 - `www.dhan.am` has redirected to `https://dhan.am:4200/`, exposing an internal
-  port.
+  port; Enclii web specs now delegate the redirect to app middleware, but live
+  production needs a rollout before this can be closed.
 
 See [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md) for the full
 assessment and remediation plan.

@@ -7,7 +7,7 @@
 > access as platform bootstrap or documented break-glass only, and record any
 > missing Enclii adapter gap.
 
-> **Last Updated**: 2026-05-19
+> **Last Updated**: 2026-05-20
 
 ## Overview
 
@@ -197,10 +197,11 @@ All monitoring manifests live in `infra/k8s/monitoring/`.
 ### Staging
 
 Staging manifests are in `infra/k8s/overlays/staging/` and import the
-production base with staging-specific env, single replicas, disabled HPAs, and
-digest-pinned images. `deploy-staging.yml` builds API, web, and admin images,
-patches their digests into the staging overlay, and lets the
-`dhanam-staging` ArgoCD Application reconcile.
+production base with staging-specific env, single replicas, disabled HPAs,
+staging-scoped Vault/ESO paths, and digest-pinned images. `deploy-staging.yml`
+builds API, web, and admin images, patches their digests into the staging
+overlay, and lets the `dhanam-staging` ArgoCD Application reconcile into the
+Enclii-registered `enclii-dhanam-staging` namespace.
 
 Required staging hostnames:
 
@@ -212,12 +213,16 @@ Required staging hostnames:
 
 The root `enclii.yaml` declares these hostnames for Enclii domain
 reconciliation. The Cloudflare tunnel must route them to the
-`dhanam-staging` namespace services; see
+`enclii-dhanam-staging` namespace services; see
 `infra/k8s/production/_cloudflare-routes-reference.yaml`.
 
-As of 2026-05-19, the staging smoke check fails before application traffic
-because `staging-api.dhan.am` has no DNS answer. Treat that as an Enclii
-domain/tunnel reconciliation blocker, not an app build failure.
+As of 2026-05-20, Enclii custom-domain verification and Cloudflare DNS CNAMEs
+exist for all three staging hostnames. Staging is still not production-grade:
+the ArgoCD Application is not registered in-cluster, the
+`enclii-dhanam-staging` namespace is absent, staging Vault/ESO paths must be
+populated, and Enclii `junctions add` currently maps hostnames to production
+namespace services instead of staging. Treat staging tunnel-route apply as an
+Enclii adapter gap until a namespace-aware route operation exists.
 
 ### Current Enclii Policy Blocker
 
@@ -233,6 +238,27 @@ verify-image-signatures:
 blocked because the concrete adapter is not wired in this Enclii build. Until
 that adapter or the Enclii deployment reconciler is fixed, do not treat a
 ready release as proof that production has rolled forward.
+
+### Current Enclii Staging Route Gap
+
+On 2026-05-20, `enclii domains add` and `enclii providers cloudflare dns-apply`
+successfully created and verified:
+
+- `staging-api.dhan.am`
+- `staging.dhan.am`
+- `staging-admin.dhan.am`
+
+`enclii junctions add` was tested and then reverted because it created tunnel
+routes to `http://dhanam-*.dhanam.svc.cluster.local:80`, which is production,
+not staging. Required staging routes are:
+
+- `staging-api.dhan.am` -> `http://dhanam-api.enclii-dhanam-staging.svc.cluster.local:80`
+- `staging.dhan.am` -> `http://dhanam-web.enclii-dhanam-staging.svc.cluster.local:80`
+- `staging-admin.dhan.am` -> `http://dhanam-admin.enclii-dhanam-staging.svc.cluster.local:80`
+
+Do not leave staging hostnames pointed at production services. Use an Enclii
+namespace-aware tunnel-route adapter when available; raw Cloudflare edits are
+break-glass only.
 
 ---
 
@@ -291,6 +317,15 @@ eas build --platform android --profile production
 | `GET /v1/monitoring/health/live`  | API liveness probe                      |
 | `GET /v1/monitoring/health/ready` | API readiness probe                     |
 | `GET /api/health`                 | Web/admin Next.js health endpoint       |
+
+Run the public DNS/HTTP preflight before and after promotion:
+
+```bash
+scripts/production-preflight.sh
+```
+
+Use `scripts/production-preflight.sh --include-staging` only after the staging
+ArgoCD Application, namespace, Vault/ESO values, and tunnel routes are active.
 
 ---
 

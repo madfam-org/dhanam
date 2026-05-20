@@ -80,4 +80,3 @@ spec:
     - domain: www.dhan.am
       tls: true
       tlsIssuer: cloudflare
-      redirectTo: dhan.am

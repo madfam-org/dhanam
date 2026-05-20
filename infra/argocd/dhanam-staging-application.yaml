@@ -2,11 +2,12 @@
 #
 # PP.2b (RFC 0001) — turns staging into a pull-based GitOps tier. Before this
 # Application is registered, the operator must:
-#   1. Create the `dhanam-staging` namespace (rendered by the overlay, but
-#      ArgoCD needs it to exist OR CreateNamespace=true in syncOptions).
-#   2. Create the staging-scoped secrets (dhanam-secrets, dhanam-billing-secrets,
-#      dhanam-provider-secrets, dhanam-janua-secrets) inside dhanam-staging
-#      from `infra/k8s/staging-secrets-template.yaml`.
+#   1. Confirm Enclii has the staging environment registered with namespace
+#      `enclii-dhanam-staging` (`enclii projects environments dhanam`).
+#   2. Populate staging-scoped Vault/ESO paths for dhanam-secrets,
+#      dhanam-billing-secrets, dhanam-provider-secrets, and
+#      dhanam-janua-secrets. `infra/k8s/staging-secrets-template.yaml` is a
+#      field checklist, not a production secret transport.
 #   3. Set the GitHub repo variable STAGING_API_URL to `https://staging-api.dhan.am`
 #      so the staging smoke step in deploy-staging.yml targets the right host.
 #
@@ -28,7 +29,7 @@ metadata:
   annotations:
     argocd.argoproj.io/description: "Dhanam staging (RFC 0001 Phase 2)"
     enclii.dev/stability-audit: gated
-    enclii.dev/stability-gate-reason: "registration requires staging-scoped secrets and STAGING_API_URL"
+    enclii.dev/stability-gate-reason: "registration requires staging-scoped Vault/ESO secrets, STAGING_API_URL, and staging tunnel routes"
 spec:
   project: default
   source:
@@ -37,7 +38,7 @@ spec:
     path: infra/k8s/overlays/staging
   destination:
     server: https://kubernetes.default.svc
-    namespace: dhanam-staging
+    namespace: enclii-dhanam-staging
   syncPolicy:
     automated:
       prune: true

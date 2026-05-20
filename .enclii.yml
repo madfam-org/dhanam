@@ -68,7 +68,7 @@ spec:
 
   env:
     - name: PORT
-      value: "3000"
+      value: "4200"
     - name: NODE_ENV
       value: production
     # Next.js public env vars (baked at build time)
@@ -139,23 +139,15 @@ spec:
       tls: true
       tlsIssuer: cloudflare
       primary: true
-    # Admin subdomain (same deployment, subdomain-based routing in middleware)
-    - domain: admin.dhan.am
-      tls: true
-      tlsIssuer: cloudflare
-    # Internal MADFAM domain (secondary)
-    - domain: dhanam.madfam.io
-      tls: true
-      tlsIssuer: cloudflare
     # Landing / SEO domain (apex)
     - domain: dhan.am
       tls: true
       tlsIssuer: cloudflare
-    # Landing / SEO domain (www → 301 redirect to apex via middleware)
+    # Landing / SEO domain. The web middleware owns the www -> apex 301 so
+    # Enclii does not synthesize a redirect that can leak the internal port.
     - domain: www.dhan.am
       tls: true
       tlsIssuer: cloudflare
-      redirectTo: dhan.am
 
   autoscaling:
     enabled: true

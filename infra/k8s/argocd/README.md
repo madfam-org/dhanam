@@ -43,4 +43,8 @@ argocd app rollback dhanam <revision>
 
 ## Staging
 
-The staging environment (`infra/k8s/staging/`) can optionally be managed by a separate ArgoCD Application targeting the `dhanam-staging` namespace. Create a copy of `application.yaml` with path and namespace adjusted.
+The staging environment is defined by `infra/k8s/overlays/staging/` and the
+`infra/argocd/dhanam-staging-application.yaml` Application. It targets the
+Enclii-registered namespace `enclii-dhanam-staging`; do not use the old
+`infra/k8s/staging/` path or the legacy `dhanam-staging` namespace for new
+work.

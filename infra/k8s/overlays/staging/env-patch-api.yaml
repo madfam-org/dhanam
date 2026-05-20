@@ -35,4 +35,4 @@ spec:
             - name: CORS_ORIGINS
               value: "https://staging.dhan.am,https://staging-admin.dhan.am,https://staging-api.dhan.am"
             # Webhook relay: staging fan-out to karafiel-staging if present.
-            # Operator populates PRODUCT_WEBHOOK_URLS in dhanam-staging secret.
+            # Operator populates PRODUCT_WEBHOOK_URLS in the staging Vault/ESO path.

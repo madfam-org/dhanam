@@ -1,8 +1,9 @@
 # =============================================================================
 # Dhanam Cloudflare Tunnel Routes
 # =============================================================================
-# Add these entries to the unified cloudflared ConfigMap in the cloudflare-tunnel
-# namespace of the Enclii cluster.
+# Reference only. The active Enclii tunnel is remotely managed through
+# Cloudflare's Tunnel Configuration API. Add or change routes through Enclii
+# provider adapters; raw Cloudflare edits are documented break-glass only.
 #
 # Location: cloudflared-unified.yaml (or equivalent)
 # Section: config.yaml → ingress
@@ -46,17 +47,17 @@
 #   # Dhanam staging - RFC 0001 PP.2b GitOps tier
 #   # =========================================================================
 #   - hostname: staging.dhan.am
-#     service: http://dhanam-web.dhanam-staging.svc.cluster.local:80
+#     service: http://dhanam-web.enclii-dhanam-staging.svc.cluster.local:80
 #     originRequest:
 #       noTLSVerify: true
 #
 #   - hostname: staging-api.dhan.am
-#     service: http://dhanam-api.dhanam-staging.svc.cluster.local:80
+#     service: http://dhanam-api.enclii-dhanam-staging.svc.cluster.local:80
 #     originRequest:
 #       noTLSVerify: true
 #
 #   - hostname: staging-admin.dhan.am
-#     service: http://dhanam-admin.dhanam-staging.svc.cluster.local:80
+#     service: http://dhanam-admin.enclii-dhanam-staging.svc.cluster.local:80
 #     originRequest:
 #       noTLSVerify: true
 #
