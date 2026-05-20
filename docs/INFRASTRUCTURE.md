@@ -213,8 +213,10 @@ GET  /v1/admin/analytics/onboarding-funnel   # Onboarding funnel
 GET  /v1/admin/feature-flags                 # List feature flags
 POST /v1/admin/feature-flags/:key            # Update feature flag
 GET  /v1/admin/queues                        # Live BullMQ queue stats
+GET  /v1/admin/queues/:name/failed           # Redacted failed job inspection
 POST /v1/admin/queues/:name/retry-failed     # Retry retained failed jobs
-POST /v1/admin/queues/:name/clear            # Clear queue, requires confirm=true
+POST /v1/admin/queues/:name/clear-failed     # Clear only failed jobs, confirm=true
+POST /v1/admin/queues/:name/clear            # Whole-queue break-glass clear, confirm=true
 ```
 
 ## CI/CD Pipeline

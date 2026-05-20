@@ -34,13 +34,13 @@ export function QueueCard({ queue, onRefresh }: QueueCardProps) {
   };
 
   const handleClear = async () => {
-    if (!window.confirm(`Clear all jobs in queue "${queue.name}"?`)) return;
+    if (!window.confirm(`Clear failed jobs in queue "${queue.name}"?`)) return;
     setLoading('clear');
     try {
-      await adminApi.clearQueue(queue.name);
+      await adminApi.clearFailedJobs(queue.name);
       onRefresh();
     } catch (error) {
-      console.error('Failed to clear queue:', error);
+      console.error('Failed to clear failed jobs:', error);
     } finally {
       setLoading(null);
     }
@@ -88,11 +88,11 @@ export function QueueCard({ queue, onRefresh }: QueueCardProps) {
           variant="outline"
           size="sm"
           onClick={handleClear}
-          disabled={loading !== null}
+          disabled={loading !== null || queue.failedJobs === 0}
           className="flex-1 flex items-center justify-center space-x-1"
         >
           <Trash2 className="h-3 w-3" />
-          <span>Clear</span>
+          <span>Clear Failed</span>
         </Button>
       </div>
     </Card>

@@ -170,6 +170,64 @@ describe('QueueService', () => {
       expect(retry).toHaveBeenCalledTimes(2);
     });
 
+    it('should list failed jobs with redacted data and normalized limit', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const queue = queues.get('sync-transactions');
+      queue.getFailed.mockResolvedValue([
+        {
+          id: 'job-1',
+          name: 'sync-transactions',
+          data: {
+            payload: {
+              connectionId: 'conn1',
+              accessToken: 'sensitive-token',
+              nested: { apiKey: 'sensitive-key', safe: 'visible' },
+            },
+          },
+          failedReason: 'Provider timeout',
+          attemptsMade: 3,
+          timestamp: 1779257000000,
+          processedOn: 1779257001000,
+          finishedOn: 1779257002000,
+        },
+      ]);
+
+      const result = await service.getFailedJobs('sync-transactions', 500);
+
+      expect(queue.getFailed).toHaveBeenCalledWith(0, 99);
+      expect(result).toEqual([
+        {
+          id: 'job-1',
+          name: 'sync-transactions',
+          data: {
+            payload: {
+              connectionId: 'conn1',
+              accessToken: '[REDACTED]',
+              nested: { apiKey: '[REDACTED]', safe: 'visible' },
+            },
+          },
+          failedReason: 'Provider timeout',
+          attemptsMade: 3,
+          timestamp: '2026-05-20T06:03:20.000Z',
+          processedOn: '2026-05-20T06:03:21.000Z',
+          finishedOn: '2026-05-20T06:03:22.000Z',
+        },
+      ]);
+    });
+
+    it('should remove only failed jobs and return the removed count', async () => {
+      const queues = (service as any).queues as Map<string, any>;
+      const remove = jest.fn().mockResolvedValue(undefined);
+      const queue = queues.get('sync-transactions');
+      queue.getFailed.mockResolvedValue([{ remove }, { remove }]);
+
+      const result = await service.clearFailedJobs('sync-transactions');
+
+      expect(result).toBe(2);
+      expect(remove).toHaveBeenCalledTimes(2);
+      expect(queue.obliterate).not.toHaveBeenCalled();
+    });
+
     it('should clear a queue and return the number of removed jobs', async () => {
       const queues = (service as any).queues as Map<string, any>;
       const queue = queues.get('sync-transactions');

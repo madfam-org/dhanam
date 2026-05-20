@@ -67,6 +67,47 @@ describe('Health Check Chaos Tests', () => {
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
+  it('provider health marks unconfigured non-production providers as optional', async () => {
+    const health = await service.getHealthStatus();
+
+    expect(health.checks.providers.status).toBe('up');
+    expect(health.checks.providers.details.belvo).toEqual({
+      status: 'unconfigured',
+      required: false,
+      mode: 'unconfigured',
+    });
+    expect(health.checks.providers.details.plaid).toEqual({
+      status: 'unconfigured',
+      required: false,
+      mode: 'unconfigured',
+    });
+    expect(health.checks.providers.details.bitso).toEqual({
+      status: 'unconfigured',
+      required: false,
+      mode: 'unconfigured',
+    });
+  });
+
+  it('production requires Belvo by default but keeps Plaid and Bitso optional', async () => {
+    mockConfig.get.mockImplementation((key: string, defaultValue?: string) => {
+      if (key === 'REDIS_URL') return 'redis://localhost:6379';
+      if (key === 'NODE_ENV') return 'production';
+      return defaultValue;
+    });
+
+    const health = await service.getHealthStatus();
+
+    expect(health.status).toBe('degraded');
+    expect(health.checks.providers.status).toBe('down');
+    expect(health.checks.providers.details.belvo).toEqual({
+      status: 'unconfigured',
+      required: true,
+      mode: 'unconfigured',
+    });
+    expect(health.checks.providers.details.plaid.required).toBe(false);
+    expect(health.checks.providers.details.bitso.required).toBe(false);
+  });
+
   it('configured Banxico failures are reported as external down', async () => {
     mockConfig.get.mockImplementation((key: string, defaultValue?: string) => {
       if (key === 'REDIS_URL') return 'redis://localhost:6379';
@@ -93,7 +134,7 @@ describe('Health Check Chaos Tests', () => {
 
     const health = await service.getHealthStatus();
     expect(health.checks.database.status).toBe('down');
-    // 3/4 core checks up = 75% >= 70% = degraded
+    // 4/5 checks up = 80% >= 70% = degraded
     expect(health.status).toBe('degraded');
   });
 
@@ -103,7 +144,7 @@ describe('Health Check Chaos Tests', () => {
     (global.fetch as jest.Mock).mockRejectedValue(new Error('External down'));
 
     const health = await service.getHealthStatus();
-    // Redis is mocked as up, so 1/4 = 25% < 70% = unhealthy
+    // Redis, external, and provider checks are up, so 3/5 = 60% < 70% = unhealthy
     expect(health.status).toBe('unhealthy');
   });
 

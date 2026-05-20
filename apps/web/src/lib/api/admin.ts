@@ -141,6 +141,17 @@ export interface QueueInfo {
   failedJobs: number;
 }
 
+export interface FailedQueueJob {
+  id: string;
+  name: string;
+  data: unknown;
+  failedReason: string;
+  attemptsMade: number;
+  timestamp?: string;
+  processedOn?: string;
+  finishedOn?: string;
+}
+
 export interface SpaceSearchParams {
   query?: string;
   page?: number;
@@ -255,8 +266,22 @@ export const adminApi = {
     return apiClient.post<{ retriedCount: number }>(`/admin/queues/${queueName}/retry-failed`);
   },
 
+  async getFailedJobs(queueName: string, limit = 25): Promise<{ jobs: FailedQueueJob[] }> {
+    return apiClient.get<{ jobs: FailedQueueJob[] }>(`/admin/queues/${queueName}/failed`, {
+      limit,
+    });
+  },
+
+  async clearFailedJobs(queueName: string): Promise<{ clearedCount: number }> {
+    return apiClient.post<{ clearedCount: number }>(`/admin/queues/${queueName}/clear-failed`, {
+      confirm: true,
+    });
+  },
+
   async clearQueue(queueName: string): Promise<{ clearedCount: number }> {
-    return apiClient.post<{ clearedCount: number }>(`/admin/queues/${queueName}/clear`);
+    return apiClient.post<{ clearedCount: number }>(`/admin/queues/${queueName}/clear`, {
+      confirm: true,
+    });
   },
 
   async searchSpaces(params: SpaceSearchParams = {}): Promise<PaginatedResponse<SpaceInfo>> {

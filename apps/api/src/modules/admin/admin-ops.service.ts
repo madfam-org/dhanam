@@ -5,7 +5,7 @@ import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { RedisService } from '@core/redis/redis.service';
 import { Prisma } from '@db';
-import { QueueService } from '@modules/jobs/queue.service';
+import { FailedQueueJob, QueueService } from '@modules/jobs/queue.service';
 
 import { CacheFlushDto, PaginatedResponseDto, SpaceSearchDto, UserActionDto } from './dto';
 
@@ -176,6 +176,57 @@ export class AdminOpsService {
     );
 
     return { retriedCount };
+  }
+
+  async getFailedJobs(
+    queueName: string,
+    limit: number | undefined,
+    adminUserId: string
+  ): Promise<{ jobs: FailedQueueJob[] }> {
+    const normalizedLimit =
+      typeof limit === 'number' && Number.isFinite(limit)
+        ? Math.min(Math.max(Math.trunc(limit), 1), 100)
+        : 25;
+    const jobs = await this.queueService.getFailedJobs(queueName, normalizedLimit);
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.queue_view_failed',
+      resource: 'Queue',
+      resourceId: queueName,
+      metadata: { limit: normalizedLimit, returnedCount: jobs.length },
+      severity: 'medium',
+    });
+
+    return { jobs };
+  }
+
+  async clearFailedJobs(
+    queueName: string,
+    confirm: boolean,
+    adminUserId: string
+  ): Promise<{ clearedCount: number }> {
+    if (confirm !== true) {
+      throw new BadRequestException('Failed job cleanup must be explicitly confirmed');
+    }
+
+    const clearedCount = await this.queueService.clearFailedJobs(queueName);
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.queue_clear_failed',
+      resource: 'Queue',
+      resourceId: queueName,
+      metadata: { clearedCount },
+      severity: 'high',
+    });
+
+    this.logger.log(
+      `Cleared ${clearedCount} failed jobs in queue "${queueName}" by admin ${adminUserId}`,
+      'AdminOpsService'
+    );
+
+    return { clearedCount };
   }
 
   async clearQueue(

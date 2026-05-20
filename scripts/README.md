@@ -172,6 +172,33 @@ export DB_PASSWORD=<secure-password>
 ./scripts/provision-db.sh
 ```
 
+### `production-preflight.sh`
+
+Checks public production DNS, TLS, redirects, and health endpoints. Use it
+before and after promotion.
+
+**Usage:**
+
+```bash
+./scripts/production-preflight.sh
+```
+
+Add `--include-staging` only after the staging ArgoCD Application, namespace,
+secrets, and tunnel routes are active.
+
+### `production-rollout-proof.js`
+
+Compares the digest-pinned production manifest with the live ArgoCD
+`dhanam-services` Application as returned through Enclii. It fails unless
+ArgoCD is Healthy/Synced and the live API, web, and admin images match
+`infra/k8s/production/kustomization.yaml`.
+
+**Usage:**
+
+```bash
+./scripts/production-rollout-proof.js
+```
+
 ### `setup-local.sh`
 
 Sets up local infrastructure with Docker.

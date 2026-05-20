@@ -50,6 +50,8 @@ export interface ProviderHealthCheck {
 
 export interface ProviderStatus {
   status: 'up' | 'down' | 'unconfigured';
+  required?: boolean;
+  mode?: 'required' | 'optional' | 'unconfigured';
   responseTime?: number;
   error?: string;
 }
@@ -136,7 +138,7 @@ export class HealthService {
         ? providersResult.value
         : this.createFailedProviderCheck('Provider check failed');
 
-    const coreChecks: HealthCheck[] = [database, redis, queues, external];
+    const coreChecks: HealthCheck[] = [database, redis, queues, external, providers];
     const overallStatus = this.determineOverallStatus(coreChecks);
 
     return {
@@ -415,21 +417,20 @@ export class HealthService {
       this.checkBitsoConnectivity(),
     ]);
 
-    // Determine overall provider status
-    const statuses = [belvo.status, plaid.status, bitso.status];
-    const configuredProviders = statuses.filter((s) => s !== 'unconfigured');
-    const upProviders = configuredProviders.filter((s) => s === 'up');
+    const providers = [belvo, plaid, bitso];
+    const requiredProviders = providers.filter((provider) => provider.required === true);
+    const requiredFailures = requiredProviders.filter((provider) => provider.status !== 'up');
+    const optionalConfiguredFailures = providers.filter(
+      (provider) => provider.required !== true && provider.status === 'down'
+    );
 
     let overallStatus: 'up' | 'down' | 'degraded';
-    if (configuredProviders.length === 0) {
-      // No providers configured is acceptable
-      overallStatus = 'up';
-    } else if (upProviders.length === configuredProviders.length) {
-      overallStatus = 'up';
-    } else if (upProviders.length > 0) {
+    if (requiredFailures.length > 0) {
+      overallStatus = 'down';
+    } else if (optionalConfiguredFailures.length > 0) {
       overallStatus = 'degraded';
     } else {
-      overallStatus = 'down';
+      overallStatus = 'up';
     }
 
     return {
@@ -445,9 +446,10 @@ export class HealthService {
   async checkBelvoConnectivity(): Promise<ProviderStatus> {
     const secretKeyId = this.configService.get<string>('BELVO_SECRET_KEY_ID');
     const secretKeyPassword = this.configService.get<string>('BELVO_SECRET_KEY_PASSWORD');
+    const required = this.isProviderRequired('BELVO', true);
 
     if (!secretKeyId || !secretKeyPassword) {
-      return { status: 'unconfigured' };
+      return { status: 'unconfigured', required, mode: 'unconfigured' };
     }
 
     const start = Date.now();
@@ -475,12 +477,16 @@ export class HealthService {
         // 401 means API is reachable but credentials may be wrong - still counts as reachable
         return {
           status: response.ok ? 'up' : 'up', // API is reachable
+          required,
+          mode: required ? 'required' : 'optional',
           responseTime: Date.now() - start,
         };
       }
 
       return {
         status: 'down',
+        required,
+        mode: required ? 'required' : 'optional',
         responseTime: Date.now() - start,
         error: `HTTP ${response.status}`,
       };
@@ -488,6 +494,8 @@ export class HealthService {
       this.logger.warn('Belvo connectivity check failed', error);
       return {
         status: 'down',
+        required,
+        mode: required ? 'required' : 'optional',
         responseTime: Date.now() - start,
         error: error instanceof Error ? error.message : 'Connection failed',
       };
@@ -500,9 +508,10 @@ export class HealthService {
   async checkPlaidConnectivity(): Promise<ProviderStatus> {
     const clientId = this.configService.get<string>('PLAID_CLIENT_ID');
     const secret = this.configService.get<string>('PLAID_SECRET');
+    const required = this.isProviderRequired('PLAID', false);
 
     if (!clientId || !secret) {
-      return { status: 'unconfigured' };
+      return { status: 'unconfigured', required, mode: 'unconfigured' };
     }
 
     const start = Date.now();
@@ -535,12 +544,16 @@ export class HealthService {
       if (response.ok || response.status === 400) {
         return {
           status: 'up',
+          required,
+          mode: required ? 'required' : 'optional',
           responseTime: Date.now() - start,
         };
       }
 
       return {
         status: 'down',
+        required,
+        mode: required ? 'required' : 'optional',
         responseTime: Date.now() - start,
         error: `HTTP ${response.status}`,
       };
@@ -548,6 +561,8 @@ export class HealthService {
       this.logger.warn('Plaid connectivity check failed', error);
       return {
         status: 'down',
+        required,
+        mode: required ? 'required' : 'optional',
         responseTime: Date.now() - start,
         error: error instanceof Error ? error.message : 'Connection failed',
       };
@@ -560,9 +575,10 @@ export class HealthService {
   async checkBitsoConnectivity(): Promise<ProviderStatus> {
     const apiKey = this.configService.get<string>('BITSO_API_KEY');
     const apiSecret = this.configService.get<string>('BITSO_API_SECRET');
+    const required = this.isProviderRequired('BITSO', false);
 
     if (!apiKey || !apiSecret) {
-      return { status: 'unconfigured' };
+      return { status: 'unconfigured', required, mode: 'unconfigured' };
     }
 
     const start = Date.now();
@@ -582,12 +598,16 @@ export class HealthService {
       if (response.ok) {
         return {
           status: 'up',
+          required,
+          mode: required ? 'required' : 'optional',
           responseTime: Date.now() - start,
         };
       }
 
       return {
         status: 'down',
+        required,
+        mode: required ? 'required' : 'optional',
         responseTime: Date.now() - start,
         error: `HTTP ${response.status}`,
       };
@@ -595,9 +615,22 @@ export class HealthService {
       this.logger.warn('Bitso connectivity check failed', error);
       return {
         status: 'down',
+        required,
+        mode: required ? 'required' : 'optional',
         responseTime: Date.now() - start,
         error: error instanceof Error ? error.message : 'Connection failed',
       };
     }
+  }
+
+  private isProviderRequired(provider: 'BELVO' | 'PLAID' | 'BITSO', productionDefault: boolean) {
+    const configured = this.configService.get<string>(`PROVIDER_${provider}_REQUIRED`);
+    if (configured !== undefined && configured !== '') {
+      return configured === 'true';
+    }
+
+    return this.configService.get<string>('NODE_ENV', 'development') === 'production'
+      ? productionDefault
+      : false;
   }
 }

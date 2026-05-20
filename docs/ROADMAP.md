@@ -33,14 +33,14 @@ Dhanam is considered fully stable only when all of these are true:
 
 ## Current Position
 
-| Area                      | Current estimate | Status                                                                                       |
-| ------------------------- | ---------------- | -------------------------------------------------------------------------------------------- |
-| Codebase and CI           | 96%              | Hosted lint/typecheck, coverage, CI, build, and Playwright are green.                        |
-| Public production surface | 90%              | Public DNS and health checks pass for apex, `www`, app, admin, and API liveness.             |
-| API runtime health        | 82%              | DB, Redis, Belvo, and optional external checks are up; queue health remains degraded.        |
-| Release and staging path  | 72%              | Images build/sign and staging overlay patches, but staging API smoke still fails.            |
-| Ops control plane         | 80%              | ArgoCD production app is Healthy/Synced; Enclii `prod` is not yet live rollout truth.        |
-| Overall stability         | 86%              | Mostly stable production with unresolved operational debt, not a finished stability mission. |
+| Area                      | Current estimate | Status                                                                                        |
+| ------------------------- | ---------------- | --------------------------------------------------------------------------------------------- |
+| Codebase and CI           | 96%              | Hosted lint/typecheck, coverage, CI, build, and Playwright are green.                         |
+| Public production surface | 90%              | Public DNS and health checks pass for apex, `www`, app, admin, and API liveness.              |
+| API runtime health        | 82%              | DB, Redis, Belvo, and optional external checks are up; queue health remains degraded.         |
+| Release and staging path  | 74%              | Images build/sign and staging overlay patches; staging DNS is restored but tunnel routes lag. |
+| Ops control plane         | 80%              | ArgoCD production app is Healthy/Synced; Enclii `prod` is not yet live rollout truth.         |
+| Overall stability         | 87%              | Mostly stable production with unresolved operational debt, not a finished stability mission.  |
 
 ## Priority Roadmap
 
@@ -74,7 +74,10 @@ Work:
 - Retry safe failures first:
   - `POST /v1/admin/queues/sync-transactions/retry-failed`
   - `POST /v1/admin/queues/categorize-transactions/retry-failed`
-- Clear only confirmed stale failures, and only with `{ "confirm": true }`.
+- Clear only confirmed stale failures with
+  `POST /v1/admin/queues/:name/clear-failed` and `{ "confirm": true }`.
+- Reserve whole-queue `clear` for documented break-glass because it removes
+  waiting, active, completed, failed, and delayed jobs.
 - Verify the health endpoint after each queue action.
 
 Acceptance:
@@ -97,6 +100,7 @@ Work:
   - `staging.dhan.am`
   - `staging-api.dhan.am`
   - `staging-admin.dhan.am`
+- Keep the staging DNS CNAMEs created through Enclii on 2026-05-20 in place.
 - Re-run `deploy-staging.yml` until build, signature, overlay patch, reconcile,
   smoke, and soak all pass.
 
@@ -117,13 +121,14 @@ Work:
   - Preferred: repair Enclii `prod` so it targets the live `dhanam` namespace.
   - Alternative: formally document ArgoCD `dhanam-services` as the production
     controller and make Enclii feed that path.
-- Add post-deploy assertions comparing intended git SHA and image digests with
-  live production images.
+- Keep `scripts/production-rollout-proof.js` as the current post-deploy
+  assertion comparing intended production digests with live ArgoCD images.
 - Fail clearly when release readiness does not equal public rollout.
 
 Acceptance:
 
-- One command or report proves live production equals the intended release.
+- `scripts/production-rollout-proof.js` or its successor proves live production
+  equals the intended release.
 - Enclii deployment records and public production truth no longer disagree.
 - Raw direct rollout remains break-glass only.
 
@@ -134,6 +139,10 @@ Goal: keep production operations Enclii-first in practice, not just policy.
 Work:
 
 - Wire `enclii ops policy waiver-plan --apply`.
+- Add a namespace-aware Cloudflare tunnel route apply operation for staging
+  hosts.
+- Add Enclii queue inspection/retry/failed-cleanup operations or an adapter to
+  call Dhanam's audited admin queue API.
 - Add idempotency and audit records for policy remediation.
 - Record operator, reason, target, result, and follow-up adapter gap for any
   break-glass operation.
@@ -141,6 +150,10 @@ Work:
 Acceptance:
 
 - Policy remediation can be planned and applied through Enclii.
+- Staging tunnel routes can be reconciled through Enclii without direct
+  Cloudflare mutation.
+- Failed production queues can be inspected and remediated through Enclii or
+  the audited Dhanam admin API.
 - No routine runbook requires raw `kubectl`, `helm`, SSH, provider CLI/API, or
   direct container access.
 
@@ -150,8 +163,8 @@ Goal: make provider health explainable and actionable.
 
 Work:
 
-- Decide whether Banxico, Plaid, and Bitso are required, optional,
-  intentionally disabled, or not yet launched in production.
+- Decide whether Banxico, Plaid, and Bitso are required, optional, or not yet
+  launched in production.
 - Encode those semantics in health output and runbooks.
 - Keep Belvo health verified after API deploys.
 - Use feature-specific staging smoke tests for providers that do not have
@@ -159,8 +172,8 @@ Work:
 
 Acceptance:
 
-- Health reports distinguish `up`, `down`, `unconfigured`, and `disabled`
-  states consistently.
+- Health reports distinguish `up`, `down`, and `unconfigured` states and expose
+  `required` / `mode` where provider readiness affects production.
 - Optional provider states do not imply instability.
 - Required provider failures degrade or fail health intentionally.
 

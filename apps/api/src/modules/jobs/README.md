@@ -179,11 +179,14 @@ const retriedCount = await queueService.retryFailedJobs('sync-transactions');
 Admin queue operations use these methods through audited endpoints:
 
 - `GET /v1/admin/queues`
+- `GET /v1/admin/queues/:name/failed?limit=25`
 - `POST /v1/admin/queues/:name/retry-failed`
+- `POST /v1/admin/queues/:name/clear-failed` with `{ "confirm": true }`
 - `POST /v1/admin/queues/:name/clear` with `{ "confirm": true }`
 
-Use retry before clear. Clearing removes all retained jobs from the queue and is
-reserved for confirmed stale failures.
+Use inspect, then retry, then failed-job-only cleanup. Whole-queue clearing
+removes waiting, active, completed, failed, and delayed jobs and is reserved for
+break-glass cleanup.
 
 ### Graceful Shutdown
 
@@ -243,6 +246,9 @@ Located in `__tests__/` and `queue.service.spec.ts`:
 ```bash
 # Audited admin endpoint
 curl "https://api.dhan.am/v1/admin/queues" \
+  -H "Authorization: Bearer <admin-token>"
+
+curl "https://api.dhan.am/v1/admin/queues/sync-transactions/failed?limit=25" \
   -H "Authorization: Bearer <admin-token>"
 ```
 

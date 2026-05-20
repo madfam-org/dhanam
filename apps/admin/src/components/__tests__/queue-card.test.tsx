@@ -44,6 +44,7 @@ jest.mock(
 jest.mock('@/lib/api/admin', () => ({
   adminApi: {
     retryFailedJobs: jest.fn().mockResolvedValue({ retriedCount: 2 }),
+    clearFailedJobs: jest.fn().mockResolvedValue({ clearedCount: 5 }),
     clearQueue: jest.fn().mockResolvedValue({ clearedCount: 5 }),
   },
 }));
@@ -73,6 +74,7 @@ describe('QueueCard', () => {
   beforeEach(() => {
     onRefresh.mockClear();
     (adminApi.retryFailedJobs as jest.Mock).mockClear();
+    (adminApi.clearFailedJobs as jest.Mock).mockClear();
   });
 
   it('renders the queue name', () => {
@@ -100,12 +102,36 @@ describe('QueueCard', () => {
   it('calls onRefresh after retrying failed jobs', async () => {
     render(<QueueCard queue={activeQueue} onRefresh={onRefresh} />);
 
-    const retryButton = screen.getByText('Retry Failed').closest('button')!;
+    const retryButton = screen.getByText('Retry Failed').closest('button');
+    expect(retryButton).toBeInTheDocument();
+    if (!retryButton) throw new Error('Retry Failed button not found');
     fireEvent.click(retryButton);
 
     await waitFor(() => {
       expect(adminApi.retryFailedJobs).toHaveBeenCalledWith('transaction-sync');
       expect(onRefresh).toHaveBeenCalled();
     });
+  });
+
+  it('clears only failed jobs after confirmation', async () => {
+    jest.spyOn(window, 'confirm').mockReturnValueOnce(true);
+    render(<QueueCard queue={activeQueue} onRefresh={onRefresh} />);
+
+    const clearButton = screen.getByText('Clear Failed').closest('button');
+    expect(clearButton).toBeInTheDocument();
+    if (!clearButton) throw new Error('Clear Failed button not found');
+    fireEvent.click(clearButton);
+
+    await waitFor(() => {
+      expect(adminApi.clearFailedJobs).toHaveBeenCalledWith('transaction-sync');
+      expect(onRefresh).toHaveBeenCalled();
+    });
+  });
+
+  it('disables Clear Failed button when there are no failed jobs', () => {
+    render(<QueueCard queue={cleanQueue} onRefresh={onRefresh} />);
+
+    const clearButton = screen.getByText('Clear Failed').closest('button');
+    expect(clearButton).toBeDisabled();
   });
 });

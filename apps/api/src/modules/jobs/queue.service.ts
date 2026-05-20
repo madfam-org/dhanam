@@ -27,6 +27,17 @@ export interface DeadLetterJob {
   processedAt?: Date;
 }
 
+export interface FailedQueueJob {
+  id: string;
+  name: string;
+  data: unknown;
+  failedReason: string;
+  attemptsMade: number;
+  timestamp?: string;
+  processedOn?: string;
+  finishedOn?: string;
+}
+
 export interface SyncTransactionsJobData {
   type: 'sync-transactions';
   payload: {
@@ -586,6 +597,39 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     return clearedCount;
   }
 
+  async getFailedJobs(queueName: string, limit = 25): Promise<FailedQueueJob[]> {
+    const queue = this.queues.get(queueName);
+    if (!queue) throw new Error(`Queue ${queueName} not found`);
+
+    const normalizedLimit = Math.min(Math.max(Math.trunc(limit), 1), 100);
+    const failedJobs = await queue.getFailed(0, normalizedLimit - 1);
+
+    return failedJobs.map((job) => ({
+      id: String(job.id ?? ''),
+      name: job.name,
+      data: this.redactJobData(job.data),
+      failedReason: job.failedReason ?? '',
+      attemptsMade: job.attemptsMade,
+      timestamp: this.toIsoTimestamp(job.timestamp),
+      processedOn: this.toIsoTimestamp(job.processedOn),
+      finishedOn: this.toIsoTimestamp(job.finishedOn),
+    }));
+  }
+
+  async clearFailedJobs(queueName: string): Promise<number> {
+    const queue = this.queues.get(queueName);
+    if (!queue) throw new Error(`Queue ${queueName} not found`);
+
+    const failedJobs = await queue.getFailed();
+
+    for (const job of failedJobs) {
+      await job.remove();
+    }
+
+    this.logger.log(`Cleared ${failedJobs.length} failed jobs in queue ${queueName}`);
+    return failedJobs.length;
+  }
+
   async retryFailedJobs(queueName: string): Promise<number> {
     const queue = this.queues.get(queueName);
     if (!queue) throw new Error(`Queue ${queueName} not found`);
@@ -598,6 +642,43 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
     this.logger.log(`Retried ${failedJobs.length} failed jobs in queue ${queueName}`);
     return failedJobs.length;
+  }
+
+  private redactJobData(value: unknown, depth = 0): unknown {
+    if (depth > 5) {
+      return '[MaxDepth]';
+    }
+
+    if (Array.isArray(value)) {
+      return value.slice(0, 50).map((item) => this.redactJobData(item, depth + 1));
+    }
+
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value as Record<string, unknown>).map(([key, nestedValue]) => [
+          key,
+          this.isSensitiveJobDataKey(key)
+            ? '[REDACTED]'
+            : this.redactJobData(nestedValue, depth + 1),
+        ])
+      );
+    }
+
+    if (typeof value === 'string' && value.length > 500) {
+      return `${value.slice(0, 500)}...`;
+    }
+
+    return value;
+  }
+
+  private isSensitiveJobDataKey(key: string): boolean {
+    return /token|secret|password|credential|authorization|cookie|session|api[_-]?key/i.test(key);
+  }
+
+  private toIsoTimestamp(value?: number): string | undefined {
+    return typeof value === 'number' && Number.isFinite(value)
+      ? new Date(value).toISOString()
+      : undefined;
   }
 
   registerWorker(queueName: string, processor: (job: Job) => Promise<any>): Worker {

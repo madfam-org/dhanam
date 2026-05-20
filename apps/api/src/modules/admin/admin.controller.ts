@@ -197,6 +197,32 @@ export class AdminController {
     return this.adminOpsService.retryFailedJobs(name, req.user.id);
   }
 
+  @Get('queues/:name/failed')
+  @ApiOperation({ summary: 'List failed jobs in a queue with redacted payloads' })
+  @ApiParam({ name: 'name', description: 'Queue name' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Maximum jobs to return, 1-100' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Failed jobs retrieved' })
+  async getFailedJobs(
+    @Param('name') name: string,
+    @Query('limit') limit: string | undefined,
+    @Request() req: AuthenticatedRequest
+  ) {
+    const parsedLimit = limit === undefined ? undefined : Number(limit);
+    return this.adminOpsService.getFailedJobs(name, parsedLimit, req.user.id);
+  }
+
+  @Post('queues/:name/clear-failed')
+  @ApiOperation({ summary: 'Clear only failed jobs in a queue' })
+  @ApiParam({ name: 'name', description: 'Queue name' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Failed jobs cleared' })
+  async clearFailedJobs(
+    @Param('name') name: string,
+    @Body() dto: ClearQueueDto,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminOpsService.clearFailedJobs(name, dto.confirm, req.user.id);
+  }
+
   @Post('queues/:name/clear')
   @ApiOperation({ summary: 'Clear a queue' })
   @ApiParam({ name: 'name', description: 'Queue name' })

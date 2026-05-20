@@ -32,7 +32,9 @@ describe('AdminOpsService', () => {
 
   const mockQueueService = {
     getAllQueueStats: jest.fn(),
+    getFailedJobs: jest.fn(),
     retryFailedJobs: jest.fn(),
+    clearFailedJobs: jest.fn(),
     clearQueue: jest.fn(),
   };
 
@@ -130,6 +132,71 @@ describe('AdminOpsService', () => {
           severity: 'high',
         })
       );
+    });
+  });
+
+  describe('getFailedJobs', () => {
+    it('should list failed jobs through QueueService and audit access', async () => {
+      mockQueueService.getFailedJobs.mockResolvedValue([
+        {
+          id: '42',
+          name: 'sync-transactions',
+          data: { payload: { connectionId: 'conn1' } },
+          failedReason: 'Provider timeout',
+          attemptsMade: 3,
+        },
+      ]);
+
+      const result = await service.getFailedJobs('sync-transactions', 10, 'admin1');
+
+      expect(result.jobs).toHaveLength(1);
+      expect(mockQueueService.getFailedJobs).toHaveBeenCalledWith('sync-transactions', 10);
+      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'admin1',
+          action: 'admin.queue_view_failed',
+          resourceId: 'sync-transactions',
+          metadata: { limit: 10, returnedCount: 1 },
+          severity: 'medium',
+        })
+      );
+    });
+
+    it('should default and clamp failed job listing limits', async () => {
+      mockQueueService.getFailedJobs.mockResolvedValue([]);
+
+      await service.getFailedJobs('sync-transactions', Number.NaN, 'admin1');
+      await service.getFailedJobs('sync-transactions', 500, 'admin1');
+
+      expect(mockQueueService.getFailedJobs).toHaveBeenNthCalledWith(1, 'sync-transactions', 25);
+      expect(mockQueueService.getFailedJobs).toHaveBeenNthCalledWith(2, 'sync-transactions', 100);
+    });
+  });
+
+  describe('clearFailedJobs', () => {
+    it('should clear only failed jobs through QueueService and audit the count', async () => {
+      mockQueueService.clearFailedJobs.mockResolvedValue(50);
+
+      const result = await service.clearFailedJobs('sync-transactions', true, 'admin1');
+
+      expect(result).toEqual({ clearedCount: 50 });
+      expect(mockQueueService.clearFailedJobs).toHaveBeenCalledWith('sync-transactions');
+      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'admin1',
+          action: 'admin.queue_clear_failed',
+          resourceId: 'sync-transactions',
+          metadata: { clearedCount: 50 },
+          severity: 'high',
+        })
+      );
+    });
+
+    it('should require explicit confirmation before clearing failed jobs', async () => {
+      await expect(service.clearFailedJobs('sync-transactions', false, 'admin1')).rejects.toThrow(
+        BadRequestException
+      );
+      expect(mockQueueService.clearFailedJobs).not.toHaveBeenCalled();
     });
   });
 

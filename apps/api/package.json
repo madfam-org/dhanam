@@ -19,7 +19,7 @@
     "test:e2e:onboarding": "jest --config ./test/jest-e2e.json onboarding-flow",
     "test:e2e:preferences": "jest --config ./test/jest-e2e.json preferences-management",
     "test:contract": "jest --config test/contract/jest-contract.json",
-    "test:chaos": "jest --testPathPatterns='chaos\\.spec\\.ts$' --runInBand --forceExit",
+    "test:chaos": "jest --testMatch='<rootDir>/src/__tests__/chaos/**/*.chaos.spec.ts' --testPathIgnorePatterns='/node_modules/' --runInBand --forceExit",
     "test:e2e:run": "./test/e2e/run-e2e.sh",
     "test:smoke": "jest --config ./test/smoke/jest-smoke.json",
     "test:smoke:remote": "SMOKE_TEST_URL=${SMOKE_TEST_URL:-https://api.dhan.am} jest --config ./test/smoke/jest-smoke.json --testPathPattern=remote",

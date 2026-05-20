@@ -173,9 +173,11 @@ Available actions:
 
 - **Retry Failed**: calls `POST /v1/admin/queues/:name/retry-failed` and
   returns the actual retried job count.
-- **Clear**: calls `POST /v1/admin/queues/:name/clear` with
-  `{ "confirm": true }`. This is destructive; prefer retry unless the failed
-  jobs are confirmed stale and safe to remove.
+- **Clear Failed**: calls `POST /v1/admin/queues/:name/clear-failed` with
+  `{ "confirm": true }` and removes only retained failed jobs.
+- Whole-queue clear remains available through `POST /v1/admin/queues/:name/clear`
+  for break-glass cleanup. It removes waiting, active, completed, failed, and
+  delayed jobs, so prefer inspect, retry, then failed-job-only cleanup.
 
 ## Admin Actions Audit Trail
 
@@ -285,7 +287,9 @@ GET  /v1/admin/analytics/onboarding-funnel
 GET  /v1/admin/feature-flags
 POST /v1/admin/feature-flags/:key
 GET  /v1/admin/queues
+GET  /v1/admin/queues/:name/failed?limit=25
 POST /v1/admin/queues/:name/retry-failed
+POST /v1/admin/queues/:name/clear-failed
 POST /v1/admin/queues/:name/clear
 ```
 

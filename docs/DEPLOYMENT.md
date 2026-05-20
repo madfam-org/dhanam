@@ -98,6 +98,17 @@ Then verify the live public runtime through the production preflight:
 scripts/production-preflight.sh
 ```
 
+For production digest parity, also prove the live ArgoCD Application matches
+the digest-pinned production manifest:
+
+```bash
+scripts/production-rollout-proof.js
+```
+
+This command reads `infra/k8s/production/kustomization.yaml`, fetches
+`dhanam-services` through Enclii, and fails unless ArgoCD is Healthy/Synced and
+the live API, web, and admin images match the intended signed digests.
+
 ### Manual Deploy via Enclii CLI
 
 ```bash
@@ -388,6 +399,7 @@ Run the public DNS/HTTP preflight before and after promotion:
 
 ```bash
 scripts/production-preflight.sh
+scripts/production-rollout-proof.js
 ```
 
 Use `scripts/production-preflight.sh --include-staging` only after the staging
@@ -430,19 +442,31 @@ handles failover automatically. Check BullMQ queue status in the admin panel at
 Queue remediation is audited through admin endpoints:
 
 ```bash
+# Inspect failed jobs with redacted payload fields before deciding.
+curl "https://api.dhan.am/v1/admin/queues/sync-transactions/failed?limit=25" \
+  -H "Authorization: Bearer <admin-token>"
+
 # Retry failed jobs after confirming the underlying provider/config issue is fixed.
 curl -X POST "https://api.dhan.am/v1/admin/queues/sync-transactions/retry-failed" \
   -H "Authorization: Bearer <admin-token>"
 
-# Destructive cleanup requires explicit confirmation in the request body.
+# Preferred cleanup removes only retained failed jobs.
+curl -X POST "https://api.dhan.am/v1/admin/queues/sync-transactions/clear-failed" \
+  -H "Authorization: Bearer <admin-token>" \
+  -H "Content-Type: application/json" \
+  -d '{"confirm":true}'
+
+# Whole-queue clearing is break-glass because it removes waiting, active,
+# completed, failed, and delayed jobs.
 curl -X POST "https://api.dhan.am/v1/admin/queues/sync-transactions/clear" \
   -H "Authorization: Bearer <admin-token>" \
   -H "Content-Type: application/json" \
   -d '{"confirm":true}'
 ```
 
-Prefer retry over clear. Use raw Redis/BullMQ scripts only as documented
-break-glass when the admin surface or Enclii adapter is unavailable.
+Prefer inspect, then retry, then failed-job-only cleanup. Use whole-queue clear
+or raw Redis/BullMQ scripts only as documented break-glass when the admin
+surface or Enclii adapter is unavailable.
 
 ### Enclii Issues
 
