@@ -27,6 +27,8 @@ metadata:
     environment: staging
   annotations:
     argocd.argoproj.io/description: "Dhanam staging (RFC 0001 Phase 2)"
+    enclii.dev/stability-audit: gated
+    enclii.dev/stability-gate-reason: "registration requires staging-scoped secrets and STAGING_API_URL"
 spec:
   project: default
   source:
