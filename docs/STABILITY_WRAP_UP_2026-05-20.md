@@ -9,7 +9,7 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 ## Current Verified State
 
 - Production ArgoCD app `dhanam-services` is `Healthy` / `Synced` at
-  `6717d0fb deploy(staging): update digests to 3acdeea`.
+  `7a848a2c deploy(staging): update digests to d1f8ccf`.
 - Live production images match `infra/k8s/production/kustomization.yaml`:
   - API `sha256:73676d24e60f3da055757efb1a1ff36d34fcd3be4c47f1057bb506a131f5d665`
   - Web `sha256:d8258c3df3ed28b7fbd0c377c6bfac29e1f4a2087f082fbb5a6844ac0e5a6b42`
@@ -21,12 +21,10 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 - Admin queue remediation routes are live and auth-gated. Unauthenticated
   `GET /v1/admin/queues/sync-transactions/failed?limit=1` returns HTTP 401,
   proving the route exists and is protected.
-- Staging API smoke is now green:
-  `https://staging-api.dhan.am/health` returns HTTP 200 / healthy.
-- Staging web and admin hostnames are reachable. This follow-up source adds
-  web/admin smoke and staging API-origin checks to `deploy-staging.yml`; the
-  next hosted staging run must prove them before staging is a complete
-  promotion proof.
+- Staging API, web, and admin smoke are green. `Deploy to Staging` run
+  `26194485016` built and signed API, web, and admin images for `d1f8ccf0`,
+  committed staging digest refresh `7a848a2c`, passed API health, and proved
+  the web/admin routes use the staging API origin.
 
 ## Implementation Landed
 
@@ -42,6 +40,8 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 - API E2E startup seeds the product catalog, including `ProductCategory.travel`.
 - Admin E2E fixtures create true platform admins.
 - Stripe integration fails closed when unconfigured.
+- Stripe checkout price resolution fails closed for unknown plan slugs instead
+  of silently defaulting to premium pricing.
 - Product-catalog sync now prunes stale rows when catalog entries are removed.
 - `scripts/production-rollout-proof.js` verifies live ArgoCD images against the
   production manifest.
@@ -70,38 +70,35 @@ namespace-aware staging route apply.
 
 ## Verified Green
 
-- Hosted `CI` for `3acdeea4 fix(catalog): prune stale sync rows`: run
-  `26189667372`, success.
-- Hosted `Lint & Type Check` for `3acdeea4`: run `26189667024`, success.
-- Hosted `Test Coverage` for `3acdeea4`: run `26189667253`, success.
-- Hosted `Deploy to Staging` for `3acdeea4`: run `26189667025`, success,
-  including build/sign for API, web, admin, staging digest patch, and API smoke.
+- Hosted `CI` for `d1f8ccf0`: run `26194485015`, success.
+- Hosted `Lint & Type Check` for `d1f8ccf0`: run `26194485017`, success.
+- Hosted `Test Coverage` for `d1f8ccf0`: run `26194484988`, success.
+- Hosted `Check Database Migrations` for `d1f8ccf0`: run `26194484989`,
+  success.
+- Hosted `Deploy to Staging` for `d1f8ccf0`: run `26194485016`, success,
+  including build/sign for API, web, admin, staging digest patch, API smoke,
+  web route/API-origin smoke, and admin route/API-origin smoke.
 - Scheduled `Promote staging -> prod` validation: run `26190740392`, success;
   write job skipped because there was no digest change to write.
-- Production rollout proof passed at revision `6717d0fb`.
+- Production rollout proof passed at revision `7a848a2c`.
 - Production full health passed with `status: "healthy"`.
-
-Local gates for the follow-up migration/doc fix must be rerun before pushing
-that final commit.
 
 ## Remaining Roadmap
 
-1. Run and pass the new full staging web/admin smoke and prove staging admin
-   uses staging API/env, not production API values.
-2. Make Enclii the complete routine operation plane for migration repair,
+1. Make Enclii the complete routine operation plane for migration repair,
    queue remediation, and namespace-aware tunnel route apply.
-3. Decide and encode final provider launch semantics for Plaid, Bitso, and
+2. Decide and encode final provider launch semantics for Plaid, Bitso, and
    Banxico in runbooks and product readiness.
-4. Keep production green over repeated deploy/rollback cycles with no
+3. Keep production green over repeated deploy/rollback cycles with no
    undocumented manual path.
-5. Expand lower-risk coverage, especially mobile and end-to-end provider
+4. Expand lower-risk coverage, especially mobile and end-to-end provider
    journeys.
 
 ## Stability Estimate
 
-Current expert estimate: about 94 percent production-stable.
+Current expert estimate: about 95 percent production-stable.
 
 Production is healthy and the codebase gates are green for the latest pushed
-source, but the system is not 100 percent stable until staging web/admin proof,
-Enclii adapter coverage, provider launch semantics, and repeated clean
-deploy/rollback evidence are complete.
+source, and staging now proves API, web, and admin route health. The system is
+not 100 percent stable until Enclii adapter coverage, provider launch
+semantics, and repeated clean deploy/rollback evidence are complete.

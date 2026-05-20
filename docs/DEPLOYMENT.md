@@ -58,8 +58,8 @@ and admin images with GitHub Actions keyless cosign signatures, and
 also requires the operator to provide a successful `Deploy to Staging` run id
 whose smoke job passed for the staged source commit, unless the operator
 selects the explicit break-glass smoke bypass. Staging digest refreshes now land
-as signed `deploy(staging)` bot commits; `6717d0fb` is the latest observed
-refresh and records signed staging digests for source commit `3acdeea4`. Future
+as signed `deploy(staging)` bot commits; `7a848a2c` is the latest observed
+refresh and records signed staging digests for source commit `d1f8ccf0`. Future
 promotions must use signed staging digests with smoke/soak evidence. The
 break-glass K8s workflows also sign
 their images before committing production digests; their raw
@@ -270,11 +270,11 @@ The workflow ignores `infra/k8s/overlays/staging/kustomization.yaml` so the
 digest patch commit it creates does not trigger a second staging build.
 
 Current status as of the 2026-05-20 wrap-up: `Deploy to Staging` run
-`26189667025` built and signed all three images for `3acdeea4`, committed
-staging digest refresh `6717d0fb`, and passed the public API smoke at
-`https://staging-api.dhan.am/health`. This follow-up source adds first-class
-web/admin smoke and staging API-origin checks; the next hosted staging run must
-pass them before staging is treated as a complete production-promotion gate.
+`26194485016` built and signed all three images for `d1f8ccf0`, committed
+staging digest refresh `7a848a2c`, passed the public API smoke at
+`https://staging-api.dhan.am/health`, and passed web/admin route checks that
+prove the staging API origin. Treat staging as the production-promotion gate
+only when the latest candidate has equivalent hosted smoke evidence.
 
 Required staging hostnames:
 
@@ -292,9 +292,8 @@ reconciliation. The Cloudflare tunnel must route them to the
 As of 2026-05-20, Enclii custom-domain verification and Cloudflare DNS CNAMEs
 exist for all three staging hostnames. The `dhanam-staging` ArgoCD Application
 is registered, `enclii-dhanam-staging` exists, ExternalSecrets are synced, and
-`staging-api.dhan.am/health` passes. This follow-up source adds web/admin route
-smoke and staging API-origin proof to `deploy-staging.yml`; staging is not a
-complete production gate until a hosted run passes those checks. Treat
+hosted smoke passes for `staging-api.dhan.am`, `staging.dhan.am`, and
+`staging-admin.dhan.am` with staging API-origin proof. Treat
 namespace-aware staging tunnel-route apply as an Enclii adapter gap until that
 operation exists.
 

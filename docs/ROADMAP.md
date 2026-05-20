@@ -34,35 +34,38 @@ Dhanam is considered fully stable only when all of these are true:
 
 ## Current Position
 
-| Area                      | Current estimate | Status                                                                                         |
-| ------------------------- | ---------------- | ---------------------------------------------------------------------------------------------- |
-| Codebase and CI           | 98%              | Hosted CI, lint/typecheck, coverage, and staging deploy are green for latest pushed source.    |
-| Public production surface | 99%              | Public DNS, TLS, redirects, app/admin/API liveness, and full API health are green.             |
-| API runtime health        | 99%              | DB, Redis, queues, Belvo, and optional external checks are up; failed queue count is zero.     |
-| Release and staging path  | 91%              | API staging smoke is green; source now adds web/admin smoke and env proof, pending hosted run. |
-| Ops control plane         | 88%              | ArgoCD production truth is healthy; Enclii still lacks key routine operation adapters.         |
-| Overall stability         | 94%              | Production is healthy; remaining gap is staging breadth, Enclii coverage, and repeated proof.  |
+| Area                      | Current estimate | Status                                                                                      |
+| ------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| Codebase and CI           | 98%              | Hosted CI, lint/typecheck, coverage, and staging deploy are green for latest pushed source. |
+| Public production surface | 99%              | Public DNS, TLS, redirects, app/admin/API liveness, and full API health are green.          |
+| API runtime health        | 99%              | DB, Redis, queues, Belvo, and optional external checks are up; failed queue count is zero.  |
+| Release and staging path  | 96%              | Staging deploy now passes API, web, admin, and staging API-origin smoke.                    |
+| Ops control plane         | 88%              | ArgoCD production truth is healthy; Enclii still lacks key routine operation adapters.      |
+| Overall stability         | 95%              | Production and staging are healthy; remaining gap is Enclii coverage and repeated proof.    |
 
 ## Current Verification Snapshot
 
 As of 2026-05-20:
 
 - Current deployment base is
-  `6717d0fb deploy(staging): update digests to 3acdeea`.
-- Latest source commit before this roadmap update is
-  `3acdeea4 fix(catalog): prune stale sync rows`.
-- Hosted `CI` (`26189667372`), `Lint & Type Check` (`26189667024`), and
-  `Test Coverage` (`26189667253`) passed for `3acdeea4`.
-- `Deploy to Staging` (`26189667025`) built and signed API, web, and admin
-  images, committed staging digests, and passed the API smoke.
+  `7a848a2c deploy(staging): update digests to d1f8ccf`.
+- Latest stability source commit before this roadmap update is
+  `d1f8ccf0 fix(stability): harden staging smoke and migration drift`.
+- Hosted `CI` for `d1f8ccf0`: run `26194485015`, success.
+- Hosted `Lint & Type Check` for `d1f8ccf0`: run `26194485017`, success.
+- Hosted `Test Coverage` for `d1f8ccf0`: run `26194484988`, success.
+- Hosted `Check Database Migrations` for `d1f8ccf0`: run `26194484989`,
+  success.
+- `Deploy to Staging` (`26194485016`) built and signed API, web, and admin
+  images, committed staging digests as `7a848a2c`, passed API health, and
+  passed web/admin route checks that prove the staging API origin.
 - `https://staging-api.dhan.am/health` returns HTTP 200 / healthy.
-- `https://staging.dhan.am` and `https://staging-admin.dhan.am` are reachable,
-  and this follow-up source adds explicit web/admin smoke plus staging admin
-  API/env proof to `deploy-staging.yml`; the next hosted run must prove it.
+- `https://staging.dhan.am` and `https://staging-admin.dhan.am` are reachable
+  and proved by hosted staging smoke.
 - `scripts/production-preflight.sh` passes for production DNS, liveness, app,
   admin, apex, and `www -> apex` redirect checks.
 - `scripts/production-rollout-proof.js` passes: ArgoCD `dhanam-services` is
-  Healthy/Synced at revision `6717d0fb`, and live production images match
+  Healthy/Synced at revision `7a848a2c`, and live production images match
   `infra/k8s/production/kustomization.yaml`.
 - Full production health returns `status: "healthy"` with `failedJobs: 0`.
 - The retained failed queue jobs were inspected and removed with a narrow
@@ -139,15 +142,15 @@ Work:
   - `staging-api.dhan.am`
   - `staging-admin.dhan.am`
 - Keep the staging DNS CNAMEs created through Enclii on 2026-05-20 in place.
-- Keep the new `deploy-staging.yml` web/admin route smoke and API-origin checks
-  green after this follow-up source lands.
+- Keep the `deploy-staging.yml` API, web, admin, and API-origin smoke checks
+  green.
 - Keep staging production-safe: API/web overlays must override production
   webhook fan-out, PhyndCRM, `WEB_URL`, `NEXTAUTH_URL`, and Paddle production
   values.
 - Keep `deploy-staging.yml` from rebuilding on its own
   `infra/k8s/overlays/staging/kustomization.yaml` digest commits.
-- Verify `staging-admin.dhan.am` uses staging API/env values through the new
-  hosted smoke before accepting staging as a complete promotion proof.
+- Preserve hosted proof that `staging-admin.dhan.am` uses staging API/env
+  values before accepting staging as a complete promotion proof.
 
 Acceptance:
 
@@ -268,14 +271,12 @@ Acceptance:
 
 ## Execution Order
 
-1. Run and pass the new full staging web/admin smoke and staging admin API/env
-   proof.
-2. Repair or formalize production rollout truth under one authoritative control
+1. Repair or formalize production rollout truth under one authoritative control
    plane.
-3. Wire Enclii migration repair, queue remediation, policy waiver apply, and
+2. Wire Enclii migration repair, queue remediation, policy waiver apply, and
    namespace-aware tunnel-route apply.
-4. Encode provider health semantics and tighten lower-severity code/docs debt.
-5. Collect repeated clean deploy/rollback evidence with no undocumented manual
+3. Encode provider health semantics and tighten lower-severity code/docs debt.
+4. Collect repeated clean deploy/rollback evidence with no undocumented manual
    path.
 
 ## Stability Milestones
@@ -283,7 +284,7 @@ Acceptance:
 | Milestone | Target state                                                                                   | Expected stability |
 | --------- | ---------------------------------------------------------------------------------------------- | ------------------ |
 | M1        | Production queue health green; public routes still pass.                                       | Complete           |
-| M2        | Staging API, web, admin routes and smoke are all passing with staging env proof.               | 94-96%             |
+| M2        | Staging API, web, admin routes and smoke are all passing with staging env proof.               | Complete           |
 | M3        | Production rollout truth is authoritative and post-deploy digest assertions pass.              | 97-98%             |
 | M4        | Enclii adapter gaps closed; provider health semantics encoded; lower-severity debt controlled. | 99%+               |
 

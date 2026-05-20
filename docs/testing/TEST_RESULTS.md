@@ -40,12 +40,13 @@ Prisma, AWS, or port assumptions.
 | Local compiled API liveness smoke                           | Passed                                        |
 | Local MX pricing API smoke                                  | Passed                                        |
 | Production preflight                                        | Passed, including `www` apex redirect         |
-| Production rollout proof                                    | Passed at ArgoCD revision `6717d0fb`          |
+| Production rollout proof                                    | Passed at ArgoCD revision `7a848a2c`          |
 | Production full health                                      | Healthy, `failedJobs: 0`                      |
-| Staging API smoke                                           | Passed for `3acdeea4` / run `26189667025`     |
-| Hosted CI for `3acdeea4`                                    | Passed, run `26189667372`                     |
-| Hosted lint/typecheck for `3acdeea4`                        | Passed, run `26189667024`                     |
-| Hosted test coverage for `3acdeea4`                         | Passed, run `26189667253`                     |
+| Staging API/web/admin smoke                                 | Passed for `d1f8ccf0` / run `26194485016`     |
+| Hosted CI for `d1f8ccf0`                                    | Passed, run `26194485015`                     |
+| Hosted lint/typecheck for `d1f8ccf0`                        | Passed, run `26194485017`                     |
+| Hosted test coverage for `d1f8ccf0`                         | Passed, run `26194484988`                     |
+| Hosted migration check for `d1f8ccf0`                       | Passed, run `26194484989`                     |
 
 ## Recently Fixed In This Stabilization Pass
 
@@ -69,18 +70,16 @@ Prisma, AWS, or port assumptions.
 
 These are not unit-test failures, but they block full-system stability:
 
-- Staging API smoke is now green. Run `26189667025` built and signed all images
-  for `3acdeea4`, committed `6717d0fb`, and passed
-  `https://staging-api.dhan.am/health`.
-- Staging web/admin hostnames are reachable. This follow-up source adds
-  web/admin route and staging API-origin smoke checks; the next hosted staging
-  run must pass them before staging is a complete promotion gate.
+- Staging API/web/admin smoke is now green. Run `26194485016` built and signed
+  all images for `d1f8ccf0`, committed `7a848a2c`, passed
+  `https://staging-api.dhan.am/health`, and passed web/admin route checks that
+  prove the staging API origin.
 - Enclii API/admin deployment records show a Kyverno image-signature annotation
   mutation denial.
 - `deploy-staging.yml` signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
   digests. Staging overlay digest refreshes land as signed `deploy(staging)`
-  bot commits; `6717d0fb` is the latest observed here. Promotion requires an
+  bot commits; `7a848a2c` is the latest observed here. Promotion requires an
   explicit successful staging smoke run id unless break-glass is selected.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`

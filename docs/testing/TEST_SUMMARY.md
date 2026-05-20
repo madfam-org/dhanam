@@ -63,14 +63,17 @@ push to `main`; see [Deployment Guide](../DEPLOYMENT.md) and
 [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md) for current
 deployment caveats.
 
-Latest wrap-up: hosted CI (`26189667372`), lint/typecheck (`26189667024`),
-test coverage (`26189667253`), and `Deploy to Staging` (`26189667025`) passed
-for `3acdeea4`. Production rollout proof passes at ArgoCD revision `6717d0fb`,
-and production full health is `status: "healthy"` with `failedJobs: 0`.
+Latest wrap-up: hosted CI (`26194485015`), lint/typecheck (`26194485017`),
+test coverage (`26194484988`), migration check (`26194484989`), and `Deploy to
+Staging` (`26194485016`) passed for `d1f8ccf0`. The staging run built and
+signed API, web, and admin images, committed digest refresh `7a848a2c`, and
+passed API/web/admin smoke with staging API-origin proof. Production rollout
+proof passes at ArgoCD revision `7a848a2c`, and production full health is
+`status: "healthy"` with `failedJobs: 0`.
 
-The current follow-up commit changes only docs plus the type-adaptive
-`product_tiers` migration source; rerun local format, Prisma validation,
-targeted API tests, and any required hosted gates before treating it as final.
+The latest stability source includes the type-adaptive `product_tiers`
+migration, staging web/admin smoke checks, and checkout price-resolution
+fail-closed hardening.
 See [Verification Snapshot](TEST_RESULTS.md) and
 [Stability Wrap-Up 2026-05-20](../STABILITY_WRAP_UP_2026-05-20.md).
 

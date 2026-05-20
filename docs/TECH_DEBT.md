@@ -24,7 +24,7 @@ For execution order and milestone targets, read the [Roadmap](ROADMAP.md).
 
 | ID      | Area                      | Severity | Status   | Current impact                                                                                                             | Primary reference                                        |
 | ------- | ------------------------- | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| TD-1002 | Staging activation        | High     | Active   | Staging API smoke is green; source now adds web/admin smoke and staging admin API/env proof, pending hosted run evidence.  | [Deployment Guide](DEPLOYMENT.md)                        |
+| TD-1002 | Staging activation        | Medium   | Active   | Staging API/web/admin smoke is green; remaining debt is repeated proof and Enclii-owned namespace-aware route apply.       | [Deployment Guide](DEPLOYMENT.md)                        |
 | TD-1003 | Production rollout truth  | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth. | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)     |
 | TD-1004 | Enclii adapter coverage   | Medium   | Active   | Migration repair, policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.     | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)     |
 | TD-1005 | Provider health semantics | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                              | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)        |
@@ -66,24 +66,27 @@ waiting, active, completed, failed, and delayed jobs.
 
 ### TD-1002: Staging Activation
 
-Staging has recovered enough for API smoke, but it is not yet a complete
-promotion proof:
+Staging now passes the full API, web, admin, and staging API-origin smoke path.
+The remaining debt is operational ownership and repeated evidence:
 
-- Populate staging Vault/ESO values.
-- Register and sync `infra/argocd/dhanam-staging-application.yaml`.
-- Create or repair the staging namespace.
+- Keep staging Vault/ESO values populated and synced.
+- Keep `infra/argocd/dhanam-staging-application.yaml` registered and synced.
+- Keep the `enclii-dhanam-staging` namespace healthy.
 - Keep namespace-aware Cloudflare tunnel routes healthy for staging hosts. DNS
   CNAMEs were restored through Enclii on 2026-05-20; tunnel route apply remains
   an Enclii adapter gap.
-- `Deploy to Staging` run `26189667025` passed build/sign, digest patch, and
-  API smoke. Extend the workflow to smoke staging web/admin too.
-- Verify `staging-admin.dhan.am` uses staging API/env values before treating it
-  as a promotion proof.
+- `Deploy to Staging` run `26194485016` passed build/sign, digest patch, API
+  smoke, web route/API-origin smoke, and admin route/API-origin smoke for
+  source commit `d1f8ccf0`, then committed staging refresh `7a848a2c`.
+- Preserve hosted evidence that `staging-admin.dhan.am` uses staging API/env
+  values before treating it as a promotion proof.
 
 Current source hardening:
 
 - `deploy-staging.yml` ignores its own staging digest patch file so bot commits
   do not self-trigger another staging build.
+- `deploy-staging.yml` now smokes API, web, and admin, including API-origin
+  assertions for web/admin routes.
 - Staging API/web overlays override production-only `WEB_URL`,
   `PRODUCT_WEBHOOK_URLS`, `PHYNDCRM_API_URL`, `NEXTAUTH_URL`, and Paddle
   environment values.
