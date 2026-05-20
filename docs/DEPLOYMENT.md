@@ -51,6 +51,14 @@ ArgoCD digest and public HTTP behavior. Use GitOps digest promotion into
 `infra/k8s/production/kustomization.yaml` as the auditable production path;
 raw `kubectl set image` remains break-glass only.
 
+Production digests must be signed. `deploy-staging.yml` currently builds and
+pushes staging images without cosign signing, so promoting those staging
+digests directly can be blocked by Kyverno. The web-only break-glass workflow
+does sign its image before committing the production digest; its direct
+`kubectl set image` step currently fails from GitHub-hosted runners because
+the cluster API is not reachable, so ArgoCD reconciliation of the signed digest
+is the effective deployment mechanism.
+
 ---
 
 ## Deployment Methods
@@ -111,7 +119,7 @@ kubectl -n dhanam set image deployment/dhanam-web \
 | `deploy-enclii.yml`    | Manual dispatch | Fallback Enclii deploy                        |
 | `deploy-staging.yml`   | Push to main    | Auto-deploy staging (1 replica, `:main` tags) |
 | `deploy-k8s.yml`       | Manual dispatch | Break-glass API K8s deploy                    |
-| `deploy-web-k8s.yml`   | Manual dispatch | Break-glass web-only K8s deploy               |
+| `deploy-web-k8s.yml`   | Manual dispatch | Break-glass web image build/sign + K8s deploy |
 | `deploy-admin-k8s.yml` | Manual dispatch | Break-glass admin-only K8s deploy             |
 | `promote-to-prod.yml`  | Manual dispatch | Promote soaked staging digest to production   |
 | `publish-packages.yml` | Tag / manual    | npm publish to npm.madfam.io                  |
@@ -267,6 +275,21 @@ verify-image-signatures:
 blocked because the concrete adapter is not wired in this Enclii build. Until
 that adapter or the Enclii deployment reconciler is fixed, do not treat a
 ready release as proof that production has rolled forward.
+
+On 2026-05-20, ArgoCD also rejected an unsigned staging web digest during
+production promotion:
+
+```text
+failed to verify image ghcr.io/madfam-org/dhanam/web@sha256:cdb413...:
+  .attestors[0].entries[0].keyless: no matching signatures
+```
+
+The signed digest
+`sha256:126661e221a67a335eddaf885c142464f82c50f2edb7c6730f79f801548bf054`
+was then built by `deploy-web-k8s.yml`, committed to production, and
+successfully reconciled by ArgoCD. The workflow still reported failure because
+its direct `kubectl set image` step could not connect to the cluster API from
+the GitHub runner.
 
 ### Current Enclii Staging Route Gap
 

@@ -29,10 +29,10 @@ production/staging domain checks and Enclii route remediation attempts.
 | Web accessibility gates   | Stable locally       | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.          |
 | Admin Playwright          | Improved             | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                      |
 | API production build      | Improved             | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                      |
-| Staging image pipeline    | Partially stable     | API/admin images build; web build was blocked by build-time font network coupling and is being rerun after removing `next/font/google`.               |
+| Staging image pipeline    | Partially stable     | API, web, and admin images build and patch the staging overlay, but staging smoke is still blocked and staging images are not signed for prod.        |
 | Staging smoke             | Blocked              | Enclii verifies staging domains and DNS CNAMEs exist, but the ArgoCD Application/namespace are absent and tunnel routes are not namespace-aware.      |
 | Production API health     | Unstable             | Public health reported DB/Redis up, but queues down, Banxico 404, Belvo 502, Plaid/Bitso unconfigured.                                                |
-| Production domain routing | Improved in config   | Enclii web specs now delegate `www.dhan.am` -> apex to app middleware; live `www` still needs a production rollout before the `:4200` leak closes.    |
+| Production domain routing | Fixed and verified   | `scripts/production-preflight.sh` passes; `www.dhan.am` redirects to `https://dhan.am/` without leaking `:4200`.                                      |
 | Enclii production rollout | Blocked/inconsistent | Enclii `prod` can build web releases, but the live public route still serves the ArgoCD `dhanam` namespace and the Enclii `prod` namespace is absent. |
 | Enclii policy remediation | Adapter gap          | `enclii ops policy waiver-plan` is planned only; apply is blocked because adapter execution is not wired.                                             |
 
@@ -49,9 +49,9 @@ production/staging domain checks and Enclii route remediation attempts.
    not have an Enclii-first remediation path for the Kyverno block.
 4. Production health is not green: queue failures and external provider checks
    are surfacing as unhealthy.
-5. Public domain behavior is not fully closed: config no longer asks Enclii to
-   synthesize the `www` redirect, but production still needs a rollout and
-   verification.
+5. Staging image digests are not signed by `deploy-staging.yml`; direct
+   promotion of those digests to production is blocked by Kyverno image
+   signature verification.
 6. Production appears to be serving older releases than the latest pushed
    code and GitHub-built images.
 7. Web Docker builds must not depend on external font downloads; the app now
@@ -77,6 +77,9 @@ Priority 1 - restore deployability:
   targets the live `dhanam` production namespace, or migrate the public route
   cleanly to an existing Enclii-managed namespace before treating Enclii
   deployment records as live production truth.
+- Sign staging images before they are eligible for production promotion, or
+  make `promote-to-prod.yml` verify signatures before writing production
+  digests.
 - Wire the Enclii `ops policy waiver-plan --apply` adapter or provide an
   Enclii-first policy exception workflow with idempotency and audit records.
 - Re-run Enclii release/deployment checks for `dhanam-api`, `dhanam-web`, and
@@ -104,12 +107,11 @@ Priority 3 - fix production health:
 - Decide whether Plaid/Bitso are intentionally unconfigured; if so, health
   should report degraded/disabled rather than down.
 
-Priority 4 - clean public routing:
+Priority 4 - keep public routing clean:
 
-- Fix `www.dhan.am` redirect behavior so it redirects to `https://dhan.am/`
-  without `:4200`.
-- Confirm `dhan.am`, `www.dhan.am`, `app.dhan.am`, `admin.dhan.am`, and
-  `api.dhan.am` all have stable TLS, expected redirects, and health checks.
+- Keep `scripts/production-preflight.sh` required around production web
+  promotions. As of 2026-05-20, `www.dhan.am` redirects to
+  `https://dhan.am/` without `:4200`, and apex/app/admin/API public checks pass.
 
 Priority 5 - harden the stable baseline:
 
@@ -136,10 +138,10 @@ Working estimate after this audit:
 - Staging and release pipeline stability: about 70 percent because images build,
   digests patch, and DNS verifies, but ArgoCD/namespace/secrets/tunnel routing
   are not live.
-- Production implementation stability: about 63 percent because live web/admin
-  surfaces respond and API liveness is up, but API full health, rollout state,
-  and `www` routing are not fully clean.
-- Overall full-system stability: about 75 percent. The remaining gap is mostly
+- Production implementation stability: about 70 percent because live web/admin
+  surfaces respond, API liveness is up, and public routing is clean, but API
+  full health and rollout control-plane state are not fully clean.
+- Overall full-system stability: about 78 percent. The remaining gap is mostly
   operational control-plane, domain, and runtime-health remediation rather than
   ordinary application code.
 
@@ -175,3 +177,25 @@ auditable production path is GitOps digest promotion into
 `infra/k8s/production/kustomization.yaml` and ArgoCD reconciliation. Raw
 `kubectl set image` remains break-glass only when Enclii/GitOps promotion is
 unavailable, and the missing Enclii adapter gap must be recorded.
+
+### Web Routing Closure
+
+The first GitOps promotion attempt used the unsigned staging web image digest
+`sha256:cdb413adb0ef876d8f3162b0b48b63cc44c3ee0647fca00d260ebd9816a901b8` and
+was correctly rejected by Kyverno image-signature verification.
+
+The signed-image break-glass workflow then built and signed web digest
+`sha256:126661e221a67a335eddaf885c142464f82c50f2edb7c6730f79f801548bf054` and
+committed it to production as `68caffde`. The workflow's direct
+`kubectl set image` step failed because the GitHub runner could not reach the
+cluster API, but ArgoCD reconciled the signed digest successfully into the live
+`dhanam` namespace.
+
+Verified after ArgoCD sync:
+
+- `dhanam-services` synced to `68caffde` and reported Healthy.
+- `dhanam-web` runs
+  `ghcr.io/madfam-org/dhanam/web@sha256:126661e221a67a335eddaf885c142464f82c50f2edb7c6730f79f801548bf054`
+  with 2/2 replicas ready.
+- `scripts/production-preflight.sh` passed.
+- `https://www.dhan.am/` returns `301 Location: https://dhan.am/`.

@@ -29,6 +29,7 @@ Prisma, AWS, or port assumptions.
 | Primary documentation markdown-link scan                    | Passed for current entrypoint docs            |
 | Local compiled API liveness smoke                           | Passed                                        |
 | Local MX pricing API smoke                                  | Passed                                        |
+| Production preflight                                        | Passed, including `www` apex redirect         |
 
 ## Recently Fixed In This Stabilization Pass
 
@@ -45,6 +46,8 @@ Prisma, AWS, or port assumptions.
   collisions with the full preferences DTO.
 - Web root layout no longer imports `next/font/google`; production builds use a
   local system font stack and no longer depend on Google Fonts network access.
+- `www.dhan.am` now redirects to `https://dhan.am/` without leaking the
+  internal `:4200` port after the signed web digest was reconciled by ArgoCD.
 
 ## Current External Blockers
 
@@ -55,10 +58,12 @@ These are not unit-test failures, but they block full-system stability:
   namespace-aware for staging tunnel routes.
 - Enclii API/admin deployment records show a Kyverno image-signature annotation
   mutation denial.
+- `deploy-staging.yml` currently publishes unsigned image digests; direct
+  promotion of those digests is blocked by Kyverno until staging image signing
+  or promotion-time signature validation is added.
+- `deploy-web-k8s.yml` can build, sign, and commit a production web digest, but
+  its direct deploy step cannot reach the cluster API from the GitHub runner.
 - Production API health has reported queue/provider degradation.
-- `www.dhan.am` has redirected to `https://dhan.am:4200/`, exposing an internal
-  port; Enclii web specs now delegate the redirect to app middleware, but live
-  production needs a rollout before this can be closed.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.
