@@ -8,8 +8,10 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 
 ## Current Verified State
 
-- Production ArgoCD app `dhanam-services` is `Healthy` / `Synced` at
-  `593953ca deploy(prod): promote ccd6c8f`.
+- Production ArgoCD app `dhanam-services` is `Healthy` / `Synced` on `main`.
+  The production image-manifest base was last changed by
+  `593953ca deploy(prod): promote ccd6c8f`; later docs-only commits can advance
+  the Argo sync revision without changing live images.
 - Live production images match `infra/k8s/production/kustomization.yaml`:
   - API `sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`
   - Web `sha256:d8258c3df3ed28b7fbd0c377c6bfac29e1f4a2087f082fbb5a6844ac0e5a6b42`
@@ -82,7 +84,8 @@ namespace-aware staging route apply.
   30-minute soak gate elapsed; committed `593953ca`.
 - Scheduled `Promote staging -> prod` validation: run `26190740392`, success;
   write job skipped because there was no digest change to write.
-- Production rollout proof passed at revision `593953ca`.
+- Production rollout proof passed: live images match the production manifest on
+  `main`.
 - Production full health passed with `status: "healthy"`.
 
 ## Remaining Roadmap

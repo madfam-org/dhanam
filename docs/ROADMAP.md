@@ -47,8 +47,9 @@ Dhanam is considered fully stable only when all of these are true:
 
 As of 2026-05-20:
 
-- Current production deployment base is
-  `593953ca deploy(prod): promote ccd6c8f`.
+- Current production image-manifest base was last changed by
+  `593953ca deploy(prod): promote ccd6c8f`. ArgoCD can report a later docs-only
+  `main` revision without changing production images.
 - Current staging digest base is
   `7a848a2c deploy(staging): update digests to d1f8ccf`.
 - Latest code stability source commit before this roadmap update is
@@ -69,7 +70,7 @@ As of 2026-05-20:
 - `scripts/production-preflight.sh` passes for production DNS, liveness, app,
   admin, apex, and `www -> apex` redirect checks.
 - `scripts/production-rollout-proof.js` passes: ArgoCD `dhanam-services` is
-  Healthy/Synced at revision `593953ca`, and live production images match
+  Healthy/Synced on `main`, and live production images match
   `infra/k8s/production/kustomization.yaml`. The API image is now
   `sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`;
   web and admin remain on their existing production digests because their

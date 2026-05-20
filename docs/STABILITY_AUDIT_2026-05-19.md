@@ -26,20 +26,20 @@ production/staging domain checks, Enclii route remediation attempts, staging
 promotion hardening, API GitOps deployment verification, queue remediation path
 hardening, production migration recovery, and failed-job cleanup.
 
-| Area                      | Status             | Evidence                                                                                                                                                      |
-| ------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Code build and unit gates | Improved           | Local pre-push ran format, typecheck, lint, tests, build, and Prisma validation successfully; latest admin/auth/job targeted Jest passed 5 suites / 71 tests. |
-| API Docker build          | Improved           | API Enclii build issue was remediated by aligning Dockerfiles to repo `pnpm@9.15.0` and pruning Docker context noise.                                         |
-| Web Playwright            | Improved           | Auth helpers now use the current `/auth/guest` flow and seed the app stores/cookies expected by Next.js.                                                      |
-| Web accessibility gates   | Stable locally     | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.                  |
-| Admin Playwright          | Improved           | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                              |
-| API production build      | Improved           | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                              |
-| Staging image pipeline    | Improved           | API, web, and admin images build, sign with cosign, and patch the staging overlay; latest refresh is `7a848a2c` for source `d1f8ccf0`.                        |
-| Staging smoke             | Improved           | Deploy run `26194485016` passed API, web, admin, and staging API-origin smoke.                                                                                |
-| Production API health     | Healthy            | Full production health returns HTTP 200 with `status: "healthy"` and `failedJobs: 0`.                                                                         |
-| Production domain routing | Fixed and verified | `scripts/production-preflight.sh` passes; `www.dhan.am` redirects to `https://dhan.am/` without leaking `:4200`.                                              |
-| Enclii production rollout | Partially improved | `scripts/production-rollout-proof.js` proves ArgoCD live digests at revision `593953ca`, but Enclii `prod` still does not own public rollout truth.           |
-| Enclii policy remediation | Adapter gap        | `enclii ops policy waiver-plan` is planned only; apply is blocked because adapter execution is not wired.                                                     |
+| Area                      | Status             | Evidence                                                                                                                                                         |
+| ------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code build and unit gates | Improved           | Local pre-push ran format, typecheck, lint, tests, build, and Prisma validation successfully; latest admin/auth/job targeted Jest passed 5 suites / 71 tests.    |
+| API Docker build          | Improved           | API Enclii build issue was remediated by aligning Dockerfiles to repo `pnpm@9.15.0` and pruning Docker context noise.                                            |
+| Web Playwright            | Improved           | Auth helpers now use the current `/auth/guest` flow and seed the app stores/cookies expected by Next.js.                                                         |
+| Web accessibility gates   | Stable locally     | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.                     |
+| Admin Playwright          | Improved           | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                                 |
+| API production build      | Improved           | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                                 |
+| Staging image pipeline    | Improved           | API, web, and admin images build, sign with cosign, and patch the staging overlay; latest refresh is `7a848a2c` for source `d1f8ccf0`.                           |
+| Staging smoke             | Improved           | Deploy run `26194485016` passed API, web, admin, and staging API-origin smoke.                                                                                   |
+| Production API health     | Healthy            | Full production health returns HTTP 200 with `status: "healthy"` and `failedJobs: 0`.                                                                            |
+| Production domain routing | Fixed and verified | `scripts/production-preflight.sh` passes; `www.dhan.am` redirects to `https://dhan.am/` without leaking `:4200`.                                                 |
+| Enclii production rollout | Partially improved | `scripts/production-rollout-proof.js` proves ArgoCD live digests match the production manifest on `main`; Enclii `prod` still does not own public rollout truth. |
+| Enclii policy remediation | Adapter gap        | `enclii ops policy waiver-plan` is planned only; apply is blocked because adapter execution is not wired.                                                        |
 
 ## Shortcomings Blocking Full Stability
 
@@ -192,8 +192,8 @@ Final evidence from the latest stabilization pass:
   passed web/admin route checks that prove the staging API origin.
 - `scripts/production-preflight.sh` passed for production.
 - `scripts/production-rollout-proof.js` passed for production with ArgoCD
-  health `Healthy`, sync `Synced`, revision `593953ca`, and live images matching
-  the production manifest.
+  health `Healthy`, sync `Synced`, and live images matching the production
+  manifest on `main`.
 - `https://api.dhan.am/v1/monitoring/health` returns HTTP 200 with
   `status: "healthy"` and `failedJobs: 0`.
 

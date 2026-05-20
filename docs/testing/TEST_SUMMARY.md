@@ -68,7 +68,7 @@ test coverage (`26194484988`), migration check (`26194484989`), and `Deploy to
 Staging` (`26194485016`) passed for `d1f8ccf0`. The staging run built and
 signed API, web, and admin images, committed digest refresh `7a848a2c`, and
 passed API/web/admin smoke with staging API-origin proof. Production rollout
-proof passes at ArgoCD revision `593953ca` after manual API promotion run
+proof passes against the production manifest after manual API promotion run
 `26195552704`, and production full health is `status: "healthy"` with
 `failedJobs: 0`.
 
