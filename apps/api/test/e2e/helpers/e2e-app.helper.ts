@@ -3,6 +3,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 
+import { PrismaService } from '../../../src/core/prisma/prisma.service';
+
+import { seedCatalogForE2E } from './catalog.helper';
+
 function disableExternalProviderCredentialsForE2E() {
   process.env.PLAID_CLIENT_ID = '';
   process.env.PLAID_SECRET = '';
@@ -48,6 +52,7 @@ export async function createE2EApp(): Promise<NestFastifyApplication> {
 
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
+  await seedCatalogForE2E(app.get(PrismaService));
 
   return app;
 }

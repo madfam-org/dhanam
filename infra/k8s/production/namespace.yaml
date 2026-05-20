@@ -11,6 +11,11 @@ metadata:
   labels:
     app.kubernetes.io/name: dhanam
     app.kubernetes.io/part-of: galaxy-ecosystem
-    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/managed-by: enclii
+    enclii.dev/data-access: "true"
+    enclii.dev/type: application
+    enclii.dev/verify-signatures: "true"
+    managed-by: enclii
+    platform: enclii
   annotations:
     description: "Dhanam - Personal Finance & Wealth Management"
