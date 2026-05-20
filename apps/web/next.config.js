@@ -1,6 +1,9 @@
 const { withSentryConfig } = require('@sentry/nextjs');
 const { z } = require('zod');
 
+const defaultApiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am/v1';
+const defaultBaseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am';
+
 const envSchema = z.object({
   NEXT_PUBLIC_BASE_URL: z.string().url(),
   NEXT_PUBLIC_API_URL: z.string().url(),
@@ -12,8 +15,8 @@ if (
   process.env.SKIP_ENV_VALIDATION !== 'true'
 ) {
   const parsed = envSchema.safeParse({
-    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_BASE_URL: defaultBaseUrl,
+    NEXT_PUBLIC_API_URL: defaultApiUrl,
   });
 
   if (!parsed.success) {
@@ -41,8 +44,8 @@ const nextConfig = {
   ],
 
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am/v1',
-    NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am',
+    NEXT_PUBLIC_API_URL: defaultApiUrl,
+    NEXT_PUBLIC_BASE_URL: defaultBaseUrl,
     NEXT_PUBLIC_ADMIN_URL: process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.dhan.am',
     NEXT_PUBLIC_OIDC_ISSUER: process.env.NEXT_PUBLIC_OIDC_ISSUER,
     NEXT_PUBLIC_OIDC_CLIENT_ID: process.env.NEXT_PUBLIC_OIDC_CLIENT_ID,
@@ -100,7 +103,7 @@ const nextConfig = {
               "font-src 'self' data:",
               `connect-src 'self' ${(() => {
                 try {
-                  return new URL(process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am').origin;
+                  return new URL(defaultApiUrl).origin;
                 } catch {
                   return 'https://api.dhan.am';
                 }
