@@ -28,6 +28,8 @@ This is the concise end-state from the production-stability push on
   deploy workflow.
 - Seeded the product catalog in API E2E app startup so billing/catalog-backed
   tests do not depend on out-of-band database state.
+- Reconciled `ProductCategory` with the canonical catalog by adding the
+  `travel` enum value required by Routecraft.
 - Clarified provider health semantics for required, optional, and unconfigured
   providers.
 - Fixed the API chaos test command.
@@ -42,6 +44,8 @@ This is the concise end-state from the production-stability push on
   validation.
 - Full local `pnpm test` passed across 13 monorepo tasks.
 - Full local `pnpm build` passed across 8 monorepo tasks.
+- Local Prisma client generation, API typecheck, and repo formatting passed
+  after the `ProductCategory.travel` schema migration.
 - Hosted `CI` run `26146547824` passed.
 - Hosted `Lint & Type Check` run `26146547856` passed.
 - Hosted `Test Coverage` run `26146547825` passed.

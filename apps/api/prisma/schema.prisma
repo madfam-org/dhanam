@@ -127,6 +127,7 @@ enum ProductCategory {
   intelligence
   fabrication
   crm
+  travel
   platform
 }
 

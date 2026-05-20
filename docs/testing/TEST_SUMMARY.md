@@ -8,7 +8,7 @@ gates before merging to `main`.
 
 Current 2026-05-20 stabilization state: full monorepo `pnpm test` and
 `pnpm build` both pass locally after the admin authorization, queue scheduler,
-staging overlay, and E2E catalog-seeding updates.
+staging overlay, E2E catalog-seeding, and product-category enum sync updates.
 
 ## Main Commands
 

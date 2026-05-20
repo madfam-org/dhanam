@@ -23,6 +23,8 @@ Prisma, AWS, or port assumptions.
 | Admin auth hook targeted Jest                               | 1 suite, 3 tests passed                       |
 | Full monorepo `pnpm test`                                   | 13 tasks passed                               |
 | Full monorepo `pnpm build`                                  | 8 tasks passed                                |
+| API Prisma generate after catalog enum sync                 | Passed                                        |
+| API typecheck after catalog enum sync                       | Passed                                        |
 | API chaos health suite                                      | 11 suites, 102 tests passed                   |
 | Shared package build                                        | Passed                                        |
 | API build                                                   | Passed                                        |
@@ -99,6 +101,8 @@ These are not unit-test failures, but they block full-system stability:
   repeatable schedules, and makes cron-dispatched queue jobs idempotent across
   API replicas. Targeted Jest and the full monorepo `pnpm test` / `pnpm build`
   gates passed locally.
+- Current source also adds `ProductCategory.travel`, matching the Routecraft
+  entry in `catalog.yaml` and unblocking catalog-seeded API E2E startup.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.
