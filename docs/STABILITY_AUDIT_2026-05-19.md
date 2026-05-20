@@ -21,28 +21,30 @@ and break-glass raw Kubernetes/provider access is exceptional and recorded.
 Snapshot originally taken on 2026-05-19 and refreshed on 2026-05-20 after
 production/staging domain checks and Enclii route remediation attempts.
 
-| Area                      | Status               | Evidence                                                                                                                                           |
-| ------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Code build and unit gates | Improved             | Local pre-push ran format, typecheck, lint, tests, build, and Prisma validation successfully.                                                      |
-| API Docker build          | Improved             | API Enclii build issue was remediated by aligning Dockerfiles to repo `pnpm@9.15.0` and pruning Docker context noise.                              |
-| Web Playwright            | Improved             | Auth helpers now use the current `/auth/guest` flow and seed the app stores/cookies expected by Next.js.                                           |
-| Web accessibility gates   | Stable locally       | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.       |
-| Admin Playwright          | Improved             | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                   |
-| API production build      | Improved             | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                   |
-| Staging image pipeline    | Partially stable     | API, web, and admin images build and the staging overlay digest patch succeeds.                                                                    |
-| Staging smoke             | Blocked              | Enclii verifies staging domains and DNS CNAMEs exist, but the ArgoCD Application/namespace are absent and tunnel routes are not namespace-aware.   |
-| Production API health     | Unstable             | Public health reported DB/Redis up, but queues down, Banxico 404, Belvo 502, Plaid/Bitso unconfigured.                                             |
-| Production domain routing | Improved in config   | Enclii web specs now delegate `www.dhan.am` -> apex to app middleware; live `www` still needs a production rollout before the `:4200` leak closes. |
-| Enclii production rollout | Blocked/inconsistent | Latest API/admin deployment records failed on Kyverno image-signature annotation mutation, while Enclii observe still reports old pods healthy.    |
-| Enclii policy remediation | Adapter gap          | `enclii ops policy waiver-plan` is planned only; apply is blocked because adapter execution is not wired.                                          |
+| Area                      | Status               | Evidence                                                                                                                                              |
+| ------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code build and unit gates | Improved             | Local pre-push ran format, typecheck, lint, tests, build, and Prisma validation successfully.                                                         |
+| API Docker build          | Improved             | API Enclii build issue was remediated by aligning Dockerfiles to repo `pnpm@9.15.0` and pruning Docker context noise.                                 |
+| Web Playwright            | Improved             | Auth helpers now use the current `/auth/guest` flow and seed the app stores/cookies expected by Next.js.                                              |
+| Web accessibility gates   | Stable locally       | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.          |
+| Admin Playwright          | Improved             | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                      |
+| API production build      | Improved             | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                      |
+| Staging image pipeline    | Partially stable     | API/admin images build; web build was blocked by build-time font network coupling and is being rerun after removing `next/font/google`.               |
+| Staging smoke             | Blocked              | Enclii verifies staging domains and DNS CNAMEs exist, but the ArgoCD Application/namespace are absent and tunnel routes are not namespace-aware.      |
+| Production API health     | Unstable             | Public health reported DB/Redis up, but queues down, Banxico 404, Belvo 502, Plaid/Bitso unconfigured.                                                |
+| Production domain routing | Improved in config   | Enclii web specs now delegate `www.dhan.am` -> apex to app middleware; live `www` still needs a production rollout before the `:4200` leak closes.    |
+| Enclii production rollout | Blocked/inconsistent | Enclii `prod` can build web releases, but the live public route still serves the ArgoCD `dhanam` namespace and the Enclii `prod` namespace is absent. |
+| Enclii policy remediation | Adapter gap          | `enclii ops policy waiver-plan` is planned only; apply is blocked because adapter execution is not wired.                                             |
 
 ## Shortcomings Blocking Full Stability
 
 1. Staging DNS is now present, but staging is not live: the ArgoCD Application,
    `enclii-dhanam-staging` namespace, staging Vault/ESO values, and
    namespace-aware tunnel routes are still missing.
-2. Enclii can produce ready releases, but API/admin roll-forward is currently
-   blocked by a Kyverno admission policy conflict.
+2. Enclii can produce ready releases, but the public production route currently
+   follows the ArgoCD `dhanam-services` Application in the `dhanam` namespace,
+   while Enclii `prod` reports deployment state for an absent
+   `enclii-dhanam-prod` namespace.
 3. The Enclii policy waiver contract exists but cannot apply, so operators do
    not have an Enclii-first remediation path for the Kyverno block.
 4. Production health is not green: queue failures and external provider checks
@@ -52,7 +54,9 @@ production/staging domain checks and Enclii route remediation attempts.
    verification.
 6. Production appears to be serving older releases than the latest pushed
    code and GitHub-built images.
-7. Local test startup still warns when optional local SMTP/PostHog/Sentry and
+7. Web Docker builds must not depend on external font downloads; the app now
+   uses a local system font stack instead of `next/font/google`.
+8. Local test startup still warns when optional local SMTP/PostHog/Sentry and
    provider credentials are absent; production should treat required
    observability and email credentials as deploy-time checks.
 
@@ -69,6 +73,10 @@ Priority 1 - restore deployability:
 
 - Fix Enclii deployment reconciliation so it does not attempt to mutate the
   protected `kyverno.io/verify-images` annotation.
+- Fix Enclii production environment reconciliation so `enclii deploy --env prod`
+  targets the live `dhanam` production namespace, or migrate the public route
+  cleanly to an existing Enclii-managed namespace before treating Enclii
+  deployment records as live production truth.
 - Wire the Enclii `ops policy waiver-plan --apply` adapter or provide an
   Enclii-first policy exception workflow with idempotency and audit records.
 - Re-run Enclii release/deployment checks for `dhanam-api`, `dhanam-web`, and
@@ -152,3 +160,18 @@ Those are production namespace services, so leaving them active would make
 staging traffic hit production. The missing Enclii adapter is a
 namespace-aware tunnel route operation that can target
 `*.enclii-dhanam-staging.svc.cluster.local`.
+
+## 2026-05-20 Production Rollout Note
+
+`enclii deploy --env prod` built `dhanam-web` at git `502dbc18` and Enclii
+reported a healthy deployment record for image
+`ghcr.io/madfam-org/enclii/dhanam-web:502dbc18`, but read-only cluster
+inspection showed no `enclii-dhanam-prod` namespace. Public `dhan.am` traffic
+continues to be served by the ArgoCD `dhanam-services` Application in the
+`dhanam` namespace, pinned by `infra/k8s/production/kustomization.yaml`.
+
+Until Enclii's production reconciler/namespace mapping is repaired, the
+auditable production path is GitOps digest promotion into
+`infra/k8s/production/kustomization.yaml` and ArgoCD reconciliation. Raw
+`kubectl set image` remains break-glass only when Enclii/GitOps promotion is
+unavailable, and the missing Enclii adapter gap must be recorded.

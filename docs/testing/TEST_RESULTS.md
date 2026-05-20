@@ -20,7 +20,7 @@ Prisma, AWS, or port assumptions.
 | API onboarding + pricing targeted Jest                      | 3 suites, 68 tests passed                     |
 | Shared package build                                        | Passed                                        |
 | API build                                                   | Passed                                        |
-| Web production build                                        | Passed with required public env vars          |
+| Web production build                                        | Passed with blank public URL env vars         |
 | Admin production build                                      | Passed after Google Fonts network access      |
 | Web Playwright accessibility + subscription slice           | 41 passed                                     |
 | Web Playwright auth + upgrade + visual harness slice        | 18 passed, 19 skipped by design               |
@@ -43,6 +43,8 @@ Prisma, AWS, or port assumptions.
   startup no longer emits missing-template errors.
 - The onboarding preferences DTO was renamed at runtime to avoid Swagger model
   collisions with the full preferences DTO.
+- Web root layout no longer imports `next/font/google`; production builds use a
+  local system font stack and no longer depend on Google Fonts network access.
 
 ## Current External Blockers
 
@@ -57,6 +59,9 @@ These are not unit-test failures, but they block full-system stability:
 - `www.dhan.am` has redirected to `https://dhan.am:4200/`, exposing an internal
   port; Enclii web specs now delegate the redirect to app middleware, but live
   production needs a rollout before this can be closed.
+- Enclii `prod` deployment records are not currently sufficient proof of public
+  production rollout: the live route is still served by the ArgoCD
+  `dhanam-services` Application in the `dhanam` namespace.
 
 See [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md) for the full
 assessment and remediation plan.

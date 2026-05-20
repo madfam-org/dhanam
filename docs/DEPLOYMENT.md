@@ -11,7 +11,11 @@
 
 ## Overview
 
-Dhanam deploys to bare-metal Kubernetes via **Enclii** (MADFAM's PaaS). The primary method is auto-deploy on push to `main`. There is no AWS/ECS/Fargate infrastructure.
+Dhanam deploys to bare-metal Kubernetes via **Enclii** (MADFAM's PaaS) and
+ArgoCD GitOps. The intended primary method is Enclii-controlled build/deploy
+plus manual promotion; the current public production runtime is the ArgoCD
+`dhanam-services` Application syncing `infra/k8s/production/` into the
+`dhanam` namespace. There is no AWS/ECS/Fargate infrastructure.
 
 ### Production URLs
 
@@ -32,31 +36,56 @@ Dhanam deploys to bare-metal Kubernetes via **Enclii** (MADFAM's PaaS). The prim
 - **GitOps**: ArgoCD syncs from `infra/k8s/production/` with auto-sync, prune, and self-heal
 - **Namespace**: `dhanam`
 
+### Current Production Runtime Gap
+
+As of 2026-05-20, public production traffic is served from the legacy/live
+`dhanam` namespace through the ArgoCD `dhanam-services` Application. Enclii
+also exposes project environments named `prod` (`enclii-dhanam-prod`) and
+`production` (`dhanam`), but a verified `enclii deploy --env prod` produced a
+healthy Enclii deployment record while the `enclii-dhanam-prod` namespace did
+not exist in the cluster.
+
+Until Enclii's production environment mapping is repaired, do not assume an
+Enclii `prod` deployment record means the public site changed. Verify the live
+ArgoCD digest and public HTTP behavior. Use GitOps digest promotion into
+`infra/k8s/production/kustomization.yaml` as the auditable production path;
+raw `kubectl set image` remains break-glass only.
+
 ---
 
 ## Deployment Methods
 
-### Auto-Deploy (Primary)
+### Auto-Deploy / Promotion
 
-Push to `main` triggers Enclii auto-deploy:
+Pushes to `main` run CI and the staging image pipeline. Production changes
+should be promoted through the manual promotion workflow or an Enclii deploy
+that is confirmed to affect the live production namespace:
 
 ```bash
 git push origin main
-# Enclii detects → builds Docker images → deploys to K8s
+# CI builds/test gates run; staging image digests are updated
+# Production is promoted manually after validation
 ```
 
-Verify deployment through Enclii:
+Verify Enclii release state first:
 
 ```bash
-enclii ps dhanam-api --env production
-enclii ps dhanam-web --env production
-enclii ps dhanam-admin --env production
+enclii releases dhanam-web --project dhanam -n 5
+enclii deployments list --limit 10
+```
+
+Then verify the live public runtime through the production preflight:
+
+```bash
+scripts/production-preflight.sh
 ```
 
 ### Manual Deploy via Enclii CLI
 
 ```bash
-enclii deploy --app dhanam --env production
+enclii deploy --file infra/enclii/services/dhanam-web.yaml --env prod --wait \
+  --change-ticket https://github.com/madfam-org/dhanam/commit/<sha> \
+  --smoke-endpoint https://dhan.am/
 ```
 
 ### Manual Deploy via kubectl (Break-Glass Only)

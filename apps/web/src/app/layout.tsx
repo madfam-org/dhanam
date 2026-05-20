@@ -1,13 +1,10 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { Toaster } from 'sonner';
 
 import { EcosystemBannerClient } from '~/components/ecosystem-banner-client';
 import { Providers } from '~/lib/providers';
 import '~/styles/globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -88,7 +85,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={inter.className}>
+      <body>
         <Providers>{children}</Providers>
         <Toaster theme="system" position="top-right" richColors />
         {/*
