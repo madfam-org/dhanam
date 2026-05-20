@@ -101,9 +101,7 @@ jobs:
         run: |
           DIGEST="${{ steps.build.outputs.digest }}"
           echo "Updating kustomization.yaml with digest: $DIGEST"
-
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
+          export DIGEST
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -116,9 +114,44 @@ jobs:
             # Reset to latest remote main and re-apply our digest change
             git reset --hard origin/main
 
-            cd infra/k8s/production
-            kustomize edit set image ${{ env.SERVICE_SHORT_NAME }}=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${DIGEST}
-            cd ${{ github.workspace }}
+            python3 <<'PY'
+          import os
+          import pathlib
+          import re
+          import sys
+
+          path = pathlib.Path("infra/k8s/production/kustomization.yaml")
+          text = path.read_text()
+          short_name = os.environ["SERVICE_SHORT_NAME"]
+          new_name = f'{os.environ["REGISTRY"]}/{os.environ["IMAGE_NAME"]}'
+          digest = os.environ["DIGEST"]
+          patterns = [
+              (
+                  r'(-\s+digest:\s+)sha256:[a-f0-9]+(\n\s+name:\s+'
+                  + re.escape(short_name)
+                  + r'\n\s+newName:\s+'
+                  + re.escape(new_name)
+                  + r')',
+                  lambda m: m.group(1) + digest + m.group(2),
+              ),
+              (
+                  r'(-\s+name:\s+'
+                  + re.escape(short_name)
+                  + r'\n\s+newName:\s+'
+                  + re.escape(new_name)
+                  + r'\n\s+digest:\s+)sha256:[a-f0-9]+',
+                  lambda m: m.group(1) + digest,
+              ),
+          ]
+          for pattern, replacement in patterns:
+              text, count = re.subn(pattern, replacement, text, count=1)
+              if count:
+                  path.write_text(text)
+                  break
+          else:
+              print(f"ERROR: Could not find image entry for {short_name} -> {new_name}", file=sys.stderr)
+              sys.exit(1)
+          PY
 
             git add infra/k8s/production/kustomization.yaml
             git diff --staged --quiet && { echo "No changes to commit"; exit 0; }

@@ -54,15 +54,19 @@ raw `kubectl set image` remains break-glass only.
 Production digests must be signed. `deploy-staging.yml` now signs API, web,
 and admin images with GitHub Actions keyless cosign signatures, and
 `promote-to-prod.yml` verifies the candidate digest was signed by
-`deploy-staging.yml@refs/heads/main` before it writes a production commit.
-The first signed staging digest refresh landed in `1af02bc2`; future
-promotions must use signed staging digests with smoke/soak evidence. The
-break-glass K8s workflows also sign their images before committing production
-digests; their raw
+`deploy-staging.yml@refs/heads/main` before it writes a production commit. It
+also requires the operator to provide a successful `Deploy to Staging` run id
+whose smoke job passed for the staged source commit, unless the operator
+selects the explicit break-glass smoke bypass. The first signed staging digest
+refresh landed in `1af02bc2`; future promotions must use signed staging
+digests with smoke/soak evidence. The break-glass K8s workflows also sign
+their images before committing production digests; their raw
 `kubectl set image` rollout is now opt-in through `direct_k8s_deploy` because
 GitHub-hosted runners currently cannot reach the cluster API. By default,
 ArgoCD reconciliation of the signed digest is the effective deployment
-mechanism.
+mechanism. The break-glass workflows patch production digests with a local
+Python stdlib edit instead of downloading the upstream kustomize install
+script, avoiding another network-dependent release step.
 
 ---
 

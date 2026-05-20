@@ -26,7 +26,7 @@ When you push to `main`:
 1. CI validates the change
 2. `deploy-staging.yml` builds and signs api/web/admin, then patches digest-pinned staging images
 3. ArgoCD reconciles staging
-4. `promote-to-prod.yml` verifies the deploy-staging cosign signature and manually promotes a soaked staging digest to production
+4. `promote-to-prod.yml` verifies the deploy-staging cosign signature, requires a successful staging smoke run id unless break-glass is selected, and manually promotes a soaked staging digest to production
 
 The raw K8s deployment workflows here are **break-glass options** for manual intervention when Enclii or promotion is unavailable.
 
@@ -111,6 +111,7 @@ Manual Kubernetes deployment workflows.
 
 - Emergency image build/sign and digest commits when Enclii/promotion is unavailable
 - Raw Kubernetes rollout is opt-in via `direct_k8s_deploy=true` and requires runner network access to the cluster API
+- Leave `direct_k8s_deploy=false` when the goal is a signed GitOps digest commit that ArgoCD will reconcile
 - Documented incident response only
 - Record the missing Enclii adapter gap after use
 
@@ -159,4 +160,4 @@ Recommended branch protection rules for `main`:
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: 2026-05-20

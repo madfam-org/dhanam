@@ -61,11 +61,17 @@ These are not unit-test failures, but they block full-system stability:
 - `deploy-staging.yml` now signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
   digests. The staging overlay was refreshed with signed digests in
-  `1af02bc2`; promotion still needs live staging smoke/soak evidence.
+  `1af02bc2`; promotion now also requires an explicit successful staging
+  smoke run id unless break-glass is selected. Live promotion still needs
+  staging smoke/soak evidence.
 - The manual K8s workflows can build, sign, and commit production digests. Raw
   `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
-  because GitHub runners cannot currently reach the cluster API.
-- Production API health has reported queue/provider degradation.
+  because GitHub runners cannot currently reach the cluster API. Their digest
+  patch step no longer downloads the volatile upstream kustomize installer.
+- Production API liveness passes, but full health has reported HTTP 503 on the
+  older deployed API image. A manual signed API digest rebuild was started on
+  2026-05-20 with direct raw K8s rollout disabled so ArgoCD remains the
+  production reconciler.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.
