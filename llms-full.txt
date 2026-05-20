@@ -1,6 +1,6 @@
 # Dhanam Full LLM Context
 
-Generated: 2026-05-19
+Generated: 2026-05-20
 
 ## Purpose
 
@@ -13,9 +13,10 @@ repository without depending on vendor-specific instruction files.
 2. `README.md` if present
 3. `docs/README.md` for the current documentation map
 4. `docs/STABILITY_AUDIT_2026-05-19.md` for current stability state
-5. `docs/DOCUMENTATION_AUDIT_2026-05-19.md` for documentation status
-6. `ECOSYSTEM.md` if present
-7. Relevant files under `docs/`, `infra/`, `.github/workflows/`, and source
+5. `docs/TECH_DEBT.md` for current active technical debt
+6. `docs/DOCUMENTATION_AUDIT_2026-05-19.md` for documentation status
+7. `ECOSYSTEM.md` if present
+8. Relevant files under `docs/`, `infra/`, `.github/workflows/`, and source
    directories for the specific task
 
 ## Agent compatibility
@@ -41,6 +42,7 @@ gap or incident link.
 - `README.md`
 - `docs/README.md`
 - `docs/STABILITY_AUDIT_2026-05-19.md`
+- `docs/TECH_DEBT.md`
 - `docs/DOCUMENTATION_AUDIT_2026-05-19.md`
 - `ECOSYSTEM.md`
 - `docs/`

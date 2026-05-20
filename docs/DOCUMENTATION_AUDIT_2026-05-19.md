@@ -50,6 +50,9 @@ current source, manifests, Enclii specs, `AGENTS.md`, or the stability audit.
 - Testing docs contained stale 2025 Prisma failure reports and obsolete tiny
   test-suite counts. `TEST_SUMMARY.md` and `TEST_RESULTS.md` now identify the
   current layered test strategy and latest verification snapshot.
+- The root `TECH_DEBT.md` was a stale March 2026 log with current-looking
+  placement. It now redirects to the current `docs/TECH_DEBT.md`, and the March
+  log is preserved under `docs/reports/`.
 - Deployment docs normalized raw Kubernetes for secrets, rollback, pod
   inspection, and troubleshooting. They now put Enclii first and explicitly mark
   raw access as break-glass/bootstrap.

@@ -13,7 +13,7 @@ Step-by-step instructions for activating each external provider in Dhanam. Each 
 2. Apply credentials to the appropriate K8s secret
 3. The service constructor auto-detects real credentials and initializes
 4. Configure webhooks (if applicable)
-5. Verify via health check
+5. Verify via health check or feature-specific staging smoke
 
 ---
 
@@ -106,8 +106,8 @@ kubectl apply -f /tmp/provider-secrets.yaml && rm /tmp/provider-secrets.yaml
 kubectl -n dhanam rollout restart deployment dhanam-api
 
 # 5. Verify
-curl -s https://api.dhan.am/health/full | jq '.providers.belvo'
-# Should show: "configured"
+curl -s https://api.dhan.am/v1/monitoring/health | jq '.checks.providers.details.belvo'
+# Should show status "up" after activation
 ```
 
 ---
@@ -137,7 +137,7 @@ curl -s https://api.dhan.am/health/full | jq '.providers.belvo'
 # 2. Add to dhanam-provider-secrets (same pattern as Belvo)
 # 3. Configure webhook: https://api.dhan.am/v1/providers/plaid/webhooks
 # 4. Restart: kubectl -n dhanam rollout restart deployment dhanam-api
-# 5. Verify: curl -s https://api.dhan.am/health/full | jq '.providers.plaid'
+# 5. Verify: curl -s https://api.dhan.am/v1/monitoring/health | jq '.checks.providers.details.plaid'
 ```
 
 ---
@@ -165,7 +165,7 @@ curl -s https://api.dhan.am/health/full | jq '.providers.belvo'
 # 2. Add to dhanam-provider-secrets
 # 3. Configure webhook: https://api.dhan.am/v1/providers/bitso/webhooks
 # 4. Restart: kubectl -n dhanam rollout restart deployment dhanam-api
-# 5. Verify: curl -s https://api.dhan.am/health/full | jq '.providers.bitso'
+# 5. Verify: curl -s https://api.dhan.am/v1/monitoring/health | jq '.checks.providers.details.bitso'
 ```
 
 ---
@@ -194,7 +194,8 @@ curl -s https://api.dhan.am/health/full | jq '.providers.belvo'
 # 2. Add to dhanam-billing-secrets
 # 3. Configure webhook: https://api.dhan.am/v1/billing/webhooks/paddle
 # 4. Restart: kubectl -n dhanam rollout restart deployment dhanam-api
-# 5. Verify: curl -s https://api.dhan.am/health/full | jq '.billing.paddle'
+# 5. Verify: create a Paddle checkout in staging; the full health endpoint does
+#    not currently expose a dedicated Paddle connectivity check.
 ```
 
 ---
@@ -218,7 +219,8 @@ curl -s https://api.dhan.am/health/full | jq '.providers.belvo'
 # 1. Get API key from Zapper Developer Portal
 # 2. Add to dhanam-provider-secrets
 # 3. Restart: kubectl -n dhanam rollout restart deployment dhanam-api
-# 4. Verify: curl -s https://api.dhan.am/health/full | jq '.providers.zapper'
+# 4. Verify: run a DeFi portfolio refresh in staging; the full health endpoint
+#    does not currently expose a dedicated Zapper connectivity check.
 ```
 
 ---
@@ -242,7 +244,8 @@ curl -s https://api.dhan.am/health/full | jq '.providers.belvo'
 # 1. Get API key from Zillow
 # 2. Add to dhanam-provider-secrets
 # 3. Restart: kubectl -n dhanam rollout restart deployment dhanam-api
-# 4. Verify: curl -s https://api.dhan.am/health/full | jq '.providers.zillow'
+# 4. Verify: run a manual asset valuation smoke in staging; the full health
+#    endpoint does not currently expose a dedicated Zillow connectivity check.
 ```
 
 ---
@@ -290,10 +293,13 @@ kubectl -n dhanam create secret generic dhanam-janua-secrets \
 After activating any provider, verify the full health check:
 
 ```bash
-curl -s https://api.dhan.am/health/full | jq '.'
+curl -s https://api.dhan.am/v1/monitoring/health | jq '.'
 ```
 
-Each activated provider should show as `configured` or `connected`. Update `TECH_DEBT.md` TD-004 status as providers are activated.
+Each provider exposed by the full health check should show `up` after activation
+or `unconfigured` when intentionally disabled. If provider activation changes
+production readiness or health semantics, update this guide and the current
+[Tech Debt Register](TECH_DEBT.md).
 
 ## K8s Secret Summary
 

@@ -13,6 +13,7 @@ file over older phase summaries when choosing what to read first.
 | [Development Guide](DEVELOPMENT.md)                                 | Local setup, ports, env files, testing workflow                                    |
 | [Deployment Guide](DEPLOYMENT.md)                                   | Enclii-first deploy, staging, rollback, current rollout blockers                   |
 | [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)         | Current truth about production, staging, DNS, health, and remaining stability gaps |
+| [Tech Debt Register](TECH_DEBT.md)                                  | Current technical debt, active stability gaps, and historical debt archive         |
 | [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md) | Docs accuracy, organization, link hygiene, and remaining documentation debt        |
 | [API Reference](API.md)                                             | REST API overview and endpoint examples                                            |
 | [Mobile Guide](MOBILE.md)                                           | React Native and Expo app notes                                                    |
@@ -105,9 +106,11 @@ and the specific source/module docs for the files you are touching.
 The `docs/reports/`, `docs/testing/`, `docs/guides/*SUMMARY*.md`, and phase
 summary files preserve implementation history. They are useful for context, but
 they may mention superseded AWS/Fargate, `dhanam.io`, old ports, or earlier test
-counts. When a historical report conflicts with this index, `AGENTS.md`,
-`DEPLOYMENT.md`, current manifests, or source code, treat the current files as
-authoritative and update the report only if it is still used operationally.
+counts. The archived March 2026 tech-debt log lives at
+[reports/TECH_DEBT_2026-03-21.md](reports/TECH_DEBT_2026-03-21.md). When a
+historical report conflicts with this index, `AGENTS.md`, `DEPLOYMENT.md`,
+current manifests, or source code, treat the current files as authoritative and
+update the report only if it is still used operationally.
 
 ## Documentation Standards
 
