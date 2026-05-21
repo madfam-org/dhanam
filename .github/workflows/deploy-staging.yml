@@ -244,7 +244,7 @@ jobs:
   smoke:
     name: Staging smoke test
     needs: [build-api, build-web, build-admin, update-staging-overlay]
-    runs-on: ubuntu-latest
+    runs-on: madfam-runners-blue
     steps:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v5
@@ -275,7 +275,19 @@ jobs:
             exit 1
           fi
 
-          kubectl -n argocd annotate application dhanam-staging argocd.argoproj.io/refresh=hard --overwrite
+          refreshed=false
+          for attempt in 1 2 3 4; do
+            if kubectl -n argocd annotate application dhanam-staging argocd.argoproj.io/refresh=hard --overwrite; then
+              refreshed=true
+              break
+            fi
+            echo "ArgoCD hard refresh attempt $attempt failed; retrying in 15s"
+            sleep 15
+          done
+          if [ "$refreshed" != "true" ]; then
+            echo "::error::Unable to request ArgoCD hard refresh for dhanam-staging."
+            exit 1
+          fi
 
           deadline=$((SECONDS + 600))
           while [ "$SECONDS" -lt "$deadline" ]; do
