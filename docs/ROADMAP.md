@@ -224,6 +224,10 @@ Work:
   writes, canonical `payment.*` fan-out, and DLQ coverage are source-landed;
   refund initiation/partial refunds, settlement reconciliation, provider
   timeline UI, and live-mode operator proof remain.
+- Keep the admin Webhook DLQ as the routine product-webhook recovery path:
+  source now includes `/webhook-dlq` for listing unresolved deliveries,
+  replaying failures, and marking out-of-band resolutions without direct
+  database access.
 - Update `packages/billing-sdk` for trusted internal callers once POS contracts
   stabilize.
 
@@ -233,6 +237,8 @@ Acceptance:
   provider id, status, and replay path.
 - Admin operators can create, inspect, refund, and reconcile payments without
   direct provider dashboard access for routine work.
+- Product webhook failures can be inspected, replayed, and resolved from the
+  admin surface before any break-glass access is considered.
 - Product webhooks are versioned, signed, documented, and tested with golden
   Dhanam -> product probes.
 - Docs clearly separate live production flows, source-landed flows, and planned

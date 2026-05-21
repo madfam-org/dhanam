@@ -63,25 +63,25 @@ Current Dhanam managed-cloud tiers in the catalog:
 
 ## API Endpoints
 
-| Endpoint                                            | Auth             | Status               | Purpose                                  |
-| --------------------------------------------------- | ---------------- | -------------------- | ---------------------------------------- |
-| `GET /billing/pricing`                              | Public           | Live                 | Regional pricing                         |
-| `GET /billing/catalog`                              | Public           | Live                 | Product catalog                          |
-| `GET /billing/catalog/:slug`                        | Public           | Live                 | Product detail                           |
-| `GET /billing/checkout`                             | Public/allowlist | Live                 | External checkout redirect               |
-| `POST /billing/upgrade`                             | User JWT         | Live                 | Authenticated subscription checkout      |
-| `POST /billing/portal`                              | User JWT         | Live                 | Stripe portal session                    |
-| `GET /billing/status`                               | User JWT         | Live                 | Subscription status                      |
-| `GET /billing/usage`                                | User JWT         | Live                 | Usage metrics                            |
-| `GET /billing/history`                              | User JWT         | Live                 | Billing event history array              |
-| `POST /billing/stripe-mx/spei-payment-intent`       | User JWT         | Live when configured | MXN SPEI PaymentIntent                   |
-| `POST /billing/webhooks/stripe`                     | Stripe HMAC      | Live                 | Stripe MX event receiver                 |
-| `POST /billing/webhook`                             | Stripe HMAC      | Legacy               | Legacy Stripe subscription webhook       |
-| `POST /billing/webhook/janua`                       | Janua HMAC       | Blocked by secrets   | Janua billing webhook                    |
-| `POST /billing/madfam-events`                       | MADFAM HMAC      | Live                 | Ecosystem revenue event receiver         |
-| `GET /billing/dlq` / `POST /billing/dlq/:id/replay` | Admin JWT        | Live                 | Product-webhook DLQ inspection/replay    |
-| `POST /admin/billing/pos/checkout`                  | Admin JWT        | Source landed        | Internal operator checkout link creation |
-| `POST /admin/billing/pos/status`                    | Admin JWT        | Source landed        | Stripe checkout session status lookup    |
+| Endpoint                                                                              | Auth             | Status               | Purpose                                    |
+| ------------------------------------------------------------------------------------- | ---------------- | -------------------- | ------------------------------------------ |
+| `GET /billing/pricing`                                                                | Public           | Live                 | Regional pricing                           |
+| `GET /billing/catalog`                                                                | Public           | Live                 | Product catalog                            |
+| `GET /billing/catalog/:slug`                                                          | Public           | Live                 | Product detail                             |
+| `GET /billing/checkout`                                                               | Public/allowlist | Live                 | External checkout redirect                 |
+| `POST /billing/upgrade`                                                               | User JWT         | Live                 | Authenticated subscription checkout        |
+| `POST /billing/portal`                                                                | User JWT         | Live                 | Stripe portal session                      |
+| `GET /billing/status`                                                                 | User JWT         | Live                 | Subscription status                        |
+| `GET /billing/usage`                                                                  | User JWT         | Live                 | Usage metrics                              |
+| `GET /billing/history`                                                                | User JWT         | Live                 | Billing event history array                |
+| `POST /billing/stripe-mx/spei-payment-intent`                                         | User JWT         | Live when configured | MXN SPEI PaymentIntent                     |
+| `POST /billing/webhooks/stripe`                                                       | Stripe HMAC      | Live                 | Stripe MX event receiver                   |
+| `POST /billing/webhook`                                                               | Stripe HMAC      | Legacy               | Legacy Stripe subscription webhook         |
+| `POST /billing/webhook/janua`                                                         | Janua HMAC       | Blocked by secrets   | Janua billing webhook                      |
+| `POST /billing/madfam-events`                                                         | MADFAM HMAC      | Live                 | Ecosystem revenue event receiver           |
+| `GET /billing/dlq` / `POST /billing/dlq/:id/replay` / `POST /billing/dlq/:id/resolve` | Admin JWT        | Live                 | Product-webhook DLQ inspect/replay/resolve |
+| `POST /admin/billing/pos/checkout`                                                    | Admin JWT        | Source landed        | Internal operator checkout link creation   |
+| `POST /admin/billing/pos/status`                                                      | Admin JWT        | Source landed        | Stripe checkout session status lookup      |
 
 ## Provider Routing Truth
 

@@ -14,6 +14,7 @@ import {
   Receipt,
   ShieldCheck,
   CreditCard,
+  Repeat2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -57,6 +58,7 @@ const navGroups: NavGroup[] = [
     label: 'Commerce',
     items: [
       { name: 'MADFAM POS', href: '/pos', icon: CreditCard },
+      { name: 'Webhook DLQ', href: '/webhook-dlq', icon: Repeat2 },
       { name: 'Billing Events', href: '/billing-events', icon: Receipt },
     ],
   },

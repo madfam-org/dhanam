@@ -143,7 +143,9 @@ build, write production digests, or mutate Kubernetes.
    one-time charges, refunds, settlement/reconciliation, CFDI proof, and SDK
    contracts. Status lookup is source-landed for Stripe checkout sessions, and
    direct Conekta webhooks now source-land linked ledger writes, canonical
-   `payment.*` fan-out, and DLQ capture.
+   `payment.*` fan-out, and DLQ capture. Admin product-webhook recovery now
+   has a source-level `/webhook-dlq` page for listing, replaying, and resolving
+   failed deliveries.
 3. Decide and encode final provider launch semantics for Plaid, Bitso, and
    Banxico in runbooks and product readiness.
 4. Keep production green over repeated deploy/rollback cycles with no

@@ -146,6 +146,11 @@ DLQ capture. Conekta is still not complete POS parity until refund initiation,
 partial-refund handling, settlement reconciliation, provider timeline UI, and
 live-mode proof are recorded.
 
+Product-webhook DLQ recovery is no longer API-only in source: the admin app now
+has `/webhook-dlq` for listing, replaying, and resolving failed consumer
+deliveries. Remaining DLQ work is production proof, golden Dhanam -> product
+probe coverage, and settlement/CFDI correlation in the POS timeline.
+
 ### TD-1011: Janua Commercial Readiness
 
 Janua-routed billing remains blocked until production Janua billing secrets are

@@ -278,6 +278,51 @@ export interface PosCheckoutStatus {
   }>;
 }
 
+export interface WebhookDlqFailure {
+  id: string;
+  eventId: string;
+  consumer: string;
+  consumerUrl: string;
+  eventType: string | null;
+  attemptCount: number;
+  lastAttemptAt: string;
+  lastStatusCode: number | null;
+  lastErrorMessage: string | null;
+  nextRetryAt: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WebhookDlqListParams {
+  consumer?: string;
+  since?: string;
+  includeResolved?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+export interface WebhookDlqListResponse {
+  items: WebhookDlqFailure[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface WebhookDlqReplayResult {
+  id: string;
+  ok: boolean;
+  statusCode: number | null;
+  attemptCount: number;
+  nextRetryAt: string | null;
+  resolvedAt: string | null;
+}
+
+export interface WebhookDlqResolveResult {
+  id: string;
+  resolvedAt: string;
+}
+
 // API client
 export const adminApi = {
   async searchUsers(params: UserSearchParams = {}): Promise<PaginatedResponse<UserDetails>> {
@@ -393,6 +438,20 @@ export const adminApi = {
 
   async getPosCheckoutStatus(sessionId: string): Promise<PosCheckoutStatus> {
     return apiClient.post<PosCheckoutStatus>('/admin/billing/pos/status', { sessionId });
+  },
+
+  async listWebhookDlqFailures(params: WebhookDlqListParams = {}): Promise<WebhookDlqListResponse> {
+    return apiClient.get<WebhookDlqListResponse>('/billing/dlq', params as Record<string, unknown>);
+  },
+
+  async replayWebhookDlqFailure(id: string): Promise<WebhookDlqReplayResult> {
+    return apiClient.post<WebhookDlqReplayResult>(`/billing/dlq/${id}/replay`);
+  },
+
+  async resolveWebhookDlqFailure(id: string, reason?: string): Promise<WebhookDlqResolveResult> {
+    return apiClient.post<WebhookDlqResolveResult>(`/billing/dlq/${id}/resolve`, {
+      reason: reason?.trim() || undefined,
+    });
   },
 
   async gdprExport(userId: string): Promise<GdprExport> {

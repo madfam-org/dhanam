@@ -13,6 +13,8 @@ The admin dashboard provides platform administrators with tools for:
 - **User Management**: Search, view, and manage user accounts
 - **Space Management**: Browse and inspect spaces
 - **Feature Flags**: Control feature rollout across the platform
+- **MADFAM POS**: Operator checkout-link creation and Stripe checkout status lookup
+- **Webhook DLQ**: Product webhook delivery failure inspection, replay, and resolve
 - **Audit Logs**: Searchable audit trail of all sensitive operations
 - **Billing Events**: Billing event log viewer
 - **Analytics**: Onboarding funnel visualization
@@ -76,6 +78,8 @@ apps/admin/
 │   │       ├── spaces/             # Space search/browse
 │   │       ├── users/              # User search/management
 │   │       ├── feature-flags/      # Feature flag CRUD
+│   │       ├── pos/                # MADFAM POS checkout operations
+│   │       ├── webhook-dlq/        # Product webhook DLQ recovery
 │   │       ├── audit-logs/         # Searchable audit trail
 │   │       ├── billing-events/     # Billing event logs
 │   │       ├── analytics/          # Onboarding funnel
@@ -129,7 +133,7 @@ The admin app includes a fully typed API client (`src/lib/api/admin.ts`) coverin
 - Queue management (live stats, retry failed jobs, confirmed destructive clear)
 - Cache operations (flush, stats)
 - Compliance actions (GDPR export/delete, retention)
-- Billing event queries
+- Billing event queries, POS checkout/status operations, and webhook DLQ recovery
 
 All requests include the auth token from the Zustand store and target the API at `NEXT_PUBLIC_API_URL`.
 

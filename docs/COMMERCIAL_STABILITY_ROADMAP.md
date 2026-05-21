@@ -16,6 +16,7 @@ full MADFAM internal billing router and POS. Read it with
 | Public/external checkout redirect | Live          | Return-host allowlist protects unauthenticated checkout.                              |
 | Admin POS checkout link creation  | Source landed | `POST /v1/admin/billing/pos/checkout` plus admin `/pos` page.                         |
 | Admin POS status lookup           | Source landed | `POST /v1/admin/billing/pos/status` inspects Stripe checkout sessions.                |
+| Admin product-webhook DLQ         | Source landed | Admin `/webhook-dlq` lists, replays, and resolves product webhook delivery failures.  |
 | Unified provider routing          | Partial       | `PaymentRouterService` exists; primary checkout lifecycle still differs.              |
 | Janua-routed billing              | Blocked       | Production Janua billing secrets must be non-empty and verified.                      |
 | Full POS terminal                 | Not complete  | One-time charges, refunds, reconciliation, and CFDI proof remain.                     |
@@ -48,6 +49,8 @@ full MADFAM internal billing router and POS. Read it with
 - Add full/partial refund workflows with idempotency.
 - Add settlement and reconciliation views in admin.
 - Add Karafiel CFDI/egreso proof for succeeded and refunded payments.
+- Keep the admin Webhook DLQ page as the default revenue-incident recovery path
+  for product webhook delivery failures.
 
 ### 4. Harden Product Contracts
 
@@ -64,7 +67,7 @@ Do not call the MADFAM POS full-fledged until all of these are true:
   reconciliation paths are implemented and tested;
 - every money event has an idempotency key, provider id, local correlation id,
   status, and replay path;
-- product webhook delivery and DLQ replay are proven;
+- product webhook delivery and admin DLQ replay/resolve are proven;
 - Janua/Conekta/Paddle/Stripe MX launch semantics are explicit;
 - docs, runbooks, API contracts, SDK types, and admin UI match source and
   production behavior.

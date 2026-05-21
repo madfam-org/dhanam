@@ -205,6 +205,25 @@ Remaining POS work is tracked in
 charges, refunds, provider-complete payment/refund timelines,
 settlement/reconciliation, CFDI proof, and route override policy.
 
+### 8. Webhook DLQ
+
+The Webhook DLQ page exposes the product-webhook dead-letter queue for admin
+operators. It is the routine recovery path when Dhanam cannot deliver a signed
+`payment.*` envelope to a MADFAM consumer such as Karafiel or Tezca.
+
+Current support:
+
+- unresolved delivery listing with consumer, event id, event type, attempt
+  count, status, retry time, consumer URL, and last error;
+- consumer, date, and resolved-row filters;
+- manual replay through `POST /v1/billing/dlq/:id/replay`;
+- manual closeout through `POST /v1/billing/dlq/:id/resolve` with an operator
+  reason for out-of-band remediation.
+
+The DLQ page reduces direct database/provider inspection during revenue
+incidents. Product webhook retries should use this page or the admin API before
+any break-glass access.
+
 ## Admin Actions Audit Trail
 
 All admin actions are logged with high severity:
