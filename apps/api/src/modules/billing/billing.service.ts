@@ -17,7 +17,10 @@ import { WebhookProcessorService } from './services/webhook-processor.service';
 import { StripeService } from './stripe.service';
 
 // Re-export so existing callers that import { UpgradeOptions } from './billing.service' keep working
-export type { UpgradeOptions } from './services/subscription-lifecycle.service';
+export type {
+  OperatorCheckoutOptions,
+  UpgradeOptions,
+} from './services/subscription-lifecycle.service';
 
 /**
  * Billing Service — Facade
@@ -173,6 +176,13 @@ export class BillingService {
     product?: string
   ): Promise<string> {
     return this.lifecycle.createExternalCheckout(userId, plan, returnUrl, product);
+  }
+
+  async createOperatorCheckout(
+    userId: string,
+    options: import('./services/subscription-lifecycle.service').OperatorCheckoutOptions
+  ): Promise<{ checkoutUrl: string; provider: string }> {
+    return this.lifecycle.createOperatorCheckout(userId, options);
   }
 
   async createFederatedCheckout(

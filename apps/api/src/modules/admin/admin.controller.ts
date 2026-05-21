@@ -33,6 +33,7 @@ import {
   UserDetailsDto,
   SystemStatsDto,
   AuditLogSearchDto,
+  AdminPosCheckoutDto,
   OnboardingFunnelDto,
   FeatureFlagDto,
   UpdateFeatureFlagDto,
@@ -281,6 +282,14 @@ export class AdminController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Billing events retrieved' })
   async getBillingEvents(@Query('page') page?: number, @Query('limit') limit?: number) {
     return this.adminOpsService.getBillingEvents(page || 1, limit || 20);
+  }
+
+  @Post('billing/pos/checkout')
+  @ApiOperation({ summary: 'Create an internal MADFAM POS checkout link' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'POS checkout link created' })
+  @ApiBadRequestResponse({ description: 'Invalid checkout request' })
+  async createPosCheckout(@Body() dto: AdminPosCheckoutDto, @Request() req: AuthenticatedRequest) {
+    return this.adminOpsService.createPosCheckout(dto, req.user.id);
   }
 
   @Get('gdpr/export/:userId')

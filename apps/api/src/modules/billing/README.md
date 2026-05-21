@@ -1,274 +1,194 @@
 # Billing Module
 
-> Subscription management, usage tracking, and payment processing with multi-provider support via Janua.
+Last updated: 2026-05-21
 
-## Purpose
+The billing module is Dhanam's commercial boundary for the MADFAM ecosystem.
+It owns subscription checkout, catalog price resolution, usage metering,
+provider webhooks, payment-event fan-out, and the first internal MADFAM POS
+checkout surface.
 
-The Billing module handles all payment and subscription operations:
+## Current Truth
 
-- **Subscription Management**: Free/Premium tier transitions
-- **Multi-Provider Billing**: Janua integration for Conekta (MX) and Polar (international)
-- **Stripe Fallback**: Direct Stripe integration as backup
-- **Usage Tracking**: Monitor feature usage per tier
-- **Webhook Handling**: Process payment events from all providers
-- **MADFAM Integration**: Enclii → Dhanam → Janua payment loop
+- Production subscription and catalog-backed checkout flows are healthy for the
+  currently deployed Stripe-backed path.
+- Catalog plan slugs resolve through `PriceResolver`; unknown plans fail
+  closed.
+- Stripe MX/SPEI webhook relay emits canonical `payment.*` envelopes, persists
+  linked billing events, and writes downstream delivery failures to the DLQ.
+- The internal POS is now a source-level admin checkout generator at
+  `POST /admin/billing/pos/checkout` and `apps/admin/src/app/(dashboard)/pos`.
+  It creates operator checkout links through the existing lifecycle path; it is
+  not yet a complete card-terminal/ledger/refund/settlement console.
+- Janua identity relay and centralized email use the shared internal Janua key
+  and Dhanam webhook secret. Janua-routed checkout remains explicitly disabled
+  with `JANUA_BILLING_ENABLED=false` until the Dhanam client route/auth contract
+  is aligned to Janua production and an end-to-end Janua checkout has been
+  verified.
+- `PaymentRouterService` exists for the Stripe MX/Paddle hybrid router, but the
+  primary `/billing/upgrade` and public `/billing/checkout` lifecycle still use
+  Janua-first/direct-Stripe logic. Treat router unification as active roadmap
+  work, not complete commercial stability.
 
-## Key Entities
+## Architecture
 
-| Entity                | Description                      |
-| --------------------- | -------------------------------- |
-| `BillingService`      | Main billing orchestration       |
-| `StripeService`       | Stripe API wrapper               |
-| `JanuaBillingService` | Janua multi-provider integration |
-| `BillingEvent`        | Payment history records          |
-| `UsageMetric`         | Daily feature usage tracking     |
+| Concern                  | Primary files                                                               |
+| ------------------------ | --------------------------------------------------------------------------- |
+| Facade and REST API      | `billing.service.ts`, `billing.controller.ts`                               |
+| Subscription lifecycle   | `services/subscription-lifecycle.service.ts`                                |
+| Catalog price resolution | `services/price-resolver.service.ts`, `services/product-catalog.service.ts` |
+| Hybrid router            | `services/payment-router.service.ts`                                        |
+| Stripe SDK wrapper       | `stripe.service.ts`                                                         |
+| Stripe MX/SPEI           | `stripe-mx.controller.ts`, `services/stripe-mx*.ts`                         |
+| Paddle                   | `services/paddle.service.ts`                                                |
+| Janua billing            | `janua-billing.service.ts`                                                  |
+| Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                      |
+| Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                      |
+| Internal POS checkout    | `modules/admin/admin.controller.ts`, `modules/admin/admin-ops.service.ts`   |
 
-## Service Architecture
+## Pricing Source Of Truth
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                       Billing Service                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │                   upgradeToPremium()                     │    │
-│  └─────────────────────────────────────────────────────────┘    │
-│                            │                                     │
-│              ┌─────────────┼─────────────┐                      │
-│              ▼             │             ▼                      │
-│  ┌───────────────────┐    │   ┌───────────────────┐            │
-│  │       Janua       │    │   │   Stripe Direct   │            │
-│  │  (Multi-provider) │◄───┘   │    (Fallback)     │            │
-│  └─────────┬─────────┘        └─────────┬─────────┘            │
-│            │                            │                       │
-│     ┌──────┼──────┐                     │                       │
-│     ▼      ▼      ▼                     ▼                       │
-│  ┌──────┐ ┌────┐ ┌─────┐          ┌──────────┐                 │
-│  │Conekta│ │Polar│ │More│         │  Stripe  │                 │
-│  │ (MX) │ │(Intl)│ │... │          │   API   │                 │
-│  └──────┘ └────┘ └─────┘          └──────────┘                 │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
+Commercial plan truth lives in [`catalog.yaml`](../../../../../catalog.yaml) and
+is synced into Dhanam's product catalog. Do not hard-code commercial pricing in
+new billing code or docs.
 
-## Subscription Tiers
+Current Dhanam managed-cloud tiers in the catalog:
 
-| Tier           | Price (USD) | Key Features                                           |
-| -------------- | ----------- | ------------------------------------------------------ |
-| **Community**  | $0          | Self-hosted, full features with BYOK                   |
-| **Essentials** | $4.99/mo    | AI categorization, bank sync, 10 sims/day              |
-| **Pro**        | $11.99/mo   | Unlimited usage, all connections, LifeBeat             |
-| **Premium**    | $19.99/mo   | 50K Monte Carlo, 24 scenarios, 25 GB, priority support |
-
-Regional pricing applies: Tier 2 (25% off), LATAM (45% off), Emerging (65% off).
-Mexico promo: MXN$31/32/33 per month for first 3 months.
-
-### Usage Limits by Tier
-
-| Feature                 | Community (Self-Hosted) | Essentials | Pro       | Premium   |
-| ----------------------- | ----------------------- | ---------- | --------- | --------- |
-| ESG Calculations        | Unlimited               | 20/day     | Unlimited | Unlimited |
-| Monte Carlo Simulations | Unlimited               | 10/day     | Unlimited | Unlimited |
-| Goal Probability        | Unlimited               | 5/day      | Unlimited | Unlimited |
-| Scenario Analysis       | Unlimited               | 3/day      | Unlimited | Unlimited |
-| Portfolio Rebalance     | Unlimited               | 0          | Unlimited | Unlimited |
-| API Requests            | Unlimited               | 5,000/day  | Unlimited | Unlimited |
-| Spaces                  | Unlimited               | 2          | 5         | 10        |
-| Storage                 | Unlimited (BYOK)        | 500 MB     | 5 GB      | 25 GB     |
-
-> **Note:** Community tier is for self-hosted deployments only. All features are unlimited because
-> users provide their own infrastructure, API keys, and storage. Paid tiers gate **managed cloud
-> services** (Dhanam-hosted provider API keys, R2 storage, ML inference), not features.
+| Tier       | USD monthly | MXN monthly |
+| ---------- | ----------- | ----------- |
+| Essentials | $4.99       | MXN 79      |
+| Pro        | $14.99      | MXN 299     |
+| Premium    | $29.99      | MXN 599     |
 
 ## API Endpoints
 
-| Endpoint                 | Method | Auth | Description                                 |
-| ------------------------ | ------ | ---- | ------------------------------------------- |
-| `/billing/pricing`       | GET    | No   | Get regional pricing for a country          |
-| `/billing/trial/start`   | POST   | Yes  | Start a free trial                          |
-| `/billing/trial/extend`  | POST   | Yes  | Extend trial with credit card               |
-| `/billing/upgrade`       | POST   | Yes  | Initiate subscription upgrade               |
-| `/billing/portal`        | POST   | Yes  | Create billing portal session               |
-| `/billing/usage`         | GET    | Yes  | Get current usage statistics                |
-| `/billing/history`       | GET    | Yes  | Get payment history                         |
-| `/billing/status`        | GET    | Yes  | Get subscription status (incl. trial/promo) |
-| `/billing/checkout`      | GET    | No   | Public checkout redirect (external apps)    |
-| `/billing/webhook`       | POST   | No   | Stripe webhook handler                      |
-| `/billing/webhook/janua` | POST   | No   | Janua webhook handler                       |
+| Endpoint                                            | Auth             | Status               | Purpose                                  |
+| --------------------------------------------------- | ---------------- | -------------------- | ---------------------------------------- |
+| `GET /billing/pricing`                              | Public           | Live                 | Regional pricing                         |
+| `GET /billing/catalog`                              | Public           | Live                 | Product catalog                          |
+| `GET /billing/catalog/:slug`                        | Public           | Live                 | Product detail                           |
+| `GET /billing/checkout`                             | Public/allowlist | Live                 | External checkout redirect               |
+| `POST /billing/upgrade`                             | User JWT         | Live                 | Authenticated subscription checkout      |
+| `POST /billing/portal`                              | User JWT         | Live                 | Stripe portal session                    |
+| `GET /billing/status`                               | User JWT         | Live                 | Subscription status                      |
+| `GET /billing/usage`                                | User JWT         | Live                 | Usage metrics                            |
+| `GET /billing/history`                              | User JWT         | Live                 | Billing event history array              |
+| `POST /billing/stripe-mx/spei-payment-intent`       | User JWT         | Live when configured | MXN SPEI PaymentIntent                   |
+| `POST /billing/webhooks/stripe`                     | Stripe HMAC      | Live                 | Stripe MX event receiver                 |
+| `POST /billing/webhook`                             | Stripe HMAC      | Legacy               | Legacy Stripe subscription webhook       |
+| `POST /billing/webhook/janua`                       | Janua HMAC       | Blocked by secrets   | Janua billing webhook                    |
+| `POST /billing/madfam-events`                       | MADFAM HMAC      | Live                 | Ecosystem revenue event receiver         |
+| `GET /billing/dlq` / `POST /billing/dlq/:id/replay` | Admin JWT        | Live                 | Product-webhook DLQ inspection/replay    |
+| `POST /admin/billing/pos/checkout`                  | Admin JWT        | Source landed        | Internal operator checkout link creation |
 
-## Trial & Promo Flow
+## Provider Routing Truth
 
-```
-1. User registers with plan selection (?plan=pro)
-2. POST /billing/trial/start → 3-day free trial (no CC)
-3. Optional: POST /billing/trial/extend → 21-day trial (with CC)
-4. Trial expires → promo pricing for 3 months (with CC) or downgrade (without CC)
-5. Promo expires → regular regional pricing
-```
+There are two routing layers today:
 
-## Upgrade Flow
+1. `SubscriptionLifecycleService`: the currently wired self-service and public
+   checkout path. It attempts Janua when enabled, otherwise direct Stripe.
+2. `PaymentRouterService`: the hybrid router implementation for `MX ->
+stripe_mx` and non-MX -> `paddle`. It is tested and registered, but not yet
+   the sole checkout system of record.
 
-### With Janua (Primary)
+Full commercial stability requires unifying these paths behind one explicit
+policy that records provider, country, product, plan, currency, price source,
+and routing reason for every checkout.
 
-```
-1. User initiates upgrade
-2. Detect country code → select provider (Conekta/Polar)
-3. Create/get Janua customer
-4. Create checkout session via Janua
-5. Redirect to provider checkout
-6. Webhook confirms payment
-7. Upgrade user to premium
-8. Notify Janua identity system (if org-linked)
-```
+## Internal POS Status
 
-### With Stripe (Fallback)
+The current internal POS surface creates checkout links for an existing Dhanam
+user and records high-severity admin audit events. It supports:
 
-```
-1. User initiates upgrade
-2. Create/get Stripe customer
-3. Create checkout session
-4. Redirect to Stripe checkout
-5. Webhook confirms payment
-6. Upgrade user to premium
-```
+- operator-selected user id, product, plan, country, organization id, and
+  optional success/cancel URLs;
+- catalog-backed plan resolution through the existing lifecycle path;
+- admin-only access through the platform admin guard;
+- admin UI access at `/pos`.
 
-## Provider Selection
+Still missing before calling this a full POS:
 
-| Country       | Provider | Payment Methods   |
-| ------------- | -------- | ----------------- |
-| Mexico (MX)   | Conekta  | Cards, OXXO, SPEI |
-| International | Polar    | Cards             |
-| Fallback      | Stripe   | Cards             |
+- one-time line-item/cart charges;
+- payment method capture, void, refund, and partial refund workflows;
+- payment/refund state timeline;
+- ledger, settlement, reconciliation, and CFDI proof in the admin UI;
+- provider fallback controls and route override policy;
+- SDK methods for trusted internal MADFAM callers.
 
-## Webhook Events
+## Webhooks And Ledger
 
-### Stripe Events
+Stripe MX/SPEI is the strongest provider path today:
 
-| Event                           | Handler                       |
-| ------------------------------- | ----------------------------- |
-| `customer.subscription.created` | `handleSubscriptionCreated`   |
-| `customer.subscription.updated` | `handleSubscriptionUpdated`   |
-| `customer.subscription.deleted` | `handleSubscriptionCancelled` |
-| `invoice.payment_succeeded`     | `handlePaymentSucceeded`      |
-| `invoice.payment_failed`        | `handlePaymentFailed`         |
+- inbound Stripe events are signature verified and idempotent on event id;
+- linked events persist `BillingEvent` rows;
+- canonical `payment.succeeded`, `payment.failed`, and `payment.refunded`
+  envelopes are sent to product webhooks;
+- downstream failures land in `WebhookDeliveryFailure` for retry/replay.
 
-### Janua Events
-
-| Event                    | Handler                            |
-| ------------------------ | ---------------------------------- |
-| `subscription.created`   | `handleJanuaSubscriptionCreated`   |
-| `subscription.updated`   | `handleJanuaSubscriptionUpdated`   |
-| `subscription.cancelled` | `handleJanuaSubscriptionCancelled` |
-| `subscription.paused`    | `handleJanuaSubscriptionPaused`    |
-| `subscription.resumed`   | `handleJanuaSubscriptionResumed`   |
-| `payment.succeeded`      | `handleJanuaPaymentSucceeded`      |
-| `payment.failed`         | `handleJanuaPaymentFailed`         |
-| `payment.refunded`       | `handleJanuaPaymentRefunded`       |
-
-## MADFAM Integration
-
-The billing module supports the Enclii → Dhanam → Janua payment loop:
-
-```
-┌────────┐     ┌────────┐     ┌────────┐
-│ Enclii │ ──► │ Dhanam │ ──► │ Janua  │
-└────────┘     └────────┘     └────────┘
-    │              │              │
-    │  orgId       │  upgrade     │  customer
-    └──────────────┼──────────────┘
-                   │
-                   ▼
-              ┌──────────┐
-              │ Provider │
-              │(Conekta/ │
-              │  Polar)  │
-              └──────────┘
-```
-
-### Organization Linking
-
-When upgrading with an `orgId`:
-
-1. Payment processed through provider
-2. Dhanam notifies Janua of tier change
-3. Janua updates organization's `subscription_tier`
-4. Enables premium features across MADFAM apps
-
-## Usage Tracking
-
-```typescript
-// Record usage
-await billing.recordUsage(userId, UsageMetricType.ESG_CALCULATION);
-
-// Check limit before operation
-const allowed = await billing.checkUsageLimit(userId, UsageMetricType.MONTE_CARLO);
-if (!allowed) {
-  throw new Error('Usage limit exceeded');
-}
-```
+Commercial gaps remain for Conekta direct, unlinked revenue events, and full
+provider parity. These are tracked in
+[`docs/ROADMAP.md`](../../../../../docs/ROADMAP.md) and
+[`docs/TECH_DEBT.md`](../../../../../docs/TECH_DEBT.md).
 
 ## Configuration
 
+Required values vary by enabled provider. Do not set placeholder or empty
+production values.
+
 ```bash
-# Stripe
-STRIPE_SECRET_KEY=sk_xxx
-STRIPE_WEBHOOK_SECRET=whsec_xxx
-STRIPE_ESSENTIALS_PRICE_ID=price_xxx
-STRIPE_PREMIUM_PRICE_ID=price_xxx      # Pro tier
-STRIPE_PREMIUM_PLAN_PRICE_ID=price_xxx  # Premium tier
+# Stripe legacy/subscription fallback
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_ESSENTIALS_PRICE_ID=price_...
+STRIPE_PREMIUM_PRICE_ID=price_...       # Pro tier legacy env fallback
+STRIPE_PREMIUM_PLAN_PRICE_ID=price_...  # Premium tier legacy env fallback
 
-# Regional pricing coupons
-STRIPE_PROMO_COUPON_MX=coupon_xxx
-STRIPE_REGIONAL_COUPON_T2=coupon_xxx
-STRIPE_REGIONAL_COUPON_LATAM=coupon_xxx
-STRIPE_REGIONAL_COUPON_EMERGING=coupon_xxx
+# Stripe MX / SPEI
+STRIPE_MX_SECRET_KEY=sk_...
+STRIPE_MX_WEBHOOK_SECRET=whsec_...
+STRIPE_MX_PUBLISHABLE_KEY=pk_...
+FEATURE_STRIPE_MXN_LIVE=false
 
-# Janua
+# Paddle
+PADDLE_VENDOR_ID=...
+PADDLE_API_KEY=...
+PADDLE_CLIENT_TOKEN=...
+PADDLE_WEBHOOK_SECRET=...
+
+# Janua identity/email relay
 JANUA_API_URL=https://api.janua.dev
-JANUA_API_KEY=xxx
-JANUA_WEBHOOK_SECRET=xxx
-DHANAM_WEBHOOK_SECRET=xxx
+JANUA_INTERNAL_API_KEY=...
+JANUA_ADMIN_KEY=...
+DHANAM_WEBHOOK_SECRET=...
+
+# Janua billing checkout proxy (disabled until route/auth contract is verified)
+JANUA_BILLING_ENABLED=false
+JANUA_API_KEY=...
+JANUA_WEBHOOK_SECRET=...
+
+# Product fan-out
+PRODUCT_WEBHOOK_URLS=karafiel:https://api.karafiel.mx/api/v1/webhooks/dhanam
 
 # General
 WEB_URL=https://app.dhan.am
+CHECKOUT_ALLOWED_HOSTS=karafiel.mx,tezca.mx,janua.dev
 ```
 
-## Security
+## Security And Stability Rules
 
-- **Webhook Verification**: All webhooks verified with HMAC signatures
-- **Audit Logging**: All billing actions logged with severity levels
-- **PCI Compliance**: No card data stored; handled by Stripe/Conekta
-- **Idempotency**: Webhook handlers are idempotent
-
-## Error Handling
-
-| Scenario                    | Behavior                                    |
-| --------------------------- | ------------------------------------------- |
-| Payment failed              | Log event, don't downgrade (retry expected) |
-| Webhook verification failed | Reject with 401                             |
-| User not found              | Log error, acknowledge webhook              |
-| Already premium             | Throw error (400)                           |
-
-## Related Modules
-
-| Module                                    | Relationship                           |
-| ----------------------------------------- | -------------------------------------- |
-| [`users`](../users/README.md)             | User subscription tier stored          |
-| [`simulations`](../simulations/README.md) | Uses usage limits for Monte Carlo      |
-| [`esg`](../esg/README.md)                 | Uses usage limits for ESG calculations |
-| [`analytics`](../analytics/README.md)     | Uses usage limits for reports          |
+- No card data is stored in Dhanam.
+- Public checkout return hosts are allowlisted.
+- Provider webhooks must be signature verified.
+- Replay protection and idempotency are mandatory for money events.
+- Admin POS actions are high-severity audit events.
+- Unknown plans, unsupported products, and unconfigured providers fail closed.
+- Routine production operations remain Enclii-first; raw provider or cluster
+  access is bootstrap/break-glass only.
 
 ## Testing
 
 ```bash
-# Run billing tests
-pnpm test -- billing
-
-# Test webhooks locally with Stripe CLI
-stripe listen --forward-to localhost:4010/billing/webhook/stripe
+pnpm --dir apps/api test -- billing
+pnpm --dir apps/api test -- admin-ops.service.spec.ts
+pnpm --dir apps/admin test -- pos-page.test.tsx
+pnpm --dir packages/billing-sdk test -- client.spec.ts
 ```
-
----
-
-**Module**: `billing`
-**Last Updated**: March 2026

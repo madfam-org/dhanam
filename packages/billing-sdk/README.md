@@ -1,6 +1,11 @@
 # @dhanam/billing-sdk
 
-Typed client for the Dhanam billing API — checkout flows, subscription management, and webhook verification.
+Typed client for the Dhanam billing API: checkout flows, subscription
+management, catalog access, usage reporting, and webhook verification.
+
+Current scope: this SDK supports product checkout and subscription operations.
+It does not yet expose internal POS, refund, DLQ replay, or settlement APIs;
+those contracts are tracked in `docs/COMMERCIAL_STABILITY_ROADMAP.md`.
 
 Zero runtime dependencies. Works in Node.js, edge runtimes, and browsers.
 
@@ -64,6 +69,9 @@ const payload = await parseWebhookPayload(rawBody, signature, secret);
 | `getUsage()`             | Yes  | Get billing-period usage metrics     |
 | `getHistory()`           | Yes  | Get billing event history            |
 | `createPortalSession()`  | Yes  | Create a self-service portal session |
+
+`getHistory()` normalizes both the current API array response and the older
+`{ events: [...] }` shape into `{ events }` for callers.
 
 ### Webhook Utilities
 

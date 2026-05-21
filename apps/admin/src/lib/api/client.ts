@@ -60,6 +60,16 @@ export class ApiClient {
         );
       }
 
+      if (
+        data &&
+        typeof data === 'object' &&
+        'data' in data &&
+        'meta' in data &&
+        Array.isArray((data as { data?: unknown }).data)
+      ) {
+        return data;
+      }
+
       return data.data || data;
     } catch (error) {
       if (error instanceof ApiError) {

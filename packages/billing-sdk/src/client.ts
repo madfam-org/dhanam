@@ -80,7 +80,11 @@ export class DhanamClient {
 
   /** Get billing event history. Requires authentication. */
   async getHistory(): Promise<BillingHistory> {
-    return this.request<BillingHistory>('GET', '/billing/history');
+    const history = await this.request<BillingHistory | BillingHistory['events']>(
+      'GET',
+      '/billing/history'
+    );
+    return Array.isArray(history) ? { events: history } : history;
   }
 
   /** Create a billing portal session for self-service management. Requires authentication. */

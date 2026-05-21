@@ -67,13 +67,27 @@ export class JanuaBillingService {
   constructor(private config: ConfigService) {
     this.januaApiUrl = this.config.get<string>('JANUA_API_URL', '');
     this.januaApiKey = this.config.get<string>('JANUA_API_KEY', '');
-    this.enabled = this.config.get<boolean>('JANUA_BILLING_ENABLED', true);
+    this.enabled = this.parseEnabledFlag(
+      this.config.get<string | boolean>('JANUA_BILLING_ENABLED', false)
+    );
 
     if (this.enabled && this.januaApiKey) {
       this.logger.log('Janua billing service initialized');
     } else {
       this.logger.warn('Janua billing disabled - falling back to direct Stripe');
     }
+  }
+
+  private parseEnabledFlag(value: string | boolean | undefined): boolean {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (!value) {
+      return false;
+    }
+
+    return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
   }
 
   /**

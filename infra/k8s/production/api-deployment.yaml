@@ -361,12 +361,19 @@ spec:
             # =================================================================
             # Janua Server-Side Keys
             # =================================================================
+            - name: JANUA_BILLING_ENABLED
+              value: "false"
             - name: JANUA_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: dhanam-janua-secrets
                   key: JANUA_API_KEY
             - name: JANUA_ADMIN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dhanam-janua-secrets
+                  key: JANUA_ADMIN_KEY
+            - name: JANUA_INTERNAL_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: dhanam-janua-secrets

@@ -18,7 +18,14 @@ embedded below.
 
 ## 1. What this repo is
 
-Dhanam is the ecosystem's billing backbone: 6 payment gateways (Stripe, Mercado Pago, Conekta, SPEI, Crypto, etc.), entitlement and credit metering, invoicing, subscription management, and customer portals. Every paid feature across the MADFAM ecosystem flows through Dhanam. Also runs the ESG crypto insight module and wealth-tracking features for end users. Ships a public-facing web app, an API, and an admin console.
+Dhanam is the ecosystem's billing backbone: catalog-backed checkout, Stripe
+subscription fallback, Stripe MX/SPEI relay, Paddle/Stripe MX router
+foundation, Janua billing integration, entitlement and credit metering,
+subscription management, product-webhook fan-out, and customer portals. Every
+paid feature across the MADFAM ecosystem should flow through Dhanam, but the
+full internal MADFAM POS is still being completed. Dhanam also runs the ESG
+crypto insight module and wealth-tracking features for end users. It ships a
+public-facing web app, an API, and an admin console.
 
 **Pillar**: Financial / Billing
 **Type**: service
@@ -32,10 +39,11 @@ Dhanam is the ecosystem's billing backbone: 6 payment gateways (Stripe, Mercado 
 | `dhanam-api`   | api.dhan.am          | 4300                      |
 | `dhanam-admin` | admin.dhan.am        | 3400                      |
 
-Current runtime caveat: the 2026-05-19 stability audit found staging DNS and
-Enclii/Kyverno rollout blockers plus degraded public API health. Treat
-`docs/STABILITY_AUDIT_2026-05-19.md` as the current operational status record
-until those blockers are cleared.
+Current runtime status: production public routes and full API health are green
+per `docs/STABILITY_WRAP_UP_2026-05-20.md`. Staging smoke is green, but live
+staging digest proof remains best-effort/manual until the Enclii proof adapter
+exists. Treat `docs/ROADMAP.md` and `docs/TECH_DEBT.md` as the current
+operational status records.
 
 **Kubernetes namespace**: `dhanam`
 **Cluster**: bare-metal k3s on Hetzner (see topology section below).
@@ -44,7 +52,8 @@ until those blockers are cleared.
 
 - postgres (customers, invoices, credits, entitlements)
 - janua (auth, multi-tenant)
-- payment gateways: stripe, mercado-pago, conekta, SPEI, crypto
+- payment gateways: Stripe, Stripe MX/SPEI, Paddle, Janua billing, Conekta
+  direct foundation
 - belvo (bank-account insights)
 - karafiel (CFDI emission for Mexican invoices)
 
@@ -74,7 +83,7 @@ below is embedded here so this document stands alone.
 | --------------- | ----------------------------- | -------------------------------------------------------------------------------------------------- |
 | **Enclii**      | `madfam-org/enclii`           | PaaS control plane — all deploys go through this                                                   |
 | **Janua**       | `madfam-org/janua`            | OIDC/OAuth 2.0 provider — RS256 JWKS at `auth.madfam.io/.well-known/jwks.json`                     |
-| **Dhanam**      | `madfam-org/dhanam`           | Billing + payment gateways (Stripe, Mercado Pago, SPEI, etc.)                                      |
+| **Dhanam**      | `madfam-org/dhanam`           | Billing boundary, catalog checkout, Stripe MX/SPEI, webhook relay, internal POS roadmap            |
 | **Selva**       | `madfam-org/autoswarm-office` | LLM inference routing + agent orchestration                                                        |
 | **Karafiel**    | `madfam-org/karafiel`         | Operational compliance — CFDI, NOM-151, e.firma, SAT-adjacent. Owns legal-ops / contract templates |
 | **Tezca**       | `madfam-org/tezca`            | Mexican law oracle (informational only — feeds Karafiel)                                           |

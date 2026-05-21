@@ -1,13 +1,26 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  Optional,
+} from '@nestjs/common';
 
 import { AuditService } from '@core/audit/audit.service';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { RedisService } from '@core/redis/redis.service';
 import { Prisma } from '@db';
+import { BillingService } from '@modules/billing/billing.service';
 import { FailedQueueJob, QueueService } from '@modules/jobs/queue.service';
 
-import { CacheFlushDto, PaginatedResponseDto, SpaceSearchDto, UserActionDto } from './dto';
+import {
+  AdminPosCheckoutDto,
+  CacheFlushDto,
+  PaginatedResponseDto,
+  SpaceSearchDto,
+  UserActionDto,
+} from './dto';
 
 @Injectable()
 export class AdminOpsService {
@@ -16,7 +29,8 @@ export class AdminOpsService {
     private logger: LoggerService,
     private redis: RedisService,
     private auditService: AuditService,
-    private queueService: QueueService
+    private queueService: QueueService,
+    @Optional() private billingService?: BillingService
   ) {}
 
   async getSystemHealth(adminUserId: string): Promise<{
@@ -458,6 +472,65 @@ export class AdminOpsService {
         limit,
         totalPages: Math.ceil(total / limit),
       },
+    };
+  }
+
+  async createPosCheckout(
+    dto: AdminPosCheckoutDto,
+    adminUserId: string
+  ): Promise<{
+    checkoutUrl: string;
+    provider: string;
+    userId: string;
+    product: string;
+    plan: string;
+    countryCode: string | null;
+  }> {
+    if (!this.billingService) {
+      throw new InternalServerErrorException('Billing service is not available');
+    }
+
+    const product = dto.product || 'dhanam';
+    const result = await this.billingService.createOperatorCheckout(dto.userId, {
+      plan: dto.plan,
+      product,
+      orgId: dto.orgId,
+      countryCode: dto.countryCode?.toUpperCase(),
+      successUrl: dto.successUrl,
+      cancelUrl: dto.cancelUrl,
+      operatorId: adminUserId,
+      source: 'internal_pos',
+    });
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.billing_pos_checkout_created',
+      resource: 'Billing',
+      resourceId: dto.userId,
+      metadata: {
+        provider: result.provider,
+        product,
+        plan: dto.plan,
+        orgId: dto.orgId,
+        countryCode: dto.countryCode?.toUpperCase(),
+        hasCustomSuccessUrl: Boolean(dto.successUrl),
+        hasCustomCancelUrl: Boolean(dto.cancelUrl),
+      },
+      severity: 'high',
+    });
+
+    this.logger.log(
+      `Admin ${adminUserId} created POS checkout for user ${dto.userId} (${product}/${dto.plan}) via ${result.provider}`,
+      'AdminOpsService'
+    );
+
+    return {
+      checkoutUrl: result.checkoutUrl,
+      provider: result.provider,
+      userId: dto.userId,
+      product,
+      plan: dto.plan,
+      countryCode: dto.countryCode?.toUpperCase() || null,
     };
   }
 

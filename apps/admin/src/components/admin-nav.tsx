@@ -13,6 +13,7 @@ import {
   Building2,
   Receipt,
   ShieldCheck,
+  CreditCard,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -53,10 +54,16 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    label: 'Commerce',
+    items: [
+      { name: 'MADFAM POS', href: '/pos', icon: CreditCard },
+      { name: 'Billing Events', href: '/billing-events', icon: Receipt },
+    ],
+  },
+  {
     label: 'Analytics',
     items: [
       { name: 'Audit Logs', href: '/audit-logs', icon: FileText },
-      { name: 'Billing Events', href: '/billing-events', icon: Receipt },
       { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     ],
   },

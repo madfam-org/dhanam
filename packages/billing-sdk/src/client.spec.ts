@@ -173,6 +173,25 @@ describe('DhanamClient', () => {
       const result = await client.getHistory();
       expect(result).toEqual(body);
     });
+
+    it('normalizes the current API array response into BillingHistory', async () => {
+      const body = [
+        {
+          id: 'evt_1',
+          type: 'payment_succeeded',
+          amount: 199,
+          currency: 'MXN',
+          status: 'completed',
+          createdAt: '2026-05-20T00:00:00.000Z',
+        },
+      ];
+      const fetch = mockFetch(200, body);
+      const client = new DhanamClient({ baseUrl, token: 'tok', fetch });
+
+      const result = await client.getHistory();
+
+      expect(result).toEqual({ events: body });
+    });
   });
 
   describe('createPortalSession', () => {

@@ -29,6 +29,7 @@ describe('AdminNav', () => {
     expect(screen.getByText('Overview')).toBeInTheDocument();
     expect(screen.getByText('SRE')).toBeInTheDocument();
     expect(screen.getByText('Data')).toBeInTheDocument();
+    expect(screen.getByText('Commerce')).toBeInTheDocument();
     // "Analytics" appears as both section label and link; match the section label specifically
     const analyticsLabels = screen.getAllByText('Analytics');
     expect(analyticsLabels.length).toBeGreaterThanOrEqual(1);
@@ -50,6 +51,7 @@ describe('AdminNav', () => {
     expect(screen.getByText('Spaces')).toBeInTheDocument();
     expect(screen.getByText('Users')).toBeInTheDocument();
     expect(screen.getByText('Feature Flags')).toBeInTheDocument();
+    expect(screen.getByText('MADFAM POS')).toBeInTheDocument();
     expect(screen.getByText('Audit Logs')).toBeInTheDocument();
     expect(screen.getByText('Billing Events')).toBeInTheDocument();
     // "Analytics" appears as both section label and link; match the nav link specifically
@@ -81,7 +83,7 @@ describe('AdminNav', () => {
     render(<AdminNav />);
 
     const allLinks = screen.getAllByRole('link').filter((link) => link.closest('nav'));
-    // 1 (Overview) + 4 (SRE) + 3 (Data) + 3 (Analytics) + 1 (Compliance) = 12
-    expect(allLinks).toHaveLength(12);
+    // 1 (Overview) + 4 (SRE) + 3 (Data) + 2 (Commerce) + 2 (Analytics) + 1 (Compliance) = 13
+    expect(allLinks).toHaveLength(13);
   });
 });

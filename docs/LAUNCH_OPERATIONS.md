@@ -7,7 +7,11 @@
 > access as platform bootstrap or documented break-glass only, and record any
 > missing Enclii adapter gap.
 
-This runbook covers every step required to take Dhanam from development to production launch. It is organized by dependency chain so that long-lead items start first and shorter tasks fill in around them.
+This runbook is a launch and provider-onboarding checklist. Production is
+already live and healthy per [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md);
+use [Roadmap](ROADMAP.md) and [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)
+for the current production/commercial gap list. Historical raw infrastructure
+examples below are break-glass/bootstrap unless an Enclii adapter exists.
 
 **Production URLs:**
 
@@ -18,7 +22,9 @@ This runbook covers every step required to take Dhanam from development to produ
 | Admin        | `https://admin.dhan.am`  |
 | Auth (Janua) | `https://auth.madfam.io` |
 
-**Deployment:** Push to `main` triggers Enclii auto-deploy to bare-metal Kubernetes.
+**Deployment:** Current production truth is verified through ArgoCD live-image
+proof and public probes. Enclii remains the required routine control-plane
+direction; gaps are tracked in [Tech Debt](TECH_DEBT.md).
 
 ---
 
@@ -325,11 +331,11 @@ Mexico's Ley para Regular las Instituciones de Tecnologia Financiera (Ley Fintec
 - [ ] Wait for Stripe to activate the account (3-7 business days).
 - [ ] Create products and prices in the Stripe dashboard for each plan tier:
   - Essentials Monthly / Annual
-  - Professional Monthly / Annual
-  - Family Monthly / Annual
+  - Pro Monthly / Annual
+  - Premium Monthly / Annual
 - [ ] Record the `price_xxx` IDs for each product.
 - [ ] Navigate to Developers > API keys. Copy `pk_live_xxx` and `sk_live_xxx`.
-- [ ] Navigate to Developers > Webhooks. Add endpoint: `https://api.dhan.am/v1/webhooks/stripe`.
+- [ ] Navigate to Developers > Webhooks. Add endpoint: `https://api.dhan.am/v1/billing/webhooks/stripe`.
 - [ ] Select events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`.
 - [ ] Copy the webhook signing secret `whsec_xxx`.
 - [ ] Enable OXXO and SPEI as payment methods under Settings > Payment methods.
@@ -820,7 +826,7 @@ eas build --platform android --profile production
 **Goal:** Open registration and enable all payment methods.
 
 - [ ] Remove invite-only restriction.
-- [ ] Enable all plan tiers: Community, Essentials, Professional, Family.
+- [ ] Enable all plan tiers: Community, Essentials, Pro, Premium.
 - [ ] Enable OXXO and SPEI payment methods in Stripe MX dashboard.
 - [ ] Publish app to App Store and Play Store (or open from TestFlight to production).
 - [ ] Activate PostHog session recording for UX analysis.

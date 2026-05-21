@@ -7,6 +7,7 @@ resources:
 - admin-deployment.yaml
 - web-deployment.yaml
 - external-secret.yaml
+- external-secret-janua.yaml
 - network-policies.yaml
 - pdb.yaml
 

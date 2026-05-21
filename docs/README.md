@@ -1,6 +1,6 @@
 # Dhanam Documentation
 
-Last updated: 2026-05-20
+Last updated: 2026-05-21
 
 This is the canonical human and agent documentation map for Dhanam. Prefer this
 file over older phase summaries when choosing what to read first.
@@ -12,6 +12,7 @@ file over older phase summaries when choosing what to read first.
 | [Repository README](../README.md)                                   | Product overview, local quick start, common commands                               |
 | [Development Guide](DEVELOPMENT.md)                                 | Local setup, ports, env files, testing workflow                                    |
 | [Roadmap](ROADMAP.md)                                               | Current stability roadmap and path to 100 percent production confidence            |
+| [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)     | Billing router and internal MADFAM POS completion plan                             |
 | [Deployment Guide](DEPLOYMENT.md)                                   | Enclii-first deploy, staging, rollback, current rollout blockers                   |
 | [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)         | Current truth about production, staging, DNS, health, and remaining stability gaps |
 | [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)     | Concise final status from the latest production-stability push                     |

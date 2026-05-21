@@ -23,6 +23,12 @@ export interface UpgradeOptions {
   successUrl?: string;
   cancelUrl?: string;
   countryCode?: string;
+  source?: string;
+  operatorId?: string;
+}
+
+export interface OperatorCheckoutOptions extends UpgradeOptions {
+  plan: string;
 }
 
 /** Map plan slugs to subscription tiers */
@@ -175,6 +181,15 @@ export class SubscriptionLifecycleService {
     if (options.orgId) {
       metadata.orgId = options.orgId;
     }
+    if (options.product) {
+      metadata.product = options.product;
+    }
+    if (options.source) {
+      metadata.source = options.source;
+    }
+    if (options.operatorId) {
+      metadata.operatorId = options.operatorId;
+    }
 
     const result = await this.januaBilling.createCheckoutSession({
       customerId,
@@ -197,6 +212,9 @@ export class SubscriptionLifecycleService {
         provider: result.provider,
         orgId: options.orgId,
         plan: options.plan,
+        product: options.product,
+        source: options.source,
+        operatorId: options.operatorId,
       },
     });
 
@@ -240,6 +258,15 @@ export class SubscriptionLifecycleService {
     if (options.orgId) {
       metadata.orgId = options.orgId;
     }
+    if (options.product) {
+      metadata.product = options.product;
+    }
+    if (options.source) {
+      metadata.source = options.source;
+    }
+    if (options.operatorId) {
+      metadata.operatorId = options.operatorId;
+    }
 
     // Apply intro coupon if configured (e.g., $0.99/mo for first 3 months)
     const introCouponId = this.config.get<string>('STRIPE_INTRO_COUPON_ID');
@@ -258,7 +285,14 @@ export class SubscriptionLifecycleService {
       userId: user.id,
       action: 'BILLING_UPGRADE_INITIATED',
       severity: 'medium',
-      metadata: { sessionId: session.id, provider: 'stripe', orgId: options.orgId },
+      metadata: {
+        sessionId: session.id,
+        provider: 'stripe',
+        orgId: options.orgId,
+        product: options.product,
+        source: options.source,
+        operatorId: options.operatorId,
+      },
     });
 
     this.logger.log(`Upgrade initiated via Stripe for user ${user.id}, session: ${session.id}`);
@@ -327,8 +361,10 @@ export class SubscriptionLifecycleService {
     if (this.januaBilling.isEnabled()) {
       const result = await this.upgradeToPremiumViaJanua(user as any, countryCode, webUrl, {
         plan,
+        product,
         successUrl: returnUrl,
         cancelUrl: returnUrl,
+        source: 'external',
       });
       return result.checkoutUrl;
     }
@@ -419,6 +455,53 @@ export class SubscriptionLifecycleService {
       checkoutUrl: session.url || '',
       sessionId: session.id,
     };
+  }
+
+  /**
+   * Create an operator-initiated checkout link for MADFAM internal POS use.
+   *
+   * This intentionally bypasses the self-service "already on this tier" guard
+   * in `upgradeToPremium()`: operators may need to sell a product-specific
+   * plan to an existing Dhanam customer. Provider/customer creation and price
+   * resolution still flow through the same lifecycle paths as normal checkout.
+   */
+  async createOperatorCheckout(
+    userId: string,
+    options: OperatorCheckoutOptions
+  ): Promise<{ checkoutUrl: string; provider: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        stripeCustomerId: true,
+        januaCustomerId: true,
+        billingProvider: true,
+        countryCode: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const webUrl = this.config.get<string>('WEB_URL', 'http://localhost:3000');
+    const countryCode = options.countryCode || user.countryCode || 'US';
+    const checkoutOptions: OperatorCheckoutOptions = {
+      ...options,
+      countryCode,
+      source: options.source || 'internal_pos',
+      successUrl:
+        options.successUrl || `${webUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: options.cancelUrl || `${webUrl}/billing/cancel`,
+    };
+
+    if (this.januaBilling.isEnabled()) {
+      return this.upgradeToPremiumViaJanua(user as any, countryCode, webUrl, checkoutOptions);
+    }
+
+    return this.upgradeToPremiumViaStripe(user, webUrl, checkoutOptions);
   }
 
   private normalizeCatalogPlanId(plan: string, product?: string): string {

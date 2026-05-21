@@ -11,6 +11,8 @@ open `docs/INDEX.md`.
 - [Development Guide](DEVELOPMENT.md) - local setup, ports, commands, tests
 - [Deployment Guide](DEPLOYMENT.md) - Enclii-first deployment and operations
 - [Roadmap](ROADMAP.md) - stability roadmap and remaining production blockers
+- [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md) - billing
+  router and internal MADFAM POS completion plan
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md) - current
   production/staging stability truth
 - [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md) - latest

@@ -1,6 +1,6 @@
 # Dhanam Roadmap
 
-Last updated: 2026-05-20
+Last updated: 2026-05-21
 
 This roadmap tracks the current path to a defensible 100 percent stable Dhanam
 codebase and production implementation across `dhan.am`, `www.dhan.am`,
@@ -31,40 +31,44 @@ Dhanam is considered fully stable only when all of these are true:
   access limited to documented break-glass.
 - CI, coverage, build, Prisma, and Playwright gates are green for the release.
 - Current docs, agent context, and runbooks match the source and live system.
+- Commercial billing flows have a single truthful provider-routing contract,
+  catalog-backed pricing, idempotent money events, DLQ/replay coverage, and
+  audited operator controls.
+- The internal MADFAM POS supports checkout creation, refunds, status lookup,
+  reconciliation, and settlement/CFDI proof before it is described as
+  full-fledged.
 
 ## Current Position
 
-| Area                      | Current estimate | Status                                                                                      |
-| ------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
-| Codebase and CI           | 98%              | Hosted CI, lint/typecheck, coverage, and staging deploy are green for latest pushed source. |
-| Public production surface | 99%              | Public DNS, TLS, redirects, app/admin/API liveness, and full API health are green.          |
-| API runtime health        | 99%              | DB, Redis, queues, Belvo, and optional external checks are up; failed queue count is zero.  |
-| Release and staging path  | 96%              | Staging deploy now passes API, web, admin, and staging API-origin smoke.                    |
-| Ops control plane         | 88%              | ArgoCD production truth is healthy; Enclii still lacks key routine operation adapters.      |
-| Overall stability         | 95%              | Production and staging are healthy; remaining gap is Enclii coverage and repeated proof.    |
+| Area                      | Current estimate | Status                                                                                                          |
+| ------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| Codebase and CI           | 98%              | Hosted CI, lint/typecheck, coverage, and staging deploy are green for latest pushed source.                     |
+| Public production surface | 99%              | Public DNS, TLS, redirects, app/admin/API liveness, and full API health are green.                              |
+| API runtime health        | 99%              | DB, Redis, queues, Belvo, and optional external checks are up; failed queue count is zero.                      |
+| Release and staging path  | 96%              | Staging deploy now passes API, web, admin, and staging API-origin smoke.                                        |
+| Ops control plane         | 88%              | ArgoCD production truth is healthy; Enclii still lacks key routine operation adapters.                          |
+| Commercial/POS stability  | 60%              | Catalog checkout is live; admin POS checkout source is landed; full POS/refund/ledger work remains.             |
+| Overall stability         | 95%              | Production and staging are healthy; remaining gap is Enclii coverage, commercial POS depth, and repeated proof. |
 
 ## Current Verification Snapshot
 
-As of 2026-05-20:
+As of 2026-05-21:
 
 - Current production image-manifest base was last changed by
-  `593953ca deploy(prod): promote ccd6c8f`. ArgoCD can report a later docs-only
-  `main` revision without changing production images.
+  `7d0acfc7 deploy(prod): promote e37125d`.
 - Current staging digest base is
-  `7f7a0248 deploy(staging): update digests to dd58fb3`.
-- Latest code stability source commit before this roadmap update is
-  `dd58fb39 fix(billing): allow catalog-backed checkout plans`.
-- Hosted `CI` for `dd58fb39`: run `26196989052`, success.
-- Hosted `Lint & Type Check` for `dd58fb39`: run `26196989035`, success.
-- Hosted `Test Coverage` for `dd58fb39`: run `26196989033`, success.
-- Latest hosted `Check Database Migrations` remains the `d1f8ccf0` run
-  `26194484989`, success; the newer `dd58fb39` change did not alter
-  migrations.
-- `Deploy to Staging` (`26196989053`) built and signed API, web, and admin
-  images for `dd58fb39`, committed staging digests as `7f7a0248`, passed API
-  health, and passed web/admin route checks that prove the staging API origin.
-- Manual API `Promote staging -> prod` (`26195552704`) succeeded after the
-  30-minute soak gate elapsed and committed `593953ca`.
+  `e37125d0 deploy(staging): update digests to 720fb6a`.
+- Latest production-proof documentation commit before this implementation pass
+  is `63362965 docs(stability): record catalog checkout production proof`.
+- Hosted `CI` for `720fb6a3`: run `26198344168`, success.
+- Hosted `Lint & Type Check` for `720fb6a3`: run `26198344082`, success.
+- Hosted `Test Coverage` for `720fb6a3`: run `26198344110`, success.
+- Hosted `Deploy to Staging` for `720fb6a3`: run `26198344080`, success,
+  including public API, web, and admin smoke. Hosted cluster access was
+  unavailable, so live staging digest proof remained best-effort/manual until
+  an Enclii adapter exists.
+- Manual API `Promote staging -> prod` (`26199879634`) succeeded after the
+  30-minute soak gate elapsed and committed `7d0acfc7`.
 - `https://staging-api.dhan.am/health` returns HTTP 200 / healthy.
 - `https://staging.dhan.am` and `https://staging-admin.dhan.am` are reachable
   and proved by hosted staging smoke.
@@ -72,10 +76,8 @@ As of 2026-05-20:
   admin, apex, and `www -> apex` redirect checks.
 - `scripts/production-rollout-proof.js` passes: ArgoCD `dhanam-services` is
   Healthy/Synced on `main`, and live production images match
-  `infra/k8s/production/kustomization.yaml`. The API image is now
-  `sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`;
-  web and admin remain on their existing production digests because their
-  Next.js public runtime values are build-time bound.
+  `infra/k8s/production/kustomization.yaml`. The live production digests are
+  recorded in [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md).
 - Full production health returns `status: "healthy"` with `failedJobs: 0`.
 - The retained failed queue jobs were inspected and removed with a narrow
   break-glass BullMQ failed-only cleanup because Enclii does not yet expose a
@@ -87,6 +89,9 @@ As of 2026-05-20:
 - Catalog-backed checkout plan slugs now route through `PriceResolver` instead
   of being rejected by the legacy local tier allowlist; unsupported generic
   slugs still fail closed rather than silently reusing premium pricing.
+- This source pass adds an admin-only internal POS checkout generator and fixes
+  admin pagination normalization and billing SDK history/provider type drift.
+  Full POS commercial readiness remains roadmap work.
 
 ## Priority Roadmap
 
@@ -192,7 +197,43 @@ Acceptance:
 - Enclii deployment records and public production truth no longer disagree.
 - Raw direct rollout remains break-glass only.
 
-### P4: Close Enclii Adapter Gaps
+### P4: Complete Commercial Billing And POS Stability
+
+Goal: make Dhanam a full-fledged MADFAM internal billing router and POS, not
+only a checkout/subscription backend.
+
+Work:
+
+- Unify checkout routing so `PaymentRouterService` or its successor is the
+  single policy path for country, provider, product, plan, currency, and price
+  source decisions.
+- Keep Janua-routed billing disabled in commercial claims until non-empty
+  secrets and end-to-end Janua checkout proof exist.
+- Expand the admin POS beyond checkout-link creation:
+  - one-time line-item/cart charges;
+  - payment status lookup and timeline;
+  - full and partial refunds;
+  - settlement/reconciliation state;
+  - Karafiel CFDI/egreso proof;
+  - provider route preview and audited override policy.
+- Bring Conekta direct to parity before treating it as commercially launched:
+  durable ledger writes, canonical `payment.*` fan-out, idempotency, refund
+  parity, and DLQ coverage.
+- Update `packages/billing-sdk` for trusted internal callers once POS contracts
+  stabilize.
+
+Acceptance:
+
+- Every money event has a durable local correlation id, idempotency key,
+  provider id, status, and replay path.
+- Admin operators can create, inspect, refund, and reconcile payments without
+  direct provider dashboard access for routine work.
+- Product webhooks are versioned, signed, documented, and tested with golden
+  Dhanam -> product probes.
+- Docs clearly separate live production flows, source-landed flows, and planned
+  commercial enhancements.
+
+### P5: Close Enclii Adapter Gaps
 
 Goal: keep production operations Enclii-first in practice, not just policy.
 
@@ -217,7 +258,7 @@ Acceptance:
 - No routine runbook requires raw `kubectl`, `helm`, SSH, provider CLI/API, or
   direct container access.
 
-### P5: Clarify Provider Health Semantics
+### P6: Clarify Provider Health Semantics
 
 Goal: make provider health explainable and actionable.
 
@@ -237,7 +278,7 @@ Acceptance:
 - Optional provider states do not imply instability.
 - Required provider failures degrade or fail health intentionally.
 
-### P6: Preserve And Tighten Release Gates
+### P7: Preserve And Tighten Release Gates
 
 Goal: keep the codebase stable while the operational path is repaired.
 
@@ -262,7 +303,7 @@ Acceptance:
 - Promotion cannot accidentally use unsigned or non-staging digests.
 - Documentation reflects the actual release path.
 
-### P7: Close Lower-Severity Codebase Debt
+### P8: Close Lower-Severity Codebase Debt
 
 Goal: remove the remaining issues that limit long-term maintainability.
 
@@ -285,10 +326,12 @@ Acceptance:
 
 1. Repair or formalize production rollout truth under one authoritative control
    plane.
-2. Wire Enclii migration repair, queue remediation, policy waiver apply, and
+2. Complete commercial billing/POS stability: router unification, refund and
+   reconciliation controls, and product webhook contract proof.
+3. Wire Enclii migration repair, queue remediation, policy waiver apply, and
    namespace-aware tunnel-route apply.
-3. Encode provider health semantics and tighten lower-severity code/docs debt.
-4. Collect repeated clean deploy/rollback evidence with no undocumented manual
+4. Encode provider health semantics and tighten lower-severity code/docs debt.
+5. Collect repeated clean deploy/rollback evidence with no undocumented manual
    path.
 
 ## Stability Milestones
@@ -298,7 +341,8 @@ Acceptance:
 | M1        | Production queue health green; public routes still pass.                                       | Complete           |
 | M2        | Staging API, web, admin routes and smoke are all passing with staging env proof.               | Complete           |
 | M3        | Production rollout truth is authoritative and post-deploy digest assertions pass.              | 97-98%             |
-| M4        | Enclii adapter gaps closed; provider health semantics encoded; lower-severity debt controlled. | 99%+               |
+| M4        | Internal POS can create, inspect, refund, reconcile, and prove product webhook delivery.       | 98% commercial     |
+| M5        | Enclii adapter gaps closed; provider health semantics encoded; lower-severity debt controlled. | 99%+               |
 
 The final 1 percent is operational proof over repeated clean deploys, clean
 health windows, and absence of undocumented manual paths.

@@ -117,6 +117,32 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
+interface ApiPaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+function normalizePaginated<T>(
+  response: PaginatedResponse<T> | ApiPaginatedResponse<T>
+): PaginatedResponse<T> {
+  if ('meta' in response) {
+    return {
+      data: response.data,
+      total: response.meta.total,
+      page: response.meta.page,
+      limit: response.meta.limit,
+      totalPages: response.meta.totalPages,
+    };
+  }
+
+  return response;
+}
+
 // Phase 5 types
 export interface SystemHealth {
   database: { status: string; connections: number };
@@ -204,13 +230,32 @@ export interface BillingEvent {
   user: { id: string; email: string; name: string } | null;
 }
 
+export interface PosCheckoutRequest {
+  userId: string;
+  plan: string;
+  product?: string;
+  orgId?: string;
+  countryCode?: string;
+  successUrl?: string;
+  cancelUrl?: string;
+}
+
+export interface PosCheckoutResult {
+  checkoutUrl: string;
+  provider: string;
+  userId: string;
+  product: string;
+  plan: string;
+  countryCode: string | null;
+}
+
 // API client
 export const adminApi = {
   async searchUsers(params: UserSearchParams = {}): Promise<PaginatedResponse<UserDetails>> {
-    return apiClient.get<PaginatedResponse<UserDetails>>(
-      '/admin/users',
-      params as Record<string, unknown>
-    );
+    const response = await apiClient.get<
+      PaginatedResponse<UserDetails> | ApiPaginatedResponse<UserDetails>
+    >('/admin/users', params as Record<string, unknown>);
+    return normalizePaginated(response);
   },
 
   async getUserDetails(userId: string): Promise<UserDetails> {
@@ -222,10 +267,10 @@ export const adminApi = {
   },
 
   async searchAuditLogs(params: AuditLogSearchParams = {}): Promise<PaginatedResponse<AuditLog>> {
-    return apiClient.get<PaginatedResponse<AuditLog>>(
-      '/admin/audit-logs',
-      params as Record<string, unknown>
-    );
+    const response = await apiClient.get<
+      PaginatedResponse<AuditLog> | ApiPaginatedResponse<AuditLog>
+    >('/admin/audit-logs', params as Record<string, unknown>);
+    return normalizePaginated(response);
   },
 
   async getOnboardingFunnel(): Promise<OnboardingFunnel> {
@@ -285,10 +330,10 @@ export const adminApi = {
   },
 
   async searchSpaces(params: SpaceSearchParams = {}): Promise<PaginatedResponse<SpaceInfo>> {
-    return apiClient.get<PaginatedResponse<SpaceInfo>>(
-      '/admin/spaces',
-      params as Record<string, unknown>
-    );
+    const response = await apiClient.get<
+      PaginatedResponse<SpaceInfo> | ApiPaginatedResponse<SpaceInfo>
+    >('/admin/spaces', params as Record<string, unknown>);
+    return normalizePaginated(response);
   },
 
   async deactivateUser(userId: string, reason: string): Promise<{ success: boolean }> {
@@ -304,10 +349,17 @@ export const adminApi = {
   },
 
   async getBillingEvents(page?: number, limit?: number): Promise<PaginatedResponse<BillingEvent>> {
-    return apiClient.get<PaginatedResponse<BillingEvent>>('/admin/billing/events', {
+    const response = await apiClient.get<
+      PaginatedResponse<BillingEvent> | ApiPaginatedResponse<BillingEvent>
+    >('/admin/billing/events', {
       page,
       limit,
     } as Record<string, unknown>);
+    return normalizePaginated(response);
+  },
+
+  async createPosCheckout(body: PosCheckoutRequest): Promise<PosCheckoutResult> {
+    return apiClient.post<PosCheckoutResult>('/admin/billing/pos/checkout', body);
   },
 
   async gdprExport(userId: string): Promise<GdprExport> {

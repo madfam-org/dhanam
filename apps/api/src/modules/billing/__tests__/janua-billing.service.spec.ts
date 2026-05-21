@@ -96,6 +96,47 @@ describe('JanuaBillingService', () => {
       const disabledService = module.get<JanuaBillingService>(JanuaBillingService);
       expect(disabledService.isEnabled()).toBe(false);
     });
+
+    it('should not treat the string false as enabled', async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          JanuaBillingService,
+          {
+            provide: ConfigService,
+            useValue: {
+              get: jest.fn((key: string, defaultValue?: any) => {
+                if (key === 'JANUA_API_KEY') return JANUA_API_KEY;
+                if (key === 'JANUA_BILLING_ENABLED') return 'false';
+                return defaultValue;
+              }),
+            },
+          },
+        ],
+      }).compile();
+
+      const disabledService = module.get<JanuaBillingService>(JanuaBillingService);
+      expect(disabledService.isEnabled()).toBe(false);
+    });
+
+    it('should default to disabled when the Janua billing flag is absent', async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          JanuaBillingService,
+          {
+            provide: ConfigService,
+            useValue: {
+              get: jest.fn((key: string, defaultValue?: any) => {
+                if (key === 'JANUA_API_KEY') return JANUA_API_KEY;
+                return defaultValue;
+              }),
+            },
+          },
+        ],
+      }).compile();
+
+      const disabledService = module.get<JanuaBillingService>(JanuaBillingService);
+      expect(disabledService.isEnabled()).toBe(false);
+    });
   });
 
   describe('getProviderForCountry', () => {

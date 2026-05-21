@@ -38,8 +38,8 @@ export type PlanSlug =
   | `${string}_${'essentials' | 'pro' | 'premium' | 'madfam'}_${'yearly' | 'monthly'}`
   | (string & {});
 
-/** Supported billing payment providers */
-export type BillingProvider = 'conekta' | 'polar' | 'stripe';
+/** Supported billing payment providers returned by Dhanam billing surfaces */
+export type BillingProvider = 'conekta' | 'polar' | 'stripe' | 'stripe_mx' | 'paddle';
 
 /** Usage metric types tracked by the billing system */
 export type UsageMetricType =

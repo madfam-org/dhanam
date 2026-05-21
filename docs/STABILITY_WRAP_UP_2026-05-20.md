@@ -27,10 +27,15 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 - Catalog-backed checkout resolution is live in production: the compiled API
   resolves normalized catalog plan IDs through `PriceResolver` before legacy
   env fallback and fails closed when no Stripe price exists.
-- Janua billing relay is still not complete. `dhanam-janua-secrets` currently
-  has `JANUA_API_KEY`, `JANUA_WEBHOOK_SECRET`, and `DHANAM_WEBHOOK_SECRET`
-  present with length 0; do not report Janua-routed billing as production-live
-  until those are provisioned and verified.
+- Janua identity/email relay is being brought under Enclii ExternalSecrets
+  ownership. Janua-routed checkout must still be reported as disabled:
+  `JANUA_BILLING_ENABLED=false` is intentional until the Dhanam Janua billing
+  client route/auth contract matches Janua production and an end-to-end Janua
+  checkout is verified.
+- Commercial POS readiness is not complete. The source now includes an
+  admin-only POS checkout generator, but full POS readiness still requires
+  one-time charges, refunds, payment status lookup, settlement/reconciliation
+  views, CFDI proof, and unified provider routing.
 
 ## Implementation Landed
 
@@ -62,6 +67,16 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 - The `product_tiers` migration now derives `product_id` type from
   `products.id`, so clean text-backed databases and historically drifted
   UUID-backed production databases both migrate safely.
+- Admin commercial operations now have a source-level POS checkout generator at
+  `POST /v1/admin/billing/pos/checkout` and `/pos` in the admin app. It is a
+  checkout-link workflow, not a complete POS terminal.
+- Janua billing is now fail-closed by default: `JANUA_BILLING_ENABLED` must be
+  explicitly truthy, and production manifests set it to `"false"` until Janua
+  billing secrets and checkout proof are complete.
+- Admin API pagination normalization was corrected so paginated `{ data, meta }`
+  responses keep their metadata in the admin client.
+- `@dhanam/billing-sdk` now normalizes the current billing-history array
+  response and includes `stripe_mx` / `paddle` in provider types.
 
 ## Production Break-Glass Actions
 
@@ -122,11 +137,14 @@ namespace-aware staging route apply.
 
 1. Make Enclii the complete routine operation plane for migration repair,
    queue remediation, and namespace-aware tunnel route apply.
-2. Decide and encode final provider launch semantics for Plaid, Bitso, and
+2. Unify billing routing and complete the internal POS commercial workflow:
+   one-time charges, refunds, status lookup, settlement/reconciliation, CFDI
+   proof, and SDK contracts.
+3. Decide and encode final provider launch semantics for Plaid, Bitso, and
    Banxico in runbooks and product readiness.
-3. Keep production green over repeated deploy/rollback cycles with no
+4. Keep production green over repeated deploy/rollback cycles with no
    undocumented manual path.
-4. Expand lower-risk coverage, especially mobile and end-to-end provider
+5. Expand lower-risk coverage, especially mobile and end-to-end provider
    journeys.
 
 ## Stability Estimate

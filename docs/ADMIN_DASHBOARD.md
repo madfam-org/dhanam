@@ -186,6 +186,23 @@ live and auth-gated. Production queue health is currently green with
 `failedJobs: 0`. Use these actions for future incidents when an admin token is
 available; direct BullMQ access is break-glass only.
 
+### 7. MADFAM POS
+
+The POS page creates admin-only checkout links for existing Dhanam users. It is
+the first operator-facing commercial control surface, not the final full POS.
+
+Current support:
+
+- user, product, plan, country, organization id, and optional return URLs;
+- catalog-backed checkout through the billing lifecycle;
+- high-severity audit event `admin.billing_pos_checkout_created`;
+- returned checkout URL plus selected provider.
+
+Remaining POS work is tracked in
+[Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md): one-time
+charges, refunds, payment status timeline, settlement/reconciliation, CFDI
+proof, and route override policy.
+
 ## Admin Actions Audit Trail
 
 All admin actions are logged with high severity:
@@ -299,6 +316,7 @@ GET  /v1/admin/queues/:name/failed?limit=25
 POST /v1/admin/queues/:name/retry-failed
 POST /v1/admin/queues/:name/clear-failed
 POST /v1/admin/queues/:name/clear
+POST /v1/admin/billing/pos/checkout
 ```
 
 ### Response Formats
