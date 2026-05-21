@@ -51,17 +51,18 @@ As of 2026-05-20:
   `593953ca deploy(prod): promote ccd6c8f`. ArgoCD can report a later docs-only
   `main` revision without changing production images.
 - Current staging digest base is
-  `7a848a2c deploy(staging): update digests to d1f8ccf`.
+  `7f7a0248 deploy(staging): update digests to dd58fb3`.
 - Latest code stability source commit before this roadmap update is
-  `d1f8ccf0 fix(stability): harden staging smoke and migration drift`.
-- Hosted `CI` for `d1f8ccf0`: run `26194485015`, success.
-- Hosted `Lint & Type Check` for `d1f8ccf0`: run `26194485017`, success.
-- Hosted `Test Coverage` for `d1f8ccf0`: run `26194484988`, success.
-- Hosted `Check Database Migrations` for `d1f8ccf0`: run `26194484989`,
-  success.
-- `Deploy to Staging` (`26194485016`) built and signed API, web, and admin
-  images, committed staging digests as `7a848a2c`, passed API health, and
-  passed web/admin route checks that prove the staging API origin.
+  `dd58fb39 fix(billing): allow catalog-backed checkout plans`.
+- Hosted `CI` for `dd58fb39`: run `26196989052`, success.
+- Hosted `Lint & Type Check` for `dd58fb39`: run `26196989035`, success.
+- Hosted `Test Coverage` for `dd58fb39`: run `26196989033`, success.
+- Latest hosted `Check Database Migrations` remains the `d1f8ccf0` run
+  `26194484989`, success; the newer `dd58fb39` change did not alter
+  migrations.
+- `Deploy to Staging` (`26196989053`) built and signed API, web, and admin
+  images for `dd58fb39`, committed staging digests as `7f7a0248`, passed API
+  health, and passed web/admin route checks that prove the staging API origin.
 - Manual API `Promote staging -> prod` (`26195552704`) succeeded after the
   30-minute soak gate elapsed and committed `593953ca`.
 - `https://staging-api.dhan.am/health` returns HTTP 200 / healthy.
@@ -83,6 +84,9 @@ As of 2026-05-20:
   repaired and resolved with a narrow break-glass Prisma recovery because
   Enclii does not yet expose a database migration repair adapter. Source now
   makes that migration type-adaptive for future drifted environments.
+- Catalog-backed checkout plan slugs now route through `PriceResolver` instead
+  of being rejected by the legacy local tier allowlist; unsupported generic
+  slugs still fail closed rather than silently reusing premium pricing.
 
 ## Priority Roadmap
 

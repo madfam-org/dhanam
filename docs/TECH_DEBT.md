@@ -75,9 +75,9 @@ The remaining debt is operational ownership and repeated evidence:
 - Keep namespace-aware Cloudflare tunnel routes healthy for staging hosts. DNS
   CNAMEs were restored through Enclii on 2026-05-20; tunnel route apply remains
   an Enclii adapter gap.
-- `Deploy to Staging` run `26194485016` passed build/sign, digest patch, API
+- `Deploy to Staging` run `26196989053` passed build/sign, digest patch, API
   smoke, web route/API-origin smoke, and admin route/API-origin smoke for
-  source commit `d1f8ccf0`, then committed staging refresh `7a848a2c`.
+  source commit `dd58fb39`, then committed staging refresh `7f7a0248`.
 - Preserve hosted evidence that `staging-admin.dhan.am` uses staging API/env
   values before treating it as a promotion proof.
 

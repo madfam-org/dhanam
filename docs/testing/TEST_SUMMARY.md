@@ -63,18 +63,19 @@ push to `main`; see [Deployment Guide](../DEPLOYMENT.md) and
 [Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md) for current
 deployment caveats.
 
-Latest wrap-up: hosted CI (`26194485015`), lint/typecheck (`26194485017`),
-test coverage (`26194484988`), migration check (`26194484989`), and `Deploy to
-Staging` (`26194485016`) passed for `d1f8ccf0`. The staging run built and
-signed API, web, and admin images, committed digest refresh `7a848a2c`, and
-passed API/web/admin smoke with staging API-origin proof. Production rollout
-proof passes against the production manifest after manual API promotion run
-`26195552704`, and production full health is `status: "healthy"` with
-`failedJobs: 0`.
+Latest wrap-up: hosted CI (`26196989052`), lint/typecheck (`26196989035`),
+test coverage (`26196989033`), and `Deploy to Staging` (`26196989053`) passed
+for `dd58fb39`. The staging run built and signed API, web, and admin images,
+committed digest refresh `7f7a0248`, and passed API/web/admin smoke with
+staging API-origin proof. The latest hosted migration check remains
+`26194484989` for `d1f8ccf0` because the newer checkout fix did not alter
+migrations. Production rollout proof passes against the production manifest
+after manual API promotion run `26195552704`, and production full health is
+`status: "healthy"` with `failedJobs: 0`.
 
 The latest stability source includes the type-adaptive `product_tiers`
-migration, staging web/admin smoke checks, and checkout price-resolution
-fail-closed hardening.
+migration, staging web/admin smoke checks, checkout price-resolution
+fail-closed hardening, and catalog-backed checkout plan resolution.
 See [Verification Snapshot](TEST_RESULTS.md) and
 [Stability Wrap-Up 2026-05-20](../STABILITY_WRAP_UP_2026-05-20.md).
 

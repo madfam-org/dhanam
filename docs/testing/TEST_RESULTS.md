@@ -42,8 +42,12 @@ Prisma, AWS, or port assumptions.
 | Production preflight                                        | Passed, including `www` apex redirect         |
 | Production rollout proof                                    | Passed; live images match prod manifest       |
 | Production full health                                      | Healthy, `failedJobs: 0`                      |
-| Staging API/web/admin smoke                                 | Passed for `d1f8ccf0` / run `26194485016`     |
+| Staging API/web/admin smoke                                 | Passed for `dd58fb39` / run `26196989053`     |
 | Manual API production promotion                             | Passed, run `26195552704`, commit `593953ca`  |
+| Hosted CI for `dd58fb39`                                    | Passed, run `26196989052`                     |
+| Hosted lint/typecheck for `dd58fb39`                        | Passed, run `26196989035`                     |
+| Hosted test coverage for `dd58fb39`                         | Passed, run `26196989033`                     |
+| Hosted staging deploy for `dd58fb39`                        | Passed, run `26196989053`, commit `7f7a0248`  |
 | Hosted CI for `d1f8ccf0`                                    | Passed, run `26194485015`                     |
 | Hosted lint/typecheck for `d1f8ccf0`                        | Passed, run `26194485017`                     |
 | Hosted test coverage for `d1f8ccf0`                         | Passed, run `26194484988`                     |
@@ -71,8 +75,8 @@ Prisma, AWS, or port assumptions.
 
 These are not unit-test failures, but they block full-system stability:
 
-- Staging API/web/admin smoke is now green. Run `26194485016` built and signed
-  all images for `d1f8ccf0`, committed `7a848a2c`, passed
+- Staging API/web/admin smoke is now green. Run `26196989053` built and signed
+  all images for `dd58fb39`, committed `7f7a0248`, passed
   `https://staging-api.dhan.am/health`, and passed web/admin route checks that
   prove the staging API origin.
 - Enclii API/admin deployment records show a Kyverno image-signature annotation
@@ -80,7 +84,7 @@ These are not unit-test failures, but they block full-system stability:
 - `deploy-staging.yml` signs newly built staging images and
   `promote-to-prod.yml` verifies those signatures before writing production
   digests. Staging overlay digest refreshes land as signed `deploy(staging)`
-  bot commits; `7a848a2c` is the latest observed here. Promotion requires an
+  bot commits; `7f7a0248` is the latest observed here. Promotion requires an
   explicit successful staging smoke run id unless break-glass is selected.
 - Manual API promotion run `26195552704` used that path after the 30-minute
   soak gate elapsed and committed production manifest change `593953ca`. Web and
@@ -113,6 +117,8 @@ These are not unit-test failures, but they block full-system stability:
 - Current source also makes the `product_tiers` migration derive
   `product_id` type from `products.id`, preventing the production UUID drift
   failure from recurring in future environments.
+- Current source also allows catalog-backed checkout plan slugs to resolve
+  through `PriceResolver`, while unsupported generic slugs still fail closed.
 - Enclii `prod` deployment records are not currently sufficient proof of public
   production rollout: the live route is still served by the ArgoCD
   `dhanam-services` Application in the `dhanam` namespace.

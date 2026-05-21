@@ -34,8 +34,8 @@ hardening, production migration recovery, and failed-job cleanup.
 | Web accessibility gates   | Stable locally     | Chromium slice passed 41/41 after fixing settings switches, report download buttons, transaction rows, and dashboard/report action controls.                     |
 | Admin Playwright          | Improved           | CI defaults to synthetic admin auth and context-level mocks for admin API reads.                                                                                 |
 | API production build      | Improved           | Nest now copies email templates into `dist`, and the duplicate Swagger `UpdatePreferencesDto` runtime model warning was removed.                                 |
-| Staging image pipeline    | Improved           | API, web, and admin images build, sign with cosign, and patch the staging overlay; latest refresh is `7a848a2c` for source `d1f8ccf0`.                           |
-| Staging smoke             | Improved           | Deploy run `26194485016` passed API, web, admin, and staging API-origin smoke.                                                                                   |
+| Staging image pipeline    | Improved           | API, web, and admin images build, sign with cosign, and patch the staging overlay; latest refresh is `7f7a0248` for source `dd58fb39`.                           |
+| Staging smoke             | Improved           | Deploy run `26196989053` passed API, web, admin, and staging API-origin smoke.                                                                                   |
 | Production API health     | Healthy            | Full production health returns HTTP 200 with `status: "healthy"` and `failedJobs: 0`.                                                                            |
 | Production domain routing | Fixed and verified | `scripts/production-preflight.sh` passes; `www.dhan.am` redirects to `https://dhan.am/` without leaking `:4200`.                                                 |
 | Enclii production rollout | Partially improved | `scripts/production-rollout-proof.js` proves ArgoCD live digests match the production manifest on `main`; Enclii `prod` still does not own public rollout truth. |
@@ -180,12 +180,20 @@ Final evidence from the latest stabilization pass:
 - The staging digest bot committed `7a848a2c` for `d1f8ccf0`.
 - Manual API `Promote staging -> prod` run `26195552704` succeeded after the
   30-minute soak gate elapsed and committed `593953ca`.
-- Local `main` is fast-forwarded to the production promotion commit.
+- Local `main` is fast-forwarded to the latest staging digest refresh commit.
 - Hosted `CI` for `d1f8ccf0`: run `26194485015`, success.
 - Hosted `Lint & Type Check` for `d1f8ccf0`: run `26194485017`, success.
 - Hosted `Test Coverage` for `d1f8ccf0`: run `26194484988`, success.
 - Hosted `Check Database Migrations` for `d1f8ccf0`: run `26194484989`,
   success.
+- `dd58fb39 fix(billing): allow catalog-backed checkout plans` was pushed
+  after the initial wrap-up and kept checkout behavior aligned with catalog
+  truth.
+- The staging digest bot committed `7f7a0248` for `dd58fb39`.
+- Hosted `CI` for `dd58fb39`: run `26196989052`, success.
+- Hosted `Lint & Type Check` for `dd58fb39`: run `26196989035`, success.
+- Hosted `Test Coverage` for `dd58fb39`: run `26196989033`, success.
+- Hosted `Deploy to Staging` for `dd58fb39`: run `26196989053`, success.
 - Hosted `Deploy to Staging` run `26194485016` built and signed API, web, and
   admin images, patched `infra/k8s/overlays/staging/kustomization.yaml`, passed
   the public API smoke step at `https://staging-api.dhan.am/health`, and
@@ -233,7 +241,7 @@ operation `op_1779260970221167708`. It showed no routes for
 `http://dhanam-admin.dhanam.svc.cluster.local:80`.
 
 Updated Enclii read-only checks on 2026-05-20 show staging is now registered:
-`dhanam-staging` is Healthy/Synced in ArgoCD at revision `7a848a2c`, the
+`dhanam-staging` is Healthy/Synced in ArgoCD at revision `7f7a0248`, the
 `enclii-dhanam-staging` namespace exists, four ExternalSecrets report
 `SecretSynced`, and hosted API/web/admin smoke with staging API-origin proof
 passes.
@@ -297,7 +305,7 @@ candidate digest has a valid signature from
 production digest. This prevents the unsigned-staging-digest failure class from
 reaching ArgoCD/Kyverno again. Signed staging builds now refresh the staging
 overlay through `deploy(staging)` bot commits; the latest observed during this
-audit was `7a848a2c`, generated for source commit `d1f8ccf0`. API, web, admin,
+audit was `7f7a0248`, generated for source commit `dd58fb39`. API, web, admin,
 and staging API-origin smoke pass, so the promotion signal covers all three
 public staging surfaces.
 

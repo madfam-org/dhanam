@@ -24,8 +24,8 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
   `GET /v1/admin/queues/sync-transactions/failed?limit=1` returns HTTP 401,
   proving the route exists and is protected.
 - Staging API, web, and admin smoke are green. `Deploy to Staging` run
-  `26194485016` built and signed API, web, and admin images for `d1f8ccf0`,
-  committed staging digest refresh `7a848a2c`, passed API health, and proved
+  `26196989053` built and signed API, web, and admin images for `dd58fb39`,
+  committed staging digest refresh `7f7a0248`, passed API health, and proved
   the web/admin routes use the staging API origin.
 
 ## Implementation Landed
@@ -44,6 +44,9 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 - Stripe integration fails closed when unconfigured.
 - Stripe checkout price resolution fails closed for unknown plan slugs instead
   of silently defaulting to premium pricing.
+- Catalog-backed product checkout plan slugs now resolve through
+  `PriceResolver`, so ecosystem products can use catalog-managed plan slugs
+  without being rejected by Dhanam's legacy local tier allowlist.
 - Product-catalog sync now prunes stale rows when catalog entries are removed.
 - `scripts/production-rollout-proof.js` verifies live ArgoCD images against the
   production manifest.
@@ -80,6 +83,12 @@ namespace-aware staging route apply.
 - Hosted `Deploy to Staging` for `d1f8ccf0`: run `26194485016`, success,
   including build/sign for API, web, admin, staging digest patch, API smoke,
   web route/API-origin smoke, and admin route/API-origin smoke.
+- Hosted `CI` for `dd58fb39`: run `26196989052`, success.
+- Hosted `Lint & Type Check` for `dd58fb39`: run `26196989035`, success.
+- Hosted `Test Coverage` for `dd58fb39`: run `26196989033`, success.
+- Hosted `Deploy to Staging` for `dd58fb39`: run `26196989053`, success,
+  including build/sign for API, web, admin, staging digest patch `7f7a0248`,
+  API smoke, web route/API-origin smoke, and admin route/API-origin smoke.
 - Manual API `Promote staging -> prod`: run `26195552704`, success after the
   30-minute soak gate elapsed; committed `593953ca`.
 - Scheduled `Promote staging -> prod` validation: run `26190740392`, success;

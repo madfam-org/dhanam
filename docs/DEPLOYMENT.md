@@ -58,8 +58,8 @@ and admin images with GitHub Actions keyless cosign signatures, and
 also requires the operator to provide a successful `Deploy to Staging` run id
 whose smoke job passed for the staged source commit, unless the operator
 selects the explicit break-glass smoke bypass. Staging digest refreshes now land
-as signed `deploy(staging)` bot commits; `7a848a2c` is the latest observed
-refresh and records signed staging digests for source commit `d1f8ccf0`. Future
+as signed `deploy(staging)` bot commits; `7f7a0248` is the latest observed
+refresh and records signed staging digests for source commit `dd58fb39`. Future
 promotions must use signed staging digests with smoke/soak evidence. The
 break-glass K8s workflows also sign
 their images before committing production digests; their raw
@@ -270,8 +270,8 @@ The workflow ignores `infra/k8s/overlays/staging/kustomization.yaml` so the
 digest patch commit it creates does not trigger a second staging build.
 
 Current status as of the 2026-05-20 wrap-up: `Deploy to Staging` run
-`26194485016` built and signed all three images for `d1f8ccf0`, committed
-staging digest refresh `7a848a2c`, passed the public API smoke at
+`26196989053` built and signed all three images for `dd58fb39`, committed
+staging digest refresh `7f7a0248`, passed the public API smoke at
 `https://staging-api.dhan.am/health`, and passed web/admin route checks that
 prove the staging API origin. Treat staging as the production-promotion gate
 only when the latest candidate has equivalent hosted smoke evidence.
