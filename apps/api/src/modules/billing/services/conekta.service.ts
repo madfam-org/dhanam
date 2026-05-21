@@ -39,7 +39,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
+import { BillingEventType, BillingStatus, Currency } from '@db';
+
+import { AuditService } from '../../../core/audit/audit.service';
 import { InfrastructureException } from '../../../core/exceptions/domain-exceptions';
+import { PrismaService } from '../../../core/prisma/prisma.service';
+
+import { PhyndCrmEngagementNotifierService } from './phyndcrm-engagement-notifier.service';
+import type { DhanamPaymentEnvelope } from './stripe-mx-spei-relay.service';
+import { WebhookDlqService } from './webhook-dlq.service';
 
 /**
  * Subset of Conekta webhook event types we care about today.
@@ -112,6 +120,32 @@ export interface ConektaVerifiedEvent {
   };
 }
 
+export type ConektaWebhookClassification = 'paid' | 'declined' | 'refunded' | 'expired' | 'ignored';
+
+export interface ConektaWebhookHandleResult {
+  handled: boolean;
+  classification: ConektaWebhookClassification;
+  chargeId?: string;
+  orderId?: string;
+  idempotent?: boolean;
+  relayed?: boolean;
+  envelopeId?: string;
+}
+
+interface ConektaEventContext {
+  chargeId?: string;
+  orderId?: string;
+  refundId?: string;
+  amountMinor: number;
+  currency: string;
+  metadata: Record<string, string>;
+  customerId?: string;
+  customerEmail?: string;
+  subscriptionId: string;
+  failureReason?: string;
+  failureCode?: string;
+}
+
 /**
  * Conekta gateway service.
  *
@@ -120,9 +154,9 @@ export interface ConektaVerifiedEvent {
  * - `createCharge()` for one-shot orders
  * - `verifyWebhookSignature()` returning a strongly-typed event
  *   (or throwing for invalid signatures — caller maps to BadRequest)
- * - `handleWebhookEvent()` for downstream dispatch (idempotency
- *   handled by the controller via `BillingEvent.stripeEventId` unique
- *   constraint, same pattern as Stripe MX SPEI relay)
+ * - `handleWebhookEvent()` for durable ledger writes + canonical
+ *   payment.* fan-out (idempotency handled via `BillingEvent.stripeEventId`,
+ *   the existing provider-event-id column shared with Stripe MX)
  */
 @Injectable()
 export class ConektaService {
@@ -135,7 +169,11 @@ export class ConektaService {
 
   constructor(
     private readonly config: ConfigService,
-    private readonly http: HttpService
+    private readonly http: HttpService,
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+    private readonly phyndcrmNotifier: PhyndCrmEngagementNotifierService,
+    private readonly dlq: WebhookDlqService
   ) {
     this.privateKey = this.config.get<string>('CONEKTA_PRIVATE_KEY', '');
     this.publicKey = this.config.get<string>('CONEKTA_PUBLIC_KEY', '');
@@ -313,40 +351,31 @@ export class ConektaService {
   /**
    * Dispatch a verified Conekta event to its handler.
    *
-   * Stays intentionally side-effect-light: this layer logs + classifies, and
-   * downstream services (BillingEvent writer, Karafiel CFDI fan-out, etc.)
-   * subscribe via the existing webhook-processor pipeline once the Cotiza →
-   * Dhanam invoice flow is live (tracked separately).
-   *
-   * Returns a stable shape so the controller can persist the right
-   * BillingEvent type without re-decoding the payload.
+   * This path is intentionally aligned with the Stripe MX SPEI relay:
+   * provider retries dedupe on event id, linked events land in
+   * `BillingEvent`, canonical `payment.*` envelopes fan out to product
+   * webhooks, and failed deliveries land in the DLQ for retry/replay.
    */
-  async handleWebhookEvent(event: ConektaVerifiedEvent): Promise<{
-    handled: boolean;
-    classification: 'paid' | 'declined' | 'refunded' | 'expired' | 'ignored';
-    chargeId?: string;
-    orderId?: string;
-  }> {
-    const obj = (event.data?.object ?? {}) as Record<string, unknown>;
-    const chargeId = (obj.id as string) ?? undefined;
-    const orderId = (obj.order_id as string) ?? undefined;
+  async handleWebhookEvent(event: ConektaVerifiedEvent): Promise<ConektaWebhookHandleResult> {
+    const context = this.extractEventContext(event);
+    const { chargeId, orderId } = context;
 
     switch (event.type) {
       case 'charge.paid':
         this.logger.log(`Conekta charge.paid id=${chargeId} order=${orderId}`);
-        return { handled: true, classification: 'paid', chargeId, orderId };
+        return this.processPaymentEvent(event, 'paid', context);
 
       case 'charge.declined':
         this.logger.warn(`Conekta charge.declined id=${chargeId} order=${orderId}`);
-        return { handled: true, classification: 'declined', chargeId, orderId };
+        return this.processPaymentEvent(event, 'declined', context);
 
       case 'charge.refunded':
         this.logger.log(`Conekta charge.refunded id=${chargeId} order=${orderId}`);
-        return { handled: true, classification: 'refunded', chargeId, orderId };
+        return this.processPaymentEvent(event, 'refunded', context);
 
       case 'order.expired':
         this.logger.log(`Conekta order.expired order=${orderId}`);
-        return { handled: true, classification: 'expired', chargeId, orderId };
+        return this.processPaymentEvent(event, 'expired', context);
 
       default:
         this.logger.log(`Conekta event ignored (no handler): type=${event.type} id=${event.id}`);
@@ -354,9 +383,412 @@ export class ConektaService {
     }
   }
 
+  private async processPaymentEvent(
+    event: ConektaVerifiedEvent,
+    classification: Exclude<ConektaWebhookClassification, 'ignored'>,
+    context: ConektaEventContext
+  ): Promise<ConektaWebhookHandleResult> {
+    const existing = await this.prisma.billingEvent.findFirst({
+      where: { stripeEventId: event.id },
+      select: { id: true },
+    });
+    if (existing) {
+      this.logger.log(`Conekta event ${event.id} already processed (idempotent replay)`);
+      return {
+        handled: true,
+        classification,
+        chargeId: context.chargeId,
+        orderId: context.orderId,
+        idempotent: true,
+        relayed: false,
+      };
+    }
+
+    const envelope = await this.buildPaymentEnvelope(event, classification, context);
+    if (!envelope) {
+      return {
+        handled: true,
+        classification,
+        chargeId: context.chargeId,
+        orderId: context.orderId,
+        relayed: false,
+      };
+    }
+
+    await this.persistBillingEvent(event, classification, envelope);
+    await this.dispatch(envelope);
+
+    return {
+      handled: true,
+      classification,
+      chargeId: context.chargeId,
+      orderId: context.orderId,
+      relayed: true,
+      envelopeId: envelope.id,
+    };
+  }
+
   // ---------------------------------------------------------------------------
   // Internals
   // ---------------------------------------------------------------------------
+
+  private async buildPaymentEnvelope(
+    event: ConektaVerifiedEvent,
+    classification: Exclude<ConektaWebhookClassification, 'ignored'>,
+    context: ConektaEventContext
+  ): Promise<DhanamPaymentEnvelope | null> {
+    if (context.currency.toUpperCase() !== 'MXN') {
+      this.logger.warn(
+        `Dropping Conekta event ${event.id} — currency "${context.currency}" is not MXN`
+      );
+      return null;
+    }
+
+    const customerId = await this.resolveEnvelopeCustomerId(context);
+    if (!customerId) {
+      await this.audit.log({
+        action: 'CONEKTA_RELAY_UNLINKED',
+        severity: 'medium',
+        metadata: {
+          conekta_event_id: event.id,
+          conekta_event_type: event.type,
+          charge_id: context.chargeId,
+          order_id: context.orderId,
+        },
+      });
+      this.logger.warn(`Skipping Conekta ${event.type} ${event.id} — no customer_id resolved`);
+      return null;
+    }
+
+    const amountMinor = Math.max(0, context.amountMinor);
+    const type = this.envelopeTypeForClassification(classification);
+    const paymentId =
+      classification === 'refunded'
+        ? context.refundId || event.id
+        : context.chargeId || context.orderId || event.id;
+
+    const envelope: DhanamPaymentEnvelope = {
+      type,
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      data: {
+        customer_id: customerId,
+        subscription_id: context.subscriptionId,
+        payment_id: paymentId,
+        amount: (amountMinor / 100).toFixed(2),
+        amount_minor: amountMinor,
+        currency: 'MXN',
+      },
+    };
+
+    if (type === 'payment.failed') {
+      envelope.data.failure_reason =
+        context.failureReason ||
+        (classification === 'expired' ? 'Conekta order expired' : 'Conekta charge declined');
+      envelope.data.failure_code =
+        context.failureCode || (classification === 'expired' ? 'order.expired' : 'charge.declined');
+    }
+
+    if (type === 'payment.refunded') {
+      envelope.data.refunded_payment_id = context.chargeId || context.orderId || event.id;
+      envelope.data.original_payment_id = context.chargeId || context.orderId || event.id;
+    }
+
+    const ecosystem = this.extractEcosystemMetadata(context.metadata);
+    if (ecosystem) {
+      envelope.data.ecosystem = ecosystem;
+    }
+
+    return envelope;
+  }
+
+  private envelopeTypeForClassification(
+    classification: Exclude<ConektaWebhookClassification, 'ignored'>
+  ): DhanamPaymentEnvelope['type'] {
+    if (classification === 'paid') return 'payment.succeeded';
+    if (classification === 'refunded') return 'payment.refunded';
+    return 'payment.failed';
+  }
+
+  private extractEventContext(event: ConektaVerifiedEvent): ConektaEventContext {
+    const obj = (event.data?.object ?? {}) as Record<string, unknown>;
+    const orderInfo = this.recordAt(obj, 'order_info');
+    const order = this.recordAt(obj, 'order');
+    const customerInfo =
+      this.recordAt(obj, 'customer_info') ?? this.recordAt(orderInfo, 'customer_info');
+    const paymentMethod = this.recordAt(obj, 'payment_method');
+    const metadata = this.extractMetadata(obj, orderInfo, order);
+
+    const chargeId = this.stringAt(obj, 'id') || this.stringAt(obj, 'charge_id');
+    const orderId =
+      this.stringAt(obj, 'order_id') ||
+      this.stringAt(orderInfo, 'id') ||
+      this.stringAt(order, 'id');
+    const refund = this.recordAt(obj, 'refund') ?? this.firstRecordAt(obj, 'refunds', 'data');
+    const refundId =
+      this.stringAt(obj, 'refund_id') || this.stringAt(refund, 'id') || this.stringAt(obj, 'id');
+
+    return {
+      chargeId,
+      orderId,
+      refundId,
+      amountMinor:
+        this.numberAt(refund, 'amount') ??
+        this.numberAt(obj, 'amount_refunded') ??
+        this.numberAt(obj, 'amount') ??
+        this.numberAt(orderInfo, 'amount') ??
+        this.numberAt(order, 'amount') ??
+        0,
+      currency:
+        this.stringAt(obj, 'currency') ||
+        this.stringAt(orderInfo, 'currency') ||
+        this.stringAt(order, 'currency') ||
+        metadata.currency ||
+        'MXN',
+      metadata,
+      customerId:
+        metadata.dhanam_user_id ||
+        metadata.user_id ||
+        metadata.customer_id ||
+        metadata.customerId ||
+        metadata.janua_customer_id ||
+        metadata.conekta_customer_id ||
+        this.stringAt(obj, 'customer_id') ||
+        this.stringAt(customerInfo, 'customer_id') ||
+        this.stringAt(customerInfo, 'id'),
+      customerEmail:
+        metadata.customer_email ||
+        metadata.email ||
+        this.stringAt(customerInfo, 'email') ||
+        this.stringAt(obj, 'customer_email'),
+      subscriptionId:
+        metadata.subscription_id ||
+        metadata.janua_subscription_id ||
+        metadata.conekta_subscription_id ||
+        '',
+      failureReason:
+        this.stringAt(obj, 'failure_message') ||
+        this.stringAt(obj, 'failure_reason') ||
+        this.stringAt(paymentMethod, 'failure_message'),
+      failureCode:
+        this.stringAt(obj, 'failure_code') || this.stringAt(paymentMethod, 'failure_code'),
+    };
+  }
+
+  private async persistBillingEvent(
+    event: ConektaVerifiedEvent,
+    classification: Exclude<ConektaWebhookClassification, 'ignored'>,
+    envelope: DhanamPaymentEnvelope
+  ): Promise<void> {
+    const typeMap: Record<DhanamPaymentEnvelope['type'], BillingEventType> = {
+      'payment.succeeded': 'payment_succeeded' as BillingEventType,
+      'payment.failed': 'payment_failed' as BillingEventType,
+      'payment.refunded': 'refund_issued' as BillingEventType,
+    };
+    const statusMap: Record<DhanamPaymentEnvelope['type'], BillingStatus> = {
+      'payment.succeeded': 'succeeded' as BillingStatus,
+      'payment.failed': 'failed' as BillingStatus,
+      'payment.refunded': 'succeeded' as BillingStatus,
+    };
+
+    const userId = await this.tryResolveLocalUserId(envelope.data.customer_id);
+    if (!userId) {
+      await this.audit.log({
+        action: 'CONEKTA_RELAY_UNLINKED',
+        severity: 'medium',
+        metadata: {
+          conekta_event_id: event.id,
+          conekta_event_type: event.type,
+          envelope_id: envelope.id,
+          envelope_type: envelope.type,
+          customer_id: envelope.data.customer_id,
+        },
+      });
+      return;
+    }
+
+    try {
+      await this.prisma.billingEvent.create({
+        data: {
+          userId,
+          type: typeMap[envelope.type],
+          status: statusMap[envelope.type],
+          amount: envelope.data.amount_minor / 100,
+          currency: (envelope.data.currency as Currency) || 'MXN',
+          stripeEventId: event.id,
+          metadata: {
+            envelope_id: envelope.id,
+            envelope_type: envelope.type,
+            conekta_event_type: event.type,
+            classification,
+            payment_id: envelope.data.payment_id,
+            subscription_id: envelope.data.subscription_id,
+            source: 'conekta_direct_relay',
+          },
+        },
+      });
+    } catch (err) {
+      this.logger.warn(
+        `BillingEvent insert for conekta_event_id=${event.id} failed: ${(err as Error).message}`
+      );
+    }
+  }
+
+  private async dispatch(envelope: DhanamPaymentEnvelope): Promise<void> {
+    void this.phyndcrmNotifier.notify(envelope);
+
+    const targets = this.listRelayTargets();
+    if (targets.length === 0) {
+      this.logger.log(
+        `No PRODUCT_WEBHOOK_URLS configured; Conekta envelope ${envelope.id} persisted only`
+      );
+      return;
+    }
+
+    const secret = this.config.get<string>('DHANAM_WEBHOOK_SECRET', '');
+    if (!secret) {
+      this.logger.warn(
+        'DHANAM_WEBHOOK_SECRET not configured — refusing to dispatch unsigned webhook'
+      );
+      return;
+    }
+
+    const body = JSON.stringify(envelope);
+    const signature = crypto.createHmac('sha256', secret).update(body).digest('hex');
+
+    await Promise.all(
+      targets.map(async ({ product, url }) => {
+        let statusCode: number | undefined;
+        let errorMessage: string | undefined;
+        let ok = false;
+
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Dhanam-Signature': signature,
+              'X-Dhanam-Envelope-Id': envelope.id,
+              'X-Dhanam-Event-Type': envelope.type,
+            },
+            body,
+          });
+          statusCode = res.status;
+          ok = res.ok;
+          if (!ok) {
+            let responseBodySnippet = '';
+            try {
+              responseBodySnippet = (await res.text()).slice(0, 500);
+            } catch {
+              responseBodySnippet = '';
+            }
+            errorMessage = `consumer responded ${res.status}: ${responseBodySnippet}`;
+            this.logger.warn(
+              `Conekta relay to ${product} (${url}) returned ${res.status} for envelope ${envelope.id}`
+            );
+          } else {
+            this.logger.log(`Relayed ${envelope.type} (${envelope.id}) → ${product}`);
+          }
+        } catch (err) {
+          errorMessage = `network/timeout: ${(err as Error).message}`;
+          this.logger.error(
+            `Conekta relay to ${product} (${url}) failed: ${(err as Error).message}`
+          );
+        }
+
+        if (!ok) {
+          try {
+            await this.dlq.recordFailure({
+              eventId: envelope.id,
+              consumer: product,
+              consumerUrl: url,
+              eventType: envelope.type,
+              payload: envelope,
+              signatureHeader: signature,
+              statusCode,
+              errorMessage: errorMessage ?? 'unknown',
+            });
+          } catch (dlqErr) {
+            this.logger.error(
+              `Failed to persist DLQ row for ${product} Conekta envelope ${envelope.id}: ${
+                (dlqErr as Error).message
+              }`
+            );
+          }
+        }
+      })
+    );
+  }
+
+  private async resolveEnvelopeCustomerId(context: ConektaEventContext): Promise<string | null> {
+    const localUserId = await this.tryResolveLocalUserId(
+      context.metadata.dhanam_user_id || context.metadata.user_id || context.customerId || ''
+    );
+    if (localUserId) return localUserId;
+    return context.customerId || context.customerEmail || null;
+  }
+
+  private async tryResolveLocalUserId(candidate: string): Promise<string | null> {
+    if (candidate) {
+      const byId = await this.prisma.user.findUnique({
+        where: { id: candidate },
+        select: { id: true },
+      });
+      if (byId) return byId.id;
+
+      const byJanuaCustomer = await this.prisma.user.findUnique({
+        where: { januaCustomerId: candidate },
+        select: { id: true },
+      });
+      if (byJanuaCustomer) return byJanuaCustomer.id;
+
+      if (candidate.includes('@')) {
+        const byEmail = await this.prisma.user.findUnique({
+          where: { email: candidate },
+          select: { id: true },
+        });
+        if (byEmail) return byEmail.id;
+      }
+    }
+
+    return null;
+  }
+
+  private extractEcosystemMetadata(
+    metadata: Record<string, string>
+  ): DhanamPaymentEnvelope['data']['ecosystem'] | null {
+    const keys = [
+      'engagement_id',
+      'cotiza_quote_id',
+      'cotiza_quote_item_id',
+      'milestone_id',
+      'order_id',
+      'source',
+    ] as const;
+    const picked: NonNullable<DhanamPaymentEnvelope['data']['ecosystem']> = {};
+    for (const key of keys) {
+      if (metadata[key]) {
+        picked[key] = metadata[key];
+      }
+    }
+    return Object.keys(picked).length > 0 ? picked : null;
+  }
+
+  private listRelayTargets(): Array<{ product: string; url: string }> {
+    const cfg = this.config.get<string>('PRODUCT_WEBHOOK_URLS', '') || '';
+    const out: Array<{ product: string; url: string }> = [];
+    for (const entry of cfg.split(',')) {
+      const trimmed = entry.trim();
+      if (!trimmed) continue;
+      const colonIdx = trimmed.indexOf(':');
+      if (colonIdx <= 0) continue;
+      const product = trimmed.slice(0, colonIdx).trim();
+      const url = trimmed.slice(colonIdx + 1).trim();
+      if (!product || !url) continue;
+      out.push({ product, url });
+    }
+    return out;
+  }
 
   private buildHeaders(idempotencyKey?: string): Record<string, string> {
     const basicAuth = Buffer.from(`${this.privateKey}:`).toString('base64');
@@ -456,5 +888,57 @@ export class ConektaService {
     }
 
     throw new Error('Conekta signature header is not in a recognized format');
+  }
+
+  private extractMetadata(
+    ...records: Array<Record<string, unknown> | undefined>
+  ): Record<string, string> {
+    const out: Record<string, string> = {};
+    for (const record of records) {
+      const metadata = this.recordAt(record, 'metadata');
+      if (!metadata) continue;
+      for (const [key, value] of Object.entries(metadata)) {
+        if (typeof value === 'string') {
+          out[key] = value;
+        } else if (typeof value === 'number' || typeof value === 'boolean') {
+          out[key] = String(value);
+        }
+      }
+    }
+    return out;
+  }
+
+  private recordAt(
+    record: Record<string, unknown> | undefined,
+    key: string
+  ): Record<string, unknown> | undefined {
+    const value = record?.[key];
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : undefined;
+  }
+
+  private firstRecordAt(
+    record: Record<string, unknown> | undefined,
+    parentKey: string,
+    childKey: string
+  ): Record<string, unknown> | undefined {
+    const parent = this.recordAt(record, parentKey);
+    const child = parent?.[childKey];
+    if (!Array.isArray(child)) return undefined;
+    const first = child[0];
+    return first && typeof first === 'object' && !Array.isArray(first)
+      ? (first as Record<string, unknown>)
+      : undefined;
+  }
+
+  private stringAt(record: Record<string, unknown> | undefined, key: string): string | undefined {
+    const value = record?.[key];
+    return typeof value === 'string' && value.length > 0 ? value : undefined;
+  }
+
+  private numberAt(record: Record<string, unknown> | undefined, key: string): number | undefined {
+    const value = record?.[key];
+    return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
   }
 }

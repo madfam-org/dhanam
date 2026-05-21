@@ -220,8 +220,10 @@ Work:
   - Karafiel CFDI/egreso proof;
   - provider route preview and audited override policy.
 - Bring Conekta direct to parity before treating it as commercially launched:
-  durable ledger writes, canonical `payment.*` fan-out, idempotency, refund
-  parity, and DLQ coverage.
+  webhook signature verification, event-id idempotency, linked `BillingEvent`
+  writes, canonical `payment.*` fan-out, and DLQ coverage are source-landed;
+  refund initiation/partial refunds, settlement reconciliation, provider
+  timeline UI, and live-mode operator proof remain.
 - Update `packages/billing-sdk` for trusted internal callers once POS contracts
   stabilize.
 

@@ -130,8 +130,12 @@ Stripe MX/SPEI is the strongest provider path today:
   envelopes are sent to product webhooks;
 - downstream failures land in `WebhookDeliveryFailure` for retry/replay.
 
-Commercial gaps remain for Conekta direct, unlinked revenue events, and full
-provider parity. These are tracked in
+The direct Conekta webhook path now follows the same core safety pattern for
+linked MXN events: signature verification, event-id dedupe, `BillingEvent`
+persistence, canonical `payment.*` product fan-out, and DLQ capture on
+consumer failure. Remaining Conekta gaps are refund initiation/partial-refund
+operations, settlement reconciliation, provider-complete timeline display, and
+live-mode operator proof. These are tracked in
 [`docs/ROADMAP.md`](../../../../../docs/ROADMAP.md) and
 [`docs/TECH_DEBT.md`](../../../../../docs/TECH_DEBT.md).
 

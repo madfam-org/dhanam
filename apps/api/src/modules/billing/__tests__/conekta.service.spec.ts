@@ -22,11 +22,27 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 
+import { AuditService } from '../../../core/audit/audit.service';
+import { PrismaService } from '../../../core/prisma/prisma.service';
 import { ConektaService } from '../services/conekta.service';
+import { PhyndCrmEngagementNotifierService } from '../services/phyndcrm-engagement-notifier.service';
+import { WebhookDlqService } from '../services/webhook-dlq.service';
 
 describe('ConektaService', () => {
   let service: ConektaService;
   let httpService: jest.Mocked<HttpService>;
+  let prisma: {
+    billingEvent: {
+      findFirst: jest.Mock;
+      create: jest.Mock;
+    };
+    user: {
+      findUnique: jest.Mock;
+    };
+  };
+  let audit: { log: jest.Mock };
+  let phyndcrmNotifier: { notify: jest.Mock };
+  let dlq: { recordFailure: jest.Mock };
 
   const CONEKTA_PRIVATE_KEY = 'key_test_private_xxx';
   const CONEKTA_PUBLIC_KEY = 'key_test_public_xxx';
@@ -39,8 +55,23 @@ describe('ConektaService', () => {
       CONEKTA_PUBLIC_KEY,
       CONEKTA_WEBHOOK_SIGNING_KEY,
       CONEKTA_API_VERSION,
+      PRODUCT_WEBHOOK_URLS: '',
+      DHANAM_WEBHOOK_SECRET: 'dhanam_webhook_secret_test',
       ...overrides,
     };
+
+    prisma = {
+      billingEvent: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        create: jest.fn().mockResolvedValue({ id: 'be_test' }),
+      },
+      user: {
+        findUnique: jest.fn().mockResolvedValue(null),
+      },
+    };
+    audit = { log: jest.fn().mockResolvedValue(undefined) };
+    phyndcrmNotifier = { notify: jest.fn().mockResolvedValue(undefined) };
+    dlq = { recordFailure: jest.fn().mockResolvedValue({ id: 'dlq_test' }) };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -60,6 +91,10 @@ describe('ConektaService', () => {
             get: jest.fn(),
           },
         },
+        { provide: PrismaService, useValue: prisma },
+        { provide: AuditService, useValue: audit },
+        { provide: PhyndCrmEngagementNotifierService, useValue: phyndcrmNotifier },
+        { provide: WebhookDlqService, useValue: dlq },
       ],
     }).compile();
 
@@ -73,7 +108,16 @@ describe('ConektaService', () => {
     const built = await buildModule();
     service = built.service;
     httpService = built.httpService;
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: jest.fn().mockResolvedValue('ok'),
+    }) as jest.Mock;
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   // ---------------------------------------------------------------------------
@@ -384,7 +428,7 @@ describe('ConektaService', () => {
 
     it('classifies charge.paid', async () => {
       const result = await service.handleWebhookEvent(baseEvent('charge.paid'));
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         handled: true,
         classification: 'paid',
         chargeId: 'chg_test_123',
@@ -412,6 +456,188 @@ describe('ConektaService', () => {
       const result = await service.handleWebhookEvent(baseEvent('customer.created'));
       expect(result.handled).toBe(false);
       expect(result.classification).toBe('ignored');
+    });
+
+    it('persists charge.paid and fans out a canonical payment.succeeded envelope', async () => {
+      const built = await buildModule({
+        PRODUCT_WEBHOOK_URLS: 'karafiel:https://karafiel.test/webhooks/dhanam',
+      });
+      service = built.service;
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: jest.fn().mockResolvedValue('ok'),
+      }) as jest.Mock;
+      prisma.user.findUnique.mockImplementation(async (args) =>
+        args.where.id === 'user_123' ? { id: 'user_123' } : null
+      );
+
+      const result = await service.handleWebhookEvent(
+        baseEvent('charge.paid', {
+          amount: 19900,
+          currency: 'MXN',
+          metadata: {
+            dhanam_user_id: 'user_123',
+            subscription_id: 'sub_123',
+            engagement_id: 'eng_123',
+            source: 'cotiza',
+          },
+        })
+      );
+
+      expect(result).toMatchObject({
+        handled: true,
+        classification: 'paid',
+        chargeId: 'chg_test_123',
+        orderId: 'ord_test_456',
+        relayed: true,
+      });
+      expect(prisma.billingEvent.findFirst).toHaveBeenCalledWith({
+        where: { stripeEventId: 'evt_charge.paid' },
+        select: { id: true },
+      });
+      expect(prisma.billingEvent.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            userId: 'user_123',
+            type: 'payment_succeeded',
+            status: 'succeeded',
+            amount: 199,
+            currency: 'MXN',
+            stripeEventId: 'evt_charge.paid',
+            metadata: expect.objectContaining({
+              envelope_type: 'payment.succeeded',
+              conekta_event_type: 'charge.paid',
+              payment_id: 'chg_test_123',
+              subscription_id: 'sub_123',
+              source: 'conekta_direct_relay',
+            }),
+          }),
+        })
+      );
+
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+      const envelope = JSON.parse(init.body);
+      expect(envelope).toMatchObject({
+        type: 'payment.succeeded',
+        data: {
+          customer_id: 'user_123',
+          subscription_id: 'sub_123',
+          payment_id: 'chg_test_123',
+          amount: '199.00',
+          amount_minor: 19900,
+          currency: 'MXN',
+          ecosystem: {
+            engagement_id: 'eng_123',
+            source: 'cotiza',
+          },
+        },
+      });
+      expect(init.headers['X-Dhanam-Event-Type']).toBe('payment.succeeded');
+      expect(phyndcrmNotifier.notify).toHaveBeenCalledWith(expect.objectContaining(envelope));
+    });
+
+    it('deduplicates repeated Conekta events by provider event id', async () => {
+      prisma.billingEvent.findFirst.mockResolvedValueOnce({ id: 'be_existing' });
+
+      const result = await service.handleWebhookEvent(baseEvent('charge.paid'));
+
+      expect(result).toMatchObject({
+        handled: true,
+        classification: 'paid',
+        idempotent: true,
+        relayed: false,
+      });
+      expect(prisma.billingEvent.create).not.toHaveBeenCalled();
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(phyndcrmNotifier.notify).not.toHaveBeenCalled();
+    });
+
+    it('records product-webhook failures in the DLQ', async () => {
+      const built = await buildModule({
+        PRODUCT_WEBHOOK_URLS: 'karafiel:https://karafiel.test/webhooks/dhanam',
+      });
+      service = built.service;
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status: 500,
+        text: jest.fn().mockResolvedValue('temporary outage'),
+      }) as jest.Mock;
+      prisma.user.findUnique.mockImplementation(async (args) =>
+        args.where.id === 'user_123' ? { id: 'user_123' } : null
+      );
+
+      await service.handleWebhookEvent(
+        baseEvent('charge.declined', {
+          amount: 19900,
+          currency: 'MXN',
+          failure_code: 'card_declined',
+          failure_message: 'Card was declined',
+          metadata: { dhanam_user_id: 'user_123' },
+        })
+      );
+
+      expect(dlq.recordFailure).toHaveBeenCalledWith(
+        expect.objectContaining({
+          consumer: 'karafiel',
+          consumerUrl: 'https://karafiel.test/webhooks/dhanam',
+          eventType: 'payment.failed',
+          statusCode: 500,
+          errorMessage: expect.stringContaining('temporary outage'),
+          payload: expect.objectContaining({
+            type: 'payment.failed',
+            data: expect.objectContaining({
+              failure_reason: 'Card was declined',
+              failure_code: 'card_declined',
+            }),
+          }),
+        })
+      );
+    });
+
+    it('audits unlinked events but still relays when a provider customer id exists', async () => {
+      const built = await buildModule({
+        PRODUCT_WEBHOOK_URLS: 'karafiel:https://karafiel.test/webhooks/dhanam',
+      });
+      service = built.service;
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: jest.fn().mockResolvedValue('ok'),
+      }) as jest.Mock;
+
+      await service.handleWebhookEvent(
+        baseEvent('charge.refunded', {
+          amount: 19900,
+          amount_refunded: 5000,
+          currency: 'MXN',
+          customer_id: 'cus_conekta_123',
+        })
+      );
+
+      expect(prisma.billingEvent.create).not.toHaveBeenCalled();
+      expect(audit.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: 'CONEKTA_RELAY_UNLINKED',
+          metadata: expect.objectContaining({
+            conekta_event_id: 'evt_charge.refunded',
+            customer_id: 'cus_conekta_123',
+          }),
+        })
+      );
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      const [, init] = (global.fetch as jest.Mock).mock.calls[0];
+      expect(JSON.parse(init.body)).toMatchObject({
+        type: 'payment.refunded',
+        data: {
+          customer_id: 'cus_conekta_123',
+          amount: '50.00',
+          amount_minor: 5000,
+          refunded_payment_id: 'chg_test_123',
+          original_payment_id: 'chg_test_123',
+        },
+      });
     });
   });
 });

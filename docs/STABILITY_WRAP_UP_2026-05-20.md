@@ -140,8 +140,10 @@ build, write production digests, or mutate Kubernetes.
 1. Make Enclii the complete routine operation plane for migration repair,
    queue remediation, and namespace-aware tunnel route apply.
 2. Unify billing routing and complete the internal POS commercial workflow:
-   one-time charges, refunds, status lookup, settlement/reconciliation, CFDI
-   proof, and SDK contracts.
+   one-time charges, refunds, settlement/reconciliation, CFDI proof, and SDK
+   contracts. Status lookup is source-landed for Stripe checkout sessions, and
+   direct Conekta webhooks now source-land linked ledger writes, canonical
+   `payment.*` fan-out, and DLQ capture.
 3. Decide and encode final provider launch semantics for Plaid, Bitso, and
    Banxico in runbooks and product readiness.
 4. Keep production green over repeated deploy/rollback cycles with no

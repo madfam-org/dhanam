@@ -9,17 +9,17 @@ full MADFAM internal billing router and POS. Read it with
 
 ## Current Status
 
-| Capability                        | Status        | Notes                                                                    |
-| --------------------------------- | ------------- | ------------------------------------------------------------------------ |
-| Catalog-backed checkout           | Live          | Product plan slugs resolve through `PriceResolver` and fail closed.      |
-| Stripe MX/SPEI relay              | Live          | Signed webhook, canonical `payment.*` fan-out, DLQ on delivery failure.  |
-| Public/external checkout redirect | Live          | Return-host allowlist protects unauthenticated checkout.                 |
-| Admin POS checkout link creation  | Source landed | `POST /v1/admin/billing/pos/checkout` plus admin `/pos` page.            |
-| Admin POS status lookup           | Source landed | `POST /v1/admin/billing/pos/status` inspects Stripe checkout sessions.   |
-| Unified provider routing          | Partial       | `PaymentRouterService` exists; primary checkout lifecycle still differs. |
-| Janua-routed billing              | Blocked       | Production Janua billing secrets must be non-empty and verified.         |
-| Full POS terminal                 | Not complete  | One-time charges, refunds, reconciliation, and CFDI proof remain.        |
-| Conekta direct commercial parity  | Not complete  | Needs durable ledger, canonical fan-out, refund parity, and DLQ path.    |
+| Capability                        | Status        | Notes                                                                                 |
+| --------------------------------- | ------------- | ------------------------------------------------------------------------------------- |
+| Catalog-backed checkout           | Live          | Product plan slugs resolve through `PriceResolver` and fail closed.                   |
+| Stripe MX/SPEI relay              | Live          | Signed webhook, canonical `payment.*` fan-out, DLQ on delivery failure.               |
+| Public/external checkout redirect | Live          | Return-host allowlist protects unauthenticated checkout.                              |
+| Admin POS checkout link creation  | Source landed | `POST /v1/admin/billing/pos/checkout` plus admin `/pos` page.                         |
+| Admin POS status lookup           | Source landed | `POST /v1/admin/billing/pos/status` inspects Stripe checkout sessions.                |
+| Unified provider routing          | Partial       | `PaymentRouterService` exists; primary checkout lifecycle still differs.              |
+| Janua-routed billing              | Blocked       | Production Janua billing secrets must be non-empty and verified.                      |
+| Full POS terminal                 | Not complete  | One-time charges, refunds, reconciliation, and CFDI proof remain.                     |
+| Conekta direct commercial parity  | Partial       | Webhook ledger/fan-out/DLQ source-landed; refunds, settlement, and live proof remain. |
 
 ## Remediation Plan
 

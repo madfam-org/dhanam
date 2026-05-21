@@ -25,13 +25,11 @@
  *
  * ## Idempotency
  *
- * Conekta delivers `event.id` (e.g. `evt_...`). The downstream BillingEvent
- * writer dedups via the existing `BillingEvent.stripeEventId` unique
- * constraint (the column is mis-named — it's a generic webhook event id
- * across all gateways). Wiring the BillingEvent persistence is in the
- * follow-up Wave A invoice-flow PR; this controller currently logs +
- * acknowledges the event, which is the same posture the Stripe MX
- * receiver had on its first ship.
+ * Conekta delivers `event.id` (e.g. `evt_...`). `ConektaService` dedups via
+ * the existing `BillingEvent.stripeEventId` unique constraint (the column is
+ * mis-named — it is now the generic provider webhook event id), persists
+ * linked payment events, emits canonical `payment.*` envelopes, and records
+ * downstream product-webhook failures in the DLQ.
  *
  * =============================================================================
  */

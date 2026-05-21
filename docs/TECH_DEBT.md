@@ -140,6 +140,12 @@ Remaining work: one-time charges, refunds, provider-complete payment/refund
 timeline, ledger/settlement views, reconciliation controls, CFDI proof, provider
 route preview, and SDK contracts for trusted MADFAM services.
 
+Adjacent commercial billing progress: the direct Conekta webhook path now
+source-lands linked `BillingEvent` writes, canonical `payment.*` fan-out, and
+DLQ capture. Conekta is still not complete POS parity until refund initiation,
+partial-refund handling, settlement reconciliation, provider timeline UI, and
+live-mode proof are recorded.
+
 ### TD-1011: Janua Commercial Readiness
 
 Janua-routed billing remains blocked until production Janua billing secrets are
