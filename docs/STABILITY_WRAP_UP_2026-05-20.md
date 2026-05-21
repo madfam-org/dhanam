@@ -10,23 +10,27 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 
 - Production ArgoCD app `dhanam-services` is `Healthy` / `Synced` on `main`.
   The production image-manifest base was last changed by
-  `593953ca deploy(prod): promote ccd6c8f`; later docs-only commits can advance
-  the Argo sync revision without changing live images.
+  `7d0acfc7 deploy(prod): promote e37125d`.
 - Live production images match `infra/k8s/production/kustomization.yaml`:
-  - API `sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`
+  - API `sha256:75cbde8ac70b58544e0ab0e2b500996dc670ec22932891e303006be420814ae2`
   - Web `sha256:d8258c3df3ed28b7fbd0c377c6bfac29e1f4a2087f082fbb5a6844ac0e5a6b42`
   - Admin `sha256:349904cde052194c6e544c01618bba581ba4f25758cff7676e59625970cb22bf`
 - Production full health is `status: "healthy"`:
   database up, Redis up, queues up, `failedJobs: 0`, Belvo up, Banxico/Plaid/Bitso
   intentionally unconfigured or optional.
+- Production catalog drift is clean: 7 products, 24 tiers, live
+  `/v1/billing/catalog` updated at `2026-05-21T01:30:15.436Z`.
 - Production liveness returns `{"alive":true}`.
 - Admin queue remediation routes are live and auth-gated. Unauthenticated
   `GET /v1/admin/queues/sync-transactions/failed?limit=1` returns HTTP 401,
   proving the route exists and is protected.
-- Staging API, web, and admin smoke are green. `Deploy to Staging` run
-  `26196989053` built and signed API, web, and admin images for `dd58fb39`,
-  committed staging digest refresh `7f7a0248`, passed API health, and proved
-  the web/admin routes use the staging API origin.
+- Catalog-backed checkout resolution is live in production: the compiled API
+  resolves normalized catalog plan IDs through `PriceResolver` before legacy
+  env fallback and fails closed when no Stripe price exists.
+- Janua billing relay is still not complete. `dhanam-janua-secrets` currently
+  has `JANUA_API_KEY`, `JANUA_WEBHOOK_SECRET`, and `DHANAM_WEBHOOK_SECRET`
+  present with length 0; do not report Janua-routed billing as production-live
+  until those are provisioned and verified.
 
 ## Implementation Landed
 
@@ -47,6 +51,11 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 - Catalog-backed product checkout plan slugs now resolve through
   `PriceResolver`, so ecosystem products can use catalog-managed plan slugs
   without being rejected by Dhanam's legacy local tier allowlist.
+- The staging workflow now records the digest-proof gap explicitly. Hosted
+  public smoke remains the routine gate; live Argo digest proof is best-effort
+  unless `STAGING_STRICT_DIGEST_PROOF=true`, because hosted runners cannot
+  reliably reach the cluster API. Manual cluster proof is required until the
+  Enclii proof adapter exists.
 - Product-catalog sync now prunes stale rows when catalog entries are removed.
 - `scripts/production-rollout-proof.js` verifies live ArgoCD images against the
   production manifest.
@@ -89,8 +98,20 @@ namespace-aware staging route apply.
 - Hosted `Deploy to Staging` for `dd58fb39`: run `26196989053`, success,
   including build/sign for API, web, admin, staging digest patch `7f7a0248`,
   API smoke, web route/API-origin smoke, and admin route/API-origin smoke.
+- Hosted `Deploy to Staging` for `720fb6a3`: run `26198344080`, success,
+  including public API/web/admin smoke. The workflow correctly warned that
+  hosted cluster access was unavailable and skipped best-effort live digest
+  proof; manual Argo/live digest proof moved staging to `e37125d0` and API
+  digest `sha256:75cbde8ac70b58544e0ab0e2b500996dc670ec22932891e303006be420814ae2`.
 - Manual API `Promote staging -> prod`: run `26195552704`, success after the
   30-minute soak gate elapsed; committed `593953ca`.
+- Manual API `Promote staging -> prod`: run `26199879634`, success after the
+  30-minute soak gate elapsed; committed `7d0acfc7`.
+- Production Argo initially still reported source `e37125d0` and old API digest
+  `sha256:d8d36df2c84a41263210a6dc845cb6bc51ab17b230c9c53d879f22ceaf1a1e4e`
+  after the promotion workflow completed. A hard Argo refresh was required;
+  after refresh the app reported `7d0acfc7`, `Synced Healthy`, and live API
+  digest `sha256:75cbde8ac70b58544e0ab0e2b500996dc670ec22932891e303006be420814ae2`.
 - Scheduled `Promote staging -> prod` validation: run `26190740392`, success;
   write job skipped because there was no digest change to write.
 - Production rollout proof passed: live images match the production manifest on
