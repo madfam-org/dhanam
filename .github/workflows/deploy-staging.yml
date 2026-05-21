@@ -4,7 +4,8 @@
 # flow: CI builds and signs the three images (api/web/admin), patches their
 # digests into infra/k8s/overlays/staging/kustomization.yaml, commits, and
 # lets the dhanam-staging ArgoCD Application reconcile. Post-reconcile smoke
-# hits https://staging-api.dhan.am/health with 6 retries x 20s like Karafiel.
+# verifies ArgoCD and the live Deployments are on the digest commit before
+# hitting https://staging-api.dhan.am/health with 6 retries x 20s like Karafiel.
 #
 # Triggered on every push to main. Does NOT touch production — that's the
 # promote-to-prod workflow's job (PP.2c).
@@ -171,6 +172,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      staging_revision: ${{ steps.patch.outputs.staging_revision }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -178,6 +181,7 @@ jobs:
           fetch-depth: 0
 
       - name: Patch overlay image digests
+        id: patch
         env:
           API_DIGEST: ${{ needs.build-api.outputs.digest }}
           WEB_DIGEST: ${{ needs.build-web.outputs.digest }}
@@ -218,13 +222,17 @@ jobs:
 
             git add "$FILE"
             git diff --staged --quiet && {
-              echo "No digest change — skipping push"
+              STAGING_REVISION="$(git rev-parse HEAD)"
+              echo "No digest change — skipping push at $STAGING_REVISION"
+              echo "staging_revision=$STAGING_REVISION" >> "$GITHUB_OUTPUT"
               exit 0
             }
             git commit -m "deploy(staging): update digests to $SHORT"
 
             if git push origin main; then
-              echo "Staging digest push succeeded on attempt $ATTEMPT"
+              STAGING_REVISION="$(git rev-parse HEAD)"
+              echo "Staging digest push succeeded on attempt $ATTEMPT at $STAGING_REVISION"
+              echo "staging_revision=$STAGING_REVISION" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             echo "Staging digest push failed, retrying..."
@@ -235,11 +243,71 @@ jobs:
 
   smoke:
     name: Staging smoke test
-    needs: update-staging-overlay
+    needs: [build-api, build-web, build-admin, update-staging-overlay]
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for ArgoCD reconcile
-        run: sleep 180
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v5
+
+      - name: Configure kubeconfig
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PRODUCTION }}
+        run: |
+          set -euo pipefail
+          if [ -z "${KUBECONFIG_B64:-}" ]; then
+            echo "::error::KUBECONFIG_PRODUCTION is required for staging smoke to prove the deployed digest."
+            exit 1
+          fi
+          mkdir -p "$HOME/.kube"
+          echo "$KUBECONFIG_B64" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Wait for ArgoCD reconcile and live digests
+        env:
+          STAGING_REVISION: ${{ needs.update-staging-overlay.outputs.staging_revision }}
+          EXPECTED_API_IMAGE: ghcr.io/${{ env.API_IMAGE }}@${{ needs.build-api.outputs.digest }}
+          EXPECTED_WEB_IMAGE: ghcr.io/${{ env.WEB_IMAGE }}@${{ needs.build-web.outputs.digest }}
+          EXPECTED_ADMIN_IMAGE: ghcr.io/${{ env.ADMIN_IMAGE }}@${{ needs.build-admin.outputs.digest }}
+        run: |
+          set -euo pipefail
+          if [ -z "${STAGING_REVISION:-}" ]; then
+            echo "::error::Missing staging digest commit revision from update-staging-overlay."
+            exit 1
+          fi
+
+          kubectl -n argocd annotate application dhanam-staging argocd.argoproj.io/refresh=hard --overwrite
+
+          deadline=$((SECONDS + 600))
+          while [ "$SECONDS" -lt "$deadline" ]; do
+            revision="$(kubectl -n argocd get application dhanam-staging -o jsonpath='{.status.sync.revision}' 2>/dev/null || true)"
+            sync="$(kubectl -n argocd get application dhanam-staging -o jsonpath='{.status.sync.status}' 2>/dev/null || true)"
+            health="$(kubectl -n argocd get application dhanam-staging -o jsonpath='{.status.health.status}' 2>/dev/null || true)"
+            api_image="$(kubectl -n enclii-dhanam-staging get deploy dhanam-api -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || true)"
+            web_image="$(kubectl -n enclii-dhanam-staging get deploy dhanam-web -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || true)"
+            admin_image="$(kubectl -n enclii-dhanam-staging get deploy dhanam-admin -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || true)"
+
+            echo "revision=$revision sync=$sync health=$health"
+            echo "api=$api_image"
+            echo "web=$web_image"
+            echo "admin=$admin_image"
+
+            if [ "$revision" = "$STAGING_REVISION" ] \
+              && [ "$sync" = "Synced" ] \
+              && [ "$health" = "Healthy" ] \
+              && [ "$api_image" = "$EXPECTED_API_IMAGE" ] \
+              && [ "$web_image" = "$EXPECTED_WEB_IMAGE" ] \
+              && [ "$admin_image" = "$EXPECTED_ADMIN_IMAGE" ]; then
+              kubectl -n enclii-dhanam-staging rollout status deployment/dhanam-api --timeout=120s
+              kubectl -n enclii-dhanam-staging rollout status deployment/dhanam-web --timeout=120s
+              kubectl -n enclii-dhanam-staging rollout status deployment/dhanam-admin --timeout=120s
+              exit 0
+            fi
+
+            sleep 15
+          done
+
+          echo "::error::Staging did not reconcile to revision $STAGING_REVISION and expected image digests."
+          exit 1
 
       - name: API health check (6x retry x 20s)
         run: |
