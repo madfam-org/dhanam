@@ -13,7 +13,12 @@ import { AdminOpsService } from './admin-ops.service';
 describe('AdminOpsService', () => {
   let service: AdminOpsService;
 
-  const mockPrismaService = {};
+  const mockPrismaService = {
+    auditLog: {
+      findMany: jest.fn(),
+      count: jest.fn(),
+    },
+  };
 
   const mockLoggerService = {
     log: jest.fn(),
@@ -41,6 +46,7 @@ describe('AdminOpsService', () => {
 
   const mockBillingService = {
     createOperatorCheckout: jest.fn(),
+    getOperatorCheckoutStatus: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -118,6 +124,23 @@ describe('AdminOpsService', () => {
           resource: 'Queue',
         })
       );
+    });
+  });
+
+  describe('getBillingEvents', () => {
+    it('includes standard billing and admin POS billing audit events', async () => {
+      mockPrismaService.auditLog.findMany.mockResolvedValue([]);
+      mockPrismaService.auditLog.count.mockResolvedValue(0);
+
+      await service.getBillingEvents(1, 20);
+
+      const expectedWhere = {
+        OR: [{ action: { startsWith: 'billing.' } }, { action: { startsWith: 'admin.billing_' } }],
+      };
+      expect(mockPrismaService.auditLog.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({ where: expectedWhere })
+      );
+      expect(mockPrismaService.auditLog.count).toHaveBeenCalledWith({ where: expectedWhere });
     });
   });
 
@@ -238,6 +261,7 @@ describe('AdminOpsService', () => {
       mockBillingService.createOperatorCheckout.mockResolvedValue({
         checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_pos',
         provider: 'stripe',
+        sessionId: 'cs_pos',
       });
 
       const result = await service.createPosCheckout(
@@ -270,6 +294,7 @@ describe('AdminOpsService', () => {
         product: 'karafiel',
         plan: 'pro',
         countryCode: 'MX',
+        sessionId: 'cs_pos',
       });
       expect(mockAuditService.logEvent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -280,6 +305,7 @@ describe('AdminOpsService', () => {
           severity: 'high',
           metadata: expect.objectContaining({
             provider: 'stripe',
+            sessionId: 'cs_pos',
             product: 'karafiel',
             plan: 'pro',
             orgId: 'org_123',
@@ -293,6 +319,7 @@ describe('AdminOpsService', () => {
       mockBillingService.createOperatorCheckout.mockResolvedValue({
         checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_pos',
         provider: 'stripe',
+        sessionId: 'cs_pos',
       });
 
       await service.createPosCheckout({ userId: 'user_123', plan: 'pro' }, 'admin1');
@@ -300,6 +327,50 @@ describe('AdminOpsService', () => {
       expect(mockBillingService.createOperatorCheckout).toHaveBeenCalledWith(
         'user_123',
         expect.objectContaining({ product: 'dhanam' })
+      );
+    });
+  });
+
+  describe('getPosCheckoutStatus', () => {
+    it('loads checkout status and records an audit entry', async () => {
+      mockBillingService.getOperatorCheckoutStatus.mockResolvedValue({
+        sessionId: 'cs_pos',
+        provider: 'stripe',
+        status: 'complete',
+        paymentStatus: 'paid',
+        customerId: 'cus_123',
+        subscriptionId: 'sub_123',
+        paymentIntentId: null,
+        userId: 'user_123',
+        product: 'karafiel',
+        plan: 'pro',
+        source: 'internal_pos',
+        amountTotal: 1199,
+        currency: 'usd',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        expiresAt: '2026-01-01T01:00:00.000Z',
+        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_pos',
+        billingEvents: [],
+      });
+
+      const result = await service.getPosCheckoutStatus({ sessionId: 'cs_pos' }, 'admin1');
+
+      expect(mockBillingService.getOperatorCheckoutStatus).toHaveBeenCalledWith('cs_pos');
+      expect(result.status).toBe('complete');
+      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'admin1',
+          action: 'admin.billing_pos_status_viewed',
+          resource: 'Billing',
+          resourceId: 'user_123',
+          severity: 'medium',
+          metadata: expect.objectContaining({
+            provider: 'stripe',
+            sessionId: 'cs_pos',
+            status: 'complete',
+            paymentStatus: 'paid',
+          }),
+        })
       );
     });
   });

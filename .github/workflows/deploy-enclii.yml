@@ -1,4 +1,4 @@
-name: Deploy via Enclii (K8s)
+name: Break-Glass Web Deploy (Raw K8s)
 
 # MADFAM-ENCLII-FIRST-WORKFLOW-EXCEPTION v1: manual emergency path only until this workflow uses Enclii ops/providers end to end.
 # Routine production deployment must use Enclii web, API, CLI, or GitOps digest promotion.
@@ -18,6 +18,15 @@ on:
   #     - '.enclii.yml'
   workflow_dispatch:
     inputs:
+      incident_id:
+        description: 'Required incident or change ticket URL/ID documenting why Enclii/promotion is unavailable'
+        required: true
+        type: string
+      break_glass_ack:
+        description: 'I acknowledge this workflow is break-glass raw Kubernetes access and must record the missing Enclii adapter gap'
+        required: true
+        default: false
+        type: boolean
       image_tag:
         description: 'Image tag to deploy (default: latest commit SHA)'
         required: false
@@ -44,6 +53,21 @@ jobs:
     outputs:
       skip: ${{ steps.check-secret.outputs.skip }}
     steps:
+      - name: Validate break-glass authorization
+        env:
+          BREAK_GLASS_ACK: ${{ inputs.break_glass_ack }}
+          INCIDENT_ID: ${{ inputs.incident_id }}
+        run: |
+          if [ "$BREAK_GLASS_ACK" != "true" ]; then
+            echo "::error::Set break_glass_ack=true before using raw Kubernetes deployment."
+            exit 1
+          fi
+          if [ -z "$INCIDENT_ID" ]; then
+            echo "::error::incident_id is required for break-glass deployment."
+            exit 1
+          fi
+          echo "Break-glass incident/change reference: $INCIDENT_ID"
+
       - name: Check KUBECONFIG secret
         id: check-secret
         run: |
@@ -57,6 +81,8 @@ jobs:
   build:
     name: Build and Push to GHCR
     runs-on: ubuntu-latest
+    needs: preflight
+    if: needs.preflight.outputs.skip != 'true'
     permissions:
       contents: read
       packages: write
@@ -225,18 +251,21 @@ jobs:
           echo "## Deployment Health Check Failed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "The deployment did not pass health checks after stabilization." >> $GITHUB_STEP_SUMMARY
-          echo "**Action Required**: Review logs and consider rolling back to previous version." >> $GITHUB_STEP_SUMMARY
+          echo "**Action Required**: Review logs and prefer Enclii rollback or \`rollback-prod.yml\` before any raw Kubernetes rollback." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "To rollback manually:" >> $GITHUB_STEP_SUMMARY
+          echo "Raw rollback is break-glass only and must reuse the incident/change reference from this run." >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "kubectl rollout undo deployment/dhanam-web -n dhanam" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
       - name: Generate summary
         if: always()
+        env:
+          INCIDENT_ID: ${{ inputs.incident_id }}
         run: |
-          echo "## Enclii Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Break-Glass Web Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Incident/change reference**: $INCIDENT_ID" >> $GITHUB_STEP_SUMMARY
           echo "**Image**: \`${{ needs.build.outputs.image_full }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Commit**: \`${{ needs.build.outputs.image_tag }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**URL**: https://app.dhan.am" >> $GITHUB_STEP_SUMMARY

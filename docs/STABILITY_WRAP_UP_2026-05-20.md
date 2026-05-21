@@ -95,7 +95,9 @@ repair or BullMQ failed-job remediation adapters:
 
 Required Enclii adapter gaps are tracked in [Tech Debt](TECH_DEBT.md):
 database migration repair, queue inspection/retry/failed-cleanup, and
-namespace-aware staging route apply.
+namespace-aware staging route apply. Manual raw production deploy workflows now
+require an incident/change reference and `break_glass_ack=true` before they
+build, write production digests, or mutate Kubernetes.
 
 ## Verified Green
 

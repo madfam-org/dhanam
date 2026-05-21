@@ -15,10 +15,12 @@ checkout surface.
   closed.
 - Stripe MX/SPEI webhook relay emits canonical `payment.*` envelopes, persists
   linked billing events, and writes downstream delivery failures to the DLQ.
-- The internal POS is now a source-level admin checkout generator at
-  `POST /admin/billing/pos/checkout` and `apps/admin/src/app/(dashboard)/pos`.
-  It creates operator checkout links through the existing lifecycle path; it is
-  not yet a complete card-terminal/ledger/refund/settlement console.
+- The internal POS is now a source-level admin checkout generator and Stripe
+  checkout status inspector at `POST /admin/billing/pos/checkout`,
+  `POST /admin/billing/pos/status`, and `apps/admin/src/app/(dashboard)/pos`.
+  It creates operator checkout links through the existing lifecycle path and
+  can inspect Stripe checkout sessions; it is not yet a complete
+  card-terminal/ledger/refund/settlement console.
 - Janua identity relay and centralized email use the shared internal Janua key
   and Dhanam webhook secret. Janua-routed checkout remains explicitly disabled
   with `JANUA_BILLING_ENABLED=false` until the Dhanam client route/auth contract
@@ -79,6 +81,7 @@ Current Dhanam managed-cloud tiers in the catalog:
 | `POST /billing/madfam-events`                       | MADFAM HMAC      | Live                 | Ecosystem revenue event receiver         |
 | `GET /billing/dlq` / `POST /billing/dlq/:id/replay` | Admin JWT        | Live                 | Product-webhook DLQ inspection/replay    |
 | `POST /admin/billing/pos/checkout`                  | Admin JWT        | Source landed        | Internal operator checkout link creation |
+| `POST /admin/billing/pos/status`                    | Admin JWT        | Source landed        | Stripe checkout session status lookup    |
 
 ## Provider Routing Truth
 
@@ -102,6 +105,8 @@ user and records high-severity admin audit events. It supports:
 - operator-selected user id, product, plan, country, organization id, and
   optional success/cancel URLs;
 - catalog-backed plan resolution through the existing lifecycle path;
+- returned provider checkout session ids;
+- Stripe checkout status lookup with recent Dhanam `BillingEvent` context;
 - admin-only access through the platform admin guard;
 - admin UI access at `/pos`.
 
@@ -109,7 +114,8 @@ Still missing before calling this a full POS:
 
 - one-time line-item/cart charges;
 - payment method capture, void, refund, and partial refund workflows;
-- payment/refund state timeline;
+- provider-complete payment/refund state timelines beyond Stripe checkout
+  session inspection;
 - ledger, settlement, reconciliation, and CFDI proof in the admin UI;
 - provider fallback controls and route override policy;
 - SDK methods for trusted internal MADFAM callers.

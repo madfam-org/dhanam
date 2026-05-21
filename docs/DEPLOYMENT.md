@@ -123,7 +123,9 @@ enclii deploy --file infra/enclii/services/dhanam-web.yaml --env prod --wait \
 Use this only for platform bootstrap or documented incidents when Enclii is
 unavailable or lacks the required adapter. The manual K8s GitHub workflows
 commit signed production digests by default and skip raw Kubernetes rollout
-unless `direct_k8s_deploy=true` is explicitly selected. Record the actor,
+unless `direct_k8s_deploy=true` is explicitly selected. The manual production
+deploy workflows require an `incident_id` plus `break_glass_ack=true` before
+they build, write production digests, or mutate Kubernetes. Record the actor,
 reason, commands, result, and follow-up Enclii adapter gap.
 
 ```bash
@@ -140,7 +142,7 @@ kubectl -n dhanam set image deployment/dhanam-web \
 | Workflow               | Trigger         | Purpose                                     |
 | ---------------------- | --------------- | ------------------------------------------- |
 | `ci.yml`               | All PRs         | Lint, test, typecheck                       |
-| `deploy-enclii.yml`    | Manual dispatch | Fallback Enclii deploy                      |
+| `deploy-enclii.yml`    | Manual dispatch | Break-glass web raw K8s deploy              |
 | `deploy-staging.yml`   | Push to main    | Build/sign staging images and patch digests |
 | `deploy-k8s.yml`       | Manual dispatch | Break-glass API build/sign, optional K8s    |
 | `deploy-web-k8s.yml`   | Manual dispatch | Break-glass web build/sign, optional K8s    |

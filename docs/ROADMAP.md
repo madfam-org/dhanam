@@ -47,7 +47,7 @@ Dhanam is considered fully stable only when all of these are true:
 | API runtime health        | 99%              | DB, Redis, queues, Belvo, and optional external checks are up; failed queue count is zero.                      |
 | Release and staging path  | 96%              | Staging deploy now passes API, web, admin, and staging API-origin smoke.                                        |
 | Ops control plane         | 88%              | ArgoCD production truth is healthy; Enclii still lacks key routine operation adapters.                          |
-| Commercial/POS stability  | 60%              | Catalog checkout is live; admin POS checkout source is landed; full POS/refund/ledger work remains.             |
+| Commercial/POS stability  | 62%              | Catalog checkout is live; admin POS checkout/status source is landed; full POS/refund/ledger work remains.      |
 | Overall stability         | 95%              | Production and staging are healthy; remaining gap is Enclii coverage, commercial POS depth, and repeated proof. |
 
 ## Current Verification Snapshot
@@ -189,13 +189,16 @@ Work:
 - Keep `scripts/production-rollout-proof.js` as the current post-deploy
   assertion comparing intended production digests with live ArgoCD images.
 - Fail clearly when release readiness does not equal public rollout.
+- Keep manual raw deployment workflows gated behind an incident/change
+  reference plus explicit break-glass acknowledgment.
 
 Acceptance:
 
 - `scripts/production-rollout-proof.js` or its successor proves live production
   equals the intended release.
 - Enclii deployment records and public production truth no longer disagree.
-- Raw direct rollout remains break-glass only.
+- Raw direct rollout remains break-glass only and cannot start without a
+  recorded incident/change reference.
 
 ### P4: Complete Commercial Billing And POS Stability
 
@@ -209,9 +212,9 @@ Work:
   source decisions.
 - Keep Janua-routed billing disabled in commercial claims until non-empty
   secrets and end-to-end Janua checkout proof exist.
-- Expand the admin POS beyond checkout-link creation:
+- Expand the admin POS beyond checkout-link creation and Stripe session status:
   - one-time line-item/cart charges;
-  - payment status lookup and timeline;
+  - provider-complete payment/refund timeline;
   - full and partial refunds;
   - settlement/reconciliation state;
   - Karafiel CFDI/egreso proof;
@@ -341,7 +344,7 @@ Acceptance:
 | M1        | Production queue health green; public routes still pass.                                       | Complete           |
 | M2        | Staging API, web, admin routes and smoke are all passing with staging env proof.               | Complete           |
 | M3        | Production rollout truth is authoritative and post-deploy digest assertions pass.              | 97-98%             |
-| M4        | Internal POS can create, inspect, refund, reconcile, and prove product webhook delivery.       | 98% commercial     |
+| M4        | Internal POS can charge, inspect, refund, reconcile, and prove product webhook delivery.       | 98% commercial     |
 | M5        | Enclii adapter gaps closed; provider health semantics encoded; lower-severity debt controlled. | 99%+               |
 
 The final 1 percent is operational proof over repeated clean deploys, clean

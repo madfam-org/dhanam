@@ -620,9 +620,14 @@ The template defines two Secret resources:
 | `dhanam-secrets`         | `DATABASE_URL`, `REDIS_URL`, `ENCRYPTION_KEY`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `NEXTAUTH_SECRET`, `JWT_SECRET`, `JWT_REFRESH_SECRET`                          |
 | `dhanam-billing-secrets` | `STRIPE_MX_PUBLISHABLE_KEY`, `STRIPE_MX_SECRET_KEY`, `STRIPE_MX_WEBHOOK_SECRET`, `PADDLE_VENDOR_ID`, `PADDLE_API_KEY`, `PADDLE_CLIENT_TOKEN`, `PADDLE_WEBHOOK_SECRET` |
 
-Add additional provider credentials to `dhanam-secrets` as they are obtained:
+Add additional provider credentials through Enclii/Vault as they are obtained.
+Direct secret mutation is bootstrap/break-glass only:
 
 ```bash
+enclii secrets set BELVO_SECRET_KEY_ID=<value> --service dhanam-api --secret --env production
+enclii secrets set BELVO_SECRET_KEY_PASSWORD=<value> --service dhanam-api --secret --env production
+
+# Break-glass/bootstrap fallback only:
 kubectl -n dhanam patch secret dhanam-secrets --type merge -p \
   '{"stringData":{"BELVO_SECRET_KEY_ID":"<value>","BELVO_SECRET_KEY_PASSWORD":"<value>"}}'
 ```
@@ -653,9 +658,15 @@ Replace `<email-provider-spf>` and `<selector>` with values from your email prov
 
 ### 6.5 Image Pull Secret
 
-Create a GitHub Container Registry pull secret so K8s can pull images from `ghcr.io/madfam-org/dhanam/*`:
+Create the GitHub Container Registry pull secret through Enclii or the cluster
+bootstrap process so K8s can pull images from `ghcr.io/madfam-org/dhanam/*`.
+Direct `kubectl create secret` is bootstrap/break-glass only:
 
 ```bash
+# Configure through Enclii/Lockbox/Vault/ESO using the production image-pull
+# secret path for the dhanam namespace.
+
+# Break-glass/bootstrap fallback only:
 kubectl -n dhanam create secret docker-registry ghcr-credentials \
   --docker-server=ghcr.io \
   --docker-username=<github-username> \
@@ -665,30 +676,27 @@ kubectl -n dhanam create secret docker-registry ghcr-credentials \
 
 ### 6.6 Deployment
 
-With Enclii, deployment is automatic on push to `main`:
+With Enclii and the current GitOps promotion gate, the standard release path is
+push to `main`, validate staging, then promote a soaked signed digest:
 
 ```bash
-# Standard deployment (push triggers auto-deploy)
 git push origin main
 
-# Verify deployment status
-kubectl -n dhanam rollout status deployment/dhanam-api
-kubectl -n dhanam rollout status deployment/dhanam-web
-kubectl -n dhanam rollout status deployment/dhanam-admin
+gh workflow run promote-to-prod.yml \
+  -f component=all \
+  -f staging_smoke_run_id=<successful-deploy-staging-run-id>
 
-# Check pod health
-kubectl -n dhanam get pods
-kubectl -n dhanam logs deployment/dhanam-api --tail=50
+scripts/production-rollout-proof.js
 ```
 
-For manual deployment (fallback):
+For manual deployment fallback, use Enclii web/API/CLI first. Raw Kubernetes
+workflows are break-glass only and require an incident/change reference plus
+`break_glass_ack=true`.
 
 ```bash
-# Apply kustomize manifests directly
-kubectl apply -k infra/k8s/production/
-
-# Or trigger a manual Enclii deploy
-# (See .github/workflows/deploy-enclii.yml for manual dispatch)
+enclii deploy --file infra/enclii/services/dhanam-web.yaml --env prod --wait \
+  --change-ticket https://github.com/madfam-org/dhanam/commit/<sha> \
+  --smoke-endpoint https://dhan.am/
 ```
 
 ---

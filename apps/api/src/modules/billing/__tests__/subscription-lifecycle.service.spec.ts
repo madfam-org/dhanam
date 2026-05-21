@@ -60,6 +60,7 @@ describe('SubscriptionLifecycleService', () => {
           useValue: {
             createCustomer: jest.fn(),
             createCheckoutSession: jest.fn(),
+            retrieveCheckoutSession: jest.fn(),
             createPortalSession: jest.fn(),
           },
         },
@@ -163,6 +164,7 @@ describe('SubscriptionLifecycleService', () => {
       expect(result).toEqual({
         checkoutUrl: 'https://checkout.stripe.com/cs_123',
         provider: 'stripe',
+        sessionId: 'cs_123',
       });
       expect(audit.log).toHaveBeenCalledWith(
         expect.objectContaining({ action: 'BILLING_UPGRADE_INITIATED' })
@@ -191,6 +193,7 @@ describe('SubscriptionLifecycleService', () => {
 
       expect(result.checkoutUrl).toBe('https://checkout.janua.dev/abc');
       expect(result.provider).toBe('conekta');
+      expect(result.sessionId).toBe('sess_janua_1');
     });
   });
 
@@ -332,6 +335,75 @@ describe('SubscriptionLifecycleService', () => {
         orderBy: { createdAt: 'desc' },
         take: 5,
       });
+    });
+  });
+
+  describe('getOperatorCheckoutStatus', () => {
+    it('retrieves Stripe checkout status with recent billing events', async () => {
+      stripe.retrieveCheckoutSession.mockResolvedValue({
+        id: 'cs_pos_123',
+        status: 'complete',
+        payment_status: 'paid',
+        customer: 'cus_123',
+        subscription: 'sub_123',
+        payment_intent: null,
+        metadata: {
+          userId: 'user-123',
+          product: 'karafiel',
+          plan: 'pro',
+          source: 'internal_pos',
+        },
+        amount_total: 1199,
+        currency: 'usd',
+        created: 1770000000,
+        expires_at: 1770003600,
+        url: 'https://checkout.stripe.com/c/pay/cs_pos_123',
+      } as any);
+      prisma.billingEvent.findMany.mockResolvedValue([
+        {
+          id: 'evt_1',
+          type: 'payment_succeeded',
+          status: 'succeeded',
+          amount: { toString: () => '11.99' },
+          currency: 'USD',
+          createdAt: new Date('2026-01-01T00:00:00.000Z'),
+          metadata: { sessionId: 'cs_pos_123' },
+        },
+      ] as any);
+
+      const result = await service.getOperatorCheckoutStatus('cs_pos_123');
+
+      expect(stripe.retrieveCheckoutSession).toHaveBeenCalledWith('cs_pos_123', {
+        expand: ['subscription', 'payment_intent'],
+      });
+      expect(prisma.billingEvent.findMany).toHaveBeenCalledWith({
+        where: { userId: 'user-123' },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      });
+      expect(result).toEqual(
+        expect.objectContaining({
+          sessionId: 'cs_pos_123',
+          provider: 'stripe',
+          status: 'complete',
+          paymentStatus: 'paid',
+          customerId: 'cus_123',
+          subscriptionId: 'sub_123',
+          userId: 'user-123',
+          product: 'karafiel',
+          plan: 'pro',
+          source: 'internal_pos',
+          amountTotal: 1199,
+          currency: 'usd',
+          billingEvents: [
+            expect.objectContaining({
+              id: 'evt_1',
+              type: 'payment_succeeded',
+              amount: '11.99',
+            }),
+          ],
+        })
+      );
     });
   });
 

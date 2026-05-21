@@ -446,7 +446,7 @@ promotion:
 | `deploy-staging.yml`   | push to main               | Builds/signs api/web/admin, patches digests into `infra/k8s/overlays/staging/kustomization.yaml`, then smoke-tests public staging |
 | `promote-to-prod.yml`  | workflow_dispatch (manual) | Promotes a soaked staging digest (one component or all) into `infra/k8s/production/kustomization.yaml`                            |
 | `rollback-prod.yml`    | workflow_dispatch (manual) | Restores a previous prod digest; defaults to the previous git-history entry                                                       |
-| `deploy-enclii.yml`    | workflow_dispatch (manual) | Manual Enclii fallback; production routine still goes through Enclii web/API/CLI or promotion                                     |
+| `deploy-enclii.yml`    | workflow_dispatch (manual) | Break-glass web raw K8s deploy requiring incident/change reference and acknowledgment; routine production stays Enclii/promotion  |
 | `deploy-k8s.yml` (API) | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
 | `deploy-web-k8s.yml`   | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
 | `deploy-admin-k8s.yml` | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |

@@ -196,12 +196,14 @@ Current support:
 - user, product, plan, country, organization id, and optional return URLs;
 - catalog-backed checkout through the billing lifecycle;
 - high-severity audit event `admin.billing_pos_checkout_created`;
-- returned checkout URL plus selected provider.
+- returned checkout URL, selected provider, and checkout session id;
+- Stripe checkout status lookup with recent billing event context and medium
+  severity audit event `admin.billing_pos_status_viewed`.
 
 Remaining POS work is tracked in
 [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md): one-time
-charges, refunds, payment status timeline, settlement/reconciliation, CFDI
-proof, and route override policy.
+charges, refunds, provider-complete payment/refund timelines,
+settlement/reconciliation, CFDI proof, and route override policy.
 
 ## Admin Actions Audit Trail
 
@@ -317,6 +319,7 @@ POST /v1/admin/queues/:name/retry-failed
 POST /v1/admin/queues/:name/clear-failed
 POST /v1/admin/queues/:name/clear
 POST /v1/admin/billing/pos/checkout
+POST /v1/admin/billing/pos/status
 ```
 
 ### Response Formats

@@ -12,7 +12,7 @@ This directory contains GitHub Actions workflows for CI/CD, quality checks, and 
 | `check-migrations.yml` | PR       | Database migration validation              |
 | `deploy-staging.yml`   | Main     | Build, sign, and patch staging digests     |
 | `promote-to-prod.yml`  | Manual   | Promote signed staging digest to prod      |
-| `deploy-enclii.yml`    | Manual   | Trigger Enclii deployment fallback         |
+| `deploy-enclii.yml`    | Manual   | Break-glass web raw K8s deploy             |
 | `deploy-k8s.yml`       | Manual   | Break-glass API build/sign, optional K8s   |
 | `deploy-web-k8s.yml`   | Manual   | Break-glass web build/sign, optional K8s   |
 | `deploy-admin-k8s.yml` | Manual   | Break-glass admin build/sign, optional K8s |
@@ -28,7 +28,7 @@ When you push to `main`:
 3. ArgoCD reconciles staging
 4. `promote-to-prod.yml` verifies the deploy-staging cosign signature, requires a successful staging smoke run id unless break-glass is selected, and manually promotes a soaked staging digest to production
 
-The raw K8s deployment workflows here are **break-glass options** for manual intervention when Enclii or promotion is unavailable.
+The raw K8s deployment workflows here are **break-glass options** for manual intervention when Enclii or promotion is unavailable. They require an incident/change reference and an explicit `break_glass_ack=true` acknowledgment before they build, write production digests, or mutate Kubernetes.
 
 ## CI/CD Pipeline
 
@@ -93,14 +93,16 @@ Validates database migrations on PRs.
 
 ### deploy-enclii.yml
 
-Manual trigger to invoke Enclii deployment.
+Manual break-glass web deployment that still uses raw Kubernetes. Prefer Enclii web/API/CLI or `promote-to-prod.yml`; use this only when those paths are unavailable and the incident/change reference is recorded.
 
 **Usage:**
 
 ```bash
 # Via GitHub UI: Actions → deploy-enclii → Run workflow
 # Or via gh CLI:
-gh workflow run deploy-enclii.yml
+gh workflow run deploy-enclii.yml \
+  -f incident_id=https://github.com/madfam-org/dhanam/issues/<id> \
+  -f break_glass_ack=true
 ```
 
 ### deploy-k8s.yml / deploy-web-k8s.yml / deploy-admin-k8s.yml
@@ -110,6 +112,7 @@ Manual Kubernetes deployment workflows.
 **Usage:**
 
 - Emergency image build/sign and digest commits when Enclii/promotion is unavailable
+- Require `incident_id` and `break_glass_ack=true`
 - Raw Kubernetes rollout is opt-in via `direct_k8s_deploy=true` and requires runner network access to the cluster API
 - Leave `direct_k8s_deploy=false` when the goal is a signed GitOps digest commit that ArgoCD will reconcile
 - Documented incident response only

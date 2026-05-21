@@ -36,6 +36,7 @@ jest.mock(
 jest.mock('@/lib/api/admin', () => ({
   adminApi: {
     createPosCheckout: jest.fn(),
+    getPosCheckoutStatus: jest.fn(),
   },
 }));
 
@@ -60,5 +61,11 @@ describe('PosPage', () => {
     render(<PosPage />);
     expect(screen.getByText('Checkout Link')).toBeInTheDocument();
     expect(screen.getByText('No checkout link created')).toBeInTheDocument();
+  });
+
+  it('renders the checkout status panel', () => {
+    render(<PosPage />);
+    expect(screen.getByText('Checkout Status')).toBeInTheDocument();
+    expect(screen.getByText('No checkout status loaded')).toBeInTheDocument();
   });
 });

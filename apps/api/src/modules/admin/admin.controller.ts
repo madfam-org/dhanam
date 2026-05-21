@@ -34,6 +34,7 @@ import {
   SystemStatsDto,
   AuditLogSearchDto,
   AdminPosCheckoutDto,
+  AdminPosStatusDto,
   OnboardingFunnelDto,
   FeatureFlagDto,
   UpdateFeatureFlagDto,
@@ -290,6 +291,14 @@ export class AdminController {
   @ApiBadRequestResponse({ description: 'Invalid checkout request' })
   async createPosCheckout(@Body() dto: AdminPosCheckoutDto, @Request() req: AuthenticatedRequest) {
     return this.adminOpsService.createPosCheckout(dto, req.user.id);
+  }
+
+  @Post('billing/pos/status')
+  @ApiOperation({ summary: 'Inspect an internal MADFAM POS checkout session' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'POS checkout status retrieved' })
+  @ApiBadRequestResponse({ description: 'Invalid checkout status request' })
+  async getPosCheckoutStatus(@Body() dto: AdminPosStatusDto, @Request() req: AuthenticatedRequest) {
+    return this.adminOpsService.getPosCheckoutStatus(dto, req.user.id);
   }
 
   @Get('gdpr/export/:userId')

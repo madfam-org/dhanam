@@ -50,3 +50,10 @@ export class AdminPosCheckoutDto {
   @Length(1, 2048)
   cancelUrl?: string;
 }
+
+export class AdminPosStatusDto {
+  @ApiProperty({ description: 'Provider checkout session id to inspect' })
+  @IsString()
+  @Length(1, 256)
+  sessionId!: string;
+}

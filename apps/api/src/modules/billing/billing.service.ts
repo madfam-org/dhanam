@@ -18,7 +18,9 @@ import { StripeService } from './stripe.service';
 
 // Re-export so existing callers that import { UpgradeOptions } from './billing.service' keep working
 export type {
+  CheckoutResult,
   OperatorCheckoutOptions,
+  OperatorCheckoutStatus,
   UpgradeOptions,
 } from './services/subscription-lifecycle.service';
 
@@ -161,7 +163,7 @@ export class BillingService {
   async upgradeToPremium(
     userId: string,
     options: import('./services/subscription-lifecycle.service').UpgradeOptions = {}
-  ): Promise<{ checkoutUrl: string; provider: string }> {
+  ): Promise<import('./services/subscription-lifecycle.service').CheckoutResult> {
     return this.lifecycle.upgradeToPremium(userId, options);
   }
 
@@ -181,8 +183,14 @@ export class BillingService {
   async createOperatorCheckout(
     userId: string,
     options: import('./services/subscription-lifecycle.service').OperatorCheckoutOptions
-  ): Promise<{ checkoutUrl: string; provider: string }> {
+  ): Promise<import('./services/subscription-lifecycle.service').CheckoutResult> {
     return this.lifecycle.createOperatorCheckout(userId, options);
+  }
+
+  async getOperatorCheckoutStatus(
+    sessionId: string
+  ): Promise<import('./services/subscription-lifecycle.service').OperatorCheckoutStatus> {
+    return this.lifecycle.getOperatorCheckoutStatus(sessionId);
   }
 
   async createFederatedCheckout(

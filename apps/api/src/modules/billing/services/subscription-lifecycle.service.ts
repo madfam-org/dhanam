@@ -2,11 +2,12 @@ import * as crypto from 'crypto';
 
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
 
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { PostHogService } from '../../analytics/posthog.service';
-import { BillingProvider, JanuaBillingService } from '../janua-billing.service';
+import { JanuaBillingService } from '../janua-billing.service';
 import { StripeService } from '../stripe.service';
 
 import { PriceResolverService } from './price-resolver.service';
@@ -29,6 +30,40 @@ export interface UpgradeOptions {
 
 export interface OperatorCheckoutOptions extends UpgradeOptions {
   plan: string;
+}
+
+export interface CheckoutResult {
+  checkoutUrl: string;
+  provider: string;
+  sessionId?: string;
+}
+
+export interface OperatorCheckoutStatus {
+  sessionId: string;
+  provider: string;
+  status: string | null;
+  paymentStatus: string | null;
+  customerId: string | null;
+  subscriptionId: string | null;
+  paymentIntentId: string | null;
+  userId: string | null;
+  product: string | null;
+  plan: string | null;
+  source: string | null;
+  amountTotal: number | null;
+  currency: string | null;
+  createdAt: string | null;
+  expiresAt: string | null;
+  checkoutUrl: string | null;
+  billingEvents: Array<{
+    id: string;
+    type: string;
+    status: string;
+    amount: string;
+    currency: string;
+    createdAt: Date;
+    metadata: unknown;
+  }>;
 }
 
 /** Map plan slugs to subscription tiers */
@@ -83,10 +118,7 @@ export class SubscriptionLifecycleService {
    * Initiate upgrade to premium subscription.
    * Uses Janua multi-provider billing when available, falls back to direct Stripe.
    */
-  async upgradeToPremium(
-    userId: string,
-    options: UpgradeOptions = {}
-  ): Promise<{ checkoutUrl: string; provider: string }> {
+  async upgradeToPremium(userId: string, options: UpgradeOptions = {}): Promise<CheckoutResult> {
     const countryCode = options.countryCode || 'US';
 
     const user = await this.prisma.user.findUnique({
@@ -152,7 +184,7 @@ export class SubscriptionLifecycleService {
     countryCode: string,
     webUrl: string,
     options: UpgradeOptions = {}
-  ): Promise<{ checkoutUrl: string; provider: BillingProvider }> {
+  ): Promise<CheckoutResult> {
     let customerId = user.januaCustomerId;
 
     if (!customerId) {
@@ -222,7 +254,11 @@ export class SubscriptionLifecycleService {
       `Upgrade initiated via Janua (${result.provider}) for user ${user.id}${options.orgId ? ` (org: ${options.orgId})` : ''}`
     );
 
-    return { checkoutUrl: result.checkoutUrl, provider: result.provider };
+    return {
+      checkoutUrl: result.checkoutUrl,
+      provider: result.provider,
+      sessionId: result.sessionId,
+    };
   }
 
   /**
@@ -232,7 +268,7 @@ export class SubscriptionLifecycleService {
     user: { id: string; email: string; name: string; stripeCustomerId?: string },
     webUrl: string,
     options: UpgradeOptions = {}
-  ): Promise<{ checkoutUrl: string; provider: BillingProvider }> {
+  ): Promise<CheckoutResult> {
     let customerId = user.stripeCustomerId;
 
     if (!customerId) {
@@ -297,7 +333,7 @@ export class SubscriptionLifecycleService {
 
     this.logger.log(`Upgrade initiated via Stripe for user ${user.id}, session: ${session.id}`);
 
-    return { checkoutUrl: session.url, provider: 'stripe' };
+    return { checkoutUrl: session.url || '', provider: 'stripe', sessionId: session.id };
   }
 
   // ─── Portal ──────────────────────────────────────────────────────────
@@ -468,7 +504,7 @@ export class SubscriptionLifecycleService {
   async createOperatorCheckout(
     userId: string,
     options: OperatorCheckoutOptions
-  ): Promise<{ checkoutUrl: string; provider: string }> {
+  ): Promise<CheckoutResult> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -502,6 +538,75 @@ export class SubscriptionLifecycleService {
     }
 
     return this.upgradeToPremiumViaStripe(user, webUrl, checkoutOptions);
+  }
+
+  async getOperatorCheckoutStatus(sessionId: string): Promise<OperatorCheckoutStatus> {
+    const session = await this.stripe.retrieveCheckoutSession(sessionId, {
+      expand: ['subscription', 'payment_intent'],
+    });
+
+    const metadata = session.metadata || {};
+    const userId = metadata.userId || metadata.janua_user_id || null;
+    const billingEvents = userId
+      ? await this.prisma.billingEvent.findMany({
+          where: { userId },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        })
+      : [];
+
+    return {
+      sessionId: session.id,
+      provider: 'stripe',
+      status: session.status || null,
+      paymentStatus: session.payment_status || null,
+      customerId: this.stripeObjectId(session.customer),
+      subscriptionId: this.stripeObjectId(session.subscription),
+      paymentIntentId: this.stripeObjectId(session.payment_intent),
+      userId,
+      product: metadata.product || null,
+      plan: metadata.plan || metadata.planId || null,
+      source: metadata.source || null,
+      amountTotal: session.amount_total ?? null,
+      currency: session.currency || null,
+      createdAt: this.unixToIso(session.created),
+      expiresAt: this.unixToIso(session.expires_at),
+      checkoutUrl: session.url || null,
+      billingEvents: billingEvents.map((event) => ({
+        id: event.id,
+        type: event.type,
+        status: event.status,
+        amount: event.amount.toString(),
+        currency: event.currency,
+        createdAt: event.createdAt,
+        metadata: event.metadata,
+      })),
+    };
+  }
+
+  private stripeObjectId(
+    value:
+      | string
+      | Stripe.Customer
+      | Stripe.Subscription
+      | Stripe.PaymentIntent
+      | Stripe.DeletedCustomer
+      | null
+      | undefined
+  ): string | null {
+    if (!value) {
+      return null;
+    }
+
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    return value.id || null;
+  }
+
+  private unixToIso(value?: number | null): string | null {
+    return value ? new Date(value * 1000).toISOString() : null;
   }
 
   private normalizeCatalogPlanId(plan: string, product?: string): string {

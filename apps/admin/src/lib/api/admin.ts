@@ -247,6 +247,35 @@ export interface PosCheckoutResult {
   product: string;
   plan: string;
   countryCode: string | null;
+  sessionId: string | null;
+}
+
+export interface PosCheckoutStatus {
+  sessionId: string;
+  provider: string;
+  status: string | null;
+  paymentStatus: string | null;
+  customerId: string | null;
+  subscriptionId: string | null;
+  paymentIntentId: string | null;
+  userId: string | null;
+  product: string | null;
+  plan: string | null;
+  source: string | null;
+  amountTotal: number | null;
+  currency: string | null;
+  createdAt: string | null;
+  expiresAt: string | null;
+  checkoutUrl: string | null;
+  billingEvents: Array<{
+    id: string;
+    type: string;
+    status: string;
+    amount: string;
+    currency: string;
+    createdAt: string;
+    metadata: Record<string, unknown> | null;
+  }>;
 }
 
 // API client
@@ -360,6 +389,10 @@ export const adminApi = {
 
   async createPosCheckout(body: PosCheckoutRequest): Promise<PosCheckoutResult> {
     return apiClient.post<PosCheckoutResult>('/admin/billing/pos/checkout', body);
+  },
+
+  async getPosCheckoutStatus(sessionId: string): Promise<PosCheckoutStatus> {
+    return apiClient.post<PosCheckoutStatus>('/admin/billing/pos/status', { sessionId });
   },
 
   async gdprExport(userId: string): Promise<GdprExport> {

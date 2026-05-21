@@ -176,6 +176,7 @@ describe('BillingService', () => {
       expect(result).toEqual({
         checkoutUrl: 'https://checkout.stripe.com/pay/cs_test123',
         provider: 'stripe',
+        sessionId: 'cs_test123',
       });
     });
 
@@ -249,6 +250,7 @@ describe('BillingService', () => {
       expect(result).toEqual({
         checkoutUrl: 'https://checkout.stripe.com/pay/cs_test123',
         provider: 'stripe',
+        sessionId: 'cs_test123',
       });
       expect(audit.log).toHaveBeenCalledWith(
         expect.objectContaining({

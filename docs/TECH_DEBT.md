@@ -109,7 +109,9 @@ match `infra/k8s/production/kustomization.yaml`.
 Wire Enclii-first apply paths for database migration repair, policy waivers,
 namespace-aware Cloudflare tunnel routes, and audited queue remediation. Until
 then, direct provider, policy, database, Redis, or BullMQ mutation remains
-break-glass only.
+break-glass only. Manual raw production deploy workflows now require an
+incident/change reference and `break_glass_ack=true`, but the underlying Enclii
+adapter gaps still need to be closed.
 
 ### TD-1005: Provider Health Semantics
 
@@ -129,12 +131,14 @@ sole production checkout path.
 
 ### TD-1010: Internal POS Completeness
 
-The admin app now has a source-level MADFAM POS checkout generator at `/pos`
-backed by `POST /v1/admin/billing/pos/checkout`. It is useful for operator
-checkout-link creation, but not yet a full internal POS. Remaining work:
-one-time charges, refunds, payment status lookup, ledger/settlement views,
-reconciliation controls, CFDI proof, provider route preview, and SDK contracts
-for trusted MADFAM services.
+The admin app now has a source-level MADFAM POS checkout generator and Stripe
+session status inspector at `/pos`, backed by
+`POST /v1/admin/billing/pos/checkout` and
+`POST /v1/admin/billing/pos/status`. It is useful for operator checkout-link
+creation and basic Stripe checkout inspection, but not yet a full internal POS.
+Remaining work: one-time charges, refunds, provider-complete payment/refund
+timeline, ledger/settlement views, reconciliation controls, CFDI proof, provider
+route preview, and SDK contracts for trusted MADFAM services.
 
 ### TD-1011: Janua Commercial Readiness
 

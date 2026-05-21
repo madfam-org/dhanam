@@ -15,6 +15,7 @@ full MADFAM internal billing router and POS. Read it with
 | Stripe MX/SPEI relay              | Live          | Signed webhook, canonical `payment.*` fan-out, DLQ on delivery failure.  |
 | Public/external checkout redirect | Live          | Return-host allowlist protects unauthenticated checkout.                 |
 | Admin POS checkout link creation  | Source landed | `POST /v1/admin/billing/pos/checkout` plus admin `/pos` page.            |
+| Admin POS status lookup           | Source landed | `POST /v1/admin/billing/pos/status` inspects Stripe checkout sessions.   |
 | Unified provider routing          | Partial       | `PaymentRouterService` exists; primary checkout lifecycle still differs. |
 | Janua-routed billing              | Blocked       | Production Janua billing secrets must be non-empty and verified.         |
 | Full POS terminal                 | Not complete  | One-time charges, refunds, reconciliation, and CFDI proof remain.        |
@@ -25,6 +26,7 @@ full MADFAM internal billing router and POS. Read it with
 ### 1. Stabilize The Operator Checkout Surface
 
 - Keep admin POS checkout creation admin-only and high-severity audited.
+- Keep POS status lookup admin-only and audit each session inspection.
 - Add admin tests for failed user lookup, invalid plan, unconfigured provider,
   and successful product-prefixed checkout.
 - Add production/staging smoke once the route is deployed.
@@ -41,7 +43,8 @@ full MADFAM internal billing router and POS. Read it with
 ### 3. Complete POS Workflows
 
 - Create one-time payment request and line-item/cart APIs.
-- Add payment status lookup and timeline.
+- Extend status lookup from Stripe checkout sessions to provider-complete
+  payment/refund timelines.
 - Add full/partial refund workflows with idempotency.
 - Add settlement and reconciliation views in admin.
 - Add Karafiel CFDI/egreso proof for succeeded and refunded payments.
@@ -57,8 +60,8 @@ full MADFAM internal billing router and POS. Read it with
 
 Do not call the MADFAM POS full-fledged until all of these are true:
 
-- checkout, one-time charge, refund, status lookup, and reconciliation paths are
-  implemented and tested;
+- checkout, one-time charge, refund, provider-complete status timeline, and
+  reconciliation paths are implemented and tested;
 - every money event has an idempotency key, provider id, local correlation id,
   status, and replay path;
 - product webhook delivery and DLQ replay are proven;

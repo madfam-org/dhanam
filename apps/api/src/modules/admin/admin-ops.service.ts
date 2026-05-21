@@ -11,11 +11,12 @@ import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { RedisService } from '@core/redis/redis.service';
 import { Prisma } from '@db';
-import { BillingService } from '@modules/billing/billing.service';
+import { BillingService, type OperatorCheckoutStatus } from '@modules/billing/billing.service';
 import { FailedQueueJob, QueueService } from '@modules/jobs/queue.service';
 
 import {
   AdminPosCheckoutDto,
+  AdminPosStatusDto,
   CacheFlushDto,
   PaginatedResponseDto,
   SpaceSearchDto,
@@ -446,7 +447,7 @@ export class AdminOpsService {
     const skip = (page - 1) * limit;
 
     const where: Prisma.AuditLogWhereInput = {
-      action: { startsWith: 'billing.' },
+      OR: [{ action: { startsWith: 'billing.' } }, { action: { startsWith: 'admin.billing_' } }],
     };
 
     const [logs, total] = await Promise.all([
@@ -485,6 +486,7 @@ export class AdminOpsService {
     product: string;
     plan: string;
     countryCode: string | null;
+    sessionId: string | null;
   }> {
     if (!this.billingService) {
       throw new InternalServerErrorException('Billing service is not available');
@@ -509,6 +511,7 @@ export class AdminOpsService {
       resourceId: dto.userId,
       metadata: {
         provider: result.provider,
+        sessionId: result.sessionId,
         product,
         plan: dto.plan,
         orgId: dto.orgId,
@@ -531,7 +534,38 @@ export class AdminOpsService {
       product,
       plan: dto.plan,
       countryCode: dto.countryCode?.toUpperCase() || null,
+      sessionId: result.sessionId || null,
     };
+  }
+
+  async getPosCheckoutStatus(
+    dto: AdminPosStatusDto,
+    adminUserId: string
+  ): Promise<OperatorCheckoutStatus> {
+    if (!this.billingService) {
+      throw new InternalServerErrorException('Billing service is not available');
+    }
+
+    const result = await this.billingService.getOperatorCheckoutStatus(dto.sessionId);
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.billing_pos_status_viewed',
+      resource: 'Billing',
+      resourceId: result.userId || dto.sessionId,
+      metadata: {
+        provider: result.provider,
+        sessionId: dto.sessionId,
+        userId: result.userId,
+        product: result.product,
+        plan: result.plan,
+        status: result.status,
+        paymentStatus: result.paymentStatus,
+      },
+      severity: 'medium',
+    });
+
+    return result;
   }
 
   async gdprExport(

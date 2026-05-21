@@ -1,10 +1,10 @@
 'use client';
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from '@dhanam/ui';
-import { Copy, CreditCard, ExternalLink, Loader2 } from 'lucide-react';
+import { Copy, CreditCard, ExternalLink, Loader2, Search } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
 
-import { adminApi, type PosCheckoutResult } from '@/lib/api/admin';
+import { adminApi, type PosCheckoutResult, type PosCheckoutStatus } from '@/lib/api/admin';
 
 const PRODUCTS = ['dhanam', 'karafiel', 'tezca', 'enclii', 'janua', 'routecraft'];
 const PLANS = ['essentials', 'essentials_yearly', 'pro', 'pro_yearly', 'premium', 'premium_yearly'];
@@ -25,6 +25,10 @@ export default function PosPage() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [statusSessionId, setStatusSessionId] = useState('');
+  const [statusResult, setStatusResult] = useState<PosCheckoutStatus | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const [statusLoading, setStatusLoading] = useState(false);
 
   const routeLabel = useMemo(() => {
     if (!result) return 'Pending';
@@ -58,6 +62,8 @@ export default function PosPage() {
         cancelUrl: form.cancelUrl.trim() || undefined,
       });
       setResult(checkout);
+      setStatusSessionId(checkout.sessionId || '');
+      setStatusResult(null);
     } catch (_err) {
       setError('Unable to create POS checkout link.');
     } finally {
@@ -69,6 +75,24 @@ export default function PosPage() {
     if (!result?.checkoutUrl) return;
     await navigator.clipboard.writeText(result.checkoutUrl);
     setCopied(true);
+  };
+
+  const loadStatus = async () => {
+    const sessionId = statusSessionId.trim();
+    if (!sessionId) {
+      setStatusError('Session ID is required.');
+      return;
+    }
+
+    setStatusLoading(true);
+    setStatusError(null);
+    try {
+      setStatusResult(await adminApi.getPosCheckoutStatus(sessionId));
+    } catch (_err) {
+      setStatusError('Unable to load checkout status.');
+    } finally {
+      setStatusLoading(false);
+    }
   };
 
   return (
@@ -219,6 +243,12 @@ export default function PosPage() {
                       {result.product}/{result.plan}
                     </span>
                   </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-gray-500 dark:text-gray-400">Session ID</span>
+                    <span className="truncate font-medium text-gray-900 dark:text-white">
+                      {result.sessionId || 'Unavailable'}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 break-all">
@@ -251,6 +281,115 @@ export default function PosPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Checkout Status</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {statusError && (
+            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+              {statusError}
+            </div>
+          )}
+
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+            <div>
+              <Label htmlFor="statusSessionId">Session ID</Label>
+              <Input
+                id="statusSessionId"
+                value={statusSessionId}
+                onChange={(event) => setStatusSessionId(event.target.value)}
+                placeholder="cs_..."
+                autoComplete="off"
+              />
+            </div>
+            <div className="flex items-end">
+              <Button type="button" onClick={loadStatus} disabled={statusLoading} className="gap-2">
+                {statusLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
+                Load status
+              </Button>
+            </div>
+          </div>
+
+          {statusResult ? (
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+              <div className="rounded-md border border-gray-200 p-4 text-sm dark:border-gray-700">
+                <div className="grid gap-3">
+                  {[
+                    ['Provider', statusResult.provider],
+                    ['Checkout', statusResult.status || 'unknown'],
+                    ['Payment', statusResult.paymentStatus || 'unknown'],
+                    ['Product', statusResult.product || 'unknown'],
+                    ['Plan', statusResult.plan || 'unknown'],
+                    ['User', statusResult.userId || 'unknown'],
+                    ['Subscription', statusResult.subscriptionId || 'none'],
+                    ['Amount', formatAmount(statusResult.amountTotal, statusResult.currency)],
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex justify-between gap-4">
+                      <span className="text-gray-500 dark:text-gray-400">{label}</span>
+                      <span className="truncate font-medium text-gray-900 dark:text-white">
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-md border border-gray-200 p-4 dark:border-gray-700">
+                <div className="mb-3 text-sm font-medium text-gray-900 dark:text-white">
+                  Recent Billing Events
+                </div>
+                {statusResult.billingEvents.length > 0 ? (
+                  <div className="space-y-3">
+                    {statusResult.billingEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="flex items-center justify-between gap-3 border-b border-gray-100 pb-3 text-sm last:border-0 last:pb-0 dark:border-gray-800"
+                      >
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {event.type}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(event.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="secondary">{event.status}</Badge>
+                          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {event.amount} {event.currency}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex min-h-24 items-center justify-center rounded-md border border-dashed border-gray-300 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                    No billing events found
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex min-h-28 items-center justify-center rounded-md border border-dashed border-gray-300 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+              No checkout status loaded
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
+}
+
+function formatAmount(amountMinor: number | null, currency: string | null) {
+  if (amountMinor === null || !currency) {
+    return 'unknown';
+  }
+
+  return `${(amountMinor / 100).toFixed(2)} ${currency.toUpperCase()}`;
 }
