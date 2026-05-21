@@ -89,3 +89,10 @@ patches:
     target:
       kind: ExternalSecret
       name: dhanam-secrets
+
+  # Keep the production Janua bridge ExternalSecret but point it at the
+  # staging-scoped source secret in the Enclii namespace.
+  - path: external-secret-janua-patch.yaml
+    target:
+      kind: ExternalSecret
+      name: dhanam-janua-secrets
