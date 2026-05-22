@@ -90,9 +90,10 @@ These are not unit-test failures, but they block full-system stability:
   soak gate elapsed and committed production manifest change `593953ca`. Web and
   admin were not promoted from staging images because their public API/app/OIDC
   values are build-time bound.
-- The manual K8s workflows can build, sign, and commit production digests. Raw
-  `kubectl set image` rollout is now opt-in with `direct_k8s_deploy=true`
-  because GitHub runners cannot currently reach the cluster API. Their digest
+- The manual K8s workflows can build, sign, and commit production digests.
+  Break-glass only: raw `kubectl set image` rollout is opt-in with
+  `direct_k8s_deploy=true` because GitHub runners cannot currently reach the
+  cluster API. Their digest
   patch step no longer downloads the volatile upstream kustomize installer.
 - Production API liveness and full health pass. Full health returns
   `status: "healthy"` with `failedJobs: 0`.
