@@ -1,0 +1,24 @@
+# Cursor indexing excludes — match .gitignore build/dep bloat
+node_modules/
+.pnp
+.pnp.js
+dist/
+build/
+.next/
+out/
+.turbo/
+coverage/
+.nyc_output/
+web-build/
+.expo/
+**/__pycache__/
+.cache/
+.parcel-cache/
+.vercel/
+.netlify/
+test-results/
+playwright-report/
+.playwright-mcp/
+postgres_data/
+redis_data/
+data/
