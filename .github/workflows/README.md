@@ -24,7 +24,7 @@ This directory contains GitHub Actions workflows for CI/CD, quality checks, and 
 When you push to `main`:
 
 1. CI validates the change
-2. `deploy-staging.yml` builds and signs api/web/admin, then patches digest-pinned staging images
+2. `deploy-staging.yml` builds and signs api/web/admin, patches digest-pinned staging images, runs health/web/admin smoke, then runs `scripts/staging-commercial-smoke.sh` (public billing tier always; admin tier when secrets are configured)
 3. ArgoCD reconciles staging
 4. `promote-to-prod.yml` verifies the deploy-staging cosign signature, requires a successful staging smoke run id unless break-glass is selected, and manually promotes a soaked staging digest to production
 

@@ -329,7 +329,7 @@ For detailed testing documentation, see:
 
 The application is deployed via **Enclii** to bare metal K8s (GitOps with ArgoCD):
 
-1. **Staging**: Push to `main` → `deploy-staging.yml` builds/signs images and patches digest-pinned staging images. API smoke is currently green; web/admin staging smoke and staging-admin API/env proof still need to be added.
+1. **Staging**: Push to `main` → `deploy-staging.yml` builds/signs images, patches digest-pinned staging images, and runs API/web/admin plus commercial billing smoke (`scripts/staging-commercial-smoke.sh`).
 2. **Production**: `promote-to-prod.yml` manually promotes a soaked staging digest after a successful staging smoke run, unless an explicit break-glass bypass is recorded.
 3. **Break glass**: `deploy-enclii.yml` / `deploy-{k8s,web-k8s,admin-k8s}.yml` are manual emergency paths only and now require an incident/change reference plus explicit break-glass acknowledgment.
 

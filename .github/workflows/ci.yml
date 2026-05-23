@@ -72,6 +72,9 @@ jobs:
       - name: Check all docs/ links
         run: python3 scripts/check-doc-links.py --all-docs
 
+      - name: Validate staging commercial smoke script
+        run: bash scripts/staging-commercial-smoke.test.sh
+
   validate:
     name: Validate Lockfile
     runs-on: ubuntu-latest

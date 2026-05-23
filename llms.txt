@@ -9,6 +9,8 @@ Compact LLM context index for this repository.
 - `docs/README.md` — canonical documentation map.
 - `docs/GA_REMEDIATION_ROADMAP.md` — full GA program (stability + commercial +
   consumer); canonical implementation plan.
+- `docs/COMMERCIAL_GA_EXECUTION.md` — G2 commercial GA runbook (WS1–WS6) and
+  staging commercial smoke configuration.
 - `docs/ROADMAP.md` — stability priorities P0–P8 and milestones M1–M7.
 - `docs/STABILITY_AUDIT_2026-05-19.md` — current stability, production,
   staging, DNS, health, and Enclii rollout status.

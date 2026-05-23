@@ -19,6 +19,7 @@ system, not to engineering artifacts.
 | Document                                                           | Role                                                     |
 | ------------------------------------------------------------------ | -------------------------------------------------------- |
 | [Roadmap](ROADMAP.md)                                              | Stability definition, P0–P8 priorities, milestones M1–M5 |
+| [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)              | WS1–WS6 operator runbook and G2 sign-off checklist       |
 | [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)    | Billing router and POS launch gate                       |
 | [Tech Debt Register](TECH_DEBT.md)                                 | Active debt IDs (TD-1002–TD-1011)                        |
 | [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)    | Latest verified production state                         |
@@ -63,7 +64,7 @@ webhooks with DLQ recovery.
 | Codebase and CI              | 98%      | Hosted CI, lint, coverage, staging deploy green      |
 | Public production            | 99%      | Preflight, full API health, zero failed jobs         |
 | Ops control plane            | 88%      | ArgoCD healthy; Enclii rollout truth split           |
-| Commercial / POS             | 62%      | Catalog + Stripe MX live; full POS incomplete        |
+| Commercial / POS             | ~75%     | Routing + POS source on main; G2 proof pending       |
 | Milestone M1 (queue health)  | Complete | P1 in [Roadmap](ROADMAP.md)                          |
 | Milestone M2 (staging smoke) | Complete | API, web, admin smoke green                          |
 
@@ -199,13 +200,13 @@ if needed:
 
 ### Implementation tasks
 
-| ID  | Task                                                                                 | Repository                                       | Acceptance                                                |
-| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------ | --------------------------------------------------------- |
-| 1.1 | Fix Enclii prod namespace mapping or formalize Argo-as-truth                         | `internal-devops`, `dhanam`                      | `enclii ps dhanam-api --env production` matches live pods |
-| 1.2 | Run `scripts/production-rollout-proof.js` as required post-promote CI step           | `dhanam` `.github/workflows/promote-to-prod.yml` | Promote fails on digest mismatch                          |
-| 1.3 | Staging digest proof: Enclii adapter, self-hosted runner, or documented manual SOP   | `internal-devops`, `dhanam`                      | Every staging deploy has digest evidence within 24h       |
-| 1.4 | Eliminate manual Argo hard-refresh after promote                                     | Enclii/Argo                                      | Promote → live digest without operator refresh            |
-| 1.5 | Execute three clean cycles: main → staging → soak → promote → proof → rollback drill | Release                                          | Written evidence, no undocumented kubectl                 |
+| ID  | Task                                                                                 | Repository                                       | Acceptance                                                  |
+| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------ | ----------------------------------------------------------- |
+| 1.1 | Fix Enclii prod namespace mapping or formalize Argo-as-truth                         | `internal-devops`, `dhanam`                      | `enclii ps dhanam-api --env production` matches live pods   |
+| 1.2 | Run `scripts/production-rollout-proof.js` as required post-promote CI step           | `dhanam` `.github/workflows/promote-to-prod.yml` | Promote fails on digest mismatch (**manifest proof wired**) |
+| 1.3 | Staging digest proof: Enclii adapter, self-hosted runner, or documented manual SOP   | `internal-devops`, `dhanam`                      | Every staging deploy has digest evidence within 24h         |
+| 1.4 | Eliminate manual Argo hard-refresh after promote                                     | Enclii/Argo                                      | Promote → live digest without operator refresh              |
+| 1.5 | Execute three clean cycles: main → staging → soak → promote → proof → rollback drill | Release                                          | Written evidence, no undocumented kubectl                   |
 
 ### Phase 1 exit criteria
 
@@ -258,12 +259,12 @@ if needed:
 2. `PaymentRouterService` — MX → `stripe_mx`, non-MX → `paddle` (not sole path).
 
 | ID   | Task                                                                    | Detail                                                                                                   |
-| ---- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| 3A.1 | Introduce single checkout entry (`CheckoutRoutingPolicy` or equivalent) | All: `POST /billing/upgrade`, `GET /billing/checkout`, admin POS                                         |
-| 3A.2 | Route all checkouts through `PaymentRouterService`                      | Persist: provider, country, currency, product, plan, `price_source`, `route_reason`, `operator_override` |
-| 3A.3 | Janua as optional wrapper only                                          | Fail-closed until secrets + E2E proof; do not block G2 on Janua                                          |
-| 3A.4 | Admin route preview API                                                 | e.g. `POST /v1/admin/billing/route/preview`                                                              |
-| 3A.5 | Matrix tests for country / currency / product combinations              | `apps/api/src/modules/billing/__tests__/`                                                                |
+| ---- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| 3A.1 | Introduce single checkout entry (`CheckoutRoutingPolicy` or equivalent) | All: `POST /billing/upgrade`, `GET /billing/checkout`, admin POS                                         | **Done** (main)                       |
+| 3A.2 | Route all checkouts through `PaymentRouterService`                      | Persist: provider, country, currency, product, plan, `price_source`, `route_reason`, `operator_override` | **Done** (audit via hybrid metadata)  |
+| 3A.3 | Janua as optional wrapper only                                          | Fail-closed until secrets + E2E proof; do not block G2 on Janua                                          | **Done** (disabled in prod)           |
+| 3A.4 | Admin route preview API                                                 | e.g. `POST /v1/admin/billing/route/preview`                                                              | **Done**                              |
+| 3A.5 | Matrix tests for country / currency / product combinations              | `apps/api/src/modules/billing/__tests__/`                                                                | **Done** (unit); staging smoke in WS1 |
 
 **Acceptance:** One code path creates checkout sessions; audit explains every routing decision.
 
@@ -272,14 +273,14 @@ if needed:
 Extend existing `POST /v1/admin/billing/pos/checkout` and `pos/status`.
 
 | Capability                  | API (proposed)                                      | Admin UI                        | Tests                                 |
-| --------------------------- | --------------------------------------------------- | ------------------------------- | ------------------------------------- |
-| One-time / line-item charge | `POST /v1/admin/billing/pos/charge`                 | `/pos` cart                     | API + admin E2E                       |
-| Provider-complete timeline  | `GET /v1/admin/billing/pos/timeline/:correlationId` | Timeline panel                  | Stripe MX + Conekta fixtures          |
-| Full refund                 | `POST /v1/admin/billing/pos/refund`                 | Refund action                   | Idempotency                           |
-| Partial refund              | Same + amount                                       | Partial refund UI               | Provider-specific cases               |
-| Settlement / reconciliation | `GET /v1/admin/billing/reconciliation`              | `/reconciliation`               | Align with nightly reconciliation job |
-| CFDI proof                  | Enrich timeline with Karafiel receipt id            | Display in admin                | Golden probe Dhanam → Karafiel        |
-| Audited provider override   | `POST /v1/admin/billing/route/override`             | Admin-only, high-severity audit | Guard tests                           |
+| --------------------------- | --------------------------------------------------- | ------------------------------- | ------------------------------------- | ------------------------------------ |
+| One-time / line-item charge | `POST /v1/admin/billing/pos/charge`                 | `/pos` cart                     | API + admin E2E                       | **Done** (source); WS1 staging proof |
+| Provider-complete timeline  | `GET /v1/admin/billing/pos/timeline/:correlationId` | Timeline panel                  | Stripe MX + Conekta fixtures          | **Done** (source); CFDI enrich WS2   |
+| Full refund                 | `POST /v1/admin/billing/pos/refund`                 | Refund action                   | Idempotency                           | **Done** (source)                    |
+| Partial refund              | Same + amount                                       | Partial refund UI               | Provider-specific cases               | API **done**; admin UI WS2           |
+| Settlement / reconciliation | `GET /v1/admin/billing/reconciliation`              | `/reconciliation`               | Align with nightly reconciliation job | **Done** (source)                    |
+| CFDI proof                  | Enrich timeline with Karafiel receipt id            | Display in admin                | Golden probe Dhanam → Karafiel        | WS2                                  |
+| Audited provider override   | `POST /v1/admin/billing/route/override`             | Admin-only, high-severity audit | Guard tests                           | WS2                                  |
 
 **Data model:** Every money event must have `idempotency_key`, `provider_id`,
 `correlation_id`, `status`, `BillingEvent` row, and DLQ entry on fan-out failure.
@@ -424,15 +425,15 @@ Already source-landed: webhooks, ledger writes, `payment.*` fan-out, DLQ.
 
 ## Milestone summary
 
-| Milestone                                 | State (2026-05-22) | GA gate     |
-| ----------------------------------------- | ------------------ | ----------- |
-| M1 — Queue health                         | **Complete**       | G1          |
-| M2 — Staging smoke                        | **Complete**       | G1          |
-| M3 — Rollout truth                        | In progress        | G1          |
-| M4 — Commercial POS                       | In progress        | G2          |
-| M5 — Enclii adapters + provider semantics | In progress        | G1 + G2     |
-| M6 — Consumer GA                          | Not started        | G3          |
-| M7 — Operational proof                    | Not started        | G1 final 1% |
+| Milestone                                 | State (2026-05-22)          | GA gate     |
+| ----------------------------------------- | --------------------------- | ----------- |
+| M1 — Queue health                         | **Complete**                | G1          |
+| M2 — Staging smoke                        | **Complete**                | G1          |
+| M3 — Rollout truth                        | In progress                 | G1          |
+| M4 — Commercial POS                       | In progress (source landed) | G2          |
+| M5 — Enclii adapters + provider semantics | In progress                 | G1 + G2     |
+| M6 — Consumer GA                          | Not started                 | G3          |
+| M7 — Operational proof                    | Not started                 | G1 final 1% |
 
 ## Execution order (canonical)
 

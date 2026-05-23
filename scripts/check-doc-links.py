@@ -20,6 +20,7 @@ PRIMARY_DOCS = [
     "docs/INDEX.md",
     "docs/ROADMAP.md",
     "docs/GA_REMEDIATION_ROADMAP.md",
+    "docs/COMMERCIAL_GA_EXECUTION.md",
     "docs/COMMERCIAL_STABILITY_ROADMAP.md",
     "docs/DEVELOPMENT.md",
     "docs/DEPLOYMENT.md",

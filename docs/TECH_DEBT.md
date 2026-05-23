@@ -1,6 +1,6 @@
 # Dhanam Tech Debt Register
 
-Last updated: 2026-05-21
+Last updated: 2026-05-22
 
 This is the current technical-debt register for Dhanam. It tracks debt that
 still affects stability, operations, development velocity, or release safety.
@@ -23,18 +23,18 @@ For execution order and milestone targets, read the
 
 ## Active Debt
 
-| ID      | Area                       | Severity | Status   | Current impact                                                                                                                                                               | Primary reference                                           |
-| ------- | -------------------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| TD-1002 | Staging activation         | Medium   | Active   | Staging API/web/admin smoke is green; remaining debt is repeated proof and Enclii-owned namespace-aware route apply.                                                         | [Deployment Guide](DEPLOYMENT.md)                           |
-| TD-1003 | Production rollout truth   | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth.                                                   | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
-| TD-1004 | Enclii adapter coverage    | Medium   | Active   | Migration repair, policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.                                                       | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
-| TD-1005 | Provider health semantics  | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                                                                                | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)           |
-| TD-1006 | React 18 global pin        | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                                                                            | [package.json](../package.json)                             |
-| TD-1007 | Mobile test depth          | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                                                                   | [Mobile Guide](MOBILE.md)                                   |
-| TD-1008 | Historical docs cleanup    | Low      | Active   | Phase summaries archived under `docs/reports/historical/`; GA banners on guides; OpenAPI export script verified locally. Long-term: generate `API.md` sections from OpenAPI. | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-22.md)    |
-| TD-1009 | Billing router unification | High     | Active   | `PaymentRouterService` exists, but `/billing/upgrade` and public checkout still use Janua-first/direct-Stripe lifecycle routing.                                             | [Billing README](../apps/api/src/modules/billing/README.md) |
-| TD-1010 | Internal POS completeness  | High     | Active   | Admin POS checkout-link creation is source-landed; refunds, one-time charges, settlement, reconciliation, and CFDI proof remain.                                             | [Roadmap](ROADMAP.md)                                       |
-| TD-1011 | Janua commercial readiness | High     | Active   | Janua billing secrets were present with zero length in production proof; Janua-routed billing must not be claimed live.                                                      | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
+| ID      | Area                       | Severity | Status   | Current impact                                                                                                                                                                              | Primary reference                                        |
+| ------- | -------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| TD-1002 | Staging activation         | Medium   | Active   | Staging API/web/admin smoke is green; remaining debt is repeated proof and Enclii-owned namespace-aware route apply.                                                                        | [Deployment Guide](DEPLOYMENT.md)                        |
+| TD-1003 | Production rollout truth   | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth.                                                                  | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)     |
+| TD-1004 | Enclii adapter coverage    | Medium   | Active   | Migration repair, policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.                                                                      | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)     |
+| TD-1005 | Provider health semantics  | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                                                                                               | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)        |
+| TD-1006 | React 18 global pin        | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                                                                                           | [package.json](../package.json)                          |
+| TD-1007 | Mobile test depth          | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                                                                                  | [Mobile Guide](MOBILE.md)                                |
+| TD-1008 | Historical docs cleanup    | Low      | Active   | Phase summaries archived under `docs/reports/historical/`; GA banners on guides; OpenAPI export script verified locally. Long-term: generate `API.md` sections from OpenAPI.                | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-22.md) |
+| TD-1009 | Billing router unification | Medium   | Active   | `CheckoutRoutingPolicyService` is wired for upgrade, external, operator, and federated checkout when Janua is off. Remaining: production staging smoke proof and close legacy bypass audit. | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)    |
+| TD-1010 | Internal POS completeness  | Medium   | Active   | Charge, refund, timeline, reconciliation, and tabbed admin `/pos` are source-landed. Remaining: CFDI proof, partial refund UI, Conekta POS, route override, SDK, golden probes, DLQ drill.  | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)    |
+| TD-1011 | Janua commercial readiness | High     | Active   | Janua billing secrets were present with zero length in production proof; Janua-routed billing must not be claimed live.                                                                     | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)     |
 
 ## Remediation Notes
 
@@ -123,34 +123,32 @@ failed.
 
 ### TD-1009: Billing Router Unification
 
-`PaymentRouterService` implements the intended Stripe MX/Paddle hybrid router,
-but the currently wired checkout lifecycle still runs Janua-first and then
-direct Stripe fallback. Close this by making one routing policy authoritative
-for product, plan, country, currency, provider, and price source. Until then,
-docs and commercial claims must say the router foundation exists but is not the
-sole production checkout path.
+`CheckoutRoutingPolicyService` and `tryHybridSubscriptionCheckout()` now route
+self-service upgrade, external checkout, operator checkout, and federated
+checkout through `PaymentRouterService` when Janua billing is disabled
+(`FEATURE_UNIFIED_CHECKOUT_ROUTING=true`, production default).
+
+Close this debt by:
+
+- keeping [`scripts/staging-commercial-smoke.sh`](../scripts/staging-commercial-smoke.sh)
+  green on every staging deploy;
+- recording production route-preview samples after API promote;
+- confirming no checkout entry point bypasses the policy when Janua is off.
 
 ### TD-1010: Internal POS Completeness
 
-The admin app now has a source-level MADFAM POS checkout generator and Stripe
-session status inspector at `/pos`, backed by
-`POST /v1/admin/billing/pos/checkout` and
-`POST /v1/admin/billing/pos/status`. It is useful for operator checkout-link
-creation and basic Stripe checkout inspection, but not yet a full internal POS.
-Remaining work: one-time charges, refunds, provider-complete payment/refund
-timeline, ledger/settlement views, reconciliation controls, CFDI proof, provider
-route preview, and SDK contracts for trusted MADFAM services.
+The admin POS console at `/pos` and `AdminPosBillingService` now expose checkout
+link creation, route preview, PaymentIntent charge/refund, correlation
+timelines, and reconciliation summary.
 
-Adjacent commercial billing progress: the direct Conekta webhook path now
-source-lands linked `BillingEvent` writes, canonical `payment.*` fan-out, and
-DLQ capture. Conekta is still not complete POS parity until refund initiation,
-partial-refund handling, settlement reconciliation, provider timeline UI, and
-live-mode proof are recorded.
+Remaining G2 gaps (see [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)):
 
-Product-webhook DLQ recovery is no longer API-only in source: the admin app now
-has `/webhook-dlq` for listing, replaying, and resolving failed consumer
-deliveries. Remaining DLQ work is production proof, golden Dhanam -> product
-probe coverage, and settlement/CFDI correlation in the POS timeline.
+- Karafiel CFDI / egreso proof in timeline;
+- partial refund amount field in admin UI;
+- Conekta operator charge/refund when Scope B is selected;
+- audited route override API;
+- golden Dhanam → product probes and production DLQ drill;
+- `@dhanam/billing-sdk` POS methods for trusted internal callers.
 
 ### TD-1011: Janua Commercial Readiness
 

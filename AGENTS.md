@@ -447,15 +447,15 @@ promotion:
 
 ### What ships on push to `main` (post PP.2b/PP.2c)
 
-| Workflow               | Trigger                    | Effect                                                                                                                            |
-| ---------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `deploy-staging.yml`   | push to main               | Builds/signs api/web/admin, patches digests into `infra/k8s/overlays/staging/kustomization.yaml`, then smoke-tests public staging |
-| `promote-to-prod.yml`  | workflow_dispatch (manual) | Promotes a soaked staging digest (one component or all) into `infra/k8s/production/kustomization.yaml`                            |
-| `rollback-prod.yml`    | workflow_dispatch (manual) | Restores a previous prod digest; defaults to the previous git-history entry                                                       |
-| `deploy-enclii.yml`    | workflow_dispatch (manual) | Break-glass web raw K8s deploy requiring incident/change reference and acknowledgment; routine production stays Enclii/promotion  |
-| `deploy-k8s.yml` (API) | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
-| `deploy-web-k8s.yml`   | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
-| `deploy-admin-k8s.yml` | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                  |
+| Workflow               | Trigger                    | Effect                                                                                                                           |
+| ---------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `deploy-staging.yml`   | push to main               | Builds/signs api/web/admin, patches staging digests, health/web/admin smoke, then `scripts/staging-commercial-smoke.sh`          |
+| `promote-to-prod.yml`  | workflow_dispatch (manual) | Promotes a soaked staging digest (one component or all) into `infra/k8s/production/kustomization.yaml`                           |
+| `rollback-prod.yml`    | workflow_dispatch (manual) | Restores a previous prod digest; defaults to the previous git-history entry                                                      |
+| `deploy-enclii.yml`    | workflow_dispatch (manual) | Break-glass web raw K8s deploy requiring incident/change reference and acknowledgment; routine production stays Enclii/promotion |
+| `deploy-k8s.yml` (API) | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                 |
+| `deploy-web-k8s.yml`   | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                 |
+| `deploy-admin-k8s.yml` | workflow_dispatch (manual) | Break-glass raw K8s deployment only when Enclii/promotion is unavailable; record the adapter gap                                 |
 
 The legacy `deploy-{k8s,web-k8s,admin-k8s}.yml` workflows no longer run on
 push to `main`; they are manual break-glass paths only.

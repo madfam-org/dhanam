@@ -32,10 +32,11 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
   `JANUA_BILLING_ENABLED=false` is intentional until the Dhanam Janua billing
   client route/auth contract matches Janua production and an end-to-end Janua
   checkout is verified.
-- Commercial POS readiness is not complete. The source now includes an
-  admin-only POS checkout generator, but full POS readiness still requires
-  one-time charges, refunds, payment status lookup, settlement/reconciliation
-  views, CFDI proof, and unified provider routing.
+- Commercial POS source now includes unified checkout routing, admin charge/refund,
+  timeline/reconciliation views, and staging commercial smoke
+  (`scripts/staging-commercial-smoke.sh` in `deploy-staging.yml`). G2
+  proof/sign-off (CFDI timeline, golden probes, prod promote evidence) remains
+  open — see [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md).
 
 ## Implementation Landed
 
@@ -67,9 +68,9 @@ Read it with [Roadmap](ROADMAP.md), [Tech Debt Register](TECH_DEBT.md),
 - The `product_tiers` migration now derives `product_id` type from
   `products.id`, so clean text-backed databases and historically drifted
   UUID-backed production databases both migrate safely.
-- Admin commercial operations now have a source-level POS checkout generator at
-  `POST /v1/admin/billing/pos/checkout` and `/pos` in the admin app. It is a
-  checkout-link workflow, not a complete POS terminal.
+- Admin commercial operations include the internal POS console at `/pos`:
+  subscription checkout, route preview, charge/refund, timeline, and
+  reconciliation. Janua billing stays off until checkout proof exists.
 - Janua billing is now fail-closed by default: `JANUA_BILLING_ENABLED` must be
   explicitly truthy, and production manifests set it to `"false"` until Janua
   billing secrets and checkout proof are complete.

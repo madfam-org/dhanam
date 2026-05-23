@@ -1,6 +1,6 @@
 # Billing Module
 
-Last updated: 2026-05-21
+Last updated: 2026-05-22
 
 The billing module is Dhanam's commercial boundary for the MADFAM ecosystem.
 It owns subscription checkout, catalog price resolution, usage metering,
@@ -15,12 +15,14 @@ checkout surface.
   closed.
 - Stripe MX/SPEI webhook relay emits canonical `payment.*` envelopes, persists
   linked billing events, and writes downstream delivery failures to the DLQ.
-- The internal POS is now a source-level admin checkout generator and Stripe
-  checkout status inspector at `POST /admin/billing/pos/checkout`,
-  `POST /admin/billing/pos/status`, and `apps/admin/src/app/(dashboard)/pos`.
-  It creates operator checkout links through the existing lifecycle path and
-  can inspect Stripe checkout sessions; it is not yet a complete
-  card-terminal/ledger/refund/settlement console.
+- The internal POS is a source-level admin console at
+  `POST /admin/billing/pos/*`, route preview at
+  `POST /admin/billing/route/preview`, and `apps/admin/src/app/(dashboard)/pos`.
+  It supports operator checkout links, Stripe checkout status, direct
+  PaymentIntent charge/refund, correlation timelines, and reconciliation
+  summary. Staging proof runs via
+  [`scripts/staging-commercial-smoke.sh`](../../../../../scripts/staging-commercial-smoke.sh)
+  (see [Commercial GA Execution](../../../docs/COMMERCIAL_GA_EXECUTION.md)).
 - Janua identity relay and centralized email use the shared internal Janua key
   and Dhanam webhook secret. Janua-routed checkout remains explicitly disabled
   with `JANUA_BILLING_ENABLED=false` until the Dhanam client route/auth contract
@@ -46,7 +48,7 @@ checkout surface.
 | Janua billing            | `janua-billing.service.ts`                                                          |
 | Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                              |
 | Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                              |
-| Internal POS checkout    | `modules/admin/admin.controller.ts`, `modules/admin/admin-ops.service.ts`           |
+| Internal POS checkout    | `modules/admin/admin-pos-billing.service.ts`, `services/internal-pos.service.ts`    |
 
 ## Pricing Source Of Truth
 
@@ -103,26 +105,32 @@ matrix before changing production flags.
 
 ## Internal POS Status
 
-The current internal POS surface creates checkout links for an existing Dhanam
-user and records high-severity admin audit events. It supports:
+The current internal POS surface supports:
 
 - operator-selected user id, product, plan, country, organization id, and
   optional success/cancel URLs;
-- catalog-backed plan resolution through the existing lifecycle path;
+- catalog-backed plan resolution through the unified routing policy;
 - returned provider checkout session ids;
 - Stripe checkout status lookup with recent Dhanam `BillingEvent` context;
+- direct PaymentIntent charge and full/partial refund (Stripe MX / legacy Stripe);
+- correlation timelines and flagged reconciliation mismatches;
 - admin-only access through the platform admin guard;
-- admin UI access at `/pos`.
+- tabbed admin UI at `/pos` (subscription, route preview, charge/refund,
+  timeline/reconcile).
 
-Still missing before calling this a full POS:
+See [Commercial GA Execution](../../../docs/COMMERCIAL_GA_EXECUTION.md) for
+staging soak and production promotion checklists.
 
-- one-time line-item/cart charges;
-- payment method capture, void, refund, and partial refund workflows;
-- provider-complete payment/refund state timelines beyond Stripe checkout
-  session inspection;
-- ledger, settlement, reconciliation, and CFDI proof in the admin UI;
-- provider fallback controls and route override policy;
-- SDK methods for trusted internal MADFAM callers.
+Still missing before **commercial GA (G2)** sign-off:
+
+- Karafiel CFDI / egreso proof in the admin POS timeline;
+- Conekta charge/refund in the operator POS path (Scope B);
+- audited provider route override API;
+- golden end-to-end revenue probes per MADFAM product;
+- production DLQ replay drill evidence;
+- `@dhanam/billing-sdk` POS client methods for trusted internal callers.
+
+Track progress in [Commercial GA Execution](../../../docs/COMMERCIAL_GA_EXECUTION.md).
 
 ## Webhooks And Ledger
 
@@ -205,4 +213,7 @@ pnpm --dir apps/api test -- billing
 pnpm --dir apps/api test -- admin-ops.service.spec.ts
 pnpm --dir apps/admin test -- pos-page.test.tsx
 pnpm --dir packages/billing-sdk test -- client.spec.ts
+bash scripts/staging-commercial-smoke.test.sh
+# optional live staging probe:
+# RUN_STAGING_COMMERCIAL_SMOKE_LIVE=true bash scripts/staging-commercial-smoke.test.sh
 ```

@@ -248,6 +248,8 @@ jobs:
     needs: [build-api, build-web, build-admin, update-staging-overlay]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v5
 
@@ -386,3 +388,13 @@ jobs:
           done
           echo "::error::Staging admin did not expose expected API origin $API_ORIGIN"
           exit 1
+
+      - name: Commercial billing smoke (public tier)
+        run: |
+          chmod +x scripts/staging-commercial-smoke.sh
+          STAGING_API_URL="${{ vars.STAGING_API_URL || 'https://staging-api.dhan.am' }}" \
+          STAGING_COMMERCIAL_ADMIN_TOKEN="${{ secrets.STAGING_COMMERCIAL_ADMIN_TOKEN }}" \
+          STAGING_COMMERCIAL_SMOKE_USER_ID="${{ secrets.STAGING_COMMERCIAL_SMOKE_USER_ID }}" \
+          STAGING_COMMERCIAL_CHARGE_ENABLED="${{ vars.STAGING_COMMERCIAL_CHARGE_ENABLED || 'false' }}" \
+          STAGING_COMMERCIAL_STRICT="${{ vars.STAGING_COMMERCIAL_STRICT || 'false' }}" \
+            ./scripts/staging-commercial-smoke.sh

@@ -188,22 +188,29 @@ available; direct BullMQ access is break-glass only.
 
 ### 7. MADFAM POS
 
-The POS page creates admin-only checkout links for existing Dhanam users. It is
-the first operator-facing commercial control surface, not the final full POS.
+The POS page at `/pos` is the operator-facing internal billing console for
+existing Dhanam users. It supports subscription checkout, unified provider
+route preview, one-time charges, refunds, payment/refund timeline, and
+reconciliation views.
 
 Current support:
 
-- user, product, plan, country, organization id, and optional return URLs;
-- catalog-backed checkout through the billing lifecycle;
-- high-severity audit event `admin.billing_pos_checkout_created`;
-- returned checkout URL, selected provider, and checkout session id;
-- Stripe checkout status lookup with recent billing event context and medium
-  severity audit event `admin.billing_pos_status_viewed`.
+- **Subscription tab:** user, product, plan, country, organization id, optional
+  return URLs; catalog-backed checkout; audit event
+  `admin.billing_pos_checkout_created`; checkout URL, provider, session id;
+  Stripe checkout status lookup with billing event context (`admin.billing_pos_status_viewed`).
+- **Route tab:** `POST /v1/admin/billing/pos/route-preview` — country/product/plan
+  routing matrix without creating a session.
+- **Charge/refund tab:** one-time charge and full/partial refund via internal POS
+  API (`POST /v1/admin/billing/pos/charge`, `POST /v1/admin/billing/pos/refund`).
+- **Timeline/reconcile tab:** payment/refund timeline and reconciliation summary
+  for a user or payment id.
 
-Remaining POS work is tracked in
-[Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md): one-time
-charges, refunds, provider-complete payment/refund timelines,
-settlement/reconciliation, CFDI proof, and route override policy.
+Remaining G2 work is tracked in
+[Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md) and
+[Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md): Karafiel CFDI
+proof on routine paths, golden product-webhook probes, DLQ drill evidence, and
+production promote sign-off.
 
 ### 8. Webhook DLQ
 
@@ -339,6 +346,11 @@ POST /v1/admin/queues/:name/clear-failed
 POST /v1/admin/queues/:name/clear
 POST /v1/admin/billing/pos/checkout
 POST /v1/admin/billing/pos/status
+POST /v1/admin/billing/pos/route-preview
+POST /v1/admin/billing/pos/charge
+POST /v1/admin/billing/pos/refund
+GET  /v1/admin/billing/pos/timeline
+GET  /v1/admin/billing/pos/reconciliation
 ```
 
 ### Response Formats

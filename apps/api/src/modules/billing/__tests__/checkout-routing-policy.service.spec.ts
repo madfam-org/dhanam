@@ -170,4 +170,48 @@ describe('CheckoutRoutingPolicyService', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('routing matrix', () => {
+    const matrix: Array<{
+      label: string;
+      context: Partial<CheckoutRoutingContext>;
+      expectedProvider: string;
+    }> = [
+      {
+        label: 'karafiel MX',
+        context: { product: 'karafiel', countryCode: 'MX', plan: 'pro' },
+        expectedProvider: 'stripe_mx',
+      },
+      {
+        label: 'dhanam US',
+        context: { product: 'dhanam', countryCode: 'US', plan: 'essentials' },
+        expectedProvider: 'paddle',
+      },
+      {
+        label: 'tezca CA',
+        context: { product: 'tezca', countryCode: 'CA', plan: 'pro_yearly' },
+        expectedProvider: 'paddle',
+      },
+      {
+        label: 'dhanam BR',
+        context: { product: 'dhanam', countryCode: 'BR', plan: 'premium' },
+        expectedProvider: 'paddle',
+      },
+    ];
+
+    it.each(matrix)(
+      'resolveProvider routes $label to $expectedProvider',
+      ({ context, expectedProvider }) => {
+        const decision = service.resolveProvider({ ...baseContext, ...context });
+        expect(decision.provider).toBe(expectedProvider);
+      }
+    );
+
+    it.each(matrix)('preview returns resolvable metadata for $label', async ({ context }) => {
+      const preview = await service.preview({ ...baseContext, ...context });
+      expect(preview.priceIdResolvable).toBe(true);
+      expect(preview.provider).toBeTruthy();
+      expect(preview.routeReason).toBeTruthy();
+    });
+  });
 });

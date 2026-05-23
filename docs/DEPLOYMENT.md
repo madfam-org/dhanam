@@ -277,9 +277,11 @@ digest patch commit it creates does not trigger a second staging build.
 Current status as of the 2026-05-20 wrap-up: `Deploy to Staging` run
 `26196989053` built and signed all three images for `dd58fb39`, committed
 staging digest refresh `7f7a0248`, passed the public API smoke at
-`https://staging-api.dhan.am/health`, and passed web/admin route checks that
-prove the staging API origin. Treat staging as the production-promotion gate
-only when the latest candidate has equivalent hosted smoke evidence.
+`https://staging-api.dhan.am/health`, passed web/admin route checks that
+prove the staging API origin, and runs `scripts/staging-commercial-smoke.sh`
+(public billing tier always; admin tier when GitHub secrets are configured).
+Treat staging as the production-promotion gate only when the latest candidate
+has equivalent hosted smoke evidence.
 
 Required staging hostnames:
 

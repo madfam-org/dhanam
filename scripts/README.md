@@ -186,6 +186,28 @@ before and after promotion.
 Add `--include-staging` only after the staging ArgoCD Application, namespace,
 secrets, and tunnel routes are active.
 
+### `staging-commercial-smoke.sh`
+
+WS1 commercial billing smoke for staging (and production when `STAGING_API_URL`
+is pointed at prod). Validates public catalog/pricing endpoints and admin POS
+route gates. Optional authenticated tier exercises route preview, timeline, and
+reconciliation when `STAGING_COMMERCIAL_ADMIN_TOKEN` is set.
+
+Also runs automatically at the end of `.github/workflows/deploy-staging.yml`.
+
+**Usage:**
+
+```bash
+./scripts/staging-commercial-smoke.sh
+
+STAGING_API_URL=https://staging-api.dhan.am \
+  STAGING_COMMERCIAL_ADMIN_TOKEN='…' \
+  STAGING_COMMERCIAL_SMOKE_USER_ID='…' \
+  ./scripts/staging-commercial-smoke.sh
+```
+
+See [Commercial GA Execution](../docs/COMMERCIAL_GA_EXECUTION.md).
+
 ### `production-rollout-proof.js`
 
 Compares the digest-pinned production manifest with the live ArgoCD

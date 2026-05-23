@@ -52,15 +52,15 @@ Dhanam is considered fully stable only when all of these are true:
 
 ## Current Position
 
-| Area                      | Current estimate | Status                                                                                                          |
-| ------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------- |
-| Codebase and CI           | 98%              | Hosted CI, lint/typecheck, coverage, and staging deploy are green for latest pushed source.                     |
-| Public production surface | 99%              | Public DNS, TLS, redirects, app/admin/API liveness, and full API health are green.                              |
-| API runtime health        | 99%              | DB, Redis, queues, Belvo, and optional external checks are up; failed queue count is zero.                      |
-| Release and staging path  | 96%              | Staging deploy now passes API, web, admin, and staging API-origin smoke.                                        |
-| Ops control plane         | 88%              | ArgoCD production truth is healthy; Enclii still lacks key routine operation adapters.                          |
-| Commercial/POS stability  | 62%              | Catalog checkout is live; admin POS checkout/status source is landed; full POS/refund/ledger work remains.      |
-| Overall stability         | 95%              | Production and staging are healthy; remaining gap is Enclii coverage, commercial POS depth, and repeated proof. |
+| Area                      | Current estimate | Status                                                                                                                  |
+| ------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Codebase and CI           | 98%              | Hosted CI, lint/typecheck, coverage, and staging deploy are green for latest pushed source.                             |
+| Public production surface | 99%              | Public DNS, TLS, redirects, app/admin/API liveness, and full API health are green.                                      |
+| API runtime health        | 99%              | DB, Redis, queues, Belvo, and optional external checks are up; failed queue count is zero.                              |
+| Release and staging path  | 96%              | Staging deploy now passes API, web, admin, and staging API-origin smoke.                                                |
+| Ops control plane         | 88%              | ArgoCD production truth is healthy; Enclii still lacks key routine operation adapters.                                  |
+| Commercial/POS stability  | ~75%             | Unified routing + internal POS charge/refund/timeline/reconcile landed; CFDI proof and prod promote evidence remain.    |
+| Overall stability         | 95%              | Production and staging are healthy; remaining gap is Enclii coverage, commercial proof/sign-off, and repeated evidence. |
 
 ## Current Verification Snapshot
 
@@ -101,9 +101,13 @@ As of 2026-05-21:
 - Catalog-backed checkout plan slugs now route through `PriceResolver` instead
   of being rejected by the legacy local tier allowlist; unsupported generic
   slugs still fail closed rather than silently reusing premium pricing.
-- This source pass adds an admin-only internal POS checkout generator and fixes
-  admin pagination normalization and billing SDK history/provider type drift.
-  Full POS commercial readiness remains roadmap work.
+- Admin internal POS now includes unified checkout routing (when
+  `FEATURE_UNIFIED_CHECKOUT_ROUTING=true`), one-time charge/refund, provider
+  route preview, payment/refund timeline, and reconciliation views at `/pos`.
+  Staging commercial smoke runs from `deploy-staging.yml` via
+  `scripts/staging-commercial-smoke.sh`. G2 proof/sign-off (golden probes, DLQ
+  drill, CFDI timeline, prod promote evidence) is tracked in
+  [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md).
 
 ## Priority Roadmap
 
@@ -219,18 +223,18 @@ only a checkout/subscription backend.
 
 Work:
 
-- Unify checkout routing so `PaymentRouterService` or its successor is the
-  single policy path for country, provider, product, plan, currency, and price
-  source decisions.
+- **Landed:** Unified checkout routing via `CheckoutRoutingPolicyService` and
+  `FEATURE_UNIFIED_CHECKOUT_ROUTING`; admin POS charge/refund, route preview,
+  timeline, and reconciliation at `/pos`; staging commercial smoke in
+  `deploy-staging.yml`.
+- Unify remaining callers on the routing policy path so country, provider,
+  product, plan, currency, and price source decisions have one contract.
 - Keep Janua-routed billing disabled in commercial claims until non-empty
   secrets and end-to-end Janua checkout proof exist.
-- Expand the admin POS beyond checkout-link creation and Stripe session status:
-  - one-time line-item/cart charges;
-  - provider-complete payment/refund timeline;
-  - full and partial refunds;
-  - settlement/reconciliation state;
-  - Karafiel CFDI/egreso proof;
-  - provider route preview and audited override policy.
+- **Remaining POS/commercial depth:**
+  - Karafiel CFDI/egreso proof on routine charge/refund paths;
+  - audited provider override policy beyond route preview;
+  - settlement/reconciliation evidence in production promote workflow.
 - Bring Conekta direct to parity before treating it as commercially launched:
   webhook signature verification, event-id idempotency, linked `BillingEvent`
   writes, canonical `payment.*` fan-out, and DLQ coverage are source-landed;
@@ -349,6 +353,9 @@ Acceptance:
 
 Detailed phase breakdown, workstreams, risks, and GA sign-off checklist:
 [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md).
+
+**Commercial GA execution (G2):** week-by-week runbook and CI smoke configuration:
+[Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md).
 
 Summary:
 
