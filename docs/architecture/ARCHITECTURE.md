@@ -139,12 +139,12 @@ Current production deploys to MADFAM bare-metal Kubernetes via Enclii:
 - Domain manifest: `enclii.yaml`
 - GitHub workflows: `.github/workflows`
 
-Staging and production status as of 2026-05-20 is documented in
-[Stability Audit 2026-05-19](../STABILITY_AUDIT_2026-05-19.md). In short:
-hosted CI is green, staging API smoke passes, production rollout proof passes
-through ArgoCD, and full production API health is `healthy`. The remaining
-stability work is full staging web/admin smoke, staging-admin API/env proof,
-and Enclii adapter coverage for routine operations.
+Staging and production status as of 2026-05-22 is documented in
+[Stability Wrap-Up 2026-05-20](../STABILITY_WRAP_UP_2026-05-20.md). In short:
+hosted CI is green, staging API/web/admin smoke passes, production rollout proof
+passes through ArgoCD, and full production API health is `healthy`. Remaining
+work is Enclii adapter coverage, commercial POS depth, and repeated deploy proof
+— see [GA Remediation Roadmap](../GA_REMEDIATION_ROADMAP.md).
 
 ## Observability
 
@@ -173,5 +173,6 @@ and Enclii adapter coverage for routine operations.
 - [Deployment Guide](../DEPLOYMENT.md)
 - [Testing Overview](../testing/TEST_SUMMARY.md)
 - [API Reference](../API.md)
+- [Module index](../../apps/api/src/modules/README.md)
 - [Billing Module README](../../apps/api/src/modules/billing/README.md)
 - [Provider Orchestrator README](../../apps/api/src/modules/providers/orchestrator/README.md)

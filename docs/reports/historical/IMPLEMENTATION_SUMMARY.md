@@ -1,11 +1,10 @@
 # Dhanam "Blue Ocean Pivot" - Implementation Summary
 
 > [!NOTE]
-> Historical implementation report from 2025. This is not current production
-> status. For current stability, deployment, domains, and blockers, read
-> [STABILITY_WRAP_UP_2026-05-20.md](STABILITY_WRAP_UP_2026-05-20.md),
-> [STABILITY_AUDIT_2026-05-19.md](STABILITY_AUDIT_2026-05-19.md), and
-> [DEPLOYMENT.md](DEPLOYMENT.md).
+> Historical document. For current status read
+> [docs/README.md](../../README.md),
+> [STABILITY_WRAP_UP_2026-05-20.md](../../STABILITY_WRAP_UP_2026-05-20.md), and
+> [GA_REMEDIATION_ROADMAP.md](../../GA_REMEDIATION_ROADMAP.md).
 
 **Project**: Dhanam Ledger
 **Implementation**: Q1 Strategic Pivot + Enhancements
@@ -1218,7 +1217,7 @@ pnpm test:db
 
 - `docs/guides/GOAL_TRACKING_GUIDE.md` (1,500 lines)
 - `docs/guides/MONTE_CARLO_GUIDE.md` (1,500 lines)
-- `docs/IMPLEMENTATION_SUMMARY.md` (this file)
+- `docs/reports/historical/IMPLEMENTATION_SUMMARY.md` (this file)
 
 ---
 

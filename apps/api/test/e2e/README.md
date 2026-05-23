@@ -46,13 +46,16 @@ pnpm test:e2e --coverage
 
 # Run in watch mode
 pnpm test:e2e --watch
+
+# Export OpenAPI JSON (single e2e spec; requires DATABASE_URL + REDIS_URL)
+pnpm openapi:export
 ```
 
 ## Runtime Bootstrap
 
 E2E suites should use `helpers/e2e-app.helper.ts` to create the Nest app. The
-helper sets local auth mode before importing `AppModule`, disables external
-Plaid credentials, suppresses SMTP delivery, applies the shared validation pipe,
+helper sets local auth mode before importing `AppModule`, derives `REDIS_URL`
+from `REDIS_HOST`/`REDIS_PORT` when unset, disables external Plaid credentials, suppresses SMTP delivery, applies the shared validation pipe,
 and waits for Fastify readiness.
 
 Set `DATABASE_URL` and `REDIS_URL` explicitly when running against local

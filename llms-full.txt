@@ -1,6 +1,6 @@
 # Dhanam Full LLM Context
 
-Generated: 2026-05-20
+Generated: 2026-05-22
 
 ## Purpose
 
@@ -12,13 +12,15 @@ repository without depending on vendor-specific instruction files.
 1. `AGENTS.md`
 2. `README.md` if present
 3. `docs/README.md` for the current documentation map
-4. `docs/ROADMAP.md` for the current stability execution plan
-5. `docs/STABILITY_AUDIT_2026-05-19.md` for current stability state
-6. `docs/STABILITY_WRAP_UP_2026-05-20.md` for the latest stability wrap-up
-7. `docs/TECH_DEBT.md` for current active technical debt
-8. `docs/DOCUMENTATION_AUDIT_2026-05-19.md` for documentation status
-9. `ECOSYSTEM.md` if present
-10. Relevant files under `docs/`, `infra/`, `.github/workflows/`, and source
+4. `docs/GA_REMEDIATION_ROADMAP.md` for the full stability and GA program
+5. `docs/ROADMAP.md` for stability priorities P0–P8
+6. `docs/STABILITY_AUDIT_2026-05-19.md` for current stability state
+7. `docs/STABILITY_WRAP_UP_2026-05-20.md` for the latest stability wrap-up
+8. `docs/TECH_DEBT.md` for current active technical debt
+9. `docs/DOCUMENTATION_AUDIT_2026-05-22.md` for documentation corpus status
+10. `ECOSYSTEM.md` if present
+11. App and module docs: `apps/*/README.md`, `apps/api/src/modules/README.md`
+12. Relevant files under `docs/`, `infra/`, `.github/workflows/`, and source
    directories for the specific task
 
 ## Agent compatibility
@@ -43,11 +45,13 @@ gap or incident link.
 
 - `README.md`
 - `docs/README.md`
+- `docs/GA_REMEDIATION_ROADMAP.md`
 - `docs/ROADMAP.md`
 - `docs/STABILITY_AUDIT_2026-05-19.md`
 - `docs/STABILITY_WRAP_UP_2026-05-20.md`
 - `docs/TECH_DEBT.md`
-- `docs/DOCUMENTATION_AUDIT_2026-05-19.md`
+- `docs/DOCUMENTATION_AUDIT_2026-05-22.md`
+- `apps/api/src/modules/README.md`
 - `ECOSYSTEM.md`
 - `docs/`
 - `infra/`

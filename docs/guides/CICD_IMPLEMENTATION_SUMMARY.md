@@ -4,8 +4,9 @@
 > Historical CI implementation report from 2025. This is not current production
 > status. For current stability, deployment, domains, and blockers, read
 > [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md),
-> [../ROADMAP.md](../ROADMAP.md), and
-> [../testing/TEST_RESULTS.md](../testing/TEST_RESULTS.md).
+> [../ROADMAP.md](../ROADMAP.md),
+> [../testing/TEST_RESULTS.md](../testing/TEST_RESULTS.md), and
+> [../GA_REMEDIATION_ROADMAP.md](../GA_REMEDIATION_ROADMAP.md).
 
 **Date:** November 17, 2025
 **Session:** CI/CD Automation Setup
@@ -494,7 +495,7 @@ Everything above, PLUS:
 
 - [CICD_SETUP.md](../../.github/CICD_SETUP.md) - Detailed setup guide
 - [TEST_COVERAGE_GUIDE.md](../../apps/api/TEST_COVERAGE_GUIDE.md) - Testing guide
-- [TEST_IMPLEMENTATION_STATUS.md](../testing/TEST_IMPLEMENTATION_STATUS.md) -
+- [TEST_IMPLEMENTATION_STATUS.md](../reports/historical/testing/TEST_IMPLEMENTATION_STATUS.md) -
   historical test implementation status
 
 ---

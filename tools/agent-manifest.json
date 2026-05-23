@@ -3,7 +3,7 @@
   "name": "dhanam",
   "version": "0.1.0",
   "description": "Dhanam - MADFAM billing ledger boundary and LATAM-first personal finance app",
-  "lastUpdated": "2026-05-20",
+  "lastUpdated": "2026-05-22",
 
   "domains": {
     "production": {
@@ -142,9 +142,12 @@
     "llmsFullTxt": "llms-full.txt",
     "docsIndex": "docs/README.md",
     "roadmap": "docs/ROADMAP.md",
+    "gaRemediationRoadmap": "docs/GA_REMEDIATION_ROADMAP.md",
     "stabilityAudit": "docs/STABILITY_AUDIT_2026-05-19.md",
     "techDebt": "docs/TECH_DEBT.md",
-    "documentationAudit": "docs/DOCUMENTATION_AUDIT_2026-05-19.md",
+    "documentationAudit": "docs/DOCUMENTATION_AUDIT_2026-05-22.md",
+    "apiModuleIndex": "apps/api/src/modules/README.md",
+    "featureGuidesIndex": "docs/guides/README.md",
     "agentsMd": "AGENTS.md",
     "claudeMd": "CLAUDE.md",
     "spec": "https://llmstxt.org/",

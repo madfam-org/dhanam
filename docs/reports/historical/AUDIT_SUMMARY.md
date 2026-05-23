@@ -1,9 +1,10 @@
 # Dhanam Ledger - Comprehensive Codebase Audit Summary
 
 > [!NOTE]
-> Historical audit report from 2025. It is preserved for context and may mention
-> superseded infrastructure. Current stability truth lives in
-> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+> Historical document. For current status read
+> [docs/README.md](../../README.md),
+> [STABILITY_WRAP_UP_2026-05-20.md](../../STABILITY_WRAP_UP_2026-05-20.md), and
+> [GA_REMEDIATION_ROADMAP.md](../../GA_REMEDIATION_ROADMAP.md).
 
 **Audit Date:** 2025-11-20
 **Auditor:** Claude Code (Sonnet 4.5)

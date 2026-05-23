@@ -3,8 +3,9 @@
 > [!NOTE]
 > Historical remediation plan from 2025. It is superseded by
 > [../ROADMAP.md](../ROADMAP.md),
-> [../TECH_DEBT.md](../TECH_DEBT.md), and
-> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+> [../TECH_DEBT.md](../TECH_DEBT.md),
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md), and
+> [../GA_REMEDIATION_ROADMAP.md](../GA_REMEDIATION_ROADMAP.md).
 
 **Version:** 1.0
 **Date:** 2025-11-16

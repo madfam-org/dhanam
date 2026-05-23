@@ -1,5 +1,10 @@
 # Documentation Audit - 2026-05-19
 
+> [!NOTE]
+> Superseded for current planning by
+> [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md). This file
+> is kept for historical context from the May 2026 stability documentation pass.
+
 Last refreshed: 2026-05-20
 
 ## Scope
@@ -82,7 +87,7 @@ backlog, and the remaining Enclii adapter gaps.
 - `docs/API.md` is useful as a broad reference, but examples still include
   older `dhanam.io` support/status URLs in later sections. The live API surface
   should eventually be regenerated from Swagger/OpenAPI to avoid manual drift.
-- `docs/MOBILE.md`, `docs/DOGFOODING_QUICKSTART.md`, and
+- `docs/MOBILE.md`, `docs/reports/historical/DOGFOODING_QUICKSTART.md`, and
   `docs/architecture/DHANAM_CLI.md` still carry old local port assumptions in
   places. They are now treated as secondary/historical until refreshed.
 - `docs/architecture/SOFTWARE_SPEC.md` still contains AWS assumptions. It should

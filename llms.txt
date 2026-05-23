@@ -7,15 +7,18 @@ Compact LLM context index for this repository.
 - `AGENTS.md` — canonical agent operating instructions.
 - `README.md` — human/product overview when present.
 - `docs/README.md` — canonical documentation map.
-- `docs/ROADMAP.md` — current stability roadmap and execution order.
+- `docs/GA_REMEDIATION_ROADMAP.md` — full GA program (stability + commercial +
+  consumer); canonical implementation plan.
+- `docs/ROADMAP.md` — stability priorities P0–P8 and milestones M1–M7.
 - `docs/STABILITY_AUDIT_2026-05-19.md` — current stability, production,
   staging, DNS, health, and Enclii rollout status.
 - `docs/STABILITY_WRAP_UP_2026-05-20.md` — concise latest stability wrap-up,
   verification state, blockers, and next order of work.
 - `docs/TECH_DEBT.md` — current active technical debt and historical debt
   archive pointers.
-- `docs/DOCUMENTATION_AUDIT_2026-05-19.md` — docs accuracy, organization, and
-  link hygiene audit.
+- `docs/DOCUMENTATION_AUDIT_2026-05-22.md` — latest documentation corpus audit.
+- `docs/runbooks/BREAK_GLASS.md` — break-glass procedures when Enclii adapters are missing.
+- `docs/api/README.md` — OpenAPI export and API reference index.
 - `ECOSYSTEM.md` — MADFAM ecosystem and Enclii deployment context when present.
 - `llms-full.txt` — full context map and durable operating contract.
 - `tools/agent-manifest.json` — machine-readable repo metadata.

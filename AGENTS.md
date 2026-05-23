@@ -16,6 +16,11 @@ redirect and should not become the source of truth again.
 ## Required operating doctrine
 
 - Read this file before making repo changes.
+- Write all implementation artifacts in **English**: source code, comments,
+  commit messages, API contracts, admin/engineering copy in code, runbooks, and
+  technical documentation. End-user product strings use the i18n system
+  (Spanish, Portuguese, etc.); never use Chinese or other non-English text in
+  code or engineering docs.
 - Prefer existing repo conventions, scripts, and docs over introducing new
   patterns.
 - Preserve user work and never revert unrelated changes.
@@ -34,6 +39,7 @@ redirect and should not become the source of truth again.
 - `ECOSYSTEM.md`
 - `docs/`
 - `docs/STABILITY_WRAP_UP_2026-05-20.md`
+- `docs/GA_REMEDIATION_ROADMAP.md`
 - `infra/`
 - `.github/workflows/`
 

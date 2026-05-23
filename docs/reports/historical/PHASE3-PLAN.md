@@ -1,5 +1,11 @@
 # Phase 3: Advanced Features - Implementation Plan
 
+> [!NOTE]
+> Historical document. For current status read
+> [docs/README.md](../../README.md),
+> [STABILITY_WRAP_UP_2026-05-20.md](../../STABILITY_WRAP_UP_2026-05-20.md), and
+> [GA_REMEDIATION_ROADMAP.md](../../GA_REMEDIATION_ROADMAP.md).
+
 ## Overview
 
 Extend Dhanam's autonomous family office with sophisticated trading, scheduling, and tax optimization capabilities.

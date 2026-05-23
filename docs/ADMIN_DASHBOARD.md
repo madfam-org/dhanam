@@ -394,5 +394,5 @@ For technical implementation details, see:
 
 - [Admin Module Code](../apps/api/src/modules/admin/)
 - [Standalone Admin App](../apps/admin/) — production admin at admin.dhan.am
-- [Web-Embedded Admin (dev fallback)](<../apps/web/src/app/(admin)/>) — redirects to standalone in production
+- Web-embedded admin (dev fallback): `apps/web/src/app/(admin)/` — redirects to standalone in production
 - [Infrastructure Guide](./INFRASTRUCTURE.md)

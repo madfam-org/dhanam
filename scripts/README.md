@@ -199,6 +199,35 @@ ArgoCD is Healthy/Synced and the live API, web, and admin images match
 ./scripts/production-rollout-proof.js
 ```
 
+### `check-doc-links.py`
+
+Validates relative markdown links in documentation entrypoints.
+
+**Usage:**
+
+```bash
+python3 scripts/check-doc-links.py --primary
+python3 scripts/check-doc-links.py --all-docs
+```
+
+See [Documentation Audit 2026-05-22](../docs/DOCUMENTATION_AUDIT_2026-05-22.md).
+
+### `export-openapi.ts` (API package)
+
+Generates `docs/api/openapi.json` via the Jest e2e harness
+(`test/e2e/openapi-export.e2e-spec.ts`). Requires PostgreSQL, Redis, and
+migrations.
+
+**Usage:**
+
+```bash
+pnpm dev:infra
+pnpm db:push
+pnpm --filter @dhanam/api openapi:export
+```
+
+See [docs/api/README.md](../docs/api/README.md).
+
 ### `setup-local.sh`
 
 Sets up local infrastructure with Docker.

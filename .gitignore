@@ -22,6 +22,9 @@ out/
 .env.test.local
 .env.production.local
 
+# Generated API artifacts
+docs/api/openapi.json
+
 # IDE
 .vscode/
 .idea/

@@ -11,6 +11,9 @@
 
 ## Overview
 
+> **Break-glass:** [runbooks/BREAK_GLASS.md](runbooks/BREAK_GLASS.md) — when
+> Enclii adapters are missing and raw access is unavoidable.
+
 Dhanam deploys to bare-metal Kubernetes via **Enclii** (MADFAM's PaaS) and
 ArgoCD GitOps. The intended primary method is Enclii-controlled build/deploy
 plus manual promotion; the current public production runtime is the ArgoCD

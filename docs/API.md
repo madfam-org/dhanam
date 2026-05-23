@@ -1,5 +1,11 @@
 # Dhanam Ledger API Documentation
 
+> **Live OpenAPI:** When the API is running, Swagger UI is at `{base}/docs`
+> (e.g. `http://localhost:4010/docs` locally). Prefer Swagger for endpoint
+> accuracy; this file is a narrative index that may drift from source.
+>
+> **Export:** See [api/README.md](api/README.md) for `pnpm --filter @dhanam/api openapi:export`.
+
 ## Overview
 
 The Dhanam Ledger API is a RESTful API built with NestJS and Fastify, providing comprehensive financial management capabilities with ESG crypto insights.

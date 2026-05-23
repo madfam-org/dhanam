@@ -1,5 +1,10 @@
 # Analytics Services Test Implementation Summary
 
+> [!NOTE]
+> Historical document. For current status read [docs/README.md](../../../README.md),
+> [testing/TEST_RESULTS.md](../../../testing/TEST_RESULTS.md), and
+> [GA_REMEDIATION_ROADMAP.md](../../../GA_REMEDIATION_ROADMAP.md).
+
 **Date:** 2025-11-20
 **Branch:** claude/codebase-audit-01ErwLffCdKT96WKvDscCXgf
 **Objective:** Add comprehensive tests for analytics services created today

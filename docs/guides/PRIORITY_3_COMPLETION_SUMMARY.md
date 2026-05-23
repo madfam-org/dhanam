@@ -2,10 +2,11 @@
 
 > [!NOTE]
 > Historical implementation report from 2025. This is not current production
-> status. For current stability, deployment, domains, and blockers, read
+> For current stability, deployment, domains, and blockers, read
 > [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md),
-> [../ROADMAP.md](../ROADMAP.md), and
-> [../testing/TEST_RESULTS.md](../testing/TEST_RESULTS.md).
+> [../ROADMAP.md](../ROADMAP.md),
+> [../testing/TEST_RESULTS.md](../testing/TEST_RESULTS.md), and
+> [../GA_REMEDIATION_ROADMAP.md](../GA_REMEDIATION_ROADMAP.md).
 
 **Date**: 2025-11-16
 **Branch**: claude/analyze-codebase-01LvH3T5Ssvkeuyapn6dTyUb

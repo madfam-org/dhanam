@@ -1,5 +1,10 @@
 # Option B: Test Coverage Completion Plan
 
+> [!NOTE]
+> Historical document. For current status read [docs/README.md](../../../README.md),
+> [STABILITY_WRAP_UP_2026-05-20.md](../../../STABILITY_WRAP_UP_2026-05-20.md), and
+> [GA_REMEDIATION_ROADMAP.md](../../../GA_REMEDIATION_ROADMAP.md).
+
 **Goal:** Verify and achieve 80%+ test coverage across all critical modules
 
 ---
@@ -416,9 +421,9 @@ Based on:
 
 ## Resources
 
-- [TEST_COVERAGE_GUIDE.md](../../apps/api/TEST_COVERAGE_GUIDE.md)
+- [TEST_COVERAGE_GUIDE.md](../../../../apps/api/TEST_COVERAGE_GUIDE.md)
 - [TEST_IMPLEMENTATION_STATUS.md](TEST_IMPLEMENTATION_STATUS.md)
-- [CICD_SETUP.md](../../.github/CICD_SETUP.md)
+- [CICD_SETUP.md](../../../../.github/CICD_SETUP.md)
 
 ---
 

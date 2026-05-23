@@ -2,8 +2,8 @@
 
 > [!NOTE]
 > Historical test execution report. For current verification status, read
-> [TEST_RESULTS.md](TEST_RESULTS.md) and
-> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+> [TEST_RESULTS.md](../../../testing/TEST_RESULTS.md) and
+> [../STABILITY_WRAP_UP_2026-05-20.md](../../../STABILITY_WRAP_UP_2026-05-20.md).
 
 **Date**: 2025-11-16
 **Branch**: claude/analyze-codebase-01LvH3T5Ssvkeuyapn6dTyUb

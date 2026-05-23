@@ -61,6 +61,17 @@ jobs:
       - name: Run linter unit tests
         run: python3 -m unittest discover -s tests/fixtures/k8s-env-lint -p 'test_*.py' -v
 
+  doc-links:
+    name: Documentation link hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check primary documentation links
+        run: python3 scripts/check-doc-links.py --primary
+      - name: Check all docs/ links
+        run: python3 scripts/check-doc-links.py --all-docs
+
   validate:
     name: Validate Lockfile
     runs-on: ubuntu-latest

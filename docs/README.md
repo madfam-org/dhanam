@@ -1,6 +1,6 @@
 # Dhanam Documentation
 
-Last updated: 2026-05-21
+Last updated: 2026-05-22
 
 This is the canonical human and agent documentation map for Dhanam. Prefer this
 file over older phase summaries when choosing what to read first.
@@ -11,14 +11,17 @@ file over older phase summaries when choosing what to read first.
 | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | [Repository README](../README.md)                                   | Product overview, local quick start, common commands                               |
 | [Development Guide](DEVELOPMENT.md)                                 | Local setup, ports, env files, testing workflow                                    |
-| [Roadmap](ROADMAP.md)                                               | Current stability roadmap and path to 100 percent production confidence            |
+| [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)                 | Full program: technical stability GA, commercial GA, consumer GA (phases 0–6)      |
+| [Roadmap](ROADMAP.md)                                               | Stability priorities P0–P8 and milestones M1–M7                                    |
 | [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)     | Billing router and internal MADFAM POS completion plan                             |
 | [Deployment Guide](DEPLOYMENT.md)                                   | Enclii-first deploy, staging, rollback, current rollout blockers                   |
 | [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)         | Current truth about production, staging, DNS, health, and remaining stability gaps |
 | [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)     | Concise final status from the latest production-stability push                     |
 | [Tech Debt Register](TECH_DEBT.md)                                  | Current technical debt, active stability gaps, and historical debt archive         |
-| [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md) | Docs accuracy, organization, link hygiene, and remaining documentation debt        |
-| [API Reference](API.md)                                             | REST API overview and endpoint examples                                            |
+| [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md) | Latest corpus audit: coverage, interconnection, remediation backlog                |
+| [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md) | Prior audit (historical context)                                                   |
+| [API Reference](API.md)                                             | REST API narrative overview                                                        |
+| [API index](api/README.md)                                          | OpenAPI export, Swagger, specialized API docs                                      |
 | [Mobile Guide](MOBILE.md)                                           | React Native and Expo app notes                                                    |
 
 ## Architecture And Operations
@@ -30,8 +33,13 @@ file over older phase summaries when choosing what to read first.
 | [Infrastructure Guide](INFRASTRUCTURE.md)               | Monitoring, admin, and infrastructure notes                                       |
 | [Launch Operations](LAUNCH_OPERATIONS.md)               | Launch checklist and operator tasks                                               |
 | [Backup And Restore](BACKUP_RESTORE.md)                 | Backup and restore runbooks                                                       |
+| [Admin Dashboard](ADMIN_DASHBOARD.md)                   | Admin app features and routes                                                     |
 | [Sentry Setup](SENTRY_SETUP.md)                         | Error monitoring setup                                                            |
+| [Catalog Truth 2026-05-20](CATALOG_TRUTH_2026-05-20.md) | Product catalog drift gate and production sync truth                              |
 | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)       | Provider credential activation runbook                                            |
+| [PP.2 Staging Audit](PP_2_STAGING_AUDIT.md)             | Staging pipeline gap analysis (RFC 0001)                                          |
+| [Break-glass runbook](runbooks/BREAK_GLASS.md)          | Documented raw-access procedures when Enclii adapters are missing                 |
+| [Compliance appendix](../claudedocs/README.md)          | SOC2 / SRE historical procedures                                                  |
 
 Production operations are Enclii-first. Raw `kubectl`, `helm`, provider CLIs,
 SSH, `docker exec`, or direct container access are break-glass/bootstrap only;
@@ -39,18 +47,22 @@ record the missing Enclii adapter gap when raw access is unavoidable.
 
 ## Development And Testing
 
-| Document                                                      | Use                                                              |
-| ------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [Testing Overview](testing/TEST_SUMMARY.md)                   | Current test layers and how to run them                          |
-| [Latest Verification Snapshot](testing/TEST_RESULTS.md)       | Most recent local verification summary                           |
-| [API Test Coverage Guide](../apps/api/TEST_COVERAGE_GUIDE.md) | API Jest, coverage, chaos, and DB-backed test notes              |
-| [Migration Checklist](MIGRATION_CHECKLIST.md)                 | Historical Janua/domain migration notes                          |
-| [Dogfooding Quickstart](DOGFOODING_QUICKSTART.md)             | Historical internal dogfooding guide; verify commands before use |
+| Document                                                             | Use                                                              |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Testing Overview](testing/TEST_SUMMARY.md)                          | Current test layers and how to run them                          |
+| [Testing index](testing/README.md)                                   | Current vs archived test documentation                           |
+| [Latest Verification Snapshot](testing/TEST_RESULTS.md)              | Most recent local verification summary                           |
+| [API Test Coverage Guide](../apps/api/TEST_COVERAGE_GUIDE.md)        | API Jest, coverage, chaos, and DB-backed test notes              |
+| [Migration Checklist](MIGRATION_CHECKLIST.md)                        | Historical Janua/domain migration notes                          |
+| [Dogfooding Quickstart](reports/historical/DOGFOODING_QUICKSTART.md) | Historical internal dogfooding guide; verify commands before use |
 
 ## Product And Feature Guides
 
+Full guide index: [guides/README.md](guides/README.md).
+
 | Document                                                                       | Use                                        |
 | ------------------------------------------------------------------------------ | ------------------------------------------ |
+| [All feature guides](guides/README.md)                                         | Complete guide catalog                     |
 | [Billing Integration](guides/BILLING_INTEGRATION.md)                           | Billing and subscription integration notes |
 | [AI Categorization](guides/AI_CATEGORIZATION_GUIDE.md)                         | Transaction categorization workflow        |
 | [Goal Tracking](guides/GOAL_TRACKING_GUIDE.md)                                 | Goal tracking UX and behavior              |
@@ -76,17 +88,41 @@ record the missing Enclii adapter gap when raw access is unavoidable.
 | [ADR-006](adr/006-mobile-state-management.md)               | Mobile state management                |
 | [Conekta/Janua Dependency](adr/conekta-janua-dependency.md) | Billing dependency notes               |
 
+## RFCs And Research
+
+| Document                                                            | Use                         |
+| ------------------------------------------------------------------- | --------------------------- |
+| [Cross-Service Event Bus](rfcs/cross-service-event-bus.md)          | NATS event bus proposal     |
+| [Connect Marketplace](rfcs/connect-marketplace.md)                  | Marketplace integration RFC |
+| [Belvo Payments Evaluation](rfcs/belvo-payments-evaluation.md)      | Belvo payments evaluation   |
+| [Pricing Tiers](market-research/pricing-tiers.md)                   | Market research             |
+| [Competitive Benchmarks](market-research/competitive-benchmarks.md) | Competitive analysis        |
+
+## Infrastructure Docs
+
+| Document                                                   | Use                          |
+| ---------------------------------------------------------- | ---------------------------- |
+| [ArgoCD](../infra/k8s/argocd/README.md)                    | GitOps applications          |
+| [Monitoring manifests](../infra/k8s/monitoring/README.md)  | Prometheus, Grafana, alerts  |
+| [Enclii service specs](../infra/enclii/services/README.md) | Enclii reconciliation source |
+| [Scripts](../scripts/README.md)                            | Dev and ops scripts          |
+| [Doc link checker](../scripts/check-doc-links.py)          | Primary docs link hygiene    |
+
 ## App, Package, And Module Docs
 
 | Area                  | Docs                                                                                                              |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| API app               | [apps/api/README.md](../apps/api/README.md)                                                                       |
+| Web app               | [apps/web/README.md](../apps/web/README.md)                                                                       |
 | Admin app             | [apps/admin/README.md](../apps/admin/README.md)                                                                   |
+| Mobile app            | [apps/mobile/README.md](../apps/mobile/README.md)                                                                 |
+| API module index      | [apps/api/src/modules/README.md](../apps/api/src/modules/README.md)                                               |
 | API e2e               | [apps/api/test/e2e/README.md](../apps/api/test/e2e/README.md)                                                     |
-| Billing API module    | [apps/api/src/modules/billing/README.md](../apps/api/src/modules/billing/README.md)                               |
+| Billing module        | [apps/api/src/modules/billing/README.md](../apps/api/src/modules/billing/README.md)                               |
 | Provider orchestrator | [apps/api/src/modules/providers/orchestrator/README.md](../apps/api/src/modules/providers/orchestrator/README.md) |
-| API modules           | Module-local `README.md` files under [apps/api/src/modules](../apps/api/src/modules/)                             |
 | UI package            | [packages/ui/README.md](../packages/ui/README.md)                                                                 |
 | Shared package        | [packages/shared/README.md](../packages/shared/README.md)                                                         |
+| Config package        | [packages/config/README.md](../packages/config/README.md)                                                         |
 | Billing SDK           | [packages/billing-sdk/README.md](../packages/billing-sdk/README.md)                                               |
 | ESG package           | [packages/esg/README.md](../packages/esg/README.md)                                                               |
 | Simulations package   | [packages/simulations/README.md](../packages/simulations/README.md)                                               |
@@ -101,17 +137,29 @@ record the missing Enclii adapter gap when raw access is unavoidable.
 | [llms-full.txt](../llms-full.txt)                   | Expanded LLM context map            |
 | [agent-manifest.json](../tools/agent-manifest.json) | Machine-readable repo metadata      |
 
-For agents: read `AGENTS.md`, this index, `STABILITY_AUDIT_2026-05-19.md`,
-and the specific source/module docs for the files you are touching.
+For agents: read `AGENTS.md`, this index,
+[Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md), and the
+specific app/module docs for the files you are touching.
 
 ## Historical Reports
 
-The `docs/reports/`, `docs/testing/`, `docs/guides/*SUMMARY*.md`, and phase
-summary files preserve implementation history. They are useful for context, but
-they may mention superseded AWS/Fargate, `dhanam.io`, old ports, or earlier test
-counts. The archived March 2026 tech-debt log lives at
-[reports/TECH_DEBT_2026-03-21.md](reports/TECH_DEBT_2026-03-21.md). When a
-historical report conflicts with this index, `AGENTS.md`, `DEPLOYMENT.md`,
+The [docs/reports/historical/](reports/historical/README.md) tree preserves
+implementation history (phase summaries, audits, archived test sessions). Useful
+for context, but may mention superseded AWS/Fargate, `dhanam.io`, old ports, or
+earlier test counts.
+
+| Document                                                                              | Use                                         |
+| ------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [Historical index](reports/historical/README.md)                                      | Archive layout and current-status links     |
+| [Phase 2 summary](reports/historical/PHASE2-SUMMARY.md)                               | Transaction execution implementation (2025) |
+| [Blue Ocean implementation summary](reports/historical/IMPLEMENTATION_SUMMARY.md)     | Q1 pivot report (2025)                      |
+| [Phase 3 plan](reports/historical/PHASE3-PLAN.md)                                     | Advanced features plan (historical)         |
+| [Implementation progress](reports/historical/architecture/IMPLEMENTATION_PROGRESS.md) | Competitive parity roadmap status (2025)    |
+| [Audit summary](reports/historical/AUDIT_SUMMARY.md)                                  | Codebase audit (2025)                       |
+| [Archived test sessions](reports/historical/testing/)                                 | Test coverage session reports               |
+| [March 2026 tech-debt log](reports/TECH_DEBT_2026-03-21.md)                           | Archived tech-debt snapshot                 |
+
+When a historical report conflicts with this index, `AGENTS.md`, `DEPLOYMENT.md`,
 current manifests, or source code, treat the current files as authoritative and
 update the report only if it is still used operationally.
 
@@ -122,5 +170,6 @@ update the report only if it is still used operationally.
 - Link from this index when adding a durable doc.
 - Mark historical or session-specific docs explicitly.
 - Use relative links for internal references.
+- Write implementation and technical documentation in English only.
 - Keep production operations Enclii-first and record any missing Enclii adapter
   rather than normalizing raw infrastructure access.

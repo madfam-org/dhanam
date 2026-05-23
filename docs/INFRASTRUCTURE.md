@@ -4,8 +4,11 @@ Last updated: 2026-05-20
 
 Current production infrastructure is Enclii-managed bare-metal Kubernetes with
 Cloudflare Tunnel ingress. For deploy/runbook truth, read
-[DEPLOYMENT.md](DEPLOYMENT.md) and
+[DEPLOYMENT.md](DEPLOYMENT.md),
+[runbooks/BREAK_GLASS.md](runbooks/BREAK_GLASS.md), and
 [STABILITY_AUDIT_2026-05-19.md](STABILITY_AUDIT_2026-05-19.md) first.
+
+For SOC2 and SRE procedure drafts, see [claudedocs/README.md](../claudedocs/README.md).
 
 ## Overview
 

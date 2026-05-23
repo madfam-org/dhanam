@@ -1,13 +1,25 @@
 # Dhanam Roadmap
 
-Last updated: 2026-05-21
+Last updated: 2026-05-22
 
 This roadmap tracks the current path to a defensible 100 percent stable Dhanam
 codebase and production implementation across `dhan.am`, `www.dhan.am`,
 `app.dhan.am`, `admin.dhan.am`, and `api.dhan.am`.
 
+**GA program:** For the full phased implementation plan toward technical
+stability GA, commercial GA, and consumer product GA, read
+[GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md). That document is the
+canonical execution program; this file defines stability priorities P0–P8 and
+milestones M1–M5.
+
+**Implementation language:** All code, comments, commits, API contracts, and
+technical documentation must be written in English. Product UI strings use the
+existing i18n system (Spanish, Portuguese, etc.).
+
 Read this with:
 
+- [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)
+- [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)
 - [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)
 - [Tech Debt Register](TECH_DEBT.md)
@@ -335,15 +347,20 @@ Acceptance:
 
 ## Execution Order
 
+Detailed phase breakdown, workstreams, risks, and GA sign-off checklist:
+[GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md).
+
+Summary:
+
 1. Repair or formalize production rollout truth under one authoritative control
-   plane.
+   plane (Phase 1, M3).
 2. Complete commercial billing/POS stability: router unification, refund and
-   reconciliation controls, and product webhook contract proof.
+   reconciliation controls, and product webhook contract proof (Phase 3, M4, G2).
 3. Wire Enclii migration repair, queue remediation, policy waiver apply, and
-   namespace-aware tunnel-route apply.
-4. Encode provider health semantics and tighten lower-severity code/docs debt.
+   namespace-aware tunnel-route apply (Phase 2, M5).
+4. Encode provider health semantics and consumer product GA (Phases 4–5, G3).
 5. Collect repeated clean deploy/rollback evidence with no undocumented manual
-   path.
+   path (Phase 6).
 
 ## Stability Milestones
 
@@ -354,6 +371,9 @@ Acceptance:
 | M3        | Production rollout truth is authoritative and post-deploy digest assertions pass.              | 97-98%             |
 | M4        | Internal POS can charge, inspect, refund, reconcile, and prove product webhook delivery.       | 98% commercial     |
 | M5        | Enclii adapter gaps closed; provider health semantics encoded; lower-severity debt controlled. | 99%+               |
+| M6        | Consumer product GA per agreed scope (web and/or mobile).                                      | G3                 |
+| M7        | Operational proof: drills, 30-day clean health, GA sign-off checklist complete.                | 100%               |
 
 The final 1 percent is operational proof over repeated clean deploys, clean
-health windows, and absence of undocumented manual paths.
+health windows, and absence of undocumented manual paths. See
+[GA Remediation Roadmap — Phase 6](GA_REMEDIATION_ROADMAP.md#phase-6--operational-proof-final-1).

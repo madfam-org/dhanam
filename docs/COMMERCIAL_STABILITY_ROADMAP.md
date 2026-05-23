@@ -1,11 +1,15 @@
 # Commercial Stability Roadmap
 
-Last updated: 2026-05-21
+Last updated: 2026-05-22
 
 This document tracks Dhanam's path from production-stable billing backbone to a
 full MADFAM internal billing router and POS. Read it with
-[Roadmap](ROADMAP.md), [Tech Debt](TECH_DEBT.md), and
+[GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md) (Phases 3–4, commercial GA
+gate G2), [Roadmap](ROADMAP.md), [Tech Debt](TECH_DEBT.md), and
 [`apps/api/src/modules/billing/README.md`](../apps/api/src/modules/billing/README.md).
+
+**Implementation language:** Code, comments, commits, and technical docs are
+English only. Product UI strings use i18n.
 
 ## Current Status
 

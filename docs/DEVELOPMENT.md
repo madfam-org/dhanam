@@ -177,6 +177,22 @@ Visual regression is opt-in:
 RUN_VISUAL_REGRESSION=true pnpm --dir apps/web exec playwright test e2e/visual-regression.spec.ts
 ```
 
+Documentation link hygiene:
+
+```bash
+python3 scripts/check-doc-links.py --primary
+python3 scripts/check-doc-links.py --all-docs
+```
+
+OpenAPI JSON export (requires `pnpm dev:infra` and `pnpm db:push`):
+
+```bash
+pnpm --filter @dhanam/api openapi:export
+```
+
+See [api/README.md](api/README.md) for port-conflict notes when local Postgres
+already uses `5432`.
+
 ## Database
 
 ```bash

@@ -91,8 +91,8 @@ These are not unit-test failures, but they block full-system stability:
   admin were not promoted from staging images because their public API/app/OIDC
   values are build-time bound.
 - The manual K8s workflows can build, sign, and commit production digests.
-  Break-glass only: raw `kubectl set image` rollout is opt-in with
-  `direct_k8s_deploy=true` because GitHub runners cannot currently reach the
+  Break-glass only (not Enclii-first): raw `kubectl set image` rollout is opt-in
+  with `direct_k8s_deploy=true` because GitHub runners cannot currently reach the
   cluster API. Their digest
   patch step no longer downloads the volatile upstream kustomize installer.
 - Production API liveness and full health pass. Full health returns

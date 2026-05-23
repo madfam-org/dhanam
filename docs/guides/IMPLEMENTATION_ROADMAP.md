@@ -2,8 +2,9 @@
 
 > [!NOTE]
 > Historical implementation roadmap. For current production-stability work, use
-> [../ROADMAP.md](../ROADMAP.md) and
-> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md).
+> [../ROADMAP.md](../ROADMAP.md),
+> [../STABILITY_WRAP_UP_2026-05-20.md](../STABILITY_WRAP_UP_2026-05-20.md), and
+> [../GA_REMEDIATION_ROADMAP.md](../GA_REMEDIATION_ROADMAP.md).
 
 **Status**: In Progress
 **Last Updated**: 2025-11-17

@@ -12,6 +12,15 @@ function disableExternalProviderCredentialsForE2E() {
   process.env.PLAID_SECRET = '';
 }
 
+function configureE2EInfrastructureEnvironment() {
+  if (!process.env.REDIS_URL) {
+    const host = process.env.REDIS_HOST || 'localhost';
+    const port = process.env.REDIS_PORT || '6379';
+    const db = process.env.REDIS_DB || '0';
+    process.env.REDIS_URL = `redis://${host}:${port}/${db}`;
+  }
+}
+
 function configureE2EAuthEnvironment() {
   process.env.AUTH_MODE = 'local';
   process.env.ENABLE_LOCAL_AUTH = 'true';
@@ -31,6 +40,7 @@ function configureE2EAuthEnvironment() {
  *  - Global prefix v1
  */
 export async function createE2EApp(): Promise<NestFastifyApplication> {
+  configureE2EInfrastructureEnvironment();
   configureE2EAuthEnvironment();
   disableExternalProviderCredentialsForE2E();
   const { AppModule } = await import('../../../src/app.module');

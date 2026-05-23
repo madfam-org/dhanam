@@ -8,7 +8,8 @@ Historical implementation logs are preserved under [reports](reports/).
 
 For full production and staging context, read this with
 [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md).
-For execution order and milestone targets, read the [Roadmap](ROADMAP.md).
+For execution order and milestone targets, read the
+[GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md) and [Roadmap](ROADMAP.md).
 
 ## Operating Rules
 
@@ -22,18 +23,18 @@ For execution order and milestone targets, read the [Roadmap](ROADMAP.md).
 
 ## Active Debt
 
-| ID      | Area                       | Severity | Status   | Current impact                                                                                                                   | Primary reference                                           |
-| ------- | -------------------------- | -------- | -------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| TD-1002 | Staging activation         | Medium   | Active   | Staging API/web/admin smoke is green; remaining debt is repeated proof and Enclii-owned namespace-aware route apply.             | [Deployment Guide](DEPLOYMENT.md)                           |
-| TD-1003 | Production rollout truth   | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth.       | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
-| TD-1004 | Enclii adapter coverage    | Medium   | Active   | Migration repair, policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.           | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
-| TD-1005 | Provider health semantics  | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                                    | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)           |
-| TD-1006 | React 18 global pin        | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                                | [package.json](../package.json)                             |
-| TD-1007 | Mobile test depth          | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                       | [Mobile Guide](MOBILE.md)                                   |
-| TD-1008 | Historical docs cleanup    | Low      | Active   | Some reports and secondary guides still mention old AWS/Fargate, ports, hosts, or test counts.                                   | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-19.md)    |
-| TD-1009 | Billing router unification | High     | Active   | `PaymentRouterService` exists, but `/billing/upgrade` and public checkout still use Janua-first/direct-Stripe lifecycle routing. | [Billing README](../apps/api/src/modules/billing/README.md) |
-| TD-1010 | Internal POS completeness  | High     | Active   | Admin POS checkout-link creation is source-landed; refunds, one-time charges, settlement, reconciliation, and CFDI proof remain. | [Roadmap](ROADMAP.md)                                       |
-| TD-1011 | Janua commercial readiness | High     | Active   | Janua billing secrets were present with zero length in production proof; Janua-routed billing must not be claimed live.          | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
+| ID      | Area                       | Severity | Status   | Current impact                                                                                                                                                               | Primary reference                                           |
+| ------- | -------------------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| TD-1002 | Staging activation         | Medium   | Active   | Staging API/web/admin smoke is green; remaining debt is repeated proof and Enclii-owned namespace-aware route apply.                                                         | [Deployment Guide](DEPLOYMENT.md)                           |
+| TD-1003 | Production rollout truth   | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth.                                                   | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
+| TD-1004 | Enclii adapter coverage    | Medium   | Active   | Migration repair, policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.                                                       | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
+| TD-1005 | Provider health semantics  | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                                                                                | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)           |
+| TD-1006 | React 18 global pin        | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                                                                            | [package.json](../package.json)                             |
+| TD-1007 | Mobile test depth          | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                                                                   | [Mobile Guide](MOBILE.md)                                   |
+| TD-1008 | Historical docs cleanup    | Low      | Active   | Phase summaries archived under `docs/reports/historical/`; GA banners on guides; OpenAPI export script verified locally. Long-term: generate `API.md` sections from OpenAPI. | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-22.md)    |
+| TD-1009 | Billing router unification | High     | Active   | `PaymentRouterService` exists, but `/billing/upgrade` and public checkout still use Janua-first/direct-Stripe lifecycle routing.                                             | [Billing README](../apps/api/src/modules/billing/README.md) |
+| TD-1010 | Internal POS completeness  | High     | Active   | Admin POS checkout-link creation is source-landed; refunds, one-time charges, settlement, reconciliation, and CFDI proof remain.                                             | [Roadmap](ROADMAP.md)                                       |
+| TD-1011 | Janua commercial readiness | High     | Active   | Janua billing secrets were present with zero length in production proof; Janua-routed billing must not be claimed live.                                                      | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)        |
 
 ## Remediation Notes
 
@@ -174,9 +175,10 @@ Current mobile tests cover only the foundation slice. Priority additions:
 
 ### TD-1008: Historical Docs Cleanup
 
-Historical reports are allowed to preserve old context, but they need a clear
-historical banner if they mention superseded infrastructure, hosts, ports, or
-test counts. Current docs should stay linked from [docs/README.md](README.md).
+Phase summaries (`PHASE2-SUMMARY`, `IMPLEMENTATION_SUMMARY`, `PHASE3-PLAN`),
+dogfooding quick wins, audit summary, and `architecture/IMPLEMENTATION_PROGRESS`
+now live under `docs/reports/historical/` with GA-linked banners. Remaining
+low-priority work: long-term `API.md` generation from OpenAPI export.
 
 ## Recently Closed Debt
 
