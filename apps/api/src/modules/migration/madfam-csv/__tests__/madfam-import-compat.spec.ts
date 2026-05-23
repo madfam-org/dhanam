@@ -33,11 +33,13 @@ describe('madfam-import-compat', () => {
     const prisma = {
       userSpace: {
         findMany: jest.fn(),
+        findFirst: jest.fn(),
       },
     } as any;
 
     beforeEach(() => {
       prisma.userSpace.findMany.mockReset();
+      prisma.userSpace.findFirst.mockReset();
     });
 
     it('maps legacy -afac accounts to partner role', async () => {
@@ -102,6 +104,43 @@ describe('madfam-import-compat', () => {
       expect(
         await discoverMadfamImportSpaces(prisma, 'user-1', SYNTHETIC_MADFAM_CSV_ROUTING)
       ).toBeNull();
+    });
+    it('fills personal role from MADFAM_SPACE_NAME_PERSONAL when no -personal accounts', async () => {
+      prisma.userSpace.findMany.mockResolvedValue([
+        {
+          space: {
+            id: 'space-business',
+            name: 'Business Co',
+            type: 'business',
+            accounts: [{ providerAccountId: 'madfam-csv-bbva-empresarial' }],
+          },
+        },
+        {
+          space: {
+            id: 'space-partner',
+            name: 'Partner Co',
+            type: 'business',
+            accounts: [{ providerAccountId: 'madfam-csv-banamex-joy-afac' }],
+          },
+        },
+      ]);
+
+      const prev = process.env.MADFAM_SPACE_NAME_PERSONAL;
+      process.env.MADFAM_SPACE_NAME_PERSONAL = 'Personal Space';
+      prisma.userSpace.findFirst.mockResolvedValue({
+        space: { id: 'space-personal', name: 'Personal Space', type: 'personal' },
+      });
+
+      const discovered = await discoverMadfamImportSpaces(
+        prisma,
+        'user-1',
+        SYNTHETIC_MADFAM_CSV_ROUTING
+      );
+      expect(discovered).toHaveLength(3);
+      expect(discovered!.find((s) => s.role === 'personal')!.spaceId).toBe('space-personal');
+
+      if (prev === undefined) delete process.env.MADFAM_SPACE_NAME_PERSONAL;
+      else process.env.MADFAM_SPACE_NAME_PERSONAL = prev;
     });
   });
 });

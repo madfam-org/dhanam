@@ -31,9 +31,39 @@ function inferRoleFromProviderAccountId(providerAccountId: string): SpaceRole | 
   return 'business';
 }
 
+function spaceRoleEnvKey(role: SpaceRole): string {
+  return `MADFAM_SPACE_NAME_${role.toUpperCase()}` as const;
+}
+
+function envSpaceNameForRole(role: SpaceRole): string | undefined {
+  return process.env[spaceRoleEnvKey(role)]?.trim() || undefined;
+}
+
+async function resolveSpaceForRoleFromEnv(
+  prisma: PrismaClient,
+  userId: string,
+  role: SpaceRole
+): Promise<{ spaceId: string; name: string; type: string } | null> {
+  const envName = envSpaceNameForRole(role);
+  if (!envName) return null;
+
+  const userSpace = await prisma.userSpace.findFirst({
+    where: { userId, space: { name: envName } },
+    include: { space: true },
+  });
+  if (!userSpace) return null;
+
+  return {
+    spaceId: userSpace.space.id,
+    name: userSpace.space.name,
+    type: userSpace.space.type,
+  };
+}
+
 /**
  * Discover space bindings from existing madfam-csv import rows for a user.
- * Used when operator env space names are unset but prod already has data.
+ * Missing roles (common: personal with no import accounts yet) can be filled
+ * from MADFAM_SPACE_NAME_* env vars pointing at existing prod spaces.
  */
 export async function discoverMadfamImportSpaces(
   prisma: PrismaClient,
@@ -63,7 +93,6 @@ export async function discoverMadfamImportSpaces(
 
       const existing = roleToSpace.get(role);
       if (existing && existing.spaceId !== space.id) {
-        // Ambiguous: two spaces claim the same role — require explicit env names.
         return null;
       }
       roleToSpace.set(role, {
@@ -75,6 +104,14 @@ export async function discoverMadfamImportSpaces(
   }
 
   const roles: SpaceRole[] = ['business', 'partner', 'personal'];
+  for (const role of roles) {
+    if (roleToSpace.has(role)) continue;
+    const fromEnv = await resolveSpaceForRoleFromEnv(prisma, userId, role);
+    if (fromEnv) {
+      roleToSpace.set(role, fromEnv);
+    }
+  }
+
   if (roles.some((role) => !roleToSpace.has(role))) {
     return null;
   }

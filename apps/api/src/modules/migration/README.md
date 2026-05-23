@@ -50,7 +50,16 @@ be duplicated on re-import:
 5. Preflight: `pnpm --filter @dhanam/api tsx scripts/verify-madfam-import-compat.ts`
 6. Operator env template: `apps/api/scripts/madfam-import.env.example`
 
-Scripts: `apps/api/scripts/import-madfam-csv.ts`, `verify-madfam-import-compat.ts`
+**Production bootstrap (kubectl):**
+
+```bash
+cd apps/api
+bash scripts/bootstrap-madfam-prod-env.sh      # writes madfam-import.local.env (gitignored)
+bash scripts/run-prod-madfam-import-verify.sh  # read-only continuity check in-cluster
+```
+
+Scripts: `apps/api/scripts/import-madfam-csv.ts`, `verify-madfam-import-compat.ts`,
+`bootstrap-madfam-prod-env.sh`, `run-prod-madfam-import-verify.sh`
 
 ## Tests
 
