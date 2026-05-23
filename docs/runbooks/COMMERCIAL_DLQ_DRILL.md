@@ -29,7 +29,7 @@ Operator drill for product-webhook dead-letter recovery on **staging** before pr
 | Replay HTTP status    | `200`                            |
 | Operator              | name + date                      |
 
-Attach evidence to [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md) G2-3 checklist.
+Attach evidence to [Commercial GA Execution](../COMMERCIAL_GA_EXECUTION.md) G2-3 checklist.
 
 ## Rollback
 
