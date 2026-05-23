@@ -15,9 +15,9 @@ test.describe('MADFAM POS', () => {
   });
 
   test('should render subscription checkout panel by default', async ({ adminPage }) => {
-    await expect(adminPage.getByText('Checkout Request')).toBeVisible();
-    await expect(adminPage.getByText('Checkout Link')).toBeVisible();
-    await expect(adminPage.getByText('Checkout Status')).toBeVisible();
+    await expect(adminPage.getByRole('heading', { name: 'Checkout Request' })).toBeVisible();
+    await expect(adminPage.getByRole('heading', { name: 'Checkout Link' })).toBeVisible();
+    await expect(adminPage.getByRole('heading', { name: 'Checkout Status' })).toBeVisible();
   });
 
   test('should show route preview form', async ({ adminPage }) => {
@@ -28,16 +28,16 @@ test.describe('MADFAM POS', () => {
 
   test('should show charge and refund forms', async ({ adminPage }) => {
     await adminPage.getByRole('tab', { name: 'Charge / Refund' }).click();
-    await expect(adminPage.getByText('Direct Charge')).toBeVisible();
-    await expect(adminPage.getByText('Refund')).toBeVisible();
+    await expect(adminPage.getByRole('heading', { name: 'Direct Charge' })).toBeVisible();
+    await expect(adminPage.getByRole('heading', { name: 'Refund' })).toBeVisible();
     await expect(adminPage.getByRole('button', { name: 'Create charge' })).toBeVisible();
     await expect(adminPage.getByRole('button', { name: 'Issue refund' })).toBeVisible();
   });
 
   test('should show timeline and reconciliation panels', async ({ adminPage }) => {
     await adminPage.getByRole('tab', { name: 'Timeline / Reconcile' }).click();
-    await expect(adminPage.getByText('POS Timeline')).toBeVisible();
-    await expect(adminPage.getByText('Reconciliation')).toBeVisible();
+    await expect(adminPage.getByRole('heading', { name: 'POS Timeline' })).toBeVisible();
+    await expect(adminPage.getByRole('heading', { name: 'Reconciliation' })).toBeVisible();
     await expect(adminPage.getByRole('button', { name: 'Load timeline' })).toBeVisible();
   });
 });

@@ -153,3 +153,27 @@
   min-width: 2.75rem;
   right: 0.25rem;
 }
+
+/* Janua SignIn muted copy — meet WCAG AA on white card when @janua/ui classes are purged */
+.admin-janua-sign-in .rounded-lg.border.bg-card p,
+.admin-janua-sign-in .rounded-lg.border.bg-card span:not(.sr-only),
+.admin-janua-sign-in .rounded-lg.border.bg-card label,
+.admin-janua-sign-in .rounded-lg.border.bg-card a {
+  color: hsl(215 16% 40%);
+}
+
+.admin-janua-sign-in .admin-oauth-github {
+  background-color: #24292e !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.admin-janua-sign-in .admin-oauth-github:hover {
+  background-color: #2f363d !important;
+}
+
+.admin-janua-sign-in .admin-oauth-google {
+  background-color: #ffffff !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}

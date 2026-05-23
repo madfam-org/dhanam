@@ -1,12 +1,21 @@
 import type { Config } from 'tailwindcss';
+import { createRequire } from 'module';
+import path from 'path';
+
+const require = createRequire(import.meta.url);
+
+function januaUiContentGlob(): string {
+  try {
+    const pkgJson = require.resolve('@janua/ui/package.json');
+    return path.join(path.dirname(pkgJson), 'src/**/*.{ts,tsx}');
+  } catch {
+    return '../../node_modules/@janua/ui/src/**/*.{ts,tsx}';
+  }
+}
 
 const config: Config = {
   darkMode: 'class',
-  content: [
-    './src/**/*.{ts,tsx}',
-    '../../packages/ui/src/**/*.{ts,tsx}',
-    '../../node_modules/@janua/ui/src/**/*.{ts,tsx}',
-  ],
+  content: ['./src/**/*.{ts,tsx}', '../../packages/ui/src/**/*.{ts,tsx}', januaUiContentGlob()],
   theme: {
     container: {
       center: true,

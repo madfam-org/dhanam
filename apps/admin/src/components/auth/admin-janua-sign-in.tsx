@@ -23,6 +23,22 @@ function patchAuthLinks(root: HTMLElement) {
   }
 }
 
+function patchSocialButtons(root: HTMLElement) {
+  for (const button of root.querySelectorAll('button')) {
+    const label = button.textContent?.trim() ?? '';
+    if (label === 'Continue with GitHub') {
+      button.classList.add('admin-oauth-github');
+    } else if (label === 'Continue with Google') {
+      button.classList.add('admin-oauth-google');
+    }
+  }
+}
+
+function patchJanuaSignIn(root: HTMLElement) {
+  patchAuthLinks(root);
+  patchSocialButtons(root);
+}
+
 /** Janua SignIn with admin-scoped link targets (react-sdk omits URL props). */
 export function AdminJanuaSignIn({ redirectTo, onSuccess }: AdminJanuaSignInProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,9 +47,9 @@ export function AdminJanuaSignIn({ redirectTo, onSuccess }: AdminJanuaSignInProp
     const root = containerRef.current;
     if (!root) return;
 
-    patchAuthLinks(root);
+    patchJanuaSignIn(root);
 
-    const observer = new MutationObserver(() => patchAuthLinks(root));
+    const observer = new MutationObserver(() => patchJanuaSignIn(root));
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();

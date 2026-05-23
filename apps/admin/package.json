@@ -45,6 +45,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@dhanam/config": "workspace:*",
+    "@janua/ui": "0.1.2",
     "@playwright/test": "^1.52.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",

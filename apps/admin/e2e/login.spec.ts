@@ -17,7 +17,7 @@ test.describe('Admin login page', () => {
     await expect(page.getByRole('button', { name: 'Continue with Google' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Continue with GitHub' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Email' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeVisible();
   });
 
   test('uses consumer-app legal and recovery URLs', async ({ page }) => {
@@ -37,11 +37,21 @@ test.describe('Admin login page', () => {
 
   test('GitHub OAuth button is visually readable', async ({ page }) => {
     const github = page.getByRole('button', { name: 'Continue with GitHub' });
-    const color = await github.evaluate((el) => getComputedStyle(el).color);
-    const backgroundColor = await github.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const styles = await github.evaluate((el) => {
+      const computed = getComputedStyle(el);
+      return {
+        color: computed.color,
+        backgroundColor: computed.backgroundColor,
+        contrast: computed.color === 'rgb(255, 255, 255)' ? 'low' : 'ok',
+      };
+    });
 
-    expect(color).not.toBe('rgb(255, 255, 255)');
-    expect(backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+    expect(styles.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+    expect(styles.backgroundColor).not.toBe('rgb(255, 255, 255)');
+    // White label on dark GitHub brand background is expected.
+    if (styles.contrast === 'low') {
+      expect(styles.backgroundColor).toMatch(/24292e|47, 47, 47|31, 41, 55/i);
+    }
   });
 
   test('meets WCAG AA on login page', async ({ page }) => {
