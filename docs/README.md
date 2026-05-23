@@ -7,24 +7,25 @@ file over older phase summaries when choosing what to read first.
 
 ## Start Here
 
-| Document                                                            | Use                                                                                |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| [Repository README](../README.md)                                   | Product overview, local quick start, common commands                               |
-| [Development Guide](DEVELOPMENT.md)                                 | Local setup, ports, env files, testing workflow                                    |
-| [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)                 | Full program: technical stability GA, commercial GA, consumer GA (phases 0–6)      |
-| [Roadmap](ROADMAP.md)                                               | Stability priorities P0–P8 and milestones M1–M7                                    |
-| [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)     | Billing router and internal MADFAM POS completion plan                             |
-| [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)               | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                |
-| [Commercial Staging Credentials](COMMERCIAL_STAGING_CREDENTIALS.md) | Vendor test-key checklist for staging commercial soak                              |
-| [Deployment Guide](DEPLOYMENT.md)                                   | Enclii-first deploy, staging, rollback, current rollout blockers                   |
-| [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)         | Current truth about production, staging, DNS, health, and remaining stability gaps |
-| [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)     | Concise final status from the latest production-stability push                     |
-| [Tech Debt Register](TECH_DEBT.md)                                  | Current technical debt, active stability gaps, and historical debt archive         |
-| [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md) | Latest corpus audit: coverage, interconnection, remediation backlog                |
-| [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md) | Prior audit (historical context)                                                   |
-| [API Reference](API.md)                                             | REST API narrative overview                                                        |
-| [API index](api/README.md)                                          | OpenAPI export, Swagger, specialized API docs                                      |
-| [Mobile Guide](MOBILE.md)                                           | React Native and Expo app notes                                                    |
+| Document                                                                | Use                                                                                |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [Repository README](../README.md)                                       | Product overview, local quick start, common commands                               |
+| [Development Guide](DEVELOPMENT.md)                                     | Local setup, ports, env files, testing workflow                                    |
+| [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)                     | Full program: technical stability GA, commercial GA, consumer GA (phases 0–7)      |
+| [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) | G4: remove operator secrets from public git; CI leakage guard                      |
+| [Roadmap](ROADMAP.md)                                                   | Stability priorities P0–P8 and milestones M1–M7                                    |
+| [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)         | Billing router and internal MADFAM POS completion plan                             |
+| [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                |
+| [Commercial Staging Credentials](COMMERCIAL_STAGING_CREDENTIALS.md)     | Vendor test-key checklist for staging commercial soak                              |
+| [Deployment Guide](DEPLOYMENT.md)                                       | Enclii-first deploy, staging, rollback, current rollout blockers                   |
+| [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)             | Current truth about production, staging, DNS, health, and remaining stability gaps |
+| [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)         | Concise final status from the latest production-stability push                     |
+| [Tech Debt Register](TECH_DEBT.md)                                      | Current technical debt, active stability gaps, and historical debt archive         |
+| [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md)     | Latest corpus audit: coverage, interconnection, remediation backlog                |
+| [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md)     | Prior audit (historical context)                                                   |
+| [API Reference](API.md)                                                 | REST API narrative overview                                                        |
+| [API index](api/README.md)                                              | OpenAPI export, Swagger, specialized API docs                                      |
+| [Mobile Guide](MOBILE.md)                                               | React Native and Expo app notes                                                    |
 
 ## Architecture And Operations
 

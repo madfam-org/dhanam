@@ -1587,7 +1587,7 @@ Test API endpoints in sandbox mode:
 ```json
 {
   "email": "demo@dhanam.app",
-  "password": "demo123"
+  "password": "<DEMO_USER_PASSWORD>"
 }
 ```
 

@@ -6,7 +6,7 @@
  *
  * Required env:
  *   LUNCHMONEY_API_TOKEN  - LunchMoney API access token
- *   TARGET_USER_EMAIL     - Dhanam user email (default: admin@madfam.io)
+ *   TARGET_USER_EMAIL     - Dhanam user email (required)
  *   DATABASE_URL          - Postgres connection string
  *
  * Optional env:
@@ -53,7 +53,11 @@ async function main() {
     process.exit(1);
   }
 
-  const targetEmail = process.env.TARGET_USER_EMAIL || 'admin@madfam.io';
+  const targetEmail = process.env.TARGET_USER_EMAIL?.trim();
+  if (!targetEmail) {
+    console.error('ERROR: TARGET_USER_EMAIL is required');
+    process.exit(1);
+  }
   const client = new LunchMoneyClient(token);
   const idMap = new IdMap();
 

@@ -34,6 +34,15 @@ jobs:
       - name: Run NetworkPolicy port lint
         run: python3 scripts/check-networkpolicy-ports.py infra/k8s/
 
+  public-repo-leakage:
+    name: Public repo leakage guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run public repo leakage check
+        run: python3 scripts/check-public-repo-leakage.py
+
   k8s-env-lint:
     name: K8s Env-Var Conflict Linter
     runs-on: ubuntu-latest

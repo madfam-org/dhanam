@@ -40,19 +40,19 @@ The platform includes multiple pre-configured user personas for testing:
    - Read-only access to demo data
    - Perfect for quick demos
 
-2. **Individual User** (maria@demo.com / demo123)
+2. **Individual User** (maria@dhanam.demo / `DEMO_USER_PASSWORD`)
    - Young professional with personal finances
    - Connected accounts: BBVA, Nu, Amex, Bitso
    - Monthly budget tracking
    - ESG crypto portfolio
 
-3. **Small Business Owner** (carlos@business.com / demo123)
+3. **Small Business Owner** (carlos@business.com / `DEMO_USER_PASSWORD`)
    - Restaurant owner with personal & business spaces
    - Multiple account types
    - Quarterly business budgeting
    - 2FA enabled
 
-4. **Enterprise Admin** (admin@enterprise.com / demo123)
+4. **Enterprise Admin** (admin@enterprise.com / `DEMO_USER_PASSWORD`)
    - Multi-currency corporate accounts
    - Annual budget planning
    - Team management features

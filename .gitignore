@@ -25,9 +25,11 @@ out/
 # Generated API artifacts
 docs/api/openapi.json
 
-# IDE
+# IDE / local agent harness (may contain tokens)
 .vscode/
 .idea/
+.claude/
+.cursor/
 *.swp
 *.swo
 *~
@@ -73,3 +75,6 @@ redis_data/
 
 # Financial data (never commit)
 data/
+
+# Operator MADFAM import secrets (see apps/api/scripts/madfam-import.env.example)
+**/madfam-import.local.env

@@ -1,5 +1,5 @@
 /**
- * Raw CSV row from the Innovaciones MADFAM Google Sheet export.
+ * Raw CSV row from a MADFAM-style Google Sheet export.
  *
  * Column names match the Spanish headers exactly.
  */
@@ -18,7 +18,7 @@ export interface MadfamCsvRow {
   Egreso: string;
   /** Bank account name (e.g. "BBVA Empresarial", "Banamex Joy Personal") */
   Cuenta_Origen: string;
-  /** Tax ID: IMA2501164Y7 (business) or RULA900317GPA (personal) */
+  /** Tax ID — business vs personal routing uses MADFAM_BUSINESS_RFC at import time */
   RFC: string;
   /** Original currency of the transaction (MXN or USD) */
   Moneda_Origen: string;
@@ -32,8 +32,7 @@ export interface MadfamCsvRow {
   Mes_Corte: string;
 }
 
-/** Space routing result for a transaction */
-export type SpaceTarget = 'innovaciones-madfam' | 'socio-afac' | 'aldo-personal';
+export type { SpaceRole } from './madfam-csv-config';
 
 /** Account mapping result */
 export interface AccountMapping {

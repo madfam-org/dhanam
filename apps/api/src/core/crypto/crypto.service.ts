@@ -84,9 +84,20 @@ export class CryptoService implements KmsProvider {
   }
 
   hmac(data: string, key?: string): string {
-    const hmacKey =
-      key || process.env.AUDIT_HMAC_KEY || process.env.ENCRYPTION_KEY || 'default-hmac-key';
+    const hmacKey = this.resolveHmacKey(key);
     return createHmac('sha256', hmacKey).update(data).digest('hex');
+  }
+
+  private resolveHmacKey(explicitKey?: string): string {
+    if (explicitKey) return explicitKey;
+    const auditKey = process.env.AUDIT_HMAC_KEY;
+    if (auditKey) return auditKey;
+    const encryptionKey = process.env.ENCRYPTION_KEY;
+    if (encryptionKey) return encryptionKey;
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('AUDIT_HMAC_KEY or ENCRYPTION_KEY must be set in production');
+    }
+    return 'dev-only-hmac-key';
   }
 
   /**

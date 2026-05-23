@@ -368,6 +368,26 @@ _Coming soon - be the first to contribute!_
 
 ---
 
+---
+
+## Public repository policy
+
+Dhanam is a **public** repository. The following must **never** be committed:
+
+- Real tax IDs (RFC), operator personal identifiers, or org-specific import routing
+- Plaintext passwords or live API keys (use Enclii Lockbox / Vault locally)
+- Hetzner node names, SSH endpoints, or full infrastructure topology
+- Hardcoded operator email defaults in migration/import scripts
+
+**Remediation program:** [docs/PUBLIC_REPO_SECURITY_REMEDIATION.md](docs/PUBLIC_REPO_SECURITY_REMEDIATION.md)  
+**CI guard:** `scripts/check-public-repo-leakage.py`
+
+Operator runbooks and full credential matrices belong in private
+`madfam-org/internal-devops`. Runtime org config (future) will live in admin
+`PlatformConfig`, not in git.
+
+---
+
 ## Additional Resources
 
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)

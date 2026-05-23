@@ -29,10 +29,28 @@ data into Dhanam spaces.
 
 ## MADFAM CSV
 
-| File                   | Role                                  |
-| ---------------------- | ------------------------------------- |
-| `madfam-csv-mapper.ts` | Map CSV rows to accounts/transactions |
-| `madfam-csv-types.ts`  | Row and mapping types                 |
+| File                      | Role                                        |
+| ------------------------- | ------------------------------------------- |
+| `madfam-csv-config.ts`    | Env-based RFC, space keys, suffixes         |
+| `madfam-csv-mapper.ts`    | Map CSV rows to accounts/transactions       |
+| `madfam-import-compat.ts` | Prod continuity: discover spaces, preflight |
+| `madfam-csv-types.ts`     | Row and mapping types                       |
+
+### Production continuity (`app.dhan.am`)
+
+Existing operator data (Janua admin account + `madfam-csv-*` accounts) must not
+be duplicated on re-import:
+
+1. Set `TARGET_USER_EMAIL` to the operator account email from Vault (not in git).
+2. Set `MADFAM_BUSINESS_RFC` from Vault.
+3. **Omit** `MADFAM_SPACE_NAME_*` when prod already has import accounts — spaces
+   are auto-discovered from `providerAccountId` patterns (`-afac` partner,
+   `-personal`, unsuffixed business).
+4. Partner suffix defaults to `-afac` (matches first prod import).
+5. Preflight: `pnpm --filter @dhanam/api tsx scripts/verify-madfam-import-compat.ts`
+6. Operator env template: `apps/api/scripts/madfam-import.env.example`
+
+Scripts: `apps/api/scripts/import-madfam-csv.ts`, `verify-madfam-import-compat.ts`
 
 ## Tests
 

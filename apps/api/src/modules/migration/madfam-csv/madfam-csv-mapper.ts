@@ -3,15 +3,11 @@
  *
  * Converts raw CSV data into Dhanam-compatible entities.
  */
-import type { MadfamCsvRow, SpaceTarget, AccountMapping } from './madfam-csv-types';
+import type { MadfamCsvRoutingConfig, SpaceRole } from './madfam-csv-config';
+import { loadMadfamCsvRoutingConfig } from './madfam-csv-config';
+import type { MadfamCsvRow, AccountMapping } from './madfam-csv-types';
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const BUSINESS_RFC = 'IMA2501164Y7';
-
-/** Canonical account definitions keyed by Cuenta_Origen */
+/** Canonical account definitions keyed by Cuenta_Origen (generic bank labels). */
 const ACCOUNT_DEFS: Record<string, { slug: string; name: string; type: 'checking' | 'credit' }> = {
   'BBVA Empresarial': { slug: 'bbva-empresarial', name: 'BBVA Empresarial', type: 'checking' },
   'Banamex Joy Personal': {
@@ -23,50 +19,65 @@ const ACCOUNT_DEFS: Record<string, { slug: string; name: string; type: 'checking
   'Banamex Oro Personal': { slug: 'banamex-oro', name: 'Banamex Oro Personal', type: 'credit' },
 };
 
-// ---------------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------------
-
 /**
- * Returns true if the RFC corresponds to the business entity (Innovaciones MADFAM).
+ * Returns true if the RFC corresponds to the configured business entity.
  */
-export function isBusinessRfc(rfc: string): boolean {
-  return rfc.trim().toUpperCase() === BUSINESS_RFC;
+export function isBusinessRfc(
+  rfc: string,
+  config: MadfamCsvRoutingConfig = loadMadfamCsvRoutingConfig()
+): boolean {
+  if (!config.businessRfc) return false;
+  return rfc.trim().toUpperCase() === config.businessRfc;
 }
 
 /**
- * Determine which space a transaction routes to based on RFC and accounting classification.
+ * Determine which space role a transaction routes to based on RFC and accounting classification.
  *
  * Routing rules:
- * - Business RFC (IMA2501164Y7) → "innovaciones-madfam"
- * - Personal RFC + "Gasto No Deducible" → "aldo-personal"
- * - Personal RFC + anything else → "socio-afac"
+ * - Business RFC (from config) → business
+ * - Personal RFC + "Gasto No Deducible" → personal
+ * - Personal RFC + anything else → partner
  */
-export function routeToSpace(rfc: string, clasificacion: string): SpaceTarget {
-  if (isBusinessRfc(rfc)) return 'innovaciones-madfam';
-  if (clasificacion.trim() === 'Gasto No Deducible') return 'aldo-personal';
-  return 'socio-afac';
+export function routeToSpace(
+  rfc: string,
+  clasificacion: string,
+  config: MadfamCsvRoutingConfig = loadMadfamCsvRoutingConfig()
+): SpaceRole {
+  if (isBusinessRfc(rfc, config)) return 'business';
+  if (clasificacion.trim() === 'Gasto No Deducible') return 'personal';
+  return 'partner';
 }
 
 /**
- * Map a Cuenta_Origen + space target to an account with unique providerAccountId.
+ * Resolve configured space slug for a routing role.
+ */
+export function spaceKeyForRole(
+  role: SpaceRole,
+  config: MadfamCsvRoutingConfig = loadMadfamCsvRoutingConfig()
+): string {
+  return config.spaceKeys[role];
+}
+
+/**
+ * Map a Cuenta_Origen + space role to an account with unique providerAccountId.
  *
- * Personal-RFC accounts get a suffix based on space:
- * - Space "socio-afac" → "-afac"
- * - Space "aldo-personal" → "-personal"
- * - Space "innovaciones-madfam" → no suffix (only BBVA Empresarial)
+ * Partner/personal roles get a suffix on shared personal-bank accounts.
  *
  * @throws Error if the account name is not recognized
  */
-export function mapAccount(cuentaOrigen: string, spaceTarget: SpaceTarget): AccountMapping {
+export function mapAccount(
+  cuentaOrigen: string,
+  spaceRole: SpaceRole,
+  config: MadfamCsvRoutingConfig = loadMadfamCsvRoutingConfig()
+): AccountMapping {
   const def = ACCOUNT_DEFS[cuentaOrigen];
   if (!def) {
     throw new Error(`Unknown Cuenta_Origen: "${cuentaOrigen}"`);
   }
 
   let suffix = '';
-  if (spaceTarget === 'socio-afac') suffix = '-afac';
-  else if (spaceTarget === 'aldo-personal') suffix = '-personal';
+  if (spaceRole === 'partner') suffix = config.accountSuffixes.partner;
+  else if (spaceRole === 'personal') suffix = config.accountSuffixes.personal;
 
   return {
     providerAccountId: `madfam-csv-${def.slug}${suffix}`,
@@ -108,7 +119,6 @@ export function mapAmount(ingreso: string, egreso: string): number | null {
  */
 export function mapDate(fechaOperacion: string): Date {
   const trimmed = fechaOperacion.trim();
-  // Validate format
   if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
     throw new Error(`Invalid date format: "${fechaOperacion}" (expected YYYY-MM-DD)`);
   }
@@ -117,9 +127,6 @@ export function mapDate(fechaOperacion: string): Date {
 
 /**
  * Extract groupName and category name from Categoria_Estrategica and Subcategoria.
- *
- * groupName comes from strategic category (I+D, OpEx, CapEx, etc.)
- * categoryName comes from subcategory.
  */
 export function parseGroupAndCategory(
   categoriaEstrategica: string,
@@ -153,7 +160,7 @@ export function parseCsvLine(line: string): string[] {
       if (ch === '"') {
         if (i + 1 < line.length && line[i + 1] === '"') {
           current += '"';
-          i++; // skip escaped quote
+          i++;
         } else {
           inQuotes = false;
         }

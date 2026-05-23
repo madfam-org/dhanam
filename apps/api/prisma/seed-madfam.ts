@@ -26,15 +26,23 @@ async function main() {
     );
   }
 
+  // Require operator email from environment — no hardcoded defaults in public repo
+  const adminEmail = process.env.MADFAM_ADMIN_EMAIL;
+  if (!adminEmail) {
+    throw new Error(
+      'MADFAM_ADMIN_EMAIL env var required for seeding. Use your operator account email.'
+    );
+  }
+
   // Create MADFAM admin user (will be linked to Janua SSO in production)
   const madfamAdmin = await prisma.user.upsert({
-    where: { email: 'admin@madfam.io' },
+    where: { email: adminEmail },
     update: {
       isAdmin: true,
       subscriptionTier: 'premium',
     },
     create: {
-      email: 'admin@madfam.io',
+      email: adminEmail,
       passwordHash: await hash(adminPassword),
       name: 'MADFAM Admin',
       locale: 'en',

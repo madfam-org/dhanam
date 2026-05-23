@@ -1,6 +1,6 @@
 # Dhanam Roadmap
 
-Last updated: 2026-05-22
+Last updated: 2026-05-23
 
 This roadmap tracks the current path to a defensible 100 percent stable Dhanam
 codebase and production implementation across `dhan.am`, `www.dhan.am`,
@@ -23,6 +23,7 @@ Read this with:
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)
 - [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)
 - [Tech Debt Register](TECH_DEBT.md)
+- [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) (G4)
 - [Deployment Guide](DEPLOYMENT.md)
 - [Testing Overview](testing/TEST_SUMMARY.md)
 

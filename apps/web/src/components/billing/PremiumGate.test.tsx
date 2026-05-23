@@ -106,7 +106,7 @@ describe('PremiumGate', () => {
 
   it('should grant access to admin users regardless of subscription tier', () => {
     mockUseAuth.mockReturnValue({
-      user: { email: 'admin@madfam.io', subscriptionTier: 'community', isAdmin: true },
+      user: { email: 'admin@example.com', subscriptionTier: 'community', isAdmin: true },
     });
     render(
       <PremiumGate feature="Estate Planning" requiredTier="premium">

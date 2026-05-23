@@ -357,5 +357,20 @@ describe('CryptoService', () => {
 
       expect(hmac1).not.toBe(hmac2);
     });
+
+    it('throws in production when no HMAC key is configured', () => {
+      const savedNodeEnv = process.env.NODE_ENV;
+      const savedAudit = process.env.AUDIT_HMAC_KEY;
+      const savedEnc = process.env.ENCRYPTION_KEY;
+      delete process.env.AUDIT_HMAC_KEY;
+      delete process.env.ENCRYPTION_KEY;
+      process.env.NODE_ENV = 'production';
+
+      expect(() => service.hmac('test')).toThrow(/AUDIT_HMAC_KEY or ENCRYPTION_KEY/);
+
+      process.env.NODE_ENV = savedNodeEnv;
+      if (savedAudit) process.env.AUDIT_HMAC_KEY = savedAudit;
+      if (savedEnc) process.env.ENCRYPTION_KEY = savedEnc;
+    });
   });
 });

@@ -400,6 +400,30 @@ Already source-landed: webhooks, ledger writes, `payment.*` fan-out, DLQ.
 
 ---
 
+## Phase 7 — Public repository security (G4)
+
+**Closes:** TD-1012  
+**Target:** Public-repo GA hygiene alongside G1–G3  
+**Canonical plan:** [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md)
+
+| Phase | Scope                                                                            | Status      |
+| ----- | -------------------------------------------------------------------------------- | ----------- |
+| P0    | Stop bleeding: RFC env config, seed/crypto fixes, doc redaction, CI leakage gate | In progress |
+| P1    | Relocate full ops runbooks to `internal-devops`                                  | Planned     |
+| P2    | Slim public `AGENTS.md`; private agent-ops doc                                   | Planned     |
+| P3    | `PlatformConfig` admin API for org import rules                                  | Planned     |
+| P4    | Dev credential hygiene (`docker-compose`, e2e defaults)                          | Planned     |
+| P5    | gitleaks, PR checklist, quarterly audit                                          | Planned     |
+
+### G4 exit criteria
+
+- [ ] `scripts/check-public-repo-leakage.py` green on `main`
+- [ ] No Critical/High manual audit findings open
+- [ ] Operator runbooks published in private `internal-devops`
+- [ ] `PlatformConfig` shipped or env-only path documented with deferral
+
+---
+
 ## Workstream ownership
 
 | Workstream                    | Primary owner     | Repos                             |
@@ -448,21 +472,22 @@ Already source-landed: webhooks, ledger writes, `payment.*` fan-out, DLQ.
 
 Use this table for the final GA review meeting.
 
-| Gate | Item                                                            | Sign-off                     |
-| ---- | --------------------------------------------------------------- | ---------------------------- |
-| G1   | Production preflight + full health green                        |                              |
-| G1   | Rollout proof automated post-promote                            |                              |
-| G1   | Three clean promote/rollback cycles documented                  |                              |
-| G1   | Enclii-first ops for queues, migrations, policy, staging routes |                              |
-| G2   | Single checkout routing policy in production                    |                              |
-| G2   | POS charge, refund, reconcile, timeline                         |                              |
-| G2   | Product webhook DLQ drill passed                                |                              |
-| G2   | Golden probes green per launched product                        |                              |
-| G2   | Commercial docs match live behavior                             |                              |
-| G3   | Core user journeys proven                                       |                              |
-| G3   | Legal pages live                                                |                              |
-| G3   | Launch Operations scope checklist signed                        |                              |
-| All  | No open **High** severity tech debt blocking GA                 | [TECH_DEBT.md](TECH_DEBT.md) |
+| Gate | Item                                                            | Sign-off                                                                   |
+| ---- | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| G1   | Production preflight + full health green                        |                                                                            |
+| G1   | Rollout proof automated post-promote                            |                                                                            |
+| G1   | Three clean promote/rollback cycles documented                  |                                                                            |
+| G1   | Enclii-first ops for queues, migrations, policy, staging routes |                                                                            |
+| G2   | Single checkout routing policy in production                    |                                                                            |
+| G2   | POS charge, refund, reconcile, timeline                         |                                                                            |
+| G2   | Product webhook DLQ drill passed                                |                                                                            |
+| G2   | Golden probes green per launched product                        |                                                                            |
+| G2   | Commercial docs match live behavior                             |                                                                            |
+| G3   | Core user journeys proven                                       |                                                                            |
+| G3   | Legal pages live                                                |                                                                            |
+| G3   | Launch Operations scope checklist signed                        |                                                                            |
+| G4   | Public repo leakage CI green; no operator secrets in git        | [PUBLIC_REPO_SECURITY_REMEDIATION.md](PUBLIC_REPO_SECURITY_REMEDIATION.md) |
+| All  | No open **High** severity tech debt blocking GA                 | [TECH_DEBT.md](TECH_DEBT.md)                                               |
 
 ---
 

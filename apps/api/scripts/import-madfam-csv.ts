@@ -1,17 +1,25 @@
 /**
  * MADFAM CSV → Dhanam Import Script
  *
- * Imports 117 Innovaciones MADFAM transactions from a Google Sheets CSV export.
- * Creates 3 spaces, accounts, categories, tags, and transactions.
+ * Imports business CSV transactions into Dhanam spaces.
  * Idempotent: safe to re-run (uses providerAccountId/providerTransactionId).
  *
  * Required env:
- *   CSV_PATH            - Path to the madfam-transactions.csv file
- *   DATABASE_URL        - Postgres connection string
+ *   CSV_PATH              - Path to the madfam-transactions.csv file
+ *   DATABASE_URL          - Postgres connection string
+ *   TARGET_USER_EMAIL       - Dhanam operator account (prod: Janua admin email from Vault)
+ *   MADFAM_BUSINESS_RFC     - Business tax ID for routing (required; never commit)
+ *
+ * Space names (optional if prod already has madfam-csv import — auto-discovered):
+ *   MADFAM_SPACE_NAME_BUSINESS / _PARTNER / _PERSONAL
  *
  * Optional env:
- *   TARGET_USER_EMAIL   - Dhanam user email (default: admin@madfam.io)
- *   DRY_RUN=true        - Log actions without writing to DB
+ *   MADFAM_IMPORT_ENV_FILE    - Path to operator .env (gitignored) with prod values
+ *   MADFAM_ACCOUNT_SUFFIX_PARTNER - Default `-afac` for prod idempotency
+ *   MADFAM_ACCOUNT_SUFFIX_PERSONAL - Default `-personal`
+ *   MADFAM_SPACE_KEY_BUSINESS / _PARTNER / _PERSONAL - Internal map keys only
+ *   MADFAM_SKIP_COMPAT_CHECK=true - Skip preflight (not recommended for prod)
+ *   DRY_RUN=true              - Log actions without writing to DB
  *
  * Usage:
  *   cd apps/api && CSV_PATH=../../data/madfam-transactions.csv pnpm tsx scripts/import-madfam-csv.ts
@@ -19,6 +27,7 @@
 
 import 'dotenv/config';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
@@ -32,11 +41,17 @@ import {
   mapDate,
   parseGroupAndCategory,
   isIncomeGroup,
+  spaceKeyForRole,
 } from '../src/modules/migration/madfam-csv/madfam-csv-mapper';
-import type {
-  MadfamCsvRow,
-  SpaceTarget,
-} from '../src/modules/migration/madfam-csv/madfam-csv-types';
+import {
+  requireMadfamCsvRoutingConfig,
+  type SpaceRole,
+} from '../src/modules/migration/madfam-csv/madfam-csv-config';
+import {
+  discoverMadfamImportSpaces,
+  MADFAM_CSV_IMPORT_ORIGIN,
+  verifyMadfamImportCompat,
+} from '../src/modules/migration/madfam-csv/madfam-import-compat';
 
 // ---------------------------------------------------------------------------
 // Setup
@@ -60,16 +75,82 @@ function log(phase: string, message: string) {
 // ---------------------------------------------------------------------------
 
 interface SpaceDef {
-  key: SpaceTarget;
+  role: SpaceRole;
+  key: string;
   name: string;
   type: 'personal' | 'business';
+  /** When set, reuse this space id (prod discovery) instead of creating by name. */
+  existingSpaceId?: string;
 }
 
-const SPACE_DEFS: SpaceDef[] = [
-  { key: 'innovaciones-madfam', name: 'Innovaciones MADFAM', type: 'business' },
-  { key: 'socio-afac', name: 'MADFAM Socio AFAC', type: 'business' },
-  { key: 'aldo-personal', name: 'Aldo Personal', type: 'personal' },
-];
+function loadOptionalOperatorEnvFile(): void {
+  const envFile = process.env.MADFAM_IMPORT_ENV_FILE?.trim();
+  if (!envFile) return;
+  const resolved = path.resolve(envFile);
+  if (!fs.existsSync(resolved)) {
+    throw new Error(`MADFAM_IMPORT_ENV_FILE not found: ${resolved}`);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('dotenv').config({ path: resolved, override: true });
+}
+
+function optionalEnv(name: string): string | undefined {
+  const value = process.env[name]?.trim();
+  return value || undefined;
+}
+
+function loadSpaceDefsFromEnv(
+  routingConfig: ReturnType<typeof requireMadfamCsvRoutingConfig>
+): SpaceDef[] | null {
+  const businessName = optionalEnv('MADFAM_SPACE_NAME_BUSINESS');
+  const partnerName = optionalEnv('MADFAM_SPACE_NAME_PARTNER');
+  const personalName = optionalEnv('MADFAM_SPACE_NAME_PERSONAL');
+
+  if (!businessName && !partnerName && !personalName) {
+    return null;
+  }
+
+  if (!businessName || !partnerName || !personalName) {
+    throw new Error(
+      'Set all of MADFAM_SPACE_NAME_BUSINESS, MADFAM_SPACE_NAME_PARTNER, and MADFAM_SPACE_NAME_PERSONAL, ' +
+        'or omit all three to auto-discover from existing madfam-csv import data.'
+    );
+  }
+
+  return [
+    {
+      role: 'business',
+      key: routingConfig.spaceKeys.business,
+      name: businessName,
+      type: 'business',
+    },
+    {
+      role: 'partner',
+      key: routingConfig.spaceKeys.partner,
+      name: partnerName,
+      type: 'business',
+    },
+    {
+      role: 'personal',
+      key: routingConfig.spaceKeys.personal,
+      name: personalName,
+      type: 'personal',
+    },
+  ];
+}
+
+function spaceDefsFromDiscovery(
+  discovered: Awaited<ReturnType<typeof discoverMadfamImportSpaces>>
+): SpaceDef[] {
+  if (!discovered) return [];
+  return discovered.map((space) => ({
+    role: space.role,
+    key: space.key,
+    name: space.name,
+    type: space.type,
+    existingSpaceId: space.spaceId,
+  }));
+}
 
 const ACCOUNTING_TAGS = [
   'Préstamo de Socio (AFAC)',
@@ -83,6 +164,8 @@ const ACCOUNTING_TAGS = [
 // ---------------------------------------------------------------------------
 
 async function main() {
+  loadOptionalOperatorEnvFile();
+
   const csvPath = process.env.CSV_PATH;
   if (!csvPath) {
     console.error('ERROR: CSV_PATH is required');
@@ -94,7 +177,38 @@ async function main() {
     process.exit(1);
   }
 
-  const targetEmail = process.env.TARGET_USER_EMAIL || 'admin@madfam.io';
+  const routingConfig = requireMadfamCsvRoutingConfig();
+
+  const targetEmail = optionalEnv('TARGET_USER_EMAIL');
+  if (!targetEmail) {
+    console.error(
+      'ERROR: TARGET_USER_EMAIL is required (production: Janua operator account email from Vault)'
+    );
+    process.exit(1);
+  }
+
+  if (process.env.MADFAM_SKIP_COMPAT_CHECK !== 'true') {
+    const compat = await verifyMadfamImportCompat(prisma, targetEmail, routingConfig);
+    if (!compat.ok) {
+      console.error('ERROR: MADFAM import preflight failed:');
+      for (const issue of compat.issues) {
+        console.error(`  - ${issue}`);
+      }
+      console.error(
+        '\nRun: pnpm --filter @dhanam/api tsx scripts/verify-madfam-import-compat.ts\n' +
+          'Or set MADFAM_SKIP_COMPAT_CHECK=true only after reviewing warnings.'
+      );
+      process.exit(1);
+    }
+    if (compat.spaces.length > 0) {
+      log('INIT', 'Preflight: existing madfam-csv spaces for operator account');
+      for (const space of compat.spaces) {
+        log('INIT', `  ${space.role}: "${space.name}" (${space.accountCount} import accounts)`);
+      }
+    }
+  }
+
+  let SPACE_DEFS = loadSpaceDefsFromEnv(routingConfig);
 
   console.log('========================================');
   console.log('  MADFAM CSV → Dhanam Import');
@@ -124,22 +238,46 @@ async function main() {
   }
   log('INIT', `Found user ${user.id}`);
 
+  if (!SPACE_DEFS) {
+    const discovered = await discoverMadfamImportSpaces(prisma, user.id, routingConfig);
+    SPACE_DEFS = spaceDefsFromDiscovery(discovered);
+    if (SPACE_DEFS.length === 3) {
+      log('INIT', 'Discovered space bindings from existing madfam-csv accounts (prod continuity)');
+    } else {
+      console.error(
+        'ERROR: Could not resolve spaces. Set MADFAM_SPACE_NAME_* to match prod space names, ' +
+          'or ensure the target user already has madfam-csv import accounts for business/partner/personal.'
+      );
+      const allUserSpaces = await prisma.userSpace.findMany({
+        where: { userId: user.id },
+        include: { space: true },
+      });
+      console.error('Existing spaces for this user:');
+      for (const us of allUserSpaces) {
+        console.error(`  - "${us.space.name}" (${us.space.id})`);
+      }
+      process.exit(1);
+    }
+  }
+
   // -----------------------------------------------------------------------
   // Phase 2: SPACES — Upsert 3 spaces
   // -----------------------------------------------------------------------
-  const spaceIds: Record<SpaceTarget, string> = {} as any;
+  const spaceIds: Record<string, string> = {};
 
   for (const spaceDef of SPACE_DEFS) {
     log('SPACES', `Processing space "${spaceDef.name}" (${spaceDef.type})...`);
 
     if (!DRY_RUN) {
-      // Check if space already exists for this user
-      const existingUserSpace = await prisma.userSpace.findFirst({
-        where: { userId: user.id },
-        include: { space: true },
-      });
+      if (spaceDef.existingSpaceId) {
+        spaceIds[spaceDef.key] = spaceDef.existingSpaceId;
+        log(
+          'SPACES',
+          `  Reusing discovered space "${spaceDef.name}" → ${spaceDef.existingSpaceId}`
+        );
+        continue;
+      }
 
-      // Look for a space matching by name among user's spaces
       const allUserSpaces = await prisma.userSpace.findMany({
         where: { userId: user.id },
         include: { space: true },
@@ -179,7 +317,7 @@ async function main() {
   // -----------------------------------------------------------------------
   // Phase 3: BUDGETS — One per space
   // -----------------------------------------------------------------------
-  const budgetIds: Record<SpaceTarget, string> = {} as any;
+  const budgetIds: Record<string, string> = {};
 
   for (const spaceDef of SPACE_DEFS) {
     const spaceId = spaceIds[spaceDef.key];
@@ -191,7 +329,7 @@ async function main() {
       let budget = await prisma.budget.findFirst({
         where: {
           spaceId,
-          metadata: { path: ['origin'], equals: 'madfam-csv-import' },
+          metadata: { path: ['origin'], equals: MADFAM_CSV_IMPORT_ORIGIN },
         },
       });
 
@@ -213,7 +351,8 @@ async function main() {
             period: 'monthly',
             startDate: new Date('2024-12-01'),
             metadata: {
-              origin: 'madfam-csv-import',
+              origin: MADFAM_CSV_IMPORT_ORIGIN,
+              spaceRole: spaceDef.role,
               importedAt: new Date().toISOString(),
             },
           },
@@ -354,13 +493,14 @@ async function main() {
     }
 
     // Route to space
-    const spaceTarget = routeToSpace(row.RFC, row.Clasificacion_Contable);
-    const spaceId = spaceIds[spaceTarget];
+    const spaceRole = routeToSpace(row.RFC, row.Clasificacion_Contable, routingConfig);
+    const spaceKey = spaceKeyForRole(spaceRole, routingConfig);
+    const spaceId = spaceIds[spaceKey];
 
     // Map account (lazy creation)
     let accountMapping;
     try {
-      accountMapping = mapAccount(row.Cuenta_Origen, spaceTarget);
+      accountMapping = mapAccount(row.Cuenta_Origen, spaceRole, routingConfig);
     } catch (err: any) {
       log('TRANSACTIONS', `  WARN: Skipping tx ${txNum} — ${err.message}`);
       txWarnings++;
@@ -379,10 +519,7 @@ async function main() {
         if (existingAccount) {
           accountMap.set(accountMapping.providerAccountId, existingAccount.id);
           accountsExisting++;
-          log(
-            'ACCOUNTS',
-            `  Exists: ${accountMapping.name} [${spaceTarget}] → ${existingAccount.id}`
-          );
+          log('ACCOUNTS', `  Exists: ${accountMapping.name} [${spaceKey}] → ${existingAccount.id}`);
         } else {
           const created = await prisma.account.create({
             data: {
@@ -398,14 +535,14 @@ async function main() {
           });
           accountMap.set(accountMapping.providerAccountId, created.id);
           accountsCreated++;
-          log('ACCOUNTS', `  Created: ${accountMapping.name} [${spaceTarget}] → ${created.id}`);
+          log('ACCOUNTS', `  Created: ${accountMapping.name} [${spaceKey}] → ${created.id}`);
         }
       } else {
         accountMap.set(
           accountMapping.providerAccountId,
           `dry-run-${accountMapping.providerAccountId}`
         );
-        log('ACCOUNTS', `  Would create: ${accountMapping.name} [${spaceTarget}]`);
+        log('ACCOUNTS', `  Would create: ${accountMapping.name} [${spaceKey}]`);
       }
     }
 
@@ -416,11 +553,11 @@ async function main() {
       row.Categoria_Estrategica,
       row.Subcategoria
     );
-    const categoryLookup = `${spaceTarget}::${groupName}::${categoryName}`;
+    const categoryLookup = `${spaceKey}::${groupName}::${categoryName}`;
     const categoryId = categoryMap.get(categoryLookup);
 
     // Resolve tag
-    const tagLookup = `${spaceTarget}::${row.Clasificacion_Contable.trim()}`;
+    const tagLookup = `${spaceKey}::${row.Clasificacion_Contable.trim()}`;
     const tagId = tagMap.get(tagLookup);
 
     // Parse date
@@ -483,7 +620,7 @@ async function main() {
     } else {
       log(
         'TRANSACTIONS',
-        `  Would create: [${spaceTarget}] ${row.Nota_Items} | ${amount} MXN | ${row.Fecha_Operacion} | ${groupName}/${categoryName}`
+        `  Would create: [${spaceKey}] ${row.Nota_Items} | ${amount} MXN | ${row.Fecha_Operacion} | ${groupName}/${categoryName}`
       );
       txCreated++;
     }

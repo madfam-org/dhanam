@@ -1,5 +1,10 @@
 # Commercial Staging Credentials (G2)
 
+> **Note:** Vault path names below are structural references only. Live secret
+> values and full checklists belong in Enclii Lockbox and
+> `madfam-org/internal-devops` — see
+> [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md).
+
 Last updated: 2026-05-22
 
 Operator checklist for **commercial GA staging** on `enclii-dhanam-staging`.

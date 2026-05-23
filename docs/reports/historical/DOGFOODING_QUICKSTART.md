@@ -67,13 +67,13 @@ pnpm dev
 
 **MADFAM Admin Account:**
 
-- Email: `finance@madfam.org`
-- Password: `madfam123`
+- Email: set via `MADFAM_ADMIN_EMAIL` when running `pnpm db:seed-madfam`
+- Password: set via `MADFAM_ADMIN_PASSWORD` (generate with `openssl rand -base64 24`)
 
 **Demo Account:**
 
 - Email: `demo@dhanam.app`
-- Password: `demo123`
+- Password: value of `DEMO_USER_PASSWORD` from your local `.env`
 
 ---
 

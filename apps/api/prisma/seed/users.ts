@@ -119,7 +119,7 @@ export async function seedUsers(prisma: PrismaClient): Promise<SeedContext> {
     update: {},
     create: {
       email: 'maria@dhanam.demo',
-      passwordHash: await hash('demo123'),
+      passwordHash: await hash(process.env.DEMO_USER_PASSWORD!),
       name: 'Maria González',
       locale: 'es',
       timezone: 'America/Mexico_City',

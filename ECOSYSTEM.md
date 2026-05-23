@@ -114,24 +114,13 @@ below is embedded here so this document stands alone.
 
 ### Production topology
 
-Bare-metal k3s (v1.33+) on Hetzner, 3 nodes:
+Bare-metal k3s on Hetzner with Cloudflare Tunnel ingress, Longhorn storage, and
+ArgoCD GitOps. **Node names, SKUs, IPs, SSH access, and cost ledger** live in the
+private `madfam-org/internal-devops` repo — not in this public tree.
 
-- `foundry-cp` (Hetzner EX44, 14C/20T, 128 GB) — control-plane + primary workload
-- `foundry-worker-01` (Hetzner AX41-NVMe, Ryzen 5 3600, 64 GB) — worker + Longhorn 2nd replica
-- `foundry-builder-01` (Hetzner VPS, 2 vCPU, 4 GB, tainted `builder=true:NoSchedule`) — ARC runners only
-
-**Ingress**: Cloudflare Tunnel → 2× cloudflared pods → K8s ClusterIP → container port.
-Zero exposed node ports. TLS terminated at Cloudflare edge.
-
-**Storage**: Longhorn CSI v1.7+ in 2-replica mode across dedicated nodes.
-Object storage: Cloudflare R2 (zero egress).
-
-**GitOps**: ArgoCD App-of-Apps (~28 apps across ~22 namespaces) with self-heal.
-Push to `main` → CI builds → GHCR → `kustomize edit set image` commits digest →
-ArgoCD syncs → Switchyard tracks lifecycle events.
-
-**Operational access** (SSH, kubeconfigs, server IPs, cost ledger): private repo
-`madfam-org/internal-devops`. Not in any public repo.
+Public surfaces: `app.dhan.am`, `api.dhan.am`, `admin.dhan.am`. Routine deploys
+via Enclii; see [Deployment Guide](docs/DEPLOYMENT.md) and
+[Public Repo Security Remediation](docs/PUBLIC_REPO_SECURITY_REMEDIATION.md).
 
 ---
 
