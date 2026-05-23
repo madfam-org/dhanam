@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
-import { Prisma } from '@db';
+import { Currency, Prisma, SubscriptionTier } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 
@@ -229,6 +229,78 @@ export class ProductCatalogService {
 
     this.invalidateCache();
     return result;
+  }
+
+  /**
+   * Apply a Tulana/Selva-approved price to the Dhanam catalog (internal pipeline only).
+   */
+  async applyApprovedCatalogPrice(input: {
+    productSlug: string;
+    tierSlug: string;
+    amountCents: number;
+    currency?: string;
+    interval?: string;
+    dhanamTier?: string;
+    displayName?: string;
+    source?: string;
+    recommendationId?: number;
+    approvalId?: string;
+    metadata?: Record<string, unknown>;
+  }): Promise<{
+    productSlug: string;
+    tierSlug: string;
+    amountCents: number;
+    currency: string;
+    interval: string;
+    dhanamTier: string;
+    productPriceId: string;
+    tierId: string;
+  }> {
+    const product = await this.getProduct(input.productSlug);
+    const currency = (input.currency || 'MXN').toUpperCase() as Currency;
+    const interval = input.interval || 'month';
+    const dhanamTier = input.dhanamTier || input.tierSlug;
+
+    const tier = await this.upsertTier(product.id, {
+      tierSlug: input.tierSlug,
+      dhanamTier,
+      displayName: input.displayName || input.tierSlug,
+      description: `Applied via ${input.source || 'tulana_selva'}`,
+      features: [],
+      limits: {},
+      isActive: true,
+    });
+
+    const price = await this.upsertPrice(product.id, {
+      tierSlug: input.tierSlug,
+      dhanamTier,
+      amountCents: input.amountCents,
+      currency,
+      interval,
+      isActive: true,
+      metadata: {
+        ...(input.metadata || {}),
+        source: input.source || 'tulana_selva',
+        recommendation_id: input.recommendationId,
+        approval_id: input.approvalId,
+        applied_at: new Date().toISOString(),
+      },
+    });
+
+    this.logger.log(
+      `Applied catalog price ${input.productSlug}/${input.tierSlug} -> ${input.amountCents} ${currency} (${input.source || 'tulana_selva'})`,
+    );
+
+    return {
+      productSlug: input.productSlug,
+      tierSlug: input.tierSlug,
+      amountCents: input.amountCents,
+      currency,
+      interval,
+      dhanamTier,
+      productPriceId: price.id,
+      tierId: tier.id,
+    };
   }
 
   /**

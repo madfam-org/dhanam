@@ -26,6 +26,7 @@ import { EmailModule } from '../email/email.module';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
 import { CatalogController } from './catalog.controller';
+import { InternalCatalogController } from './internal-catalog.controller';
 import { ConektaController } from './conekta.controller';
 import { CotizaWebhookController } from './cotiza-webhook.controller';
 import { CreditBillingController } from './credit-billing.controller';
@@ -37,6 +38,7 @@ import { ProviderConnectionGuard } from './guards/provider-connection.guard';
 import { SpaceLimitGuard } from './guards/space-limit.guard';
 import { SubscriptionGuard } from './guards/subscription.guard';
 import { UsageLimitGuard } from './guards/usage-limit.guard';
+import { CatalogApplySecretGuard } from './guards/catalog-apply-secret.guard';
 import { UsageTrackingInterceptor } from './interceptors/usage-tracking.interceptor';
 import { JanuaBillingService } from './janua-billing.service';
 import { OverageInvoicingJob } from './jobs/overage-invoicing.job';
@@ -100,6 +102,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
   ],
   controllers: [
     BillingController,
+    InternalCatalogController,
     ConektaController,
     CreditBillingController,
     CustomerFederationController,
@@ -177,6 +180,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     // Guards and interceptors
     SubscriptionGuard,
     UsageLimitGuard,
+    CatalogApplySecretGuard,
     SpaceLimitGuard,
     ProviderConnectionGuard,
     FeatureGateGuard,
