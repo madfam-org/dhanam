@@ -1,0 +1,35 @@
+import { Page, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+export async function checkA11y(
+  page: Page,
+  options?: {
+    include?: string;
+    disableRules?: string[];
+  }
+): Promise<void> {
+  let builder = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
+
+  if (options?.include) {
+    builder = builder.include(options.include);
+  }
+
+  if (options?.disableRules?.length) {
+    builder = builder.disableRules(options.disableRules);
+  }
+
+  const results = await builder.analyze();
+
+  const violationMessages = results.violations.map((v) => {
+    const nodes = v.nodes
+      .slice(0, 3)
+      .map((n) => `  - ${n.target.join(' > ')}`)
+      .join('\n');
+    return `[${v.impact}] ${v.id}: ${v.description}\n${nodes}`;
+  });
+
+  expect(
+    results.violations,
+    `Accessibility violations found:\n\n${violationMessages.join('\n\n')}`
+  ).toHaveLength(0);
+}

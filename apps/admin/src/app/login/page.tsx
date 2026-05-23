@@ -1,9 +1,13 @@
 'use client';
 
-import { JanuaProvider, SignIn } from '@janua/react-sdk';
+import { Alert, AlertDescription, Button } from '@dhanam/ui';
+import { JanuaProvider } from '@janua/react-sdk';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, Component, type ReactNode } from 'react';
 
+import { AdminAuthShell } from '@/components/auth/admin-auth-shell';
+import { AdminJanuaSignIn } from '@/components/auth/admin-janua-sign-in';
 import { useAdminAuth } from '@/lib/hooks/use-admin-auth';
 
 const januaConfig = {
@@ -27,15 +31,14 @@ class JanuaErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         this.props.fallback ?? (
-          <div className="text-center p-4">
-            <p className="text-sm text-gray-500 mb-3">SSO sign-in unavailable</p>
-            <a
-              href="https://auth.madfam.io"
-              className="inline-block px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800"
-            >
-              Sign in with Janua SSO
-            </a>
-          </div>
+          <Alert variant="destructive">
+            <AlertDescription className="space-y-3">
+              <p>SSO sign-in is temporarily unavailable.</p>
+              <Button variant="default" asChild>
+                <Link href="https://auth.madfam.io">Sign in with Janua SSO</Link>
+              </Button>
+            </AlertDescription>
+          </Alert>
         )
       );
     }
@@ -48,33 +51,50 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isAdmin, _hasHydrated } = useAdminAuth();
 
-  // Redirect authenticated admins to their intended destination
+  const redirectTo = searchParams.get('from') || '/dashboard';
+
   useEffect(() => {
     if (!_hasHydrated) return;
     if (isAuthenticated && isAdmin) {
-      const from = searchParams.get('from');
-      router.replace(from || '/dashboard');
+      router.replace(redirectTo);
     }
-  }, [isAuthenticated, isAdmin, _hasHydrated, router, searchParams]);
+  }, [isAuthenticated, isAdmin, _hasHydrated, router, redirectTo]);
 
   const handleSignInSuccess = () => {
-    const from = searchParams.get('from');
-    router.replace(from || '/dashboard');
+    router.replace(redirectTo);
   };
 
-  if (!_hasHydrated || (isAuthenticated && isAdmin)) {
-    return null;
+  if (!_hasHydrated) {
+    return (
+      <div
+        className="rounded-lg border border-border bg-card p-8 shadow-sm"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <p className="text-center text-sm text-muted-foreground">Checking session…</p>
+      </div>
+    );
+  }
+
+  if (isAuthenticated && isAdmin) {
+    return (
+      <div
+        className="rounded-lg border border-border bg-card p-8 shadow-sm"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="text-center text-sm text-muted-foreground">Redirecting…</p>
+      </div>
+    );
   }
 
   return (
     <JanuaErrorBoundary>
-      <SignIn
-        redirectTo={searchParams.get('from') || '/dashboard'}
-        enableSSO
-        socialProviders={{ google: true, github: true }}
-        showRememberMe
-        onSuccess={handleSignInSuccess}
-      />
+      <h2 id="admin-login-heading" className="sr-only">
+        Operator sign in
+      </h2>
+      <AdminJanuaSignIn redirectTo={redirectTo} onSuccess={handleSignInSuccess} />
     </JanuaErrorBoundary>
   );
 }
@@ -86,31 +106,13 @@ export default function AdminLoginPage() {
     setMounted(true);
   }, []);
 
-  // Prevent SSR for JanuaProvider (accesses browser APIs at module level)
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="w-full max-w-md p-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dhanam Admin</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">Loading...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-      <div className="w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dhanam Admin</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Welcome back</p>
-        </div>
+    <AdminAuthShell loading={!mounted}>
+      {mounted ? (
         <JanuaProvider config={januaConfig}>
           <LoginForm />
         </JanuaProvider>
-      </div>
-    </div>
+      ) : null}
+    </AdminAuthShell>
   );
 }

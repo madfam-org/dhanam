@@ -123,3 +123,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Janua auth micro-animations (used by @janua/ui SignIn) */
+@keyframes janua-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes janua-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Admin login: larger password visibility target (WCAG 2.5.8) */
+.admin-janua-sign-in button[aria-label*='password' i] {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  right: 0.25rem;
+}
