@@ -29,16 +29,18 @@ spec:
               value: "https://staging.dhan.am"
             # Billing: force test-mode. Livemode Stripe events are 200-ACK'd
             # with a warning per stripe-mx-spei-relay guardrails (CLAUDE.md).
+            - name: FEATURE_UNIFIED_CHECKOUT_ROUTING
+              value: "true"
             - name: FEATURE_STRIPE_MXN_LIVE
               value: "false"
             - name: PADDLE_ENVIRONMENT
               value: "sandbox"
-            # Staging CORS (superset of prod origins; includes staging-*)
-            - name: CORS_ORIGINS
-              value: "https://staging.dhan.am,https://staging-admin.dhan.am,https://staging-api.dhan.am"
-            # Webhook relay: disabled until downstream staging consumers are
-            # explicitly registered; never inherit production fan-out targets.
+            # Webhook relay: set PRODUCT_WEBHOOK_URLS in dhanam-secrets (Vault) when
+            # staging Karafiel/Tezca consumers are registered. Example:
+            # karafiel:https://staging-api.karafiel.io/api/v1/webhooks/dhanam
             - name: PRODUCT_WEBHOOK_URLS
               value: ""
+            - name: CORS_ORIGINS
+              value: "https://staging.dhan.am,https://staging-admin.dhan.am,https://staging-api.dhan.am"
             - name: PHYNDCRM_API_URL
               value: "https://staging-crm.madfam.io"

@@ -47,6 +47,7 @@ import { WebhookDlqRetryJob } from './jobs/webhook-dlq-retry.job';
 import { MadfamEventsController } from './madfam-events.controller';
 // Federation (PhyndCRM integration)
 import { CancellationService } from './services/cancellation.service';
+import { CheckoutRouteOverrideService } from './services/checkout-route-override.service';
 import { CheckoutRoutingPolicyService } from './services/checkout-routing-policy.service';
 import { ConektaService } from './services/conekta.service';
 import { CustomerFederationService } from './services/customer-federation.service';
@@ -119,6 +120,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     UsageMeteringService,
     UsageTrackingService,
     CheckoutRoutingPolicyService,
+    CheckoutRouteOverrideService,
     InternalPosService,
     OperatorCheckoutStatusService,
     SubscriptionJanuaNotifierService,
@@ -196,6 +198,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     UsageMeteringService,
     UsageTrackingService,
     CheckoutRoutingPolicyService,
+    CheckoutRouteOverrideService,
     InternalPosService,
     OperatorCheckoutStatusService,
     SubscriptionJanuaNotifierService,

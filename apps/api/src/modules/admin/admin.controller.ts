@@ -38,6 +38,8 @@ import {
   AdminPosStatusDto,
   AdminPosChargeDto,
   AdminPosRefundDto,
+  AdminRouteOverrideClearDto,
+  AdminRouteOverrideDto,
   AdminRoutePreviewDto,
   OnboardingFunnelDto,
   FeatureFlagDto,
@@ -314,6 +316,26 @@ export class AdminController {
     @Request() req: AuthenticatedRequest
   ) {
     return this.adminPosBillingService.previewCheckoutRoute(dto, req.user.id);
+  }
+
+  @Post('billing/route/override')
+  @ApiOperation({ summary: 'Persist an audited checkout route override for a user/product' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Route override stored' })
+  async setCheckoutRouteOverride(
+    @Body() dto: AdminRouteOverrideDto,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminPosBillingService.setCheckoutRouteOverride(dto, req.user.id);
+  }
+
+  @Post('billing/route/override/clear')
+  @ApiOperation({ summary: 'Clear an active checkout route override' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Route override cleared' })
+  async clearCheckoutRouteOverride(
+    @Body() dto: AdminRouteOverrideClearDto,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminPosBillingService.clearCheckoutRouteOverride(dto, req.user.id);
   }
 
   @Post('billing/pos/charge')

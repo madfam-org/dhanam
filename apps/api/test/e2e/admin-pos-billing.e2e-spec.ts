@@ -109,6 +109,44 @@ describe('Admin POS Billing Journey', () => {
     });
   });
 
+  describe('Route override', () => {
+    it('stores and applies checkout route override', async () => {
+      const setResponse = await request(app.getHttpServer())
+        .post('/v1/admin/billing/route/override')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          userId: targetUserId,
+          product: 'dhanam',
+          provider: 'paddle',
+          reason: 'e2e override drill',
+          ttlHours: 1,
+        })
+        .expect(201);
+
+      expect(setResponse.body.provider).toBe('paddle');
+
+      const preview = await request(app.getHttpServer())
+        .post('/v1/admin/billing/route/preview')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          userId: targetUserId,
+          plan: 'pro',
+          product: 'dhanam',
+          countryCode: 'MX',
+        })
+        .expect(200);
+
+      expect(preview.body.provider).toBe('paddle');
+      expect(preview.body.routeReason).toBe('operator_stored_override');
+
+      await request(app.getHttpServer())
+        .post('/v1/admin/billing/route/override/clear')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userId: targetUserId, product: 'dhanam', reason: 'e2e cleanup' })
+        .expect(201);
+    });
+  });
+
   describe('Timeline and reconciliation', () => {
     it('returns empty timeline for unknown correlation id', async () => {
       const response = await request(app.getHttpServer())

@@ -336,6 +336,14 @@ export interface PosRefundResult {
   currency: string;
 }
 
+export interface PosProductWebhookDelivery {
+  consumer: string;
+  status: 'delivered' | 'failed' | 'pending' | 'resolved';
+  cfdiUuid?: string | null;
+  eventType?: string | null;
+  lastError?: string | null;
+}
+
 export interface PosTimelineEntry {
   id: string;
   type: string;
@@ -344,6 +352,8 @@ export interface PosTimelineEntry {
   currency: string;
   createdAt: string;
   metadata: unknown;
+  cfdiUuid?: string | null;
+  productWebhookDeliveries?: PosProductWebhookDelivery[];
 }
 
 export interface ReconciliationSummary {
@@ -522,6 +532,25 @@ export const adminApi = {
 
   async previewCheckoutRoute(body: RoutePreviewRequest): Promise<RoutePreviewResult> {
     return apiClient.post<RoutePreviewResult>('/admin/billing/route/preview', body);
+  },
+
+  async setCheckoutRouteOverride(body: {
+    userId: string;
+    product?: string;
+    provider: RoutePreviewResult['provider'];
+    countryCode?: string;
+    reason: string;
+    ttlHours?: number;
+  }): Promise<Record<string, unknown>> {
+    return apiClient.post<Record<string, unknown>>('/admin/billing/route/override', body);
+  },
+
+  async clearCheckoutRouteOverride(body: {
+    userId: string;
+    product?: string;
+    reason?: string;
+  }): Promise<{ cleared: true }> {
+    return apiClient.post<{ cleared: true }>('/admin/billing/route/override/clear', body);
   },
 
   async createPosCharge(body: PosChargeRequest): Promise<PosChargeResult> {

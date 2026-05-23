@@ -264,6 +264,14 @@ export default function PosPage() {
       ? Number.parseInt(refundForm.amountMinor, 10)
       : undefined;
 
+    if (
+      refundForm.amountMinor.trim() &&
+      (!Number.isInteger(amountMinor) || (amountMinor ?? 0) <= 0)
+    ) {
+      setRefundError('Partial amount must be a positive integer (minor units).');
+      return;
+    }
+
     setRefundLoading(true);
     try {
       const result = await adminApi.createPosRefund({
@@ -651,6 +659,18 @@ export default function PosPage() {
                         <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                           {event.amount} {event.currency}
                         </div>
+                        {event.cfdiUuid ? (
+                          <div className="mt-1 font-mono text-xs text-emerald-600 dark:text-emerald-400">
+                            CFDI {event.cfdiUuid}
+                          </div>
+                        ) : null}
+                        {event.productWebhookDeliveries?.length ? (
+                          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {event.productWebhookDeliveries
+                              .map((d) => `${d.consumer}:${d.status}`)
+                              .join(', ')}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                   ))}

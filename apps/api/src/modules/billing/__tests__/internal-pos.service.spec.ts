@@ -28,6 +28,9 @@ describe('InternalPosService', () => {
               findFirst: jest.fn(),
               count: jest.fn(),
             },
+            webhookDeliveryFailure: {
+              findMany: jest.fn().mockResolvedValue([]),
+            },
           },
         },
         {

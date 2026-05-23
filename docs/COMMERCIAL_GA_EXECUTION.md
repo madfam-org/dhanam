@@ -18,15 +18,15 @@ recorded. Janua-routed billing remains disabled (`JANUA_BILLING_ENABLED=false`).
 
 ## Workstream status
 
-| WS    | Name                           | Status (2026-05-22) | Next action                                            |
-| ----- | ------------------------------ | ------------------- | ------------------------------------------------------ |
-| 0     | Rollout truth                  | In progress         | Enclii vs Argo decision + three promote cycles         |
-| **1** | **Deploy & prove routing/POS** | **In progress**     | Run commercial smoke on staging after each main deploy |
-| 2     | POS completion + CFDI          | Not started         | Karafiel receipt id in timeline                        |
-| 3     | Golden probes + DLQ drills     | Not started         | Karafiel probe first                                   |
-| 4     | Conekta parity (Scope B)       | Deferred (Scope A)  | Revisit after G2 Scope A sign-off                      |
-| 5     | SDK + docs + semantics         | In progress         | Keep README / TECH_DEBT synced                         |
-| 6     | G2 sign-off evidence           | Not started         | Commercial drill log                                   |
+| WS    | Name                           | Status (2026-05-22) | Next action                                                |
+| ----- | ------------------------------ | ------------------- | ---------------------------------------------------------- |
+| 0     | Rollout truth                  | In progress         | Enclii vs Argo decision + three promote cycles             |
+| **1** | **Deploy & prove routing/POS** | **In progress**     | Configure staging vendor secrets + strict commercial smoke |
+| 2     | POS completion + CFDI          | **In progress**     | CFDI timeline + route override landed; soak on staging     |
+| 3     | Golden probes + DLQ drills     | Not started         | Karafiel probe first                                       |
+| 4     | Conekta parity (Scope B)       | Deferred (Scope A)  | Revisit after G2 Scope A sign-off                          |
+| 5     | SDK + docs + semantics         | In progress         | Keep README / TECH_DEBT synced                             |
+| 6     | G2 sign-off evidence           | Not started         | Commercial drill log                                       |
 
 ---
 

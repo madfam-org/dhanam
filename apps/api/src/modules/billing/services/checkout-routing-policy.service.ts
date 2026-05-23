@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { JanuaBillingService } from '../janua-billing.service';
 
+import { CheckoutRouteOverrideService } from './checkout-route-override.service';
 import { PaddleService } from './paddle.service';
 import { PaymentRouterService } from './payment-router.service';
 import { PriceResolverService } from './price-resolver.service';
@@ -23,6 +24,8 @@ export interface CheckoutRoutingContext {
   operatorId?: string;
   /** Operator-only override for dry-run or forced routing. */
   providerOverride?: CheckoutRouteProvider;
+  /** Distinguishes preview dry-run vs persisted operator override. */
+  overrideKind?: 'stored' | 'preview';
 }
 
 export interface CheckoutRoutingPreview {
@@ -63,7 +66,8 @@ export class CheckoutRoutingPolicyService {
     private paymentRouter: PaymentRouterService,
     private stripeMx: StripeMxService,
     private paddle: PaddleService,
-    @Optional() private priceResolver?: PriceResolverService
+    @Optional() private priceResolver?: PriceResolverService,
+    @Optional() private routeOverride?: CheckoutRouteOverrideService
   ) {}
 
   isUnifiedRoutingEnabled(): boolean {
@@ -107,13 +111,14 @@ export class CheckoutRoutingPolicyService {
   }
 
   async preview(context: CheckoutRoutingContext): Promise<CheckoutRoutingPreview> {
-    const countryCode = context.countryCode.toUpperCase();
-    const { provider, reason } = this.resolveProvider(context);
+    const resolvedContext = await this.applyStoredOverride(context);
+    const countryCode = resolvedContext.countryCode.toUpperCase();
+    const { provider, reason } = this.resolveProvider(resolvedContext);
     const providerConfig =
       provider === 'stripe_mx' || provider === 'paddle'
         ? this.paymentRouter.getProviderForCountry(countryCode)
         : null;
-    const priceId = await this.resolvePriceId(context.plan, context.product);
+    const priceId = await this.resolvePriceId(resolvedContext.plan, resolvedContext.product);
 
     return {
       provider,
@@ -140,7 +145,26 @@ export class CheckoutRoutingPolicyService {
       hybridRouterAvailable: this.isHybridRouterAvailable(countryCode),
       legacyStripeAvailable: this.isLegacyStripeConfigured(),
       priceIdResolvable: Boolean(priceId),
-      catalogPlanId: this.normalizeCatalogPlanId(context.plan, context.product),
+      catalogPlanId: this.normalizeCatalogPlanId(resolvedContext.plan, resolvedContext.product),
+    };
+  }
+
+  private async applyStoredOverride(
+    context: CheckoutRoutingContext
+  ): Promise<CheckoutRoutingContext> {
+    if (context.providerOverride || !this.routeOverride) {
+      return context;
+    }
+
+    const stored = await this.routeOverride.getActiveOverride(context.userId, context.product);
+    if (!stored) {
+      return context;
+    }
+
+    return {
+      ...context,
+      providerOverride: stored.provider,
+      overrideKind: 'stored',
     };
   }
 
@@ -151,7 +175,8 @@ export class CheckoutRoutingPolicyService {
     if (context.providerOverride) {
       return {
         provider: context.providerOverride,
-        reason: 'operator_override',
+        reason:
+          context.overrideKind === 'preview' ? 'operator_override' : 'operator_stored_override',
       };
     }
 
@@ -177,7 +202,8 @@ export class CheckoutRoutingPolicyService {
    * back to Janua or legacy Stripe orchestration in SubscriptionLifecycleService.
    */
   async tryHybridCheckout(context: CheckoutRoutingContext): Promise<HybridCheckoutResult | null> {
-    const { provider, reason } = this.resolveProvider(context);
+    const resolvedContext = await this.applyStoredOverride(context);
+    const { provider, reason } = this.resolveProvider(resolvedContext);
 
     if (provider === 'janua' || provider === 'legacy_stripe') {
       return null;
@@ -187,34 +213,34 @@ export class CheckoutRoutingPolicyService {
       return null;
     }
 
-    const priceId = await this.resolvePriceId(context.plan, context.product);
+    const priceId = await this.resolvePriceId(resolvedContext.plan, resolvedContext.product);
     if (!priceId) {
       this.logger.warn(
-        `Hybrid checkout skipped for user ${context.userId}: no price for ${context.plan}`
+        `Hybrid checkout skipped for user ${resolvedContext.userId}: no price for ${resolvedContext.plan}`
       );
       return null;
     }
 
     const metadata: Record<string, string> = {
-      userId: context.userId,
-      plan: context.plan,
+      userId: resolvedContext.userId,
+      plan: resolvedContext.plan,
     };
-    if (context.product) metadata.product = context.product;
-    if (context.orgId) metadata.orgId = context.orgId;
-    if (context.source) metadata.source = context.source;
-    if (context.operatorId) metadata.operatorId = context.operatorId;
+    if (resolvedContext.product) metadata.product = resolvedContext.product;
+    if (resolvedContext.orgId) metadata.orgId = resolvedContext.orgId;
+    if (resolvedContext.source) metadata.source = resolvedContext.source;
+    if (resolvedContext.operatorId) metadata.operatorId = resolvedContext.operatorId;
 
     const result = await this.paymentRouter.createCheckout({
-      userId: context.userId,
+      userId: resolvedContext.userId,
       priceId,
-      countryCode: context.countryCode.toUpperCase(),
-      successUrl: context.successUrl,
-      cancelUrl: context.cancelUrl,
+      countryCode: resolvedContext.countryCode.toUpperCase(),
+      successUrl: resolvedContext.successUrl,
+      cancelUrl: resolvedContext.cancelUrl,
       metadata,
     });
 
     this.logger.log(
-      `Hybrid checkout routed user ${context.userId} to ${result.provider} (${reason})`
+      `Hybrid checkout routed user ${resolvedContext.userId} to ${result.provider} (${reason})`
     );
 
     return {

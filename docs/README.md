@@ -15,6 +15,7 @@ file over older phase summaries when choosing what to read first.
 | [Roadmap](ROADMAP.md)                                               | Stability priorities P0–P8 and milestones M1–M7                                    |
 | [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)     | Billing router and internal MADFAM POS completion plan                             |
 | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)               | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                |
+| [Commercial Staging Credentials](COMMERCIAL_STAGING_CREDENTIALS.md) | Vendor test-key checklist for staging commercial soak                              |
 | [Deployment Guide](DEPLOYMENT.md)                                   | Enclii-first deploy, staging, rollback, current rollout blockers                   |
 | [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)         | Current truth about production, staging, DNS, health, and remaining stability gaps |
 | [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)     | Concise final status from the latest production-stability push                     |

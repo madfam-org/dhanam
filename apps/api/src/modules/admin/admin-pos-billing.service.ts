@@ -16,12 +16,18 @@ import type {
   PosReconciliationSummary,
   PosTimelineEntry,
 } from '@modules/billing/services/internal-pos.service';
+import {
+  CheckoutRouteOverrideService,
+  type StoredRouteOverride,
+} from '@modules/billing/services/checkout-route-override.service';
 
 import {
   AdminPosChargeDto,
   AdminPosCheckoutDto,
   AdminPosRefundDto,
   AdminPosStatusDto,
+  AdminRouteOverrideClearDto,
+  AdminRouteOverrideDto,
   AdminRoutePreviewDto,
 } from './dto';
 
@@ -31,7 +37,8 @@ export class AdminPosBillingService {
     private prisma: PrismaService,
     private logger: LoggerService,
     private auditService: AuditService,
-    @Optional() private billingService?: BillingService
+    @Optional() private billingService?: BillingService,
+    @Optional() private routeOverride?: CheckoutRouteOverrideService
   ) {}
 
   async createPosCheckout(
@@ -153,6 +160,7 @@ export class AdminPosBillingService {
       successUrl: `${webUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${webUrl}/billing/cancel`,
       providerOverride: dto.providerOverride,
+      overrideKind: dto.providerOverride ? 'preview' : undefined,
     });
 
     await this.auditService.logEvent({
@@ -187,6 +195,7 @@ export class AdminPosBillingService {
       correlationId: dto.correlationId,
       countryCode: dto.countryCode?.toUpperCase(),
       operatorId: adminUserId,
+      provider: dto.provider,
     });
 
     await this.auditService.logEvent({
@@ -276,5 +285,70 @@ export class AdminPosBillingService {
     });
 
     return summary;
+  }
+
+  async setCheckoutRouteOverride(
+    dto: AdminRouteOverrideDto,
+    adminUserId: string
+  ): Promise<StoredRouteOverride> {
+    if (!this.routeOverride) {
+      throw new InternalServerErrorException('Route override service is not available');
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: dto.userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const record = await this.routeOverride.setOverride({
+      targetUserId: dto.userId,
+      product: dto.product || 'dhanam',
+      provider: dto.provider,
+      countryCode: dto.countryCode?.toUpperCase(),
+      reason: dto.reason,
+      operatorId: adminUserId,
+      ttlHours: dto.ttlHours,
+    });
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.billing_route_override_set',
+      resource: 'Billing',
+      resourceId: dto.userId,
+      metadata: record,
+      severity: 'high',
+    });
+
+    return record;
+  }
+
+  async clearCheckoutRouteOverride(
+    dto: AdminRouteOverrideClearDto,
+    adminUserId: string
+  ): Promise<{ cleared: true }> {
+    if (!this.routeOverride) {
+      throw new InternalServerErrorException('Route override service is not available');
+    }
+
+    await this.routeOverride.clearOverride(
+      dto.userId,
+      dto.product || 'dhanam',
+      adminUserId,
+      dto.reason
+    );
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.billing_route_override_cleared',
+      resource: 'Billing',
+      resourceId: dto.userId,
+      metadata: { product: dto.product || 'dhanam', reason: dto.reason },
+      severity: 'medium',
+    });
+
+    return { cleared: true };
   }
 }

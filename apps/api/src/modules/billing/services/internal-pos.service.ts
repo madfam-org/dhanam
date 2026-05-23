@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 
@@ -14,22 +15,26 @@ import { Prisma, Currency } from '@db';
 
 import { StripeService } from '../stripe.service';
 
+import { ConektaService } from './conekta.service';
 import { StripeMxService } from './stripe-mx.service';
+
+export type PosProvider = 'stripe_mx' | 'legacy_stripe' | 'conekta';
 
 export interface PosChargeRequest {
   userId: string;
   amountMinor: number;
   currency: string;
   description: string;
-  paymentMethod?: 'card' | 'oxxo' | 'customer_balance';
+  paymentMethod?: 'card' | 'oxxo' | 'customer_balance' | 'spei';
   correlationId?: string;
   countryCode?: string;
   operatorId: string;
+  provider?: PosProvider | 'auto';
 }
 
 export interface PosChargeResult {
   correlationId: string;
-  provider: 'stripe_mx' | 'legacy_stripe';
+  provider: PosProvider;
   paymentIntentId: string;
   clientSecret: string | null;
   status: string;
@@ -48,10 +53,18 @@ export interface PosRefundRequest {
 export interface PosRefundResult {
   correlationId: string;
   refundId: string;
-  provider: 'stripe_mx' | 'legacy_stripe';
+  provider: PosProvider;
   status: string | null;
   amountMinor: number;
   currency: string;
+}
+
+export interface PosProductWebhookDelivery {
+  consumer: string;
+  status: 'delivered' | 'failed' | 'pending' | 'resolved';
+  cfdiUuid?: string | null;
+  eventType?: string | null;
+  lastError?: string | null;
 }
 
 export interface PosTimelineEntry {
@@ -62,6 +75,8 @@ export interface PosTimelineEntry {
   currency: string;
   createdAt: Date;
   metadata: unknown;
+  cfdiUuid?: string | null;
+  productWebhookDeliveries?: PosProductWebhookDelivery[];
 }
 
 export interface PosReconciliationSummary {
@@ -88,7 +103,8 @@ export class InternalPosService {
     private prisma: PrismaService,
     private audit: AuditService,
     private stripeMx: StripeMxService,
-    private stripe: StripeService
+    private stripe: StripeService,
+    @Optional() private conekta?: ConektaService
   ) {}
 
   async createCharge(request: PosChargeRequest): Promise<PosChargeResult> {
@@ -114,6 +130,7 @@ export class InternalPosService {
     const correlationId = request.correlationId || crypto.randomUUID();
     const countryCode = (request.countryCode || user.countryCode || 'US').toUpperCase();
     const currency = request.currency.toLowerCase();
+    const providerChoice = request.provider ?? 'auto';
     const metadata = {
       dhanam_user_id: user.id,
       correlation_id: correlationId,
@@ -121,13 +138,84 @@ export class InternalPosService {
       operator_id: request.operatorId,
     };
 
-    if (countryCode === 'MX' && currency === 'mxn' && this.stripeMx.isConfigured()) {
+    const useConekta =
+      providerChoice === 'conekta' ||
+      (providerChoice === 'auto' &&
+        countryCode === 'MX' &&
+        currency === 'mxn' &&
+        !this.stripeMx.isConfigured() &&
+        this.conekta?.isConfigured());
+
+    if (useConekta && countryCode === 'MX' && currency === 'mxn' && this.conekta?.isConfigured()) {
+      const paymentSource =
+        request.paymentMethod === 'oxxo'
+          ? { type: 'oxxo_cash' as const }
+          : { type: 'spei' as const };
+
+      const charge = await this.conekta.createCharge({
+        amount: request.amountMinor,
+        currency: 'MXN',
+        customerInfo: {
+          name: user.name || user.email,
+          email: user.email,
+        },
+        paymentSource,
+        description: request.description,
+        metadata: {
+          ...Object.fromEntries(
+            Object.entries(metadata).map(([key, value]) => [key, String(value)])
+          ),
+          idempotency_key: correlationId,
+        },
+      });
+
+      await this.recordPosEvent(user.id, 'payment_succeeded', request.amountMinor, Currency.MXN, {
+        correlationId,
+        paymentIntentId: charge.orderId,
+        chargeId: charge.chargeId,
+        provider: 'conekta',
+        operatorId: request.operatorId,
+      });
+
+      await this.audit.log({
+        userId: request.operatorId,
+        action: 'ADMIN_POS_CHARGE_INITIATED',
+        severity: 'high',
+        metadata: {
+          targetUserId: user.id,
+          correlationId,
+          paymentIntentId: charge.orderId,
+          chargeId: charge.chargeId,
+          provider: 'conekta',
+          amountMinor: request.amountMinor,
+          currency: 'MXN',
+        },
+      });
+
+      return {
+        correlationId,
+        provider: 'conekta',
+        paymentIntentId: charge.orderId,
+        clientSecret: charge.paymentInstructions?.reference ?? null,
+        status: charge.paymentStatus,
+        currency: 'MXN',
+        amountMinor: request.amountMinor,
+      };
+    }
+
+    if (
+      countryCode === 'MX' &&
+      currency === 'mxn' &&
+      this.stripeMx.isConfigured() &&
+      providerChoice !== 'legacy_stripe'
+    ) {
       const paymentIntent = await this.stripeMx.createPaymentIntent({
         amount: request.amountMinor,
         customerEmail: user.email,
         customerId: user.stripeCustomerId || undefined,
         description: request.description,
-        paymentMethod: request.paymentMethod || 'card',
+        paymentMethod:
+          request.paymentMethod === 'spei' ? 'customer_balance' : request.paymentMethod || 'card',
         metadata,
       });
 
@@ -213,6 +301,12 @@ export class InternalPosService {
   async createRefund(request: PosRefundRequest): Promise<PosRefundResult> {
     const correlationId = request.correlationId || crypto.randomUUID();
     const provider = await this.resolveRefundProvider(request.paymentIntentId);
+
+    if (provider === 'conekta') {
+      throw new BadRequestException(
+        'Conekta POS refunds are webhook-driven; use the Conekta dashboard or wait for charge.refunded'
+      );
+    }
 
     let refund;
     if (provider === 'stripe_mx') {
@@ -302,15 +396,73 @@ export class InternalPosService {
       take: 100,
     });
 
-    return events.map((event) => ({
-      id: event.id,
-      type: event.type,
-      status: event.status,
-      amount: event.amount.toString(),
-      currency: event.currency,
-      createdAt: event.createdAt,
-      metadata: event.metadata,
-    }));
+    const paymentReferences = new Set<string>();
+    for (const event of events) {
+      const meta = event.metadata as Record<string, unknown> | null;
+      if (typeof meta?.paymentIntentId === 'string') {
+        paymentReferences.add(meta.paymentIntentId);
+      }
+      if (typeof meta?.payment_id === 'string') {
+        paymentReferences.add(meta.payment_id);
+      }
+    }
+
+    const deliveryRows =
+      paymentReferences.size > 0
+        ? await this.prisma.webhookDeliveryFailure.findMany({
+            where: {
+              OR: Array.from(paymentReferences).map((ref) => ({
+                payload: {
+                  path: ['data', 'payment_id'],
+                  equals: ref,
+                },
+              })),
+            },
+            orderBy: { createdAt: 'asc' },
+            take: 50,
+          })
+        : [];
+
+    const deliveriesByPayment = new Map<string, PosProductWebhookDelivery[]>();
+    for (const row of deliveryRows) {
+      const payload = row.payload as { data?: { payment_id?: string }; type?: string };
+      const paymentId = payload.data?.payment_id;
+      if (!paymentId) {
+        continue;
+      }
+      const list = deliveriesByPayment.get(paymentId) ?? [];
+      list.push({
+        consumer: row.consumer,
+        status: row.resolvedAt ? 'resolved' : 'failed',
+        eventType: row.eventType,
+        lastError: row.lastErrorMessage,
+      });
+      deliveriesByPayment.set(paymentId, list);
+    }
+
+    return events.map((event) => {
+      const meta = (event.metadata as Record<string, unknown> | null) ?? {};
+      const paymentRef =
+        (typeof meta.paymentIntentId === 'string' && meta.paymentIntentId) ||
+        (typeof meta.payment_id === 'string' && meta.payment_id) ||
+        null;
+      const cfdiUuid =
+        (typeof meta.cfdiUuid === 'string' && meta.cfdiUuid) ||
+        (typeof meta.cfdi_uuid === 'string' && meta.cfdi_uuid) ||
+        null;
+
+      return {
+        id: event.id,
+        type: event.type,
+        status: event.status,
+        amount: event.amount.toString(),
+        currency: event.currency,
+        createdAt: event.createdAt,
+        metadata: event.metadata,
+        cfdiUuid,
+        productWebhookDeliveries: paymentRef ? deliveriesByPayment.get(paymentRef) : undefined,
+      };
+    });
   }
 
   async getReconciliationSummary(limit = 25): Promise<PosReconciliationSummary> {
@@ -338,9 +490,7 @@ export class InternalPosService {
     };
   }
 
-  private async resolveRefundProvider(
-    paymentIntentId: string
-  ): Promise<'stripe_mx' | 'legacy_stripe'> {
+  private async resolveRefundProvider(paymentIntentId: string): Promise<PosProvider> {
     const prior = await this.prisma.billingEvent.findFirst({
       where: {
         metadata: {
@@ -353,8 +503,12 @@ export class InternalPosService {
     });
 
     const provider = (prior?.metadata as { provider?: string } | null)?.provider;
-    if (provider === 'stripe_mx' || provider === 'legacy_stripe') {
+    if (provider === 'stripe_mx' || provider === 'legacy_stripe' || provider === 'conekta') {
       return provider;
+    }
+
+    if (paymentIntentId.startsWith('ord_')) {
+      return 'conekta';
     }
 
     if (this.stripeMx.isConfigured()) {

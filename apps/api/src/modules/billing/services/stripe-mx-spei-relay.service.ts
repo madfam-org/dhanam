@@ -83,13 +83,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type Stripe from 'stripe';
 
-import { BillingEventType, BillingStatus, Currency } from '@db';
+import { BillingEventType, BillingStatus, Currency, Prisma } from '@db';
 
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 
 import { PhyndCrmEngagementNotifierService } from './phyndcrm-engagement-notifier.service';
 import { WebhookDlqService } from './webhook-dlq.service';
+import { parseKarafielCfdiUuid } from '../utils/karafiel-webhook-response';
 
 /** Outbound Dhanam envelope for payment.* events. */
 export interface DhanamPaymentEnvelope {
@@ -546,8 +547,7 @@ export class StripeMxSpeiRelayService {
         let statusCode: number | undefined;
         let errorMessage: string | undefined;
         let ok = false;
-        let responseBodySnippet: string;
-
+        let responseBodySnippet = '';
         try {
           const res = await fetch(url, {
             method: 'POST',
@@ -561,18 +561,24 @@ export class StripeMxSpeiRelayService {
           });
           statusCode = res.status;
           ok = res.ok;
+          try {
+            responseBodySnippet = (await res.text()).slice(0, 2000);
+          } catch {
+            responseBodySnippet = '';
+          }
           if (!ok) {
-            try {
-              responseBodySnippet = (await res.text()).slice(0, 500);
-            } catch {
-              responseBodySnippet = '';
-            }
-            errorMessage = `consumer responded ${res.status}: ${responseBodySnippet}`;
+            errorMessage = `consumer responded ${res.status}: ${responseBodySnippet.slice(0, 500)}`;
             this.logger.warn(
               `Relay to ${product} (${url}) returned ${res.status} for envelope ${envelope.id}`
             );
           } else {
             this.logger.log(`Relayed ${envelope.type} (${envelope.id}) → ${product}`);
+            if (product === 'karafiel') {
+              await this.recordKarafielCfdiOnTimeline(
+                envelope.data.payment_id,
+                parseKarafielCfdiUuid(responseBodySnippet)
+              );
+            }
           }
         } catch (err) {
           errorMessage = `network/timeout: ${(err as Error).message}`;
@@ -604,6 +610,42 @@ export class StripeMxSpeiRelayService {
         }
       })
     );
+  }
+
+  private async recordKarafielCfdiOnTimeline(
+    paymentId: string,
+    cfdiUuid: string | null
+  ): Promise<void> {
+    if (!paymentId) {
+      return;
+    }
+
+    const events = await this.prisma.billingEvent.findMany({
+      where: {
+        metadata: {
+          path: ['paymentIntentId'],
+          equals: paymentId,
+        },
+      },
+      take: 25,
+    });
+
+    for (const event of events) {
+      const existing = (event.metadata as Record<string, unknown> | null) ?? {};
+      const mergedCfdi =
+        cfdiUuid ?? (typeof existing.cfdiUuid === 'string' ? existing.cfdiUuid : null);
+      await this.prisma.billingEvent.update({
+        where: { id: event.id },
+        data: {
+          metadata: {
+            ...existing,
+            ...(mergedCfdi ? { cfdiUuid: mergedCfdi } : {}),
+            karafielDelivered: true,
+            karafielDeliveredAt: new Date().toISOString(),
+          } as Prisma.InputJsonValue,
+        },
+      });
+    }
   }
 
   private listRelayTargets(): Array<{ product: string; url: string }> {
