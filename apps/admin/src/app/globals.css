@@ -162,6 +162,10 @@
   color: hsl(215 16% 40%);
 }
 
+.admin-janua-sign-in .rounded-lg.border.bg-card p.text-xs.text-muted-foreground {
+  opacity: 1 !important;
+}
+
 .admin-janua-sign-in .admin-oauth-github {
   background-color: #24292e !important;
   border-color: transparent !important;

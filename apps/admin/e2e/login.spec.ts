@@ -42,15 +42,14 @@ test.describe('Admin login page', () => {
       return {
         color: computed.color,
         backgroundColor: computed.backgroundColor,
-        contrast: computed.color === 'rgb(255, 255, 255)' ? 'low' : 'ok',
       };
     });
 
     expect(styles.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
     expect(styles.backgroundColor).not.toBe('rgb(255, 255, 255)');
-    // White label on dark GitHub brand background is expected.
-    if (styles.contrast === 'low') {
-      expect(styles.backgroundColor).toMatch(/24292e|47, 47, 47|31, 41, 55/i);
+    // White label on GitHub brand dark background is expected.
+    if (styles.color === 'rgb(255, 255, 255)') {
+      expect(styles.backgroundColor).toMatch(/36,\s*41,\s*46|24292e/i);
     }
   });
 
