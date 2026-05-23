@@ -32,12 +32,13 @@ plus manual promotion; the current public production runtime is the ArgoCD
 
 ### Infrastructure
 
-- **Cluster**: 2-node Hetzner bare metal
-- **Production Node**: "The Sanctuary" (AX41-NVMe)
-- **Build Node**: "The Forge" (CPX11)
+- **Cluster**: MADFAM bare-metal Kubernetes (Enclii-managed)
 - **Ingress**: Cloudflare Tunnel (zero-trust)
 - **GitOps**: ArgoCD syncs from `infra/k8s/production/` with auto-sync, prune, and self-heal
 - **Namespace**: `dhanam`
+
+Node hostnames, provider inventory, and full topology live in private
+`madfam-org/internal-devops` — not in this public repo.
 
 ### Current Production Runtime Gap
 

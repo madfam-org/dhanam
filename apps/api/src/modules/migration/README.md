@@ -54,7 +54,8 @@ be duplicated on re-import:
 
 **Platform config (optional):** set `PLATFORM_CONFIG_SOURCE=db` to load
 `madfam.import.*` keys from the `platform_config` table (env vars override).
-Admin API: `GET/PATCH /v1/admin/platform-config/madfam-import`.
+Admin API: `GET/PATCH /v1/admin/platform-config/madfam-import`.  
+Admin UI: `https://admin.dhan.am/madfam-import` (after admin deploy).
 
 **Production bootstrap (kubectl):**
 
@@ -68,7 +69,8 @@ bash scripts/run-prod-madfam-budget-backfill.sh  # idempotent budget metadata ta
 
 Scripts: `import-madfam-csv.ts`, `verify-madfam-import-compat.ts`,
 `backfill-madfam-budget-metadata.ts`, `bootstrap-madfam-prod-env.sh`,
-`run-prod-madfam-import-verify.sh`, `run-prod-madfam-budget-backfill.sh`
+`run-prod-madfam-import-verify.sh`, `run-prod-madfam-budget-backfill.sh`,
+`seed-madfam-platform-config.ts`, `run-prod-seed-madfam-platform-config.sh`
 
 ## Tests
 

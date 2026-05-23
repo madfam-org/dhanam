@@ -13,10 +13,10 @@ data-rich `admin@madfam.io` operator slice** at `app.dhan.am` / `admin.dhan.am`.
 
 ## Executive summary
 
-| Track                      | Today (2026-05-23)                | Target             | Horizon    |
-| -------------------------- | --------------------------------- | ------------------ | ---------- |
-| **G4 public sanitization** | ~40% (P0 shipped)                 | 100% G4 sign-off   | 6–8 weeks  |
-| **Operator prod slice**    | ~50% (124 CSV txs, continuity OK) | 100% dogfood-ready | 6–10 weeks |
+| Track                      | Today (2026-05-23)                  | Target             | Horizon    |
+| -------------------------- | ----------------------------------- | ------------------ | ---------- |
+| **G4 public sanitization** | ~48% (P0 + A6 + partial P1)         | 100% G4 sign-off   | 6–8 weeks  |
+| **Operator prod slice**    | ~65% (ledger + metadata + admin UI) | 100% dogfood-ready | 6–10 weeks |
 
 Both tracks share **Phase 3 (PlatformConfig + admin runtime)** — build once, satisfy
 both gates.
@@ -158,7 +158,7 @@ kubectl, git env files, or CSV-only manual paths for routine ops.
 | --- | ------------------------------------------------------------------- | ------ | ----------- | -------- |
 | D1  | Prisma `PlatformConfig` (`key`, `value` JSON, `scope`, `updatedBy`) | dhanam | API         | **Done** |
 | D2  | `GET/PATCH /v1/admin/platform-config` + audit events                | dhanam | API + Admin | **Done** |
-| D3  | Admin UI: MADFAM Import Settings panel (RFC, space names, suffixes) | dhanam | Admin       | Planned  |
+| D3  | Admin UI: MADFAM Import Settings panel (RFC, space names, suffixes) | dhanam | Admin       | **Done** |
 | D4  | Import script reads config from DB when `PLATFORM_CONFIG_SOURCE=db` | dhanam | API         | **Done** |
 | D5  | Seed prod rows via admin (not git): `madfam.import.*` keys          | Ops    | Ops         |
 | D6  | Ship `internal-catalog.controller` + Vault secret; admin smoke      | dhanam | API         |
@@ -264,14 +264,14 @@ Recorded during `run-prod-madfam-import-verify.sh`:
 
 ## Implementation order (sprint-sized)
 
-| Sprint | Focus             | Delivers                                              | Status                                                                                                              |
-| ------ | ----------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| S1     | A1–A6, B1, B4     | Docs relocated; metadata backfill; bootstrap env-only | **In progress** — A6 ✅, B1 ✅ (prod backfill 2026-05-23), B4 scripts ✅, D1–D4 ✅ (code; migration pending deploy) |
-| S2     | C1–C4, B2–B3      | AGENTS diet; personal routing fix                     |
-| S3     | D1–D4             | PlatformConfig API + import reads DB                  |
-| S4     | D3, D5, D6, E1–E2 | Admin UI settings; Belvo prod connect                 |
-| S5     | E3–E4, F1–F4      | Dashboard proof; governance CI                        |
-| S6     | F5–F6             | Audits; close TD-1012 + TD-1013                       |
+| Sprint | Focus         | Delivers                                              | Status                                                                                               |
+| ------ | ------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| S1     | A1–A6, B1, B4 | Docs relocated; metadata backfill; bootstrap env-only | **In progress** — A6 ✅, B1 ✅, B4 ✅, D1–D4 ✅, D3 ✅ (admin UI); partial P1 (DEPLOYMENT redaction) |
+| S2     | C1–C4, B2–B3  | AGENTS diet; personal routing fix                     |
+| S3     | D1–D4         | PlatformConfig API + import reads DB                  | **Done** (code)                                                                                      |
+| S4     | D5, D6, E1–E2 | Prod PlatformConfig seed; Belvo prod connect          |
+| S5     | E3–E4, F1–F4  | Dashboard proof; governance CI                        |
+| S6     | F5–F6         | Audits; close TD-1012 + TD-1013                       |
 
 ---
 

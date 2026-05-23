@@ -13,6 +13,7 @@ The admin dashboard provides platform administrators with tools for:
 - **User Management**: Search, view, and manage user accounts
 - **Space Management**: Browse and inspect spaces
 - **Feature Flags**: Control feature rollout across the platform
+- **MADFAM Import**: Operator CSV routing settings (RFC, space names, suffixes) via PlatformConfig
 - **MADFAM POS**: Operator checkout links, route preview, direct charge/refund, timeline, and reconciliation
 - **Webhook DLQ**: Product webhook delivery failure inspection, replay, and resolve
 - **Audit Logs**: Searchable audit trail of all sensitive operations
@@ -78,6 +79,7 @@ apps/admin/
 │   │       ├── spaces/             # Space search/browse
 │   │       ├── users/              # User search/management
 │   │       ├── feature-flags/      # Feature flag CRUD
+│   │       ├── madfam-import/      # MADFAM CSV import PlatformConfig settings
 │   │       ├── pos/                # MADFAM POS checkout operations
 │   │       ├── webhook-dlq/        # Product webhook DLQ recovery
 │   │       ├── audit-logs/         # Searchable audit trail

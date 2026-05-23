@@ -412,9 +412,9 @@ Already source-landed: webhooks, ledger writes, `payment.*` fan-out, DLQ.
 | P0    | Stop bleeding: RFC env config, seed/crypto fixes, doc redaction, CI leakage gate | Done        |
 | P1    | Relocate full ops runbooks to `internal-devops`                                  | Planned     |
 | P2    | Slim public `AGENTS.md`; private agent-ops doc                                   | Planned     |
-| P3    | `PlatformConfig` admin API + MADFAM import DB hydration                          | In progress |
+| P3    | `PlatformConfig` admin API + UI + MADFAM import DB hydration                     | In progress |
 | P4    | Dev credential hygiene (`docker-compose`, e2e defaults)                          | Planned     |
-| P5    | gitleaks, PR checklist, quarterly audit                                          | Planned     |
+| P5    | gitleaks, PR checklist, quarterly audit                                          | In progress |
 
 ### G4 exit criteria
 

@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   CreditCard,
   Repeat2,
+  Database,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -52,6 +53,7 @@ const navGroups: NavGroup[] = [
       { name: 'Spaces', href: '/spaces', icon: Building2 },
       { name: 'Users', href: '/users', icon: Users },
       { name: 'Feature Flags', href: '/feature-flags', icon: Flag },
+      { name: 'MADFAM Import', href: '/madfam-import', icon: Database },
     ],
   },
   {

@@ -106,6 +106,34 @@ function inferRole(id) {
   console.log('Business RFC configured:', businessRfc ? 'yes' : 'no');
   console.log('Partner suffix default: -afac');
 
+  const ORIGIN = 'madfam-csv-import';
+  console.log('Budget import metadata:');
+  for (const role of ['business', 'partner', 'personal']) {
+    const space = roleMap.get(role);
+    if (!space) {
+      issues.push(`missing space for budget check: ${role}`);
+      continue;
+    }
+    let budget = (await pool.query(
+      `SELECT id, metadata FROM budgets WHERE space_id=$1 AND metadata->>'origin'=$2 LIMIT 1`,
+      [space.space_id, ORIGIN]
+    )).rows[0];
+    if (!budget) {
+      budget = (await pool.query(
+        `SELECT id, metadata FROM budgets WHERE space_id=$1 ORDER BY created_at ASC LIMIT 1`,
+        [space.space_id]
+      )).rows[0];
+    }
+    const tagged =
+      budget?.metadata &&
+      budget.metadata.origin === ORIGIN &&
+      typeof budget.metadata.spaceRole === 'string';
+    console.log(`  ${role}: budget=${budget?.id ?? 'none'} tagged=${tagged ? 'yes' : 'no'}`);
+    if (!tagged) {
+      issues.push(`budget metadata missing for ${role}`);
+    }
+  }
+
   if (issues.length) {
     console.error('FAIL:', issues.join('; '));
     process.exit(1);

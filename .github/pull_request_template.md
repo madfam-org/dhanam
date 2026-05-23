@@ -87,6 +87,7 @@ Closes #
 ### Security
 
 - [ ] No sensitive data exposed (API keys, passwords, etc.)
+- [ ] No operator secrets, real RFCs, or MADFAM PII in the public diff (see `scripts/check-public-repo-leakage.py`)
 - [ ] Input validation added where necessary
 - [ ] SQL injection prevention verified (if applicable)
 - [ ] XSS prevention verified (if applicable)

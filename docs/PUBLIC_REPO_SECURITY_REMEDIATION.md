@@ -86,7 +86,7 @@ Public repo keeps **pointers only**: “See MADFAM internal-devops runbook X.”
 | P3.3 | Load MADFAM CSV routing from `PlatformConfig` when `PLATFORM_CONFIG_SOURCE=db` | Done    |
 | P3.4 | Finish `internal-catalog.controller` + secret in Vault only                    | Planned |
 | P3.5 | Audit log all platform-config mutations                                        | Done    |
-| P3.6 | Admin UI MADFAM Import Settings panel                                          | Planned |
+| P3.6 | Admin UI MADFAM Import Settings panel                                          | Done    |
 
 **Runtime contract:** `admin@madfam.io` Janua role → admin app → DB config. Git
 never holds org-specific RFCs or space routing again.
@@ -102,12 +102,12 @@ never holds org-specific RFCs or space routing again.
 
 ### Phase 5 — Governance (ongoing)
 
-| ID   | Task                                                         |
-| ---- | ------------------------------------------------------------ |
-| P5.1 | gitleaks/trufflehog in CI (or GitHub secret scanning alerts) |
-| P5.2 | PR template checkbox: “No operator secrets or MADFAM PII”    |
-| P5.3 | Quarterly re-run leakage audit                               |
-| P5.4 | `SECURITY.md` public-repo section (done in Phase 0)          |
+| ID   | Task                                                         | Status  |
+| ---- | ------------------------------------------------------------ | ------- |
+| P5.1 | gitleaks/trufflehog in CI (or GitHub secret scanning alerts) | Planned |
+| P5.2 | PR template checkbox: “No operator secrets or MADFAM PII”    | Done    |
+| P5.3 | Quarterly re-run leakage audit                               | Planned |
+| P5.4 | `SECURITY.md` public-repo section (done in Phase 0)          | Done    |
 
 ## Target architecture
 

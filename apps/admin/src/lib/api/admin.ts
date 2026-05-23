@@ -109,6 +109,16 @@ export interface FeatureFlag {
   updatedAt: string;
 }
 
+/** MADFAM CSV import routing (non-secret operator config). */
+export interface MadfamImportPlatformSettings {
+  businessRfc: string | null;
+  spaceNameBusiness: string | null;
+  spaceNamePartner: string | null;
+  spaceNamePersonal: string | null;
+  accountSuffixPartner: string | null;
+  accountSuffixPersonal: string | null;
+}
+
 export interface PaginatedResponse<T> {
   data: T[];
   total: number;
@@ -451,6 +461,19 @@ export const adminApi = {
 
   async updateFeatureFlag(key: string, updates: Partial<FeatureFlag>): Promise<FeatureFlag> {
     return apiClient.post<FeatureFlag>(`/admin/feature-flags/${key}`, updates);
+  },
+
+  async getMadfamImportPlatformConfig(): Promise<MadfamImportPlatformSettings> {
+    return apiClient.get<MadfamImportPlatformSettings>('/admin/platform-config/madfam-import');
+  },
+
+  async updateMadfamImportPlatformConfig(
+    settings: Partial<MadfamImportPlatformSettings>
+  ): Promise<MadfamImportPlatformSettings> {
+    return apiClient.patch<MadfamImportPlatformSettings>(
+      '/admin/platform-config/madfam-import',
+      settings
+    );
   },
 
   // Phase 5 endpoints

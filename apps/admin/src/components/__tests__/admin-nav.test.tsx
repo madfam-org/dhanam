@@ -51,6 +51,7 @@ describe('AdminNav', () => {
     expect(screen.getByText('Spaces')).toBeInTheDocument();
     expect(screen.getByText('Users')).toBeInTheDocument();
     expect(screen.getByText('Feature Flags')).toBeInTheDocument();
+    expect(screen.getByText('MADFAM Import')).toBeInTheDocument();
     expect(screen.getByText('MADFAM POS')).toBeInTheDocument();
     expect(screen.getByText('Webhook DLQ')).toBeInTheDocument();
     expect(screen.getByText('Audit Logs')).toBeInTheDocument();
@@ -84,7 +85,7 @@ describe('AdminNav', () => {
     render(<AdminNav />);
 
     const allLinks = screen.getAllByRole('link').filter((link) => link.closest('nav'));
-    // 1 (Overview) + 4 (SRE) + 3 (Data) + 3 (Commerce) + 2 (Analytics) + 1 (Compliance) = 14
-    expect(allLinks).toHaveLength(14);
+    // 1 (Overview) + 4 (SRE) + 4 (Data) + 3 (Commerce) + 2 (Analytics) + 1 (Compliance) = 15
+    expect(allLinks).toHaveLength(15);
   });
 });
