@@ -27,6 +27,7 @@ import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from '@core/types/authenticated-request';
 
 import { AdminOpsService } from './admin-ops.service';
+import { AdminPosBillingService } from './admin-pos-billing.service';
 import { AdminService } from './admin.service';
 import {
   UserSearchDto,
@@ -35,6 +36,9 @@ import {
   AuditLogSearchDto,
   AdminPosCheckoutDto,
   AdminPosStatusDto,
+  AdminPosChargeDto,
+  AdminPosRefundDto,
+  AdminRoutePreviewDto,
   OnboardingFunnelDto,
   FeatureFlagDto,
   UpdateFeatureFlagDto,
@@ -55,7 +59,8 @@ import { AdminGuard } from './guards/admin.guard';
 export class AdminController {
   constructor(
     private readonly adminService: AdminService,
-    private readonly adminOpsService: AdminOpsService
+    private readonly adminOpsService: AdminOpsService,
+    private readonly adminPosBillingService: AdminPosBillingService
   ) {}
 
   @Get('users')
@@ -290,7 +295,7 @@ export class AdminController {
   @ApiResponse({ status: HttpStatus.OK, description: 'POS checkout link created' })
   @ApiBadRequestResponse({ description: 'Invalid checkout request' })
   async createPosCheckout(@Body() dto: AdminPosCheckoutDto, @Request() req: AuthenticatedRequest) {
-    return this.adminOpsService.createPosCheckout(dto, req.user.id);
+    return this.adminPosBillingService.createPosCheckout(dto, req.user.id);
   }
 
   @Post('billing/pos/status')
@@ -298,7 +303,53 @@ export class AdminController {
   @ApiResponse({ status: HttpStatus.OK, description: 'POS checkout status retrieved' })
   @ApiBadRequestResponse({ description: 'Invalid checkout status request' })
   async getPosCheckoutStatus(@Body() dto: AdminPosStatusDto, @Request() req: AuthenticatedRequest) {
-    return this.adminOpsService.getPosCheckoutStatus(dto, req.user.id);
+    return this.adminPosBillingService.getPosCheckoutStatus(dto, req.user.id);
+  }
+
+  @Post('billing/route/preview')
+  @ApiOperation({ summary: 'Preview checkout routing for a user/plan/country matrix' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Routing preview returned' })
+  async previewCheckoutRoute(
+    @Body() dto: AdminRoutePreviewDto,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminPosBillingService.previewCheckoutRoute(dto, req.user.id);
+  }
+
+  @Post('billing/pos/charge')
+  @ApiOperation({ summary: 'Create an operator POS charge (PaymentIntent)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'POS charge created' })
+  async createPosCharge(@Body() dto: AdminPosChargeDto, @Request() req: AuthenticatedRequest) {
+    return this.adminPosBillingService.createPosCharge(dto, req.user.id);
+  }
+
+  @Post('billing/pos/refund')
+  @ApiOperation({ summary: 'Refund a POS PaymentIntent (full or partial)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'POS refund created' })
+  async createPosRefund(@Body() dto: AdminPosRefundDto, @Request() req: AuthenticatedRequest) {
+    return this.adminPosBillingService.createPosRefund(dto, req.user.id);
+  }
+
+  @Get('billing/pos/timeline/:correlationId')
+  @ApiOperation({ summary: 'Billing event timeline for a POS correlation id' })
+  @ApiParam({ name: 'correlationId', description: 'POS correlation id' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Timeline retrieved' })
+  async getPosTimeline(
+    @Param('correlationId') correlationId: string,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminPosBillingService.getPosTimeline(correlationId, req.user.id);
+  }
+
+  @Get('billing/reconciliation')
+  @ApiOperation({ summary: 'Flagged billing reconciliation mismatches' })
+  @ApiQuery({ name: 'limit', required: false })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Reconciliation summary retrieved' })
+  async getBillingReconciliation(
+    @Query('limit') limit: number | undefined,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminPosBillingService.getBillingReconciliation(req.user.id, limit || 25);
   }
 
   @Get('gdpr/export/:userId')

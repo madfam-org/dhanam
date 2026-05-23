@@ -5,7 +5,6 @@ import { AuditService } from '@core/audit/audit.service';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { RedisService } from '@core/redis/redis.service';
-import { BillingService } from '@modules/billing/billing.service';
 import { QueueService } from '@modules/jobs/queue.service';
 
 import { AdminOpsService } from './admin-ops.service';
@@ -44,11 +43,6 @@ describe('AdminOpsService', () => {
     clearQueue: jest.fn(),
   };
 
-  const mockBillingService = {
-    createOperatorCheckout: jest.fn(),
-    getOperatorCheckoutStatus: jest.fn(),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -58,7 +52,6 @@ describe('AdminOpsService', () => {
         { provide: RedisService, useValue: mockRedisService },
         { provide: AuditService, useValue: mockAuditService },
         { provide: QueueService, useValue: mockQueueService },
-        { provide: BillingService, useValue: mockBillingService },
       ],
     }).compile();
 
@@ -253,125 +246,6 @@ describe('AdminOpsService', () => {
         BadRequestException
       );
       expect(mockQueueService.clearQueue).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('createPosCheckout', () => {
-    it('creates an operator checkout link and records a high-severity audit entry', async () => {
-      mockBillingService.createOperatorCheckout.mockResolvedValue({
-        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_pos',
-        provider: 'stripe',
-        sessionId: 'cs_pos',
-      });
-
-      const result = await service.createPosCheckout(
-        {
-          userId: 'user_123',
-          product: 'karafiel',
-          plan: 'pro',
-          orgId: 'org_123',
-          countryCode: 'mx',
-          successUrl: 'https://admin.dhan.am/pos/success',
-          cancelUrl: 'https://admin.dhan.am/pos/cancel',
-        },
-        'admin1'
-      );
-
-      expect(mockBillingService.createOperatorCheckout).toHaveBeenCalledWith('user_123', {
-        plan: 'pro',
-        product: 'karafiel',
-        orgId: 'org_123',
-        countryCode: 'MX',
-        successUrl: 'https://admin.dhan.am/pos/success',
-        cancelUrl: 'https://admin.dhan.am/pos/cancel',
-        operatorId: 'admin1',
-        source: 'internal_pos',
-      });
-      expect(result).toEqual({
-        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_pos',
-        provider: 'stripe',
-        userId: 'user_123',
-        product: 'karafiel',
-        plan: 'pro',
-        countryCode: 'MX',
-        sessionId: 'cs_pos',
-      });
-      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          userId: 'admin1',
-          action: 'admin.billing_pos_checkout_created',
-          resource: 'Billing',
-          resourceId: 'user_123',
-          severity: 'high',
-          metadata: expect.objectContaining({
-            provider: 'stripe',
-            sessionId: 'cs_pos',
-            product: 'karafiel',
-            plan: 'pro',
-            orgId: 'org_123',
-            countryCode: 'MX',
-          }),
-        })
-      );
-    });
-
-    it('defaults POS checkout product to dhanam', async () => {
-      mockBillingService.createOperatorCheckout.mockResolvedValue({
-        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_pos',
-        provider: 'stripe',
-        sessionId: 'cs_pos',
-      });
-
-      await service.createPosCheckout({ userId: 'user_123', plan: 'pro' }, 'admin1');
-
-      expect(mockBillingService.createOperatorCheckout).toHaveBeenCalledWith(
-        'user_123',
-        expect.objectContaining({ product: 'dhanam' })
-      );
-    });
-  });
-
-  describe('getPosCheckoutStatus', () => {
-    it('loads checkout status and records an audit entry', async () => {
-      mockBillingService.getOperatorCheckoutStatus.mockResolvedValue({
-        sessionId: 'cs_pos',
-        provider: 'stripe',
-        status: 'complete',
-        paymentStatus: 'paid',
-        customerId: 'cus_123',
-        subscriptionId: 'sub_123',
-        paymentIntentId: null,
-        userId: 'user_123',
-        product: 'karafiel',
-        plan: 'pro',
-        source: 'internal_pos',
-        amountTotal: 1199,
-        currency: 'usd',
-        createdAt: '2026-01-01T00:00:00.000Z',
-        expiresAt: '2026-01-01T01:00:00.000Z',
-        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_pos',
-        billingEvents: [],
-      });
-
-      const result = await service.getPosCheckoutStatus({ sessionId: 'cs_pos' }, 'admin1');
-
-      expect(mockBillingService.getOperatorCheckoutStatus).toHaveBeenCalledWith('cs_pos');
-      expect(result.status).toBe('complete');
-      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          userId: 'admin1',
-          action: 'admin.billing_pos_status_viewed',
-          resource: 'Billing',
-          resourceId: 'user_123',
-          severity: 'medium',
-          metadata: expect.objectContaining({
-            provider: 'stripe',
-            sessionId: 'cs_pos',
-            status: 'complete',
-            paymentStatus: 'paid',
-          }),
-        })
-      );
     });
   });
 });

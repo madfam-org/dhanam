@@ -10,6 +10,20 @@ import { PostHogService } from '../analytics/posthog.service';
 
 import { JanuaWebhookPayloadDto } from './dto/janua-webhook.dto';
 import { JanuaBillingService } from './janua-billing.service';
+import { CheckoutRoutingPolicyService } from './services/checkout-routing-policy.service';
+import type {
+  CheckoutRoutingContext,
+  CheckoutRoutingPreview,
+} from './services/checkout-routing-policy.service';
+import {
+  InternalPosService,
+  type PosChargeRequest,
+  type PosChargeResult,
+  type PosRefundRequest,
+  type PosRefundResult,
+  type PosReconciliationSummary,
+  type PosTimelineEntry,
+} from './services/internal-pos.service';
 import { PriceResolverService } from './services/price-resolver.service';
 import { SubscriptionLifecycleService } from './services/subscription-lifecycle.service';
 import { UsageTrackingService } from './services/usage-tracking.service';
@@ -73,7 +87,9 @@ export class BillingService {
     // --- pre-built sub-services (available when module registers them) ---
     @Optional() usageTracking?: UsageTrackingService,
     @Optional() lifecycle?: SubscriptionLifecycleService,
-    @Optional() webhooks?: WebhookProcessorService
+    @Optional() webhooks?: WebhookProcessorService,
+    @Optional() private checkoutRouting?: CheckoutRoutingPolicyService,
+    @Optional() private internalPos?: InternalPosService
   ) {
     // Build sub-services from raw deps if not provided via DI (test compat)
     this.usageTracking = usageTracking ?? new UsageTrackingService(this.prisma);
@@ -203,6 +219,41 @@ export class BillingService {
 
   async getBillingHistory(userId: string, limit = 20) {
     return this.lifecycle.getBillingHistory(userId, limit);
+  }
+
+  async previewCheckoutRouting(context: CheckoutRoutingContext): Promise<CheckoutRoutingPreview> {
+    if (!this.checkoutRouting) {
+      throw new Error('Checkout routing policy is not available');
+    }
+    return this.checkoutRouting.preview(context);
+  }
+
+  async createPosCharge(request: PosChargeRequest): Promise<PosChargeResult> {
+    if (!this.internalPos) {
+      throw new Error('Internal POS service is not available');
+    }
+    return this.internalPos.createCharge(request);
+  }
+
+  async createPosRefund(request: PosRefundRequest): Promise<PosRefundResult> {
+    if (!this.internalPos) {
+      throw new Error('Internal POS service is not available');
+    }
+    return this.internalPos.createRefund(request);
+  }
+
+  async getPosTimeline(correlationId: string): Promise<PosTimelineEntry[]> {
+    if (!this.internalPos) {
+      throw new Error('Internal POS service is not available');
+    }
+    return this.internalPos.getTimeline(correlationId);
+  }
+
+  async getBillingReconciliationSummary(limit = 25): Promise<PosReconciliationSummary> {
+    if (!this.internalPos) {
+      throw new Error('Internal POS service is not available');
+    }
+    return this.internalPos.getReconciliationSummary(limit);
   }
 
   // =========================================================================

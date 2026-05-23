@@ -13,7 +13,7 @@ The admin dashboard provides platform administrators with tools for:
 - **User Management**: Search, view, and manage user accounts
 - **Space Management**: Browse and inspect spaces
 - **Feature Flags**: Control feature rollout across the platform
-- **MADFAM POS**: Operator checkout-link creation and Stripe checkout status lookup
+- **MADFAM POS**: Operator checkout links, route preview, direct charge/refund, timeline, and reconciliation
 - **Webhook DLQ**: Product webhook delivery failure inspection, replay, and resolve
 - **Audit Logs**: Searchable audit trail of all sensitive operations
 - **Billing Events**: Billing event log viewer

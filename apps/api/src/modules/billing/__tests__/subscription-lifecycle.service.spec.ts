@@ -6,6 +6,8 @@ import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { PostHogService } from '../../analytics/posthog.service';
 import { JanuaBillingService } from '../janua-billing.service';
+import { OperatorCheckoutStatusService } from '../services/operator-checkout-status.service';
+import { SubscriptionJanuaNotifierService } from '../services/subscription-janua-notifier.service';
 import {
   SubscriptionLifecycleService,
   PLAN_TIER_MAP,
@@ -98,6 +100,15 @@ describe('SubscriptionLifecycleService', () => {
             capture: jest.fn(),
           },
         },
+        {
+          provide: SubscriptionJanuaNotifierService,
+          useValue: {
+            dispatchJanuaRoleUpgrade: jest.fn(),
+            notifyJanuaOfTierChange: jest.fn(),
+            notifyProductWebhooks: jest.fn(),
+          },
+        },
+        OperatorCheckoutStatusService,
       ],
     }).compile();
 

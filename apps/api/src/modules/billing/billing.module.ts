@@ -47,9 +47,12 @@ import { WebhookDlqRetryJob } from './jobs/webhook-dlq-retry.job';
 import { MadfamEventsController } from './madfam-events.controller';
 // Federation (PhyndCRM integration)
 import { CancellationService } from './services/cancellation.service';
+import { CheckoutRoutingPolicyService } from './services/checkout-routing-policy.service';
 import { ConektaService } from './services/conekta.service';
 import { CustomerFederationService } from './services/customer-federation.service';
 // Hybrid Router Services (Stripe MX + Paddle)
+import { InternalPosService } from './services/internal-pos.service';
+import { OperatorCheckoutStatusService } from './services/operator-checkout-status.service';
 import { PaddleService } from './services/paddle.service';
 import { PaymentRouterService } from './services/payment-router.service';
 import { PhyndCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
@@ -59,6 +62,7 @@ import { ProductCatalogService } from './services/product-catalog.service';
 import { RevenueMetricsService } from './services/revenue-metrics.service';
 import { StripeMxSpeiRelayService } from './services/stripe-mx-spei-relay.service';
 import { StripeMxService } from './services/stripe-mx.service';
+import { SubscriptionJanuaNotifierService } from './services/subscription-janua-notifier.service';
 import { SubscriptionLifecycleService } from './services/subscription-lifecycle.service';
 import { SyntheticRevenueProbeService } from './services/synthetic-revenue-probe.service';
 import { TrialService } from './services/trial.service';
@@ -114,6 +118,10 @@ import { UsageAlertsController } from './usage-alerts.controller';
     // Extracted sub-services
     UsageMeteringService,
     UsageTrackingService,
+    CheckoutRoutingPolicyService,
+    InternalPosService,
+    OperatorCheckoutStatusService,
+    SubscriptionJanuaNotifierService,
     SubscriptionLifecycleService,
     WebhookProcessorService,
 
@@ -187,6 +195,10 @@ import { UsageAlertsController } from './usage-alerts.controller';
     CustomerFederationService,
     UsageMeteringService,
     UsageTrackingService,
+    CheckoutRoutingPolicyService,
+    InternalPosService,
+    OperatorCheckoutStatusService,
+    SubscriptionJanuaNotifierService,
     SubscriptionLifecycleService,
     WebhookDlqService,
     WebhookProcessorService,

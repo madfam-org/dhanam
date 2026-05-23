@@ -345,4 +345,25 @@ export class StripeMxService {
 
     return (await this.stripe.customers.retrieve(customerId)) as Stripe.Customer;
   }
+
+  /**
+   * Refund a PaymentIntent (full or partial).
+   */
+  async createRefund(params: {
+    paymentIntentId: string;
+    amountMinor?: number;
+    reason?: string;
+    metadata?: Record<string, string>;
+  }): Promise<Stripe.Refund> {
+    if (!this.stripe) {
+      throw InfrastructureException.configurationError('STRIPE_MX_SECRET_KEY');
+    }
+
+    return await this.stripe.refunds.create({
+      payment_intent: params.paymentIntentId,
+      amount: params.amountMinor,
+      reason: params.reason as Stripe.RefundCreateParams.Reason | undefined,
+      metadata: params.metadata || {},
+    });
+  }
 }

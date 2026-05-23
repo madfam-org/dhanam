@@ -278,6 +278,86 @@ export interface PosCheckoutStatus {
   }>;
 }
 
+export interface RoutePreviewRequest {
+  userId: string;
+  plan: string;
+  product?: string;
+  countryCode?: string;
+  providerOverride?: 'janua' | 'stripe_mx' | 'paddle' | 'legacy_stripe';
+}
+
+export interface RoutePreviewResult {
+  provider: string;
+  routeReason: string;
+  countryCode: string;
+  currency: string;
+  paymentMethods: string[];
+  januaEnabled: boolean;
+  unifiedRoutingEnabled: boolean;
+  hybridRouterAvailable: boolean;
+  legacyStripeAvailable: boolean;
+  priceIdResolvable: boolean;
+  catalogPlanId: string;
+}
+
+export interface PosChargeRequest {
+  userId: string;
+  amountMinor: number;
+  currency: string;
+  description: string;
+  paymentMethod?: 'card' | 'oxxo' | 'customer_balance';
+  correlationId?: string;
+  countryCode?: string;
+}
+
+export interface PosChargeResult {
+  correlationId: string;
+  provider: 'stripe_mx' | 'legacy_stripe';
+  paymentIntentId: string;
+  clientSecret: string | null;
+  status: string;
+  currency: string;
+  amountMinor: number;
+}
+
+export interface PosRefundRequest {
+  paymentIntentId: string;
+  amountMinor?: number;
+  reason?: string;
+  correlationId?: string;
+}
+
+export interface PosRefundResult {
+  correlationId: string;
+  refundId: string;
+  provider: 'stripe_mx' | 'legacy_stripe';
+  status: string | null;
+  amountMinor: number;
+  currency: string;
+}
+
+export interface PosTimelineEntry {
+  id: string;
+  type: string;
+  status: string;
+  amount: string;
+  currency: string;
+  createdAt: string;
+  metadata: unknown;
+}
+
+export interface ReconciliationSummary {
+  flaggedCount: number;
+  recentMismatches: Array<{
+    id: string;
+    userId: string | null;
+    type: string;
+    status: string;
+    createdAt: string;
+    metadata: unknown;
+  }>;
+}
+
 export interface WebhookDlqFailure {
   id: string;
   eventId: string;
@@ -438,6 +518,30 @@ export const adminApi = {
 
   async getPosCheckoutStatus(sessionId: string): Promise<PosCheckoutStatus> {
     return apiClient.post<PosCheckoutStatus>('/admin/billing/pos/status', { sessionId });
+  },
+
+  async previewCheckoutRoute(body: RoutePreviewRequest): Promise<RoutePreviewResult> {
+    return apiClient.post<RoutePreviewResult>('/admin/billing/route/preview', body);
+  },
+
+  async createPosCharge(body: PosChargeRequest): Promise<PosChargeResult> {
+    return apiClient.post<PosChargeResult>('/admin/billing/pos/charge', body);
+  },
+
+  async createPosRefund(body: PosRefundRequest): Promise<PosRefundResult> {
+    return apiClient.post<PosRefundResult>('/admin/billing/pos/refund', body);
+  },
+
+  async getPosTimeline(correlationId: string): Promise<PosTimelineEntry[]> {
+    return apiClient.get<PosTimelineEntry[]>(
+      `/admin/billing/pos/timeline/${encodeURIComponent(correlationId)}`
+    );
+  },
+
+  async getBillingReconciliation(limit = 25): Promise<ReconciliationSummary> {
+    return apiClient.get<ReconciliationSummary>('/admin/billing/reconciliation', {
+      limit,
+    } as Record<string, unknown>);
   },
 
   async listWebhookDlqFailures(params: WebhookDlqListParams = {}): Promise<WebhookDlqListResponse> {

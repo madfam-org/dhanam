@@ -8,6 +8,7 @@ import { BillingModule } from '@modules/billing/billing.module';
 import { JobsModule } from '@modules/jobs/jobs.module';
 
 import { AdminOpsService } from './admin-ops.service';
+import { AdminPosBillingService } from './admin-pos-billing.service';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import { AdminGuard } from './guards/admin.guard';
@@ -15,7 +16,7 @@ import { AdminGuard } from './guards/admin.guard';
 @Module({
   imports: [PrismaModule, LoggerModule, RedisModule, AuditModule, JobsModule, BillingModule],
   controllers: [AdminController],
-  providers: [AdminService, AdminOpsService, AdminGuard],
-  exports: [AdminService, AdminOpsService, AdminGuard],
+  providers: [AdminService, AdminOpsService, AdminPosBillingService, AdminGuard],
+  exports: [AdminService, AdminOpsService, AdminPosBillingService, AdminGuard],
 })
 export class AdminModule {}

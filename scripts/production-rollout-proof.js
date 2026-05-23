@@ -6,7 +6,9 @@ const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..');
 const kustomizationPath = path.join(repoRoot, 'infra/k8s/production/kustomization.yaml');
-const appName = process.argv[2] || 'dhanam-services';
+const args = process.argv.slice(2);
+const manifestOnly = args.includes('--manifest-only');
+const appName = args.find((arg) => !arg.startsWith('-')) || 'dhanam-services';
 
 function readExpectedImages() {
   const text = fs.readFileSync(kustomizationPath, 'utf8');
@@ -78,6 +80,15 @@ function collectLiveImages(app) {
 
 function main() {
   const expected = readExpectedImages();
+
+  if (manifestOnly) {
+    console.log('Production manifest proof (manifest-only mode)');
+    for (const item of expected) {
+      console.log(`OK  ${item.shortName} ${item.image}`);
+    }
+    return;
+  }
+
   const app = readLiveApplication();
   const liveImages = collectLiveImages(app);
   const health = app?.status?.health?.status;

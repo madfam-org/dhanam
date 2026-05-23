@@ -337,3 +337,28 @@ jobs:
             exit 0
           }
           git push
+
+  manifest-proof:
+    name: Validate production manifest digests
+    needs: promote
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert prod kustomization has signed digests
+        run: node scripts/production-rollout-proof.js --manifest-only
+
+  rollout-proof:
+    name: Prove live prod matches promoted digests (Enclii)
+    needs: promote
+    if: vars.ENCLII_ROLLOUT_PROOF_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Enclii CLI
+        run: |
+          if ! command -v enclii >/dev/null 2>&1; then
+            echo "::error::Enclii CLI not found on runner — set ENCLII_ROLLOUT_PROOF_ENABLED=false or install enclii"
+            exit 1
+          fi
+      - name: Compare live ArgoCD digests to production manifest
+        run: node scripts/production-rollout-proof.js dhanam-services

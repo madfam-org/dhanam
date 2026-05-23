@@ -26,26 +26,27 @@ checkout surface.
   with `JANUA_BILLING_ENABLED=false` until the Dhanam client route/auth contract
   is aligned to Janua production and an end-to-end Janua checkout has been
   verified.
-- `PaymentRouterService` exists for the Stripe MX/Paddle hybrid router, but the
-  primary `/billing/upgrade` and public `/billing/checkout` lifecycle still use
-  Janua-first/direct-Stripe logic. Treat router unification as active roadmap
-  work, not complete commercial stability.
+- `CheckoutRoutingPolicyService` wires subscription, external, and operator
+  checkout through `PaymentRouterService` when Janua billing is disabled
+  (`FEATURE_UNIFIED_CHECKOUT_ROUTING=true`, default). MX routes to Stripe MX;
+  non-MX routes to Paddle. Legacy US Stripe remains the fallback when hybrid
+  providers are not configured.
 
 ## Architecture
 
-| Concern                  | Primary files                                                               |
-| ------------------------ | --------------------------------------------------------------------------- |
-| Facade and REST API      | `billing.service.ts`, `billing.controller.ts`                               |
-| Subscription lifecycle   | `services/subscription-lifecycle.service.ts`                                |
-| Catalog price resolution | `services/price-resolver.service.ts`, `services/product-catalog.service.ts` |
-| Hybrid router            | `services/payment-router.service.ts`                                        |
-| Stripe SDK wrapper       | `stripe.service.ts`                                                         |
-| Stripe MX/SPEI           | `stripe-mx.controller.ts`, `services/stripe-mx*.ts`                         |
-| Paddle                   | `services/paddle.service.ts`                                                |
-| Janua billing            | `janua-billing.service.ts`                                                  |
-| Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                      |
-| Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                      |
-| Internal POS checkout    | `modules/admin/admin.controller.ts`, `modules/admin/admin-ops.service.ts`   |
+| Concern                  | Primary files                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------- |
+| Facade and REST API      | `billing.service.ts`, `billing.controller.ts`                                       |
+| Subscription lifecycle   | `services/subscription-lifecycle.service.ts`                                        |
+| Catalog price resolution | `services/price-resolver.service.ts`, `services/product-catalog.service.ts`         |
+| Hybrid router            | `services/payment-router.service.ts`, `services/checkout-routing-policy.service.ts` |
+| Stripe SDK wrapper       | `stripe.service.ts`                                                                 |
+| Stripe MX/SPEI           | `stripe-mx.controller.ts`, `services/stripe-mx*.ts`                                 |
+| Paddle                   | `services/paddle.service.ts`                                                        |
+| Janua billing            | `janua-billing.service.ts`                                                          |
+| Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                              |
+| Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                              |
+| Internal POS checkout    | `modules/admin/admin.controller.ts`, `modules/admin/admin-ops.service.ts`           |
 
 ## Pricing Source Of Truth
 
@@ -80,22 +81,25 @@ Current Dhanam managed-cloud tiers in the catalog:
 | `POST /billing/webhook/janua`                                                         | Janua HMAC       | Blocked by secrets   | Janua billing webhook                      |
 | `POST /billing/madfam-events`                                                         | MADFAM HMAC      | Live                 | Ecosystem revenue event receiver           |
 | `GET /billing/dlq` / `POST /billing/dlq/:id/replay` / `POST /billing/dlq/:id/resolve` | Admin JWT        | Live                 | Product-webhook DLQ inspect/replay/resolve |
-| `POST /admin/billing/pos/checkout`                                                    | Admin JWT        | Source landed        | Internal operator checkout link creation   |
-| `POST /admin/billing/pos/status`                                                      | Admin JWT        | Source landed        | Stripe checkout session status lookup      |
+| `POST /admin/billing/pos/checkout`                                                    | Admin JWT        | Live                 | Internal operator checkout link creation   |
+| `POST /admin/billing/pos/status`                                                      | Admin JWT        | Live                 | Stripe checkout session status lookup      |
+| `POST /admin/billing/route/preview`                                                   | Admin JWT        | Live                 | Dry-run checkout routing matrix            |
+| `POST /admin/billing/pos/charge`                                                      | Admin JWT        | Live                 | Operator PaymentIntent charge              |
+| `POST /admin/billing/pos/refund`                                                      | Admin JWT        | Live                 | Operator refund (full/partial)             |
+| `GET /admin/billing/pos/timeline/:correlationId`                                      | Admin JWT        | Live                 | POS correlation billing-event timeline     |
+| `GET /admin/billing/reconciliation`                                                   | Admin JWT        | Live                 | Flagged reconciliation mismatches          |
 
 ## Provider Routing Truth
 
-There are two routing layers today:
+1. `SubscriptionLifecycleService`: self-service, external, and operator checkout
+   orchestrator. Janua when enabled; otherwise hybrid router via
+   `CheckoutRoutingPolicyService`, then legacy Stripe fallback.
+2. `CheckoutRoutingPolicyService`: records provider, country, currency, and route
+   reason; executes hybrid checkout through `PaymentRouterService`.
+3. `PaymentRouterService`: `MX -> stripe_mx`, non-MX -> `paddle` implementation.
 
-1. `SubscriptionLifecycleService`: the currently wired self-service and public
-   checkout path. It attempts Janua when enabled, otherwise direct Stripe.
-2. `PaymentRouterService`: the hybrid router implementation for `MX ->
-stripe_mx` and non-MX -> `paddle`. It is tested and registered, but not yet
-   the sole checkout system of record.
-
-Full commercial stability requires unifying these paths behind one explicit
-policy that records provider, country, product, plan, currency, price source,
-and routing reason for every checkout.
+Use `POST /admin/billing/route/preview` to dry-run routing for a user/plan/country
+matrix before changing production flags.
 
 ## Internal POS Status
 

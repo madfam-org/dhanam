@@ -234,6 +234,45 @@ export class StripeService {
   }
 
   /**
+   * Create a one-time PaymentIntent (operator POS / ad-hoc charges).
+   */
+  async createPaymentIntent(params: {
+    amount: number;
+    currency: string;
+    customerEmail: string;
+    customerId?: string;
+    description: string;
+    metadata?: Record<string, string>;
+  }): Promise<Stripe.PaymentIntent> {
+    return await this.client().paymentIntents.create({
+      amount: params.amount,
+      currency: params.currency,
+      customer: params.customerId,
+      receipt_email: params.customerEmail,
+      description: params.description,
+      metadata: params.metadata || {},
+      automatic_payment_methods: { enabled: true },
+    });
+  }
+
+  /**
+   * Refund a PaymentIntent (full or partial).
+   */
+  async createRefund(params: {
+    paymentIntentId: string;
+    amountMinor?: number;
+    reason?: string;
+    metadata?: Record<string, string>;
+  }): Promise<Stripe.Refund> {
+    return await this.client().refunds.create({
+      payment_intent: params.paymentIntentId,
+      amount: params.amountMinor,
+      reason: params.reason as Stripe.RefundCreateParams.Reason | undefined,
+      metadata: params.metadata || {},
+    });
+  }
+
+  /**
    * Check if Stripe is configured
    */
   isConfigured(): boolean {
