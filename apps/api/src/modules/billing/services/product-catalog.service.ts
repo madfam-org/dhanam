@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
-import { Prisma } from '@db';
+import { Currency, Prisma, SubscriptionTier } from '@db';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
 
@@ -229,6 +229,81 @@ export class ProductCatalogService {
 
     this.invalidateCache();
     return result;
+  }
+
+  private resolveDhanamTier(tierSlug: string, override?: string): SubscriptionTier {
+    if (override?.trim()) {
+      return override.trim() as SubscriptionTier;
+    }
+    const key = tierSlug.toLowerCase();
+    const essentialsLike = ['community', 'free', 'free_member', 'essentials'];
+    if (essentialsLike.includes(key)) {
+      return SubscriptionTier.essentials;
+    }
+    return SubscriptionTier.pro;
+  }
+
+  /**
+   * Internal apply after Selva HITL: upsert product + price by ecosystem slugs.
+   */
+  async applyApprovedCatalogPrice(input: {
+    productSlug: string;
+    tierSlug: string;
+    amountCents: number;
+    currency?: Currency;
+    interval?: string;
+    dhanamTier?: string;
+    displayName?: string;
+    metadata?: Record<string, unknown>;
+    source?: string;
+  }): Promise<{
+    ok: true;
+    product: { id: string; slug: string; name: string };
+    price: {
+      id: string;
+      tierSlug: string;
+      amountCents: number;
+      currency: Currency;
+      interval: string;
+    };
+    created: boolean;
+  }> {
+    const currency = input.currency ?? Currency.MXN;
+    const interval = input.interval ?? 'month';
+    const product = await this.upsertProduct({
+      slug: input.productSlug,
+      name: input.displayName ?? input.productSlug,
+    });
+    const dhanamTier = this.resolveDhanamTier(input.tierSlug, input.dhanamTier);
+    const priceRow = await this.upsertPrice(product.id, {
+      tierSlug: input.tierSlug,
+      dhanamTier,
+      amountCents: input.amountCents,
+      currency: currency as string,
+      interval,
+      displayName: input.displayName,
+      metadata: {
+        ...(input.metadata || {}),
+        applied_via: input.source || 'tulana_selva_hitl',
+        tulana_tier_slug: input.tierSlug,
+      },
+    });
+    return {
+      ok: true,
+      product: {
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+      },
+      price: {
+        id: priceRow.id,
+        tierSlug: priceRow.tierSlug,
+        amountCents: priceRow.amountCents,
+        currency: priceRow.currency as Currency,
+        interval: priceRow.interval,
+      },
+      created: true,
+    };
   }
 
   /**

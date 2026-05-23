@@ -39,6 +39,7 @@ import {
   PaymentGatewayRegistry,
   StripeMxGateway,
 } from './gateways';
+import { CatalogApplySecretGuard } from './guards/catalog-apply-secret.guard';
 import { FeatureGateGuard } from './guards/feature-gate.guard';
 import { FederationAuthGuard } from './guards/federation-auth.guard';
 import { ProviderConnectionGuard } from './guards/provider-connection.guard';
@@ -46,6 +47,7 @@ import { SpaceLimitGuard } from './guards/space-limit.guard';
 import { SubscriptionGuard } from './guards/subscription.guard';
 import { UsageLimitGuard } from './guards/usage-limit.guard';
 import { UsageTrackingInterceptor } from './interceptors/usage-tracking.interceptor';
+import { InternalCatalogController } from './internal-catalog.controller';
 import { JanuaBillingService } from './janua-billing.service';
 import { OverageInvoicingJob } from './jobs/overage-invoicing.job';
 import { ReconciliationJob } from './jobs/reconciliation.job';
@@ -108,6 +110,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
   ],
   controllers: [
     BillingController,
+    InternalCatalogController,
     ConektaController,
     CreditBillingController,
     CustomerFederationController,
@@ -192,6 +195,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     // Guards and interceptors
     SubscriptionGuard,
     UsageLimitGuard,
+    CatalogApplySecretGuard,
     SpaceLimitGuard,
     ProviderConnectionGuard,
     FeatureGateGuard,
