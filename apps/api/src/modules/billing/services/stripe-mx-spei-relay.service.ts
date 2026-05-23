@@ -88,9 +88,10 @@ import { BillingEventType, BillingStatus, Currency, Prisma } from '@db';
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 
+import { parseKarafielCfdiUuid } from '../utils/karafiel-webhook-response';
+
 import { PhyndCrmEngagementNotifierService } from './phyndcrm-engagement-notifier.service';
 import { WebhookDlqService } from './webhook-dlq.service';
-import { parseKarafielCfdiUuid } from '../utils/karafiel-webhook-response';
 
 /** Outbound Dhanam envelope for payment.* events. */
 export interface DhanamPaymentEnvelope {
@@ -547,7 +548,7 @@ export class StripeMxSpeiRelayService {
         let statusCode: number | undefined;
         let errorMessage: string | undefined;
         let ok = false;
-        let responseBodySnippet = '';
+        let responseBodySnippet: string;
         try {
           const res = await fetch(url, {
             method: 'POST',

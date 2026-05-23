@@ -9,6 +9,10 @@ import { AuditService } from '@core/audit/audit.service';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { BillingService, type OperatorCheckoutStatus } from '@modules/billing/billing.service';
+import {
+  CheckoutRouteOverrideService,
+  type StoredRouteOverride,
+} from '@modules/billing/services/checkout-route-override.service';
 import type { CheckoutRoutingPreview } from '@modules/billing/services/checkout-routing-policy.service';
 import type {
   PosChargeResult,
@@ -16,10 +20,6 @@ import type {
   PosReconciliationSummary,
   PosTimelineEntry,
 } from '@modules/billing/services/internal-pos.service';
-import {
-  CheckoutRouteOverrideService,
-  type StoredRouteOverride,
-} from '@modules/billing/services/checkout-route-override.service';
 
 import {
   AdminPosChargeDto,
