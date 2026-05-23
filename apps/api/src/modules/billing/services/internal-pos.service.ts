@@ -5,7 +5,6 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  Optional,
   ServiceUnavailableException,
 } from '@nestjs/common';
 
@@ -13,12 +12,9 @@ import { AuditService } from '@core/audit/audit.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { Prisma, Currency } from '@db';
 
-import { StripeService } from '../stripe.service';
+import { PaymentGatewayRegistry, PosProvider } from '../gateways/payment-gateway.registry';
 
-import { ConektaService } from './conekta.service';
-import { StripeMxService } from './stripe-mx.service';
-
-export type PosProvider = 'stripe_mx' | 'legacy_stripe' | 'conekta';
+export type { PosProvider };
 
 export interface PosChargeRequest {
   userId: string;
@@ -102,9 +98,7 @@ export class InternalPosService {
   constructor(
     private prisma: PrismaService,
     private audit: AuditService,
-    private stripeMx: StripeMxService,
-    private stripe: StripeService,
-    @Optional() private conekta?: ConektaService
+    private gatewayRegistry: PaymentGatewayRegistry
   ) {}
 
   async createCharge(request: PosChargeRequest): Promise<PosChargeResult> {
@@ -138,140 +132,47 @@ export class InternalPosService {
       operator_id: request.operatorId,
     };
 
-    const useConekta =
-      providerChoice === 'conekta' ||
-      (providerChoice === 'auto' &&
-        countryCode === 'MX' &&
-        currency === 'mxn' &&
-        !this.stripeMx.isConfigured() &&
-        this.conekta?.isConfigured());
+    const provider = this.gatewayRegistry.resolvePosGateway({
+      countryCode,
+      currency,
+      providerChoice,
+    });
 
-    if (useConekta && countryCode === 'MX' && currency === 'mxn' && this.conekta?.isConfigured()) {
-      const paymentSource =
-        request.paymentMethod === 'oxxo'
-          ? { type: 'oxxo_cash' as const }
-          : { type: 'spei' as const };
-
-      const charge = await this.conekta.createCharge({
-        amount: request.amountMinor,
-        currency: 'MXN',
-        customerInfo: {
-          name: user.name || user.email,
-          email: user.email,
-        },
-        paymentSource,
-        description: request.description,
-        metadata: {
-          ...Object.fromEntries(
-            Object.entries(metadata).map(([key, value]) => [key, String(value)])
-          ),
-          idempotency_key: correlationId,
-        },
-      });
-
-      await this.recordPosEvent(user.id, 'payment_succeeded', request.amountMinor, Currency.MXN, {
-        correlationId,
-        paymentIntentId: charge.orderId,
-        chargeId: charge.chargeId,
-        provider: 'conekta',
-        operatorId: request.operatorId,
-      });
-
-      await this.audit.log({
-        userId: request.operatorId,
-        action: 'ADMIN_POS_CHARGE_INITIATED',
-        severity: 'high',
-        metadata: {
-          targetUserId: user.id,
-          correlationId,
-          paymentIntentId: charge.orderId,
-          chargeId: charge.chargeId,
-          provider: 'conekta',
-          amountMinor: request.amountMinor,
-          currency: 'MXN',
-        },
-      });
-
-      return {
-        correlationId,
-        provider: 'conekta',
-        paymentIntentId: charge.orderId,
-        clientSecret: charge.paymentInstructions?.reference ?? null,
-        status: charge.paymentStatus,
-        currency: 'MXN',
-        amountMinor: request.amountMinor,
-      };
-    }
-
-    if (
-      countryCode === 'MX' &&
-      currency === 'mxn' &&
-      this.stripeMx.isConfigured() &&
-      providerChoice !== 'legacy_stripe'
-    ) {
-      const paymentIntent = await this.stripeMx.createPaymentIntent({
-        amount: request.amountMinor,
-        customerEmail: user.email,
-        customerId: user.stripeCustomerId || undefined,
-        description: request.description,
-        paymentMethod:
-          request.paymentMethod === 'spei' ? 'customer_balance' : request.paymentMethod || 'card',
-        metadata,
-      });
-
-      await this.recordPosEvent(user.id, 'payment_succeeded', request.amountMinor, Currency.MXN, {
-        correlationId,
-        paymentIntentId: paymentIntent.id,
-        provider: 'stripe_mx',
-        operatorId: request.operatorId,
-      });
-
-      await this.audit.log({
-        userId: request.operatorId,
-        action: 'ADMIN_POS_CHARGE_INITIATED',
-        severity: 'high',
-        metadata: {
-          targetUserId: user.id,
-          correlationId,
-          paymentIntentId: paymentIntent.id,
-          provider: 'stripe_mx',
-          amountMinor: request.amountMinor,
-          currency: 'MXN',
-        },
-      });
-
-      return {
-        correlationId,
-        provider: 'stripe_mx',
-        paymentIntentId: paymentIntent.id,
-        clientSecret: paymentIntent.client_secret,
-        status: paymentIntent.status,
-        currency: 'MXN',
-        amountMinor: request.amountMinor,
-      };
-    }
-
-    if (currency !== 'usd') {
+    if (provider === 'legacy_stripe' && currency !== 'usd') {
       throw new BadRequestException(
         'Legacy POS charge supports USD only; use MXN + MX country for Stripe MX'
       );
     }
 
-    const paymentIntent = await this.stripe.createPaymentIntent({
-      amount: request.amountMinor,
-      currency: 'usd',
+    const gateway = this.gatewayRegistry.require(provider);
+    if (!gateway.isConfigured()) {
+      throw new ServiceUnavailableException(`Payment gateway ${provider} is not configured`);
+    }
+
+    const charge = await gateway.createPosCharge!({
+      amountMinor: request.amountMinor,
+      currency,
       customerEmail: user.email,
+      customerName: user.name || undefined,
       customerId: user.stripeCustomerId || undefined,
       description: request.description,
+      paymentMethod: request.paymentMethod,
       metadata,
     });
 
-    await this.recordPosEvent(user.id, 'payment_succeeded', request.amountMinor, Currency.USD, {
-      correlationId,
-      paymentIntentId: paymentIntent.id,
-      provider: 'legacy_stripe',
-      operatorId: request.operatorId,
-    });
+    await this.recordPosEvent(
+      user.id,
+      'payment_succeeded',
+      request.amountMinor,
+      provider === 'legacy_stripe' ? Currency.USD : Currency.MXN,
+      {
+        correlationId,
+        paymentIntentId: charge.paymentIntentId,
+        chargeId: charge.chargeId,
+        provider,
+        operatorId: request.operatorId,
+      }
+    );
 
     await this.audit.log({
       userId: request.operatorId,
@@ -280,20 +181,21 @@ export class InternalPosService {
       metadata: {
         targetUserId: user.id,
         correlationId,
-        paymentIntentId: paymentIntent.id,
-        provider: 'legacy_stripe',
+        paymentIntentId: charge.paymentIntentId,
+        chargeId: charge.chargeId,
+        provider,
         amountMinor: request.amountMinor,
-        currency: 'USD',
+        currency: charge.currency,
       },
     });
 
     return {
       correlationId,
-      provider: 'legacy_stripe',
-      paymentIntentId: paymentIntent.id,
-      clientSecret: paymentIntent.client_secret,
-      status: paymentIntent.status,
-      currency: 'USD',
+      provider,
+      paymentIntentId: charge.paymentIntentId,
+      clientSecret: charge.clientSecret,
+      status: charge.status,
+      currency: charge.currency,
       amountMinor: request.amountMinor,
     };
   }
@@ -301,40 +203,23 @@ export class InternalPosService {
   async createRefund(request: PosRefundRequest): Promise<PosRefundResult> {
     const correlationId = request.correlationId || crypto.randomUUID();
     const provider = await this.resolveRefundProvider(request.paymentIntentId);
+    const gatewayId = provider === 'legacy_stripe' ? 'legacy_stripe' : provider;
+    const gateway = this.gatewayRegistry.require(gatewayId);
 
-    if (provider === 'conekta') {
-      throw new BadRequestException(
-        'Conekta POS refunds are webhook-driven; use the Conekta dashboard or wait for charge.refunded'
-      );
+    if (!gateway.isConfigured()) {
+      throw new ServiceUnavailableException(`Payment gateway ${gatewayId} is not configured`);
     }
 
-    let refund;
-    if (provider === 'stripe_mx') {
-      if (!this.stripeMx.isConfigured()) {
-        throw new ServiceUnavailableException('Stripe MX is not configured');
-      }
-      refund = await this.stripeMx.createRefund({
-        paymentIntentId: request.paymentIntentId,
-        amountMinor: request.amountMinor,
-        reason: request.reason,
-        metadata: {
-          correlation_id: correlationId,
-          operator_id: request.operatorId,
-          source: 'internal_pos',
-        },
-      });
-    } else {
-      refund = await this.stripe.createRefund({
-        paymentIntentId: request.paymentIntentId,
-        amountMinor: request.amountMinor,
-        reason: request.reason,
-        metadata: {
-          correlation_id: correlationId,
-          operator_id: request.operatorId,
-          source: 'internal_pos',
-        },
-      });
-    }
+    const refund = await gateway.createRefund!({
+      paymentIntentId: request.paymentIntentId,
+      amountMinor: request.amountMinor,
+      reason: request.reason,
+      metadata: {
+        correlation_id: correlationId,
+        operator_id: request.operatorId,
+        source: 'internal_pos',
+      },
+    });
 
     const userId =
       (refund.metadata?.dhanam_user_id as string | undefined) ||
@@ -344,11 +229,11 @@ export class InternalPosService {
       await this.recordPosEvent(
         userId,
         'refund_issued',
-        refund.amount,
+        refund.amountMinor,
         refund.currency.toUpperCase() as Currency,
         {
           correlationId,
-          refundId: refund.id,
+          refundId: refund.refundId,
           paymentIntentId: request.paymentIntentId,
           provider,
           operatorId: request.operatorId,
@@ -362,24 +247,24 @@ export class InternalPosService {
       severity: 'high',
       metadata: {
         correlationId,
-        refundId: refund.id,
+        refundId: refund.refundId,
         paymentIntentId: request.paymentIntentId,
         provider,
-        amountMinor: refund.amount,
+        amountMinor: refund.amountMinor,
         currency: refund.currency.toUpperCase(),
       },
     });
 
     this.logger.log(
-      `POS refund ${refund.id} for PI ${request.paymentIntentId} by operator ${request.operatorId}`
+      `POS refund ${refund.refundId} for PI ${request.paymentIntentId} by operator ${request.operatorId}`
     );
 
     return {
       correlationId,
-      refundId: refund.id,
+      refundId: refund.refundId,
       provider,
       status: refund.status,
-      amountMinor: refund.amount,
+      amountMinor: refund.amountMinor,
       currency: refund.currency.toUpperCase(),
     };
   }
@@ -511,7 +396,7 @@ export class InternalPosService {
       return 'conekta';
     }
 
-    if (this.stripeMx.isConfigured()) {
+    if (this.gatewayRegistry.isConfigured('stripe_mx')) {
       return 'stripe_mx';
     }
 

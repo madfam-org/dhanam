@@ -1,23 +1,19 @@
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { JanuaBillingService } from '../janua-billing.service';
+import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
 
 import {
   CheckoutRoutingPolicyService,
   CheckoutRoutingContext,
 } from '../services/checkout-routing-policy.service';
-import { PaddleService } from '../services/paddle.service';
 import { PaymentRouterService } from '../services/payment-router.service';
 import { PriceResolverService } from '../services/price-resolver.service';
-import { StripeMxService } from '../services/stripe-mx.service';
 
 describe('CheckoutRoutingPolicyService', () => {
   let service: CheckoutRoutingPolicyService;
-  let januaBilling: jest.Mocked<JanuaBillingService>;
+  let gatewayRegistry: jest.Mocked<PaymentGatewayRegistry>;
   let paymentRouter: jest.Mocked<PaymentRouterService>;
-  let stripeMx: jest.Mocked<StripeMxService>;
-  let paddle: jest.Mocked<PaddleService>;
   let priceResolver: jest.Mocked<PriceResolverService>;
 
   const baseContext: CheckoutRoutingContext = {
@@ -45,27 +41,42 @@ describe('CheckoutRoutingPolicyService', () => {
           },
         },
         {
-          provide: JanuaBillingService,
-          useValue: { isEnabled: jest.fn().mockReturnValue(false) },
+          provide: PaymentGatewayRegistry,
+          useValue: {
+            isConfigured: jest.fn((id: string) => {
+              if (id === 'janua') return false;
+              if (id === 'legacy_stripe') return true;
+              return true;
+            }),
+            isHybridCheckoutAvailable: jest.fn((country: string) => {
+              if (country === 'MX') return true;
+              return true;
+            }),
+            resolveHybridCheckoutGateway: jest.fn((country: string) =>
+              country === 'MX' ? 'stripe_mx' : 'paddle'
+            ),
+            get: jest.fn((id: string) => ({
+              id,
+              getProviderConfig: jest.fn(() =>
+                id === 'stripe_mx'
+                  ? {
+                      currency: 'MXN',
+                      paymentMethods: ['card', 'oxxo', 'customer_balance'],
+                      taxHandling: 'automatic',
+                    }
+                  : {
+                      currency: 'USD',
+                      paymentMethods: ['card', 'paypal'],
+                      taxHandling: 'merchant-of-record',
+                    }
+              ),
+            })),
+            toGatewayId: jest.fn((provider: string) => provider),
+          },
         },
         {
           provide: PaymentRouterService,
           useValue: {
-            getProviderForCountry: jest.fn((country: string) =>
-              country === 'MX'
-                ? {
-                    provider: 'stripe_mx',
-                    currency: 'MXN',
-                    paymentMethods: ['card', 'oxxo', 'customer_balance'],
-                    taxHandling: 'automatic',
-                  }
-                : {
-                    provider: 'paddle',
-                    currency: 'USD',
-                    paymentMethods: ['card', 'paypal'],
-                    taxHandling: 'automatic',
-                  }
-            ),
             createCheckout: jest.fn().mockResolvedValue({
               checkoutUrl: 'https://checkout.example/mx',
               sessionId: 'cs_mx',
@@ -73,14 +84,6 @@ describe('CheckoutRoutingPolicyService', () => {
               currency: 'MXN',
             }),
           },
-        },
-        {
-          provide: StripeMxService,
-          useValue: { isConfigured: jest.fn().mockReturnValue(true) },
-        },
-        {
-          provide: PaddleService,
-          useValue: { isConfigured: jest.fn().mockReturnValue(true) },
         },
         {
           provide: PriceResolverService,
@@ -92,10 +95,8 @@ describe('CheckoutRoutingPolicyService', () => {
     }).compile();
 
     service = module.get(CheckoutRoutingPolicyService);
-    januaBilling = module.get(JanuaBillingService);
+    gatewayRegistry = module.get(PaymentGatewayRegistry);
     paymentRouter = module.get(PaymentRouterService);
-    stripeMx = module.get(StripeMxService);
-    paddle = module.get(PaddleService);
     priceResolver = module.get(PriceResolverService);
   });
 
@@ -112,14 +113,13 @@ describe('CheckoutRoutingPolicyService', () => {
     });
 
     it('prefers Janua when enabled', () => {
-      januaBilling.isEnabled.mockReturnValue(true);
+      gatewayRegistry.isConfigured.mockImplementation((id: string) => id === 'janua');
       const decision = service.resolveProvider(baseContext);
       expect(decision.provider).toBe('janua');
     });
 
     it('falls back to legacy Stripe when hybrid router unavailable', () => {
-      stripeMx.isConfigured.mockReturnValue(false);
-      paddle.isConfigured.mockReturnValue(false);
+      gatewayRegistry.isHybridCheckoutAvailable.mockReturnValue(false);
       const decision = service.resolveProvider({ ...baseContext, countryCode: 'US' });
       expect(decision.provider).toBe('legacy_stripe');
     });

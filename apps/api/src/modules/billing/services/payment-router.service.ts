@@ -42,6 +42,8 @@ import { ConfigService } from '@nestjs/config';
 
 import { PrismaService } from '@core/prisma/prisma.service';
 
+import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
+
 import { PaddleService } from './paddle.service';
 import { StripeMxService } from './stripe-mx.service';
 
@@ -78,7 +80,8 @@ export class PaymentRouterService {
     private prisma: PrismaService,
     private config: ConfigService,
     private stripeMx: StripeMxService,
-    private paddle: PaddleService
+    private paddle: PaddleService,
+    private gatewayRegistry: PaymentGatewayRegistry
   ) {
     this.logger.log('Payment Router initialized (Hybrid Strategy: Stripe MX + Paddle)');
   }
@@ -87,22 +90,23 @@ export class PaymentRouterService {
    * Determine the best payment provider for a country
    */
   getProviderForCountry(countryCode: string): ProviderConfig {
-    // Mexico → Stripe MX (native MXN, OXXO, SPEI)
-    if (countryCode === 'MX') {
+    const gatewayId = this.gatewayRegistry.resolveHybridCheckoutGateway(countryCode);
+    if (gatewayId === 'stripe_mx') {
+      const config = this.gatewayRegistry.require('stripe_mx').getProviderConfig?.(countryCode);
       return {
         provider: 'stripe_mx',
-        currency: 'MXN',
-        paymentMethods: ['card', 'oxxo', 'customer_balance'],
-        taxHandling: 'automatic', // Stripe Tax handles Mexican IVA
+        currency: config?.currency ?? 'MXN',
+        paymentMethods: config?.paymentMethods ?? ['card', 'oxxo', 'customer_balance'],
+        taxHandling: 'automatic',
       };
     }
 
-    // All other countries → Paddle (Merchant of Record)
+    const paddleConfig = this.gatewayRegistry.require('paddle').getProviderConfig?.(countryCode);
     return {
       provider: 'paddle',
-      currency: 'USD', // Paddle converts to local currency at checkout
-      paymentMethods: ['card', 'paypal', 'apple_pay', 'google_pay'],
-      taxHandling: 'automatic', // Paddle handles global tax compliance
+      currency: paddleConfig?.currency ?? 'USD',
+      paymentMethods: paddleConfig?.paymentMethods ?? ['card', 'paypal', 'apple_pay', 'google_pay'],
+      taxHandling: 'automatic',
     };
   }
 
@@ -180,26 +184,27 @@ export class PaymentRouterService {
       });
     }
 
-    // Create checkout session
-    const session = await this.stripeMx.createCheckoutSession({
+    // Create checkout session via gateway adapter
+    const gateway = this.gatewayRegistry.require('stripe_mx');
+    const checkout = await gateway.createSubscriptionCheckout!({
       customerId,
       customerEmail: user.email,
       customerName: user.name || undefined,
       priceId,
+      countryCode: 'MX',
       successUrl: `${successUrl}?provider=stripe_mx&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl,
       metadata: {
         ...metadata,
         dhanam_user_id: user.id,
       },
-      paymentMethods: ['card', 'oxxo', 'customer_balance'],
     });
 
     return {
-      checkoutUrl: session.url!,
-      sessionId: session.id,
+      checkoutUrl: checkout.checkoutUrl,
+      sessionId: checkout.sessionId,
       provider: 'stripe_mx',
-      currency: 'MXN',
+      currency: checkout.currency,
     };
   }
 
@@ -241,15 +246,15 @@ export class PaymentRouterService {
       });
     }
 
-    // Create transaction
-    const transaction = await this.paddle.createTransaction({
+    const gateway = this.gatewayRegistry.require('paddle');
+    const checkout = await gateway.createSubscriptionCheckout!({
       customerId,
       customerEmail: user.email,
       customerName: user.name || undefined,
       priceId,
+      countryCode,
       successUrl: `${successUrl}?provider=paddle&transaction_id={transaction_id}`,
       cancelUrl,
-      countryCode,
       metadata: {
         ...metadata,
         dhanam_user_id: user.id,
@@ -257,10 +262,10 @@ export class PaymentRouterService {
     });
 
     return {
-      checkoutUrl: transaction.checkoutUrl,
-      sessionId: transaction.transactionId,
+      checkoutUrl: checkout.checkoutUrl,
+      sessionId: checkout.sessionId,
       provider: 'paddle',
-      currency: 'USD',
+      currency: checkout.currency,
     };
   }
 

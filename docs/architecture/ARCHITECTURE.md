@@ -111,6 +111,23 @@ Dhanam uses Janua for production authentication:
 Do not introduce Auth0, Clerk, or another identity provider. Keep Janua as the
 auth source of truth.
 
+Janua is **identity-only** in production today (`JANUA_BILLING_ENABLED=false`).
+Optional Janua-mediated checkout is documented in
+[ADR-008](../adr/008-integration-planes-janua-vs-direct.md).
+
+## Integration Planes
+
+Dhanam separates external integrations into three planes (ADR-008):
+
+| Plane              | Route                                                | Examples                                           |
+| ------------------ | ---------------------------------------------------- | -------------------------------------------------- |
+| **Identity**       | Janua OIDC only                                      | Login, MFA, org membership                         |
+| **Financial data** | Dhanam provider orchestrator (direct)                | Belvo, Plaid, Bitso, Zapper                        |
+| **Money movement** | Dhanam billing boundary via `PaymentGatewayRegistry` | Stripe MX, Paddle, Conekta, optional Janua adapter |
+
+Financial provider OAuth never routes through Janua. PSP webhooks and secrets
+live in Dhanam billing modules, not in Janua.
+
 ## Billing Boundary
 
 The billing module in `apps/api/src/modules/billing` is a facade over focused

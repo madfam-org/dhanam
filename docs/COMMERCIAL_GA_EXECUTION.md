@@ -13,6 +13,8 @@ full technical-stability sign-off (G1/M7) are tracked separately.
 **G2 scope decision (default):** **Scope A** — Stripe MX + Paddle are in GA;
 Conekta direct is integration-ready but not launched until Phase 3C proof is
 recorded. Janua-routed billing remains disabled (`JANUA_BILLING_ENABLED=false`).
+All PSP adapters implement `PaymentGatewayPort` via `PaymentGatewayRegistry`
+(see [ADR-008](adr/008-integration-planes-janua-vs-direct.md)).
 
 ---
 

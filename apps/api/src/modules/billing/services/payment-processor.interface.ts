@@ -4,14 +4,9 @@
  * =============================================================================
  *
  * Every processor (Stripe, Stripe MX, Paddle, Conekta/Polar via Janua) must
- * conform to this interface. Marketplace methods are OPTIONAL and the
- * processor declares its marketplace capability via the `capabilities`
- * object — the router checks capabilities before dispatching, and throws
- * NotSupportedError if a caller asks for marketplace routing against a
- * processor that doesn't have it.
- *
- * Adding a new processor: implement this interface + register in
- * PaymentRouterService. No other changes required.
+ * conform to this interface. Subscription checkout and POS charge/refund paths
+ * use {@link PaymentGatewayPort} via {@link PaymentGatewayRegistry} (ADR-008).
+ * Marketplace methods remain on this interface for Connect/RFC-5.
  *
  * See docs/rfcs/connect-marketplace.md (RFC-5) for the full design.
  * =============================================================================

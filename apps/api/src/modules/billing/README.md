@@ -29,26 +29,32 @@ checkout surface.
   is aligned to Janua production and an end-to-end Janua checkout has been
   verified.
 - `CheckoutRoutingPolicyService` wires subscription, external, and operator
-  checkout through `PaymentRouterService` when Janua billing is disabled
-  (`FEATURE_UNIFIED_CHECKOUT_ROUTING=true`, default). MX routes to Stripe MX;
-  non-MX routes to Paddle. Legacy US Stripe remains the fallback when hybrid
-  providers are not configured.
+  checkout through `PaymentGatewayRegistry` → `PaymentRouterService` when Janua
+  billing is disabled (`FEATURE_UNIFIED_CHECKOUT_ROUTING=true`, default). MX
+  routes to Stripe MX; non-MX routes to Paddle. Legacy US Stripe remains the
+  fallback when hybrid providers are not configured.
+
+See [ADR-008](../../../docs/adr/008-integration-planes-janua-vs-direct.md) for
+the identity vs financial-data vs money-movement separation model.
 
 ## Architecture
 
-| Concern                  | Primary files                                                                       |
-| ------------------------ | ----------------------------------------------------------------------------------- |
-| Facade and REST API      | `billing.service.ts`, `billing.controller.ts`                                       |
-| Subscription lifecycle   | `services/subscription-lifecycle.service.ts`                                        |
-| Catalog price resolution | `services/price-resolver.service.ts`, `services/product-catalog.service.ts`         |
-| Hybrid router            | `services/payment-router.service.ts`, `services/checkout-routing-policy.service.ts` |
-| Stripe SDK wrapper       | `stripe.service.ts`                                                                 |
-| Stripe MX/SPEI           | `stripe-mx.controller.ts`, `services/stripe-mx*.ts`                                 |
-| Paddle                   | `services/paddle.service.ts`                                                        |
-| Janua billing            | `janua-billing.service.ts`                                                          |
-| Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                              |
-| Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                              |
-| Internal POS checkout    | `modules/admin/admin-pos-billing.service.ts`, `services/internal-pos.service.ts`    |
+| Concern                  | Primary files                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| Facade and REST API      | `billing.service.ts`, `billing.controller.ts`                                        |
+| Subscription lifecycle   | `services/subscription-lifecycle.service.ts`                                         |
+| Catalog price resolution | `services/price-resolver.service.ts`, `services/product-catalog.service.ts`          |
+| Checkout policy          | `services/checkout-routing-policy.service.ts`                                        |
+| Payment gateway port     | `gateways/payment-gateway.port.ts`, `gateways/payment-gateway.registry.ts`           |
+| Hybrid router            | `services/payment-router.service.ts`                                                 |
+| Stripe SDK wrapper       | `stripe.service.ts`                                                                  |
+| Stripe MX/SPEI           | `stripe-mx.controller.ts`, `services/stripe-mx*.ts`, `gateways/stripe-mx.gateway.ts` |
+| Paddle                   | `services/paddle.service.ts`, `gateways/paddle.gateway.ts`                           |
+| Conekta direct           | `services/conekta.service.ts`, `gateways/conekta.gateway.ts`                         |
+| Janua billing adapter    | `janua-billing.service.ts`, `gateways/janua-billing.gateway.ts`                      |
+| Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                               |
+| Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                               |
+| Internal POS checkout    | `modules/admin/admin-pos-billing.service.ts`, `services/internal-pos.service.ts`     |
 
 ## Pricing Source Of Truth
 

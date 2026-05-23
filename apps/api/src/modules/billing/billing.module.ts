@@ -31,6 +31,14 @@ import { CotizaWebhookController } from './cotiza-webhook.controller';
 import { CreditBillingController } from './credit-billing.controller';
 import { CustomerFederationController } from './customer-federation.controller';
 import { DlqController } from './dlq.controller';
+import {
+  ConektaGateway,
+  JanuaBillingGateway,
+  LegacyStripeGateway,
+  PaddleGateway,
+  PaymentGatewayRegistry,
+  StripeMxGateway,
+} from './gateways';
 import { FeatureGateGuard } from './guards/feature-gate.guard';
 import { FederationAuthGuard } from './guards/federation-auth.guard';
 import { ProviderConnectionGuard } from './guards/provider-connection.guard';
@@ -166,6 +174,13 @@ import { UsageAlertsController } from './usage-alerts.controller';
     StripeMxSpeiRelayService,
     PhyndCrmEngagementNotifierService,
     PaddleService,
+    // Payment gateway adapters (ADR-008 — single port for all PSPs)
+    StripeMxGateway,
+    PaddleGateway,
+    ConektaGateway,
+    JanuaBillingGateway,
+    LegacyStripeGateway,
+    PaymentGatewayRegistry,
     // Conekta direct gateway (Wave A — alongside Stripe MX, distinct from
     // Janua-routed Conekta path in JanuaBillingService)
     ConektaService,
@@ -214,6 +229,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     ProductCatalogService,
     CancellationService,
     UsageAlertsService,
+    PaymentGatewayRegistry,
   ],
 })
 export class BillingModule {}

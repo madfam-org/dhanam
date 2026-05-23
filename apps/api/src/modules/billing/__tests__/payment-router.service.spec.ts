@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PrismaService } from '../../../core/prisma/prisma.service';
+import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
 import { PaddleService } from '../services/paddle.service';
 import { PaymentRouterService, PaymentProvider } from '../services/payment-router.service';
 import { StripeMxService } from '../services/stripe-mx.service';
@@ -11,6 +12,27 @@ describe('PaymentRouterService', () => {
   let prisma: jest.Mocked<PrismaService>;
   let stripeMx: jest.Mocked<StripeMxService>;
   let paddle: jest.Mocked<PaddleService>;
+  let gatewayRegistry: jest.Mocked<PaymentGatewayRegistry>;
+
+  const stripeMxGateway = {
+    id: 'stripe_mx',
+    getProviderConfig: jest.fn().mockReturnValue({
+      currency: 'MXN',
+      paymentMethods: ['card', 'oxxo', 'customer_balance'],
+      taxHandling: 'automatic',
+    }),
+    createSubscriptionCheckout: jest.fn(),
+  };
+
+  const paddleGateway = {
+    id: 'paddle',
+    getProviderConfig: jest.fn().mockReturnValue({
+      currency: 'USD',
+      paymentMethods: ['card', 'paypal', 'apple_pay', 'google_pay'],
+      taxHandling: 'merchant-of-record',
+    }),
+    createSubscriptionCheckout: jest.fn(),
+  };
 
   const mockUser = {
     id: 'user-123',
@@ -62,6 +84,17 @@ describe('PaymentRouterService', () => {
             getEnvironment: jest.fn().mockReturnValue('sandbox'),
           },
         },
+        {
+          provide: PaymentGatewayRegistry,
+          useValue: {
+            resolveHybridCheckoutGateway: jest.fn((country: string) =>
+              country === 'MX' ? 'stripe_mx' : 'paddle'
+            ),
+            require: jest.fn((id: string) =>
+              id === 'stripe_mx' ? stripeMxGateway : paddleGateway
+            ),
+          },
+        },
       ],
     }).compile();
 
@@ -69,6 +102,7 @@ describe('PaymentRouterService', () => {
     prisma = module.get(PrismaService) as jest.Mocked<PrismaService>;
     stripeMx = module.get(StripeMxService) as jest.Mocked<StripeMxService>;
     paddle = module.get(PaddleService) as jest.Mocked<PaddleService>;
+    gatewayRegistry = module.get(PaymentGatewayRegistry) as jest.Mocked<PaymentGatewayRegistry>;
 
     jest.clearAllMocks();
   });
@@ -117,10 +151,11 @@ describe('PaymentRouterService', () => {
       prisma.user.update.mockResolvedValue({ ...mockUser, stripeCustomerId: 'cus_mx_123' } as any);
 
       stripeMx.createCustomer.mockResolvedValue({ id: 'cus_mx_123' } as any);
-      stripeMx.createCheckoutSession.mockResolvedValue({
-        id: 'cs_mx_test123',
-        url: 'https://checkout.stripe.com/pay/cs_mx_test123',
-      } as any);
+      stripeMxGateway.createSubscriptionCheckout.mockResolvedValue({
+        checkoutUrl: 'https://checkout.stripe.com/pay/cs_mx_test123',
+        sessionId: 'cs_mx_test123',
+        currency: 'MXN',
+      });
 
       const result = await service.createCheckout({
         userId: 'user-123',
@@ -152,9 +187,10 @@ describe('PaymentRouterService', () => {
         customerId: 'ctm_123',
         email: 'test@example.com',
       });
-      paddle.createTransaction.mockResolvedValue({
-        transactionId: 'txn_123',
+      paddleGateway.createSubscriptionCheckout.mockResolvedValue({
         checkoutUrl: 'https://checkout.paddle.com/checkout/txn_123',
+        sessionId: 'txn_123',
+        currency: 'USD',
       });
 
       const result = await service.createCheckout({
@@ -184,10 +220,11 @@ describe('PaymentRouterService', () => {
       const userWithStripe = { ...mockUser, stripeCustomerId: 'cus_existing_mx' };
       prisma.user.findUnique.mockResolvedValue(userWithStripe as any);
 
-      stripeMx.createCheckoutSession.mockResolvedValue({
-        id: 'cs_mx_test123',
-        url: 'https://checkout.stripe.com/pay/cs_mx_test123',
-      } as any);
+      stripeMxGateway.createSubscriptionCheckout.mockResolvedValue({
+        checkoutUrl: 'https://checkout.stripe.com/pay/cs_mx_test123',
+        sessionId: 'cs_mx_test123',
+        currency: 'MXN',
+      });
 
       await service.createCheckout({
         userId: 'user-123',
@@ -198,7 +235,7 @@ describe('PaymentRouterService', () => {
       });
 
       expect(stripeMx.createCustomer).not.toHaveBeenCalled();
-      expect(stripeMx.createCheckoutSession).toHaveBeenCalledWith(
+      expect(stripeMxGateway.createSubscriptionCheckout).toHaveBeenCalledWith(
         expect.objectContaining({ customerId: 'cus_existing_mx' })
       );
     });
@@ -207,9 +244,10 @@ describe('PaymentRouterService', () => {
       const userWithPaddle = { ...mockUser, paddleCustomerId: 'ctm_existing' };
       prisma.user.findUnique.mockResolvedValue(userWithPaddle as any);
 
-      paddle.createTransaction.mockResolvedValue({
-        transactionId: 'txn_123',
+      paddleGateway.createSubscriptionCheckout.mockResolvedValue({
         checkoutUrl: 'https://checkout.paddle.com/checkout/txn_123',
+        sessionId: 'txn_123',
+        currency: 'USD',
       });
 
       await service.createCheckout({
@@ -221,7 +259,7 @@ describe('PaymentRouterService', () => {
       });
 
       expect(paddle.createCustomer).not.toHaveBeenCalled();
-      expect(paddle.createTransaction).toHaveBeenCalledWith(
+      expect(paddleGateway.createSubscriptionCheckout).toHaveBeenCalledWith(
         expect.objectContaining({ customerId: 'ctm_existing' })
       );
     });

@@ -1,13 +1,11 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { JanuaBillingService } from '../janua-billing.service';
+import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
 
 import { CheckoutRouteOverrideService } from './checkout-route-override.service';
-import { PaddleService } from './paddle.service';
 import { PaymentRouterService } from './payment-router.service';
 import { PriceResolverService } from './price-resolver.service';
-import { StripeMxService } from './stripe-mx.service';
 
 /** Canonical checkout route targets exposed to operators and audit logs. */
 export type CheckoutRouteProvider = 'janua' | 'stripe_mx' | 'paddle' | 'legacy_stripe';
@@ -52,9 +50,8 @@ export interface HybridCheckoutResult {
 /**
  * Centralizes geography-aware checkout routing decisions.
  *
- * When Janua billing is disabled (production default), eligible checkouts
- * route through {@link PaymentRouterService} (MX → Stripe MX, global → Paddle)
- * instead of the legacy US Stripe account path.
+ * Resolves a {@link PaymentGatewayId} via {@link PaymentGatewayRegistry} and
+ * delegates checkout execution to {@link PaymentRouterService}.
  */
 @Injectable()
 export class CheckoutRoutingPolicyService {
@@ -62,10 +59,8 @@ export class CheckoutRoutingPolicyService {
 
   constructor(
     private config: ConfigService,
-    private januaBilling: JanuaBillingService,
+    private gatewayRegistry: PaymentGatewayRegistry,
     private paymentRouter: PaymentRouterService,
-    private stripeMx: StripeMxService,
-    private paddle: PaddleService,
     @Optional() private priceResolver?: PriceResolverService,
     @Optional() private routeOverride?: CheckoutRouteOverrideService
   ) {}
@@ -75,15 +70,11 @@ export class CheckoutRoutingPolicyService {
   }
 
   isLegacyStripeConfigured(): boolean {
-    return Boolean(this.config.get<string>('STRIPE_SECRET_KEY'));
+    return this.gatewayRegistry.isConfigured('legacy_stripe');
   }
 
   isHybridRouterAvailable(countryCode: string): boolean {
-    const normalized = countryCode.toUpperCase();
-    if (normalized === 'MX') {
-      return this.stripeMx.isConfigured();
-    }
-    return this.paddle.isConfigured();
+    return this.gatewayRegistry.isHybridCheckoutAvailable(countryCode);
   }
 
   normalizeCatalogPlanId(plan: string, product?: string): string {
@@ -114,10 +105,8 @@ export class CheckoutRoutingPolicyService {
     const resolvedContext = await this.applyStoredOverride(context);
     const countryCode = resolvedContext.countryCode.toUpperCase();
     const { provider, reason } = this.resolveProvider(resolvedContext);
-    const providerConfig =
-      provider === 'stripe_mx' || provider === 'paddle'
-        ? this.paymentRouter.getProviderForCountry(countryCode)
-        : null;
+    const gateway = this.gatewayRegistry.get(this.gatewayRegistry.toGatewayId(provider));
+    const providerConfig = gateway?.getProviderConfig?.(countryCode) ?? null;
     const priceId = await this.resolvePriceId(resolvedContext.plan, resolvedContext.product);
 
     return {
@@ -140,7 +129,7 @@ export class CheckoutRoutingPolicyService {
               ? ['card', 'spei', 'oxxo']
               : ['card']
             : (providerConfig?.paymentMethods ?? []),
-      januaEnabled: this.januaBilling.isEnabled(),
+      januaEnabled: this.gatewayRegistry.isConfigured('janua'),
       unifiedRoutingEnabled: this.isUnifiedRoutingEnabled(),
       hybridRouterAvailable: this.isHybridRouterAvailable(countryCode),
       legacyStripeAvailable: this.isLegacyStripeConfigured(),
@@ -180,16 +169,16 @@ export class CheckoutRoutingPolicyService {
       };
     }
 
-    if (this.januaBilling.isEnabled()) {
+    if (this.gatewayRegistry.isConfigured('janua')) {
       return { provider: 'janua', reason: 'janua_billing_enabled' };
     }
 
     const countryCode = context.countryCode.toUpperCase();
 
     if (this.isUnifiedRoutingEnabled() && this.isHybridRouterAvailable(countryCode)) {
-      const providerConfig = this.paymentRouter.getProviderForCountry(countryCode);
+      const gatewayId = this.gatewayRegistry.resolveHybridCheckoutGateway(countryCode);
       return {
-        provider: providerConfig.provider,
+        provider: gatewayId === 'stripe_mx' ? 'stripe_mx' : 'paddle',
         reason: `hybrid_router_${countryCode.toLowerCase()}`,
       };
     }

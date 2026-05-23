@@ -2,7 +2,12 @@
 
 ## Status
 
-**Accepted** - April 2026
+**Superseded by [ADR-008](008-integration-planes-janua-vs-direct.md)** — May 2026
+
+> Historical record only. G2 commercial architecture uses Dhanam as the billing
+> boundary with direct Stripe MX / Paddle / Conekta adapters behind
+> `PaymentGatewayRegistry`. Janua billing remains an optional gateway when
+> `JANUA_BILLING_ENABLED=true`. See ADR-008 for the current model.
 
 ## Context
 

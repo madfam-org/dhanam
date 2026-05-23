@@ -80,15 +80,16 @@ Full guide index: [guides/README.md](guides/README.md).
 
 ## ADRs
 
-| ADR                                                         | Decision                               |
-| ----------------------------------------------------------- | -------------------------------------- |
-| [ADR-001](adr/001-nestjs-fastify.md)                        | NestJS with Fastify                    |
-| [ADR-002](adr/002-prisma-orm.md)                            | Prisma ORM                             |
-| [ADR-003](adr/003-multi-provider-strategy.md)               | Multi-provider financial data strategy |
-| [ADR-004](adr/004-janua-auth-integration.md)                | Janua authentication                   |
-| [ADR-005](adr/005-enclii-deployment.md)                     | Enclii deployment                      |
-| [ADR-006](adr/006-mobile-state-management.md)               | Mobile state management                |
-| [Conekta/Janua Dependency](adr/conekta-janua-dependency.md) | Billing dependency notes               |
+| ADR                                                      | Decision                               |
+| -------------------------------------------------------- | -------------------------------------- |
+| [ADR-001](adr/001-nestjs-fastify.md)                     | NestJS with Fastify                    |
+| [ADR-002](adr/002-prisma-orm.md)                         | Prisma ORM                             |
+| [ADR-003](adr/003-multi-provider-strategy.md)            | Multi-provider financial data strategy |
+| [ADR-004](adr/004-janua-auth-integration.md)             | Janua authentication                   |
+| [ADR-005](adr/005-enclii-deployment.md)                  | Enclii deployment                      |
+| [ADR-006](adr/006-mobile-state-management.md)            | Mobile state management                |
+| [ADR-008](adr/008-integration-planes-janua-vs-direct.md) | Integration planes (Janua vs direct)   |
+| [ADR-007 (superseded)](adr/conekta-janua-dependency.md)  | Historical Conekta/Janua billing notes |
 
 ## RFCs And Research
 

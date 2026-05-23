@@ -2,6 +2,11 @@
 
 > Multi-provider coordination with automatic failover, circuit breaker pattern, and ML-based provider selection.
 
+Financial data providers (Belvo, Plaid, Bitso, …) are **Dhanam-direct** — Janua
+is used only for identity (JWT on API calls), not for bank-link OAuth or token
+storage. See [ADR-008](../../../../docs/adr/008-integration-planes-janua-vs-direct.md)
+for the full identity vs financial-data vs money-movement separation.
+
 ## Purpose
 
 The Provider Orchestrator is the central coordination layer for all financial data provider interactions. It ensures high availability and reliability by implementing:

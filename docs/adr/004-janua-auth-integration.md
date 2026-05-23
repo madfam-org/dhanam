@@ -4,6 +4,11 @@
 
 **Accepted** - January 2025
 
+> **Billing note (ADR-008, May 2026):** Janua is mandatory for **identity** only.
+> Optional Janua-mediated checkout (`JANUA_BILLING_ENABLED`) is a separate
+> money-movement adapter behind Dhanam's `PaymentGatewayRegistry`; financial
+> data providers never route through Janua.
+
 ## Context
 
 Dhanam is part of the MADFAM ecosystem of products (Dhanam, Enclii, Copernic, etc.). Authentication requirements:
