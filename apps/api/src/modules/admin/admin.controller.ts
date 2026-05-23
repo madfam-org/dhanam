@@ -49,8 +49,11 @@ import {
   ClearQueueDto,
   SpaceSearchDto,
   UserActionDto,
+  MadfamImportPlatformSettingsDto,
+  PlatformConfigEntryDto,
 } from './dto';
 import { AdminGuard } from './guards/admin.guard';
+import { PlatformConfigService } from '@modules/platform-config/platform-config.service';
 
 @ApiTags('Admin')
 @ApiBearerAuth()
@@ -62,7 +65,8 @@ export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly adminOpsService: AdminOpsService,
-    private readonly adminPosBillingService: AdminPosBillingService
+    private readonly adminPosBillingService: AdminPosBillingService,
+    private readonly platformConfigService: PlatformConfigService
   ) {}
 
   @Get('users')
@@ -163,6 +167,39 @@ export class AdminController {
     @Request() req: AuthenticatedRequest
   ): Promise<FeatureFlagDto> {
     return this.adminService.updateFeatureFlag(key, dto, req.user.id);
+  }
+
+  @Get('platform-config')
+  @ApiOperation({ summary: 'List platform-scoped config entries (optional key prefix)' })
+  @ApiQuery({
+    name: 'prefix',
+    required: false,
+    description: 'Filter keys by prefix, e.g. madfam.import.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Platform config entries',
+    type: [PlatformConfigEntryDto],
+  })
+  async listPlatformConfig(@Query('prefix') prefix?: string): Promise<PlatformConfigEntryDto[]> {
+    return this.platformConfigService.listPlatform(prefix);
+  }
+
+  @Get('platform-config/madfam-import')
+  @ApiOperation({ summary: 'MADFAM CSV import routing settings (non-secret operator config)' })
+  @ApiResponse({ status: HttpStatus.OK, type: MadfamImportPlatformSettingsDto })
+  async getMadfamImportPlatformConfig(): Promise<MadfamImportPlatformSettingsDto> {
+    return this.platformConfigService.getMadfamImportSettings();
+  }
+
+  @Patch('platform-config/madfam-import')
+  @ApiOperation({ summary: 'Update MADFAM CSV import routing settings' })
+  @ApiResponse({ status: HttpStatus.OK, type: MadfamImportPlatformSettingsDto })
+  async updateMadfamImportPlatformConfig(
+    @Body() dto: MadfamImportPlatformSettingsDto,
+    @Request() req: AuthenticatedRequest
+  ): Promise<MadfamImportPlatformSettingsDto> {
+    return this.platformConfigService.updateMadfamImportSettings(dto, req.user.id);
   }
 
   // ──────────────────────────────────────────────

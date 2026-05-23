@@ -43,16 +43,17 @@ G4 is a **prerequisite for declaring open-source / public-repo GA** alongside G1
 
 ### Phase 0 — Stop the bleeding (Week 1) ✅ shipped
 
-| ID   | Task                                                                   | Owner    | Status |
-| ---- | ---------------------------------------------------------------------- | -------- | ------ |
-| P0.1 | Remove real RFCs from `madfam-csv-*`; env-based `MADFAM_BUSINESS_RFC`  | API      | Done   |
-| P0.2 | Fix Maria seed password to use `DEMO_USER_PASSWORD`                    | API      | Done   |
-| P0.3 | Remove insecure HMAC fallback in production                            | API      | Done   |
-| P0.4 | Redact passwords in historical dogfooding doc                          | Docs     | Done   |
-| P0.5 | `.gitignore` for `.claude/`, `.cursor/`                                | Platform | Done   |
-| P0.6 | Require env for `TARGET_USER_EMAIL` in import/migration scripts        | API      | Done   |
-| P0.7 | CI leakage scanner (`check-public-repo-leakage.py`)                    | Platform | Done   |
-| P0.8 | Verify `.claude/settings.local.json` never committed; rotate if leaked | Ops      | Manual |
+| ID    | Task                                                                      | Owner    | Status |
+| ----- | ------------------------------------------------------------------------- | -------- | ------ |
+| P0.1  | Remove real RFCs from `madfam-csv-*`; env-based `MADFAM_BUSINESS_RFC`     | API      | Done   |
+| P0.2  | Fix Maria seed password to use `DEMO_USER_PASSWORD`                       | API      | Done   |
+| P0.3  | Remove insecure HMAC fallback in production                               | API      | Done   |
+| P0.4  | Redact passwords in historical dogfooding doc                             | Docs     | Done   |
+| P0.5  | `.gitignore` for `.claude/`, `.cursor/`                                   | Platform | Done   |
+| P0.6  | Require env for `TARGET_USER_EMAIL` in import/migration scripts           | API      | Done   |
+| P0.6b | Require env in `bootstrap-madfam-prod-env.sh` (no default operator email) | API      | Done   |
+| P0.7  | CI leakage scanner (`check-public-repo-leakage.py`)                       | Platform | Done   |
+| P0.8  | Verify `.claude/settings.local.json` never committed; rotate if leaked    | Ops      | Manual |
 
 ### Phase 1 — Document relocation (Week 2)
 
@@ -78,13 +79,14 @@ Public repo keeps **pointers only**: “See MADFAM internal-devops runbook X.”
 
 ### Phase 3 — Admin runtime slice (Week 3–5)
 
-| ID   | Task                                                                       |
-| ---- | -------------------------------------------------------------------------- |
-| P3.1 | Prisma `PlatformConfig` model (`key`, `value` JSON, `scope`: platform/org) |
-| P3.2 | Admin API `GET/PATCH /v1/admin/platform-config` (platform-admin only)      |
-| P3.3 | Load MADFAM CSV routing (RFC, space keys) from `PlatformConfig` in prod    |
-| P3.4 | Finish `internal-catalog.controller` + secret in Vault only                |
-| P3.5 | Audit log all platform-config mutations                                    |
+| ID   | Task                                                                           | Status  |
+| ---- | ------------------------------------------------------------------------------ | ------- |
+| P3.1 | Prisma `PlatformConfig` model (`key`, `value` JSON, `scope`: platform/org)     | Done    |
+| P3.2 | Admin API `GET/PATCH /v1/admin/platform-config/madfam-import`                  | Done    |
+| P3.3 | Load MADFAM CSV routing from `PlatformConfig` when `PLATFORM_CONFIG_SOURCE=db` | Done    |
+| P3.4 | Finish `internal-catalog.controller` + secret in Vault only                    | Planned |
+| P3.5 | Audit log all platform-config mutations                                        | Done    |
+| P3.6 | Admin UI MADFAM Import Settings panel                                          | Planned |
 
 **Runtime contract:** `admin@madfam.io` Janua role → admin app → DB config. Git
 never holds org-specific RFCs or space routing again.
@@ -158,4 +160,5 @@ Existing data under the operator Janua account must survive security refactors:
 
 ---
 
-Update this file and [TECH_DEBT.md](TECH_DEBT.md) TD-1012 as phases complete.
+Update this file and [TECH_DEBT.md](TECH_DEBT.md) TD-1012 / TD-1013 as phases complete.  
+**100% program:** [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md)

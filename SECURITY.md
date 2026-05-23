@@ -383,8 +383,9 @@ Dhanam is a **public** repository. The following must **never** be committed:
 **CI guard:** `scripts/check-public-repo-leakage.py`
 
 Operator runbooks and full credential matrices belong in private
-`madfam-org/internal-devops`. Runtime org config (future) will live in admin
-`PlatformConfig`, not in git.
+`madfam-org/internal-devops`. Runtime org config for MADFAM CSV import lives in
+admin `PlatformConfig` (`GET/PATCH /v1/admin/platform-config/madfam-import`) or
+Vault — never in git.
 
 ---
 

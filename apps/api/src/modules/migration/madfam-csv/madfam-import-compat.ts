@@ -135,6 +135,178 @@ export interface MadfamImportCompatReport {
   issues: string[];
   spaces: Array<{ role: SpaceRole; name: string; spaceId: string; accountCount: number }>;
   sampleProviderAccountIds: string[];
+  budgets?: Array<{
+    role: SpaceRole;
+    spaceId: string;
+    budgetId: string;
+    hasImportMetadata: boolean;
+  }>;
+}
+
+export interface MadfamBudgetMetadataBackfillResult {
+  updated: number;
+  skipped: number;
+  details: Array<{
+    role: SpaceRole;
+    spaceId: string;
+    budgetId: string;
+    action: 'updated' | 'skipped';
+  }>;
+}
+
+function budgetNameForSpace(spaceName: string): string {
+  return `${spaceName} — Presupuesto`;
+}
+
+function budgetHasImportMetadata(metadata: unknown): boolean {
+  if (!metadata || typeof metadata !== 'object') return false;
+  const meta = metadata as Record<string, unknown>;
+  return meta.origin === MADFAM_CSV_IMPORT_ORIGIN && typeof meta.spaceRole === 'string';
+}
+
+/**
+ * Idempotently backfill madfam-csv-import budget metadata on prod spaces.
+ */
+export async function backfillMadfamBudgetMetadata(
+  prisma: PrismaClient,
+  userId: string,
+  routingConfig: MadfamCsvRoutingConfig = loadMadfamCsvRoutingConfig(),
+  dryRun = false
+): Promise<MadfamBudgetMetadataBackfillResult> {
+  const result: MadfamBudgetMetadataBackfillResult = {
+    updated: 0,
+    skipped: 0,
+    details: [],
+  };
+
+  const discovered = await discoverMadfamImportSpaces(prisma, userId, routingConfig);
+  if (!discovered) {
+    throw new Error(
+      'Cannot backfill budget metadata: madfam import spaces not fully resolved. ' +
+        'Set MADFAM_SPACE_NAME_* or ensure madfam-csv accounts exist.'
+    );
+  }
+
+  for (const space of discovered) {
+    let budget = await prisma.budget.findFirst({
+      where: {
+        spaceId: space.spaceId,
+        metadata: { path: ['origin'], equals: MADFAM_CSV_IMPORT_ORIGIN },
+      },
+    });
+
+    if (!budget) {
+      budget = await prisma.budget.findFirst({
+        where: { spaceId: space.spaceId, name: budgetNameForSpace(space.name) },
+      });
+    }
+
+    if (!budget) {
+      budget = await prisma.budget.findFirst({
+        where: { spaceId: space.spaceId },
+        orderBy: { createdAt: 'asc' },
+      });
+    }
+
+    if (!budget) {
+      result.skipped++;
+      result.details.push({
+        role: space.role,
+        spaceId: space.spaceId,
+        budgetId: 'none',
+        action: 'skipped',
+      });
+      continue;
+    }
+
+    if (budgetHasImportMetadata(budget.metadata)) {
+      result.skipped++;
+      result.details.push({
+        role: space.role,
+        spaceId: space.spaceId,
+        budgetId: budget.id,
+        action: 'skipped',
+      });
+      continue;
+    }
+
+    const existingMeta =
+      budget.metadata && typeof budget.metadata === 'object'
+        ? (budget.metadata as Record<string, unknown>)
+        : {};
+
+    if (!dryRun) {
+      await prisma.budget.update({
+        where: { id: budget.id },
+        data: {
+          metadata: {
+            ...existingMeta,
+            origin: MADFAM_CSV_IMPORT_ORIGIN,
+            spaceRole: space.role,
+            metadataBackfilledAt: new Date().toISOString(),
+          },
+        },
+      });
+    }
+
+    result.updated++;
+    result.details.push({
+      role: space.role,
+      spaceId: space.spaceId,
+      budgetId: budget.id,
+      action: 'updated',
+    });
+  }
+
+  return result;
+}
+
+async function checkBudgetMetadataForSpaces(
+  prisma: PrismaClient,
+  discovered: MadfamImportSpaceDef[]
+): Promise<
+  Array<{ role: SpaceRole; spaceId: string; budgetId: string; hasImportMetadata: boolean }>
+> {
+  const budgets: Array<{
+    role: SpaceRole;
+    spaceId: string;
+    budgetId: string;
+    hasImportMetadata: boolean;
+  }> = [];
+
+  for (const space of discovered) {
+    let budget = await prisma.budget.findFirst({
+      where: {
+        spaceId: space.spaceId,
+        metadata: { path: ['origin'], equals: MADFAM_CSV_IMPORT_ORIGIN },
+      },
+    });
+
+    if (!budget) {
+      budget = await prisma.budget.findFirst({
+        where: { spaceId: space.spaceId, name: budgetNameForSpace(space.name) },
+      });
+    }
+
+    if (!budget) {
+      budgets.push({
+        role: space.role,
+        spaceId: space.spaceId,
+        budgetId: 'none',
+        hasImportMetadata: false,
+      });
+      continue;
+    }
+
+    budgets.push({
+      role: space.role,
+      spaceId: space.spaceId,
+      budgetId: budget.id,
+      hasImportMetadata: budgetHasImportMetadata(budget.metadata),
+    });
+  }
+
+  return budgets;
 }
 
 /**
@@ -190,6 +362,16 @@ export async function verifyMadfamImportCompat(
         spaceId: space.spaceId,
         accountCount,
       });
+    }
+
+    report.budgets = await checkBudgetMetadataForSpaces(prisma, discovered);
+    for (const budget of report.budgets) {
+      if (!budget.hasImportMetadata) {
+        issues.push(
+          `Budget metadata missing for ${budget.role} space (budget ${budget.budgetId}): ` +
+            'expected metadata.origin=madfam-csv-import and spaceRole'
+        );
+      }
     }
   } else if (hasEnvSpaceNames) {
     issues.push(

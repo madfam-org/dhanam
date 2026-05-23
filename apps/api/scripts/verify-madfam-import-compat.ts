@@ -19,6 +19,7 @@ import { PrismaClient } from '../generated/prisma';
 
 import { loadMadfamCsvRoutingConfig } from '../src/modules/migration/madfam-csv/madfam-csv-config';
 import { verifyMadfamImportCompat } from '../src/modules/migration/madfam-csv/madfam-import-compat';
+import { hydrateMadfamImportEnvFromPlatformConfig } from '../src/modules/migration/madfam-csv/madfam-platform-config';
 
 function loadOptionalOperatorEnvFile(): void {
   const envFile = process.env.MADFAM_IMPORT_ENV_FILE?.trim();
@@ -45,6 +46,11 @@ async function main() {
   const prisma = new PrismaClient({ adapter });
 
   try {
+    const hydrated = await hydrateMadfamImportEnvFromPlatformConfig(prisma);
+    if (hydrated > 0) {
+      console.log(`Hydrated ${hydrated} MADFAM import setting(s) from platform_config`);
+    }
+
     const routingConfig = loadMadfamCsvRoutingConfig();
     const report = await verifyMadfamImportCompat(prisma, targetEmail, routingConfig);
 
@@ -61,6 +67,16 @@ async function main() {
       for (const space of report.spaces) {
         console.log(
           `  ${space.role.padEnd(8)} "${space.name}"  accounts=${space.accountCount}  id=${space.spaceId}`
+        );
+      }
+      console.log('');
+    }
+
+    if (report.budgets?.length) {
+      console.log('Budget import metadata:');
+      for (const budget of report.budgets) {
+        console.log(
+          `  ${budget.role.padEnd(8)} budget=${budget.budgetId}  tagged=${budget.hasImportMetadata ? 'yes' : 'no'}`
         );
       }
       console.log('');

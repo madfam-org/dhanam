@@ -404,23 +404,24 @@ Already source-landed: webhooks, ledger writes, `payment.*` fan-out, DLQ.
 
 **Closes:** TD-1012  
 **Target:** Public-repo GA hygiene alongside G1–G3  
-**Canonical plan:** [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md)
+**Canonical plan:** [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md)  
+**100% program (G4 + operator slice):** [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md)
 
 | Phase | Scope                                                                            | Status      |
 | ----- | -------------------------------------------------------------------------------- | ----------- |
-| P0    | Stop bleeding: RFC env config, seed/crypto fixes, doc redaction, CI leakage gate | In progress |
+| P0    | Stop bleeding: RFC env config, seed/crypto fixes, doc redaction, CI leakage gate | Done        |
 | P1    | Relocate full ops runbooks to `internal-devops`                                  | Planned     |
 | P2    | Slim public `AGENTS.md`; private agent-ops doc                                   | Planned     |
-| P3    | `PlatformConfig` admin API for org import rules                                  | Planned     |
+| P3    | `PlatformConfig` admin API + MADFAM import DB hydration                          | In progress |
 | P4    | Dev credential hygiene (`docker-compose`, e2e defaults)                          | Planned     |
 | P5    | gitleaks, PR checklist, quarterly audit                                          | Planned     |
 
 ### G4 exit criteria
 
-- [ ] `scripts/check-public-repo-leakage.py` green on `main`
+- [x] `scripts/check-public-repo-leakage.py` green on `main`
 - [ ] No Critical/High manual audit findings open
 - [ ] Operator runbooks published in private `internal-devops`
-- [ ] `PlatformConfig` shipped or env-only path documented with deferral
+- [x] `PlatformConfig` API shipped; env-only path retained via `PLATFORM_CONFIG_SOURCE=db` opt-in
 
 ---
 

@@ -6,7 +6,12 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="${ROOT}/madfam-import.local.env"
 NAMESPACE="${DHANAM_NAMESPACE:-dhanam}"
-TARGET_EMAIL="${TARGET_USER_EMAIL:-admin@madfam.io}"
+
+if [[ -z "${TARGET_USER_EMAIL:-}" ]]; then
+  echo "ERROR: TARGET_USER_EMAIL is required (operator email from Vault — never hardcode in scripts)" >&2
+  exit 1
+fi
+TARGET_EMAIL="${TARGET_USER_EMAIL}"
 
 echo "Bootstrapping ${OUT} from namespace ${NAMESPACE}..."
 

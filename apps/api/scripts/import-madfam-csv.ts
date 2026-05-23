@@ -18,6 +18,7 @@
  *   MADFAM_ACCOUNT_SUFFIX_PARTNER - Default `-afac` for prod idempotency
  *   MADFAM_ACCOUNT_SUFFIX_PERSONAL - Default `-personal`
  *   MADFAM_SPACE_KEY_BUSINESS / _PARTNER / _PERSONAL - Internal map keys only
+ *   PLATFORM_CONFIG_SOURCE=db  - Load madfam.import.* from platform_config (env wins)
  *   MADFAM_SKIP_COMPAT_CHECK=true - Skip preflight (not recommended for prod)
  *   DRY_RUN=true              - Log actions without writing to DB
  *
@@ -52,6 +53,7 @@ import {
   MADFAM_CSV_IMPORT_ORIGIN,
   verifyMadfamImportCompat,
 } from '../src/modules/migration/madfam-csv/madfam-import-compat';
+import { hydrateMadfamImportEnvFromPlatformConfig } from '../src/modules/migration/madfam-csv/madfam-platform-config';
 
 // ---------------------------------------------------------------------------
 // Setup
@@ -165,6 +167,11 @@ const ACCOUNTING_TAGS = [
 
 async function main() {
   loadOptionalOperatorEnvFile();
+
+  const hydrated = await hydrateMadfamImportEnvFromPlatformConfig(prisma);
+  if (hydrated > 0) {
+    log('CONFIG', `Hydrated ${hydrated} MADFAM import setting(s) from platform_config`);
+  }
 
   const csvPath = process.env.CSV_PATH;
   if (!csvPath) {
@@ -342,7 +349,28 @@ async function main() {
 
       if (budget) {
         budgetIds[spaceDef.key] = budget.id;
-        log('BUDGETS', `  Exists: "${budgetName}" → ${budget.id}`);
+        const meta =
+          budget.metadata && typeof budget.metadata === 'object'
+            ? (budget.metadata as Record<string, unknown>)
+            : {};
+        const needsMetadata =
+          meta.origin !== MADFAM_CSV_IMPORT_ORIGIN || meta.spaceRole !== spaceDef.role;
+        if (needsMetadata) {
+          await prisma.budget.update({
+            where: { id: budget.id },
+            data: {
+              metadata: {
+                ...meta,
+                origin: MADFAM_CSV_IMPORT_ORIGIN,
+                spaceRole: spaceDef.role,
+                importedAt: meta.importedAt ?? new Date().toISOString(),
+              },
+            },
+          });
+          log('BUDGETS', `  Updated metadata: "${budgetName}" → ${budget.id}`);
+        } else {
+          log('BUDGETS', `  Exists: "${budgetName}" → ${budget.id}`);
+        }
       } else {
         budget = await prisma.budget.create({
           data: {

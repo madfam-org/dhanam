@@ -23,7 +23,7 @@ Read this with:
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)
 - [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)
 - [Tech Debt Register](TECH_DEBT.md)
-- [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) (G4)
+- [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) (G4 + operator slice)
 - [Deployment Guide](DEPLOYMENT.md)
 - [Testing Overview](testing/TEST_SUMMARY.md)
 

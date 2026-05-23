@@ -6,6 +6,7 @@ export * from './audit-log-search.dto';
 export * from './admin-pos-checkout.dto';
 export * from './admin-pos-billing.dto';
 export * from './feature-flag.dto';
+export * from './platform-config.dto';
 export * from './onboarding-analytics.dto';
 export * from './cache-flush.dto';
 export * from './queue-action.dto';

@@ -82,11 +82,25 @@ and do not grant access to platform-admin endpoints.
 - `GET /admin/feature-flags/:key` - Get specific feature flag
 - `POST /admin/feature-flags/:key` - Update feature flag
 
+### Platform Config
+
+Operator/runtime settings (non-secret). RFCs and space names belong here or in
+Vault — never in git.
+
+- `GET /admin/platform-config?prefix=` - List platform-scoped config entries
+- `GET /admin/platform-config/madfam-import` - MADFAM CSV import routing settings
+- `PATCH /admin/platform-config/madfam-import` - Update MADFAM import settings
+
+Mutations are audit-logged (`admin.upsert_platform_config`, severity high).
+
+Import scripts honor `PLATFORM_CONFIG_SOURCE=db` to hydrate `madfam.import.*`
+keys; env vars always override DB values.
+
 ## Security Considerations
 
 1. All admin actions are logged to the audit trail
 2. User detail access is tracked with medium severity
-3. Feature flag changes are tracked with high severity
+3. Feature flag and platform-config changes are tracked with high severity
 4. No write operations on user data (read-only access)
 5. Sensitive data (passwords, tokens) are never exposed
 

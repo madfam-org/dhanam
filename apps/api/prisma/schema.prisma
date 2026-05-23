@@ -374,6 +374,7 @@ model User {
   identityVerifications IdentityVerification[]
   ambassadorProfile     AmbassadorProfile?
   merchantAccounts      MerchantAccount[]
+  platformConfigUpdates PlatformConfig[]           @relation("PlatformConfigUpdates")
 
   @@index([onboardingCompleted, createdAt(sort: Desc)])
   @@index([lastLoginAt(sort: Desc)])
@@ -2691,4 +2692,27 @@ model ComplianceRecord {
 
   @@index([spaceId])
   @@map("compliance_records")
+}
+
+enum PlatformConfigScope {
+  platform
+  org
+}
+
+/// Operator/runtime settings — never store secrets here; use Vault/ESO for credentials.
+model PlatformConfig {
+  id        String              @id @default(uuid())
+  key       String
+  scope     PlatformConfigScope @default(platform)
+  scopeId   String              @default("") @map("scope_id")
+  value     Json
+  updatedBy String?             @map("updated_by")
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+
+  updatedByUser User? @relation("PlatformConfigUpdates", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([key, scope, scopeId])
+  @@index([scope, scopeId])
+  @@map("platform_config")
 }

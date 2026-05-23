@@ -1,6 +1,7 @@
 import { SYNTHETIC_MADFAM_CSV_ROUTING, loadMadfamCsvRoutingConfig } from '../madfam-csv-config';
 import { mapAccount } from '../madfam-csv-mapper';
 import {
+  backfillMadfamBudgetMetadata,
   discoverMadfamImportSpaces,
   MADFAM_CSV_IMPORT_ORIGIN,
   verifyMadfamImportCompat,
@@ -141,6 +142,136 @@ describe('madfam-import-compat', () => {
 
       if (prev === undefined) delete process.env.MADFAM_SPACE_NAME_PERSONAL;
       else process.env.MADFAM_SPACE_NAME_PERSONAL = prev;
+    });
+  });
+
+  describe('backfillMadfamBudgetMetadata', () => {
+    it('updates budgets missing import metadata', async () => {
+      const prismaBackfill = {
+        userSpace: {
+          findMany: jest.fn().mockResolvedValue([
+            {
+              space: {
+                id: 'space-business',
+                name: 'Business Co',
+                type: 'business',
+                accounts: [{ providerAccountId: 'madfam-csv-bbva-empresarial' }],
+              },
+            },
+            {
+              space: {
+                id: 'space-partner',
+                name: 'Partner Co',
+                type: 'business',
+                accounts: [{ providerAccountId: 'madfam-csv-banamex-joy-afac' }],
+              },
+            },
+            {
+              space: {
+                id: 'space-personal',
+                name: 'Personal',
+                type: 'personal',
+                accounts: [{ providerAccountId: 'madfam-csv-banamex-joy-personal' }],
+              },
+            },
+          ]),
+          findFirst: jest.fn(),
+        },
+        budget: {
+          findFirst: jest
+            .fn()
+            .mockResolvedValueOnce({
+              id: 'budget-1',
+              metadata: {},
+            })
+            .mockResolvedValueOnce({
+              id: 'budget-2',
+              metadata: { origin: MADFAM_CSV_IMPORT_ORIGIN, spaceRole: 'partner' },
+            })
+            .mockResolvedValueOnce({
+              id: 'budget-3',
+              metadata: {},
+            }),
+          update: jest.fn(),
+        },
+      } as any;
+
+      const result = await backfillMadfamBudgetMetadata(
+        prismaBackfill,
+        'user-1',
+        SYNTHETIC_MADFAM_CSV_ROUTING,
+        false
+      );
+
+      expect(result.updated).toBe(2);
+      expect(result.skipped).toBe(1);
+      expect(prismaBackfill.budget.update).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('verifyMadfamImportCompat', () => {
+    it('fails when budget import metadata is missing', async () => {
+      const verifyPrisma = {
+        user: {
+          findUnique: jest.fn().mockResolvedValue({ id: 'user-1', email: 'op@example.com' }),
+        },
+        userSpace: {
+          findMany: jest.fn().mockResolvedValue([
+            {
+              space: {
+                id: 'space-business',
+                name: 'Business Co',
+                type: 'business',
+                accounts: [{ providerAccountId: 'madfam-csv-bbva-empresarial' }],
+              },
+            },
+            {
+              space: {
+                id: 'space-partner',
+                name: 'Partner Co',
+                type: 'business',
+                accounts: [{ providerAccountId: 'madfam-csv-banamex-joy-afac' }],
+              },
+            },
+            {
+              space: {
+                id: 'space-personal',
+                name: 'Personal',
+                type: 'personal',
+                accounts: [{ providerAccountId: 'madfam-csv-banamex-joy-personal' }],
+              },
+            },
+          ]),
+          findFirst: jest.fn(),
+        },
+        account: {
+          count: jest.fn().mockResolvedValue(1),
+          findMany: jest
+            .fn()
+            .mockResolvedValue([{ providerAccountId: 'madfam-csv-bbva-empresarial' }]),
+        },
+        budget: {
+          findFirst: jest
+            .fn()
+            .mockResolvedValueOnce({ id: 'b1', metadata: {} })
+            .mockResolvedValueOnce({
+              id: 'b2',
+              metadata: { origin: MADFAM_CSV_IMPORT_ORIGIN, spaceRole: 'partner' },
+            })
+            .mockResolvedValueOnce({ id: 'b3', metadata: {} }),
+        },
+      } as any;
+
+      process.env.MADFAM_BUSINESS_RFC = 'XAXX010101000';
+      const report = await verifyMadfamImportCompat(
+        verifyPrisma,
+        'op@example.com',
+        SYNTHETIC_MADFAM_CSV_ROUTING
+      );
+
+      expect(report.ok).toBe(false);
+      expect(report.budgets).toHaveLength(3);
+      expect(report.issues.some((i) => i.includes('Budget metadata missing'))).toBe(true);
     });
   });
 });

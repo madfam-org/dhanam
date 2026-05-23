@@ -35,7 +35,8 @@ For execution order and milestone targets, read the
 | TD-1009 | Billing router unification   | Medium   | Active   | `CheckoutRoutingPolicyService` is wired for upgrade, external, operator, and federated checkout when Janua is off. Remaining: production staging smoke proof and close legacy bypass audit. | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   |
 | TD-1010 | Internal POS completeness    | Medium   | Active   | Charge, refund, timeline, reconciliation, and tabbed admin `/pos` are source-landed. Remaining: CFDI proof, partial refund UI, Conekta POS, route override, SDK, golden probes, DLQ drill.  | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   |
 | TD-1011 | Janua commercial readiness   | High     | Active   | Janua billing secrets were present with zero length in production proof; Janua-routed billing must not be claimed live.                                                                     | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)                    |
-| TD-1012 | Public repo security hygiene | High     | Active   | Real RFCs, operator defaults, topology, and credential runbooks must not live in public git. Phase 0 in progress; G4 gate before public-repo GA.                                            | [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) |
+| TD-1012 | Public repo security hygiene | High     | Active   | ~45%: P0 + bootstrap env-only (A6). Full program: [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md).                                                                  | [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) |
+| TD-1013 | MADFAM operator prod slice   | High     | Active   | ~60%: 124 CSV txs, budget metadata backfilled, PlatformConfig API landed (migration pending deploy). Belvo + personal routing remain.                                                       | [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) |
 
 ## Remediation Notes
 
@@ -162,11 +163,22 @@ exists.
 
 ### TD-1012: Public Repository Security Hygiene
 
-Real RFCs, plaintext passwords, Hetzner node codenames, hardcoded operator
-emails in migration scripts, and full Vault runbooks must not live in public
-git. Program: [PUBLIC_REPO_SECURITY_REMEDIATION.md](PUBLIC_REPO_SECURITY_REMEDIATION.md).
-CI guard: `scripts/check-public-repo-leakage.py`. Target: G4 gate before
-public-repo GA; Phase 3 adds admin `PlatformConfig` for org import rules.
+Phase 0 shipped (~45% of G4). A6 bootstrap env-only done. Remaining: P1–P2, P4–P5 per
+[Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) and
+[PUBLIC_REPO_SECURITY_REMEDIATION.md](PUBLIC_REPO_SECURITY_REMEDIATION.md).
+
+### TD-1013: MADFAM Operator Prod Slice
+
+**Severity:** High  
+**Status:** Active (~60%)
+
+Prod baseline (2026-05-23): operator account has 124 CSV import txs across
+Innovaciones MADFAM + MADFAM Socio AFAC; import continuity verified; budget
+metadata backfilled on all three CSV spaces; `PlatformConfig` API + import DB
+hydration shipped (migration deploy pending). Gaps: Aldo Personal empty (no
+personal-routed txs), no Belvo proof, admin UI for import settings (D3).
+
+100% DoD: [Full Remediation Plan — Operator slice](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md#100-definition-of-done--operator-prod-slice-adminmadfamio).
 
 ### TD-1006: React 18 Global Pin
 

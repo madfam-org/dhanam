@@ -13,6 +13,7 @@ file over older phase summaries when choosing what to read first.
 | [Development Guide](DEVELOPMENT.md)                                     | Local setup, ports, env files, testing workflow                                    |
 | [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)                     | Full program: technical stability GA, commercial GA, consumer GA (phases 0–7)      |
 | [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) | G4: remove operator secrets from public git; CI leakage guard                      |
+| [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) | 100% G4 sanitization + 100% admin@madfam.io operator prod slice (6-sprint program) |
 | [Roadmap](ROADMAP.md)                                                   | Stability priorities P0–P8 and milestones M1–M7                                    |
 | [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)         | Billing router and internal MADFAM POS completion plan                             |
 | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                |
