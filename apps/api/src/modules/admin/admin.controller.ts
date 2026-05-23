@@ -25,6 +25,7 @@ import {
 
 import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { AuthenticatedRequest } from '@core/types/authenticated-request';
+import { PlatformConfigService } from '@modules/platform-config/platform-config.service';
 
 import { AdminOpsService } from './admin-ops.service';
 import { AdminPosBillingService } from './admin-pos-billing.service';
@@ -53,7 +54,6 @@ import {
   PlatformConfigEntryDto,
 } from './dto';
 import { AdminGuard } from './guards/admin.guard';
-import { PlatformConfigService } from '@modules/platform-config/platform-config.service';
 
 @ApiTags('Admin')
 @ApiBearerAuth()

@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PlatformConfigScope } from '../../../generated/prisma';
 
 import { AuditService } from '@core/audit/audit.service';
 import { PrismaService } from '@core/prisma/prisma.service';
+
+import { PlatformConfigScope } from '../../../generated/prisma';
 
 import {
   MADFAM_IMPORT_CONFIG_KEYS,

@@ -4,7 +4,6 @@
  */
 import type { PrismaClient } from '../../../../generated/prisma';
 import { PlatformConfigScope } from '../../../../generated/prisma';
-
 import {
   MADFAM_IMPORT_CONFIG_KEYS,
   MADFAM_IMPORT_ENV_MAP,
