@@ -394,6 +394,9 @@ importers:
       joi:
         specifier: ^18.0.1
         version: 18.0.2
+      js-yaml:
+        specifier: '>=4.1.1'
+        version: 4.1.1
       jstat:
         specifier: ^1.9.6
         version: 1.9.6

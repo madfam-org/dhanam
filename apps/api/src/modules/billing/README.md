@@ -62,6 +62,13 @@ Commercial plan truth lives in [`catalog.yaml`](../../../../../catalog.yaml) and
 is synced into Dhanam's product catalog. Do not hard-code commercial pricing in
 new billing code or docs.
 
+The public catalog endpoints serve `catalog.yaml` directly in production
+(`DHANAM_PUBLIC_CATALOG_SOURCE=file` or unset with `NODE_ENV=production`). The
+database catalog remains the Stripe/checkout reconciliation store populated by
+`scripts/sync-catalog.ts`; it must not be the only public catalog source because
+stale DB rows or connection pressure would otherwise hide the canonical MADFAM
+SKU catalogue from downstream systems such as Tulana.
+
 Current Dhanam managed-cloud tiers in the catalog:
 
 | Tier       | USD monthly | MXN monthly |

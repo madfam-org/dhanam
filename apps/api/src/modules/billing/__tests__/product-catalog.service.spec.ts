@@ -6,6 +6,7 @@ import { ProductCatalogService } from '../services/product-catalog.service';
 
 describe('ProductCatalogService', () => {
   let service: ProductCatalogService;
+  const originalCatalogSource = process.env.DHANAM_PUBLIC_CATALOG_SOURCE;
   let prisma: {
     product: { findMany: jest.Mock; findUnique: jest.Mock; upsert: jest.Mock; update: jest.Mock };
     productTier: { upsert: jest.Mock };
@@ -88,6 +89,7 @@ describe('ProductCatalogService', () => {
   };
 
   beforeEach(async () => {
+    process.env.DHANAM_PUBLIC_CATALOG_SOURCE = 'db';
     prisma = {
       product: {
         findMany: jest.fn(),
@@ -106,6 +108,14 @@ describe('ProductCatalogService', () => {
     }).compile();
 
     service = module.get(ProductCatalogService);
+  });
+
+  afterAll(() => {
+    if (originalCatalogSource === undefined) {
+      delete process.env.DHANAM_PUBLIC_CATALOG_SOURCE;
+    } else {
+      process.env.DHANAM_PUBLIC_CATALOG_SOURCE = originalCatalogSource;
+    }
   });
 
   describe('getFullCatalog', () => {
@@ -143,6 +153,17 @@ describe('ProductCatalogService', () => {
 
       expect(prisma.product.findMany).toHaveBeenCalledTimes(1);
     });
+
+    it('should serve catalog.yaml when file source is enabled', async () => {
+      process.env.DHANAM_PUBLIC_CATALOG_SOURCE = 'file';
+
+      const catalog = await service.getFullCatalog();
+
+      expect(catalog.length).toBeGreaterThanOrEqual(28);
+      expect(catalog.find((product) => product.slug === 'enclii')).toBeDefined();
+      expect(catalog.find((product) => product.slug === 'dhanam')?.tiers).toHaveLength(3);
+      expect(prisma.product.findMany).not.toHaveBeenCalled();
+    });
   });
 
   describe('getProductBySlug', () => {
@@ -160,6 +181,16 @@ describe('ProductCatalogService', () => {
 
       await expect(service.getProductBySlug('nonexistent')).rejects.toThrow(NotFoundException);
     });
+
+    it('should return a single product from catalog.yaml when file source is enabled', async () => {
+      process.env.DHANAM_PUBLIC_CATALOG_SOURCE = 'file';
+
+      const product = await service.getProductBySlug('enclii');
+
+      expect(product.slug).toBe('enclii');
+      expect(product.tiers.length).toBeGreaterThan(0);
+      expect(prisma.product.findUnique).not.toHaveBeenCalled();
+    });
   });
 
   describe('getCreditCosts', () => {
@@ -174,6 +205,15 @@ describe('ProductCatalogService', () => {
       expect(costs).toHaveLength(2);
       expect(costs[0]).toEqual({ operation: 'cfdi_stamp', credits: 1, label: 'CFDI Stamp' });
       expect(costs[1]).toEqual({ operation: 'filing', credits: 5, label: 'Filing' });
+    });
+
+    it('should return credit costs from catalog.yaml when file source is enabled', async () => {
+      process.env.DHANAM_PUBLIC_CATALOG_SOURCE = 'file';
+
+      const costs = await service.getCreditCosts('dhanam');
+
+      expect(costs.find((cost) => cost.operation === 'api_request')?.credits).toBe(1);
+      expect(prisma.productCreditCost.findMany).not.toHaveBeenCalled();
     });
   });
 

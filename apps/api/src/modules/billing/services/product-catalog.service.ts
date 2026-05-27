@@ -1,4 +1,8 @@
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import * as yaml from 'js-yaml';
 
 import { Currency, Prisma, SubscriptionTier } from '@db';
 
@@ -20,6 +24,32 @@ import { PrismaService } from '../../../core/prisma/prisma.service';
 interface CachedCatalog {
   data: CatalogProduct[];
   expiresAt: number;
+}
+
+interface CatalogYaml {
+  products?: Record<string, YamlProduct>;
+}
+
+interface YamlProduct {
+  name: string;
+  description?: string;
+  category?: string;
+  icon_url?: string;
+  iconUrl?: string;
+  website?: string;
+  websiteUrl?: string;
+  sort_order?: number;
+  tiers?: Record<string, YamlTier>;
+  credit_costs?: Record<string, number>;
+}
+
+interface YamlTier {
+  dhanam_tier: string;
+  display_name?: string;
+  description?: string;
+  metadata?: Record<string, unknown>;
+  prices?: Record<string, { monthly?: number | null; yearly?: number | null }>;
+  features?: string[];
 }
 
 export interface CatalogProduct {
@@ -60,6 +90,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 export class ProductCatalogService {
   private readonly logger = new Logger(ProductCatalogService.name);
   private cache: CachedCatalog | null = null;
+  private fileCache: CachedCatalog | null = null;
 
   constructor(private prisma: PrismaService) {}
 
@@ -68,6 +99,13 @@ export class ProductCatalogService {
    * Cached in-memory for 5 minutes.
    */
   async getFullCatalog(): Promise<CatalogProduct[]> {
+    if (this.shouldUseFileCatalog()) {
+      const fileCatalog = this.loadFileCatalogOrNull();
+      if (fileCatalog) {
+        return fileCatalog;
+      }
+    }
+
     if (this.cache && Date.now() < this.cache.expiresAt) {
       return this.cache.data;
     }
@@ -93,6 +131,17 @@ export class ProductCatalogService {
    * Get a single product by slug.
    */
   async getProductBySlug(slug: string): Promise<CatalogProduct> {
+    if (this.shouldUseFileCatalog()) {
+      const fileCatalog = this.loadFileCatalogOrNull();
+      if (fileCatalog) {
+        const product = fileCatalog.find((item) => item.slug === slug);
+        if (product) {
+          return product;
+        }
+        throw new NotFoundException(`Product not found: ${slug}`);
+      }
+    }
+
     const product = await this.prisma.product.findUnique({
       where: { slug },
       include: {
@@ -114,6 +163,14 @@ export class ProductCatalogService {
    * Get credit costs for a product (for metering pre-flight checks).
    */
   async getCreditCosts(slug: string): Promise<CatalogCreditCost[]> {
+    if (this.shouldUseFileCatalog()) {
+      const fileCatalog = this.loadFileCatalogOrNull();
+      if (fileCatalog) {
+        const product = fileCatalog.find((item) => item.slug === slug);
+        return product?.creditCosts ?? [];
+      }
+    }
+
     const costs = await this.prisma.productCreditCost.findMany({
       where: { product: { slug } },
       orderBy: { operation: 'asc' },
@@ -131,6 +188,14 @@ export class ProductCatalogService {
    * Returns null if not found (caller should use a default).
    */
   async getCreditCostForOperation(slug: string, operation: string): Promise<number | null> {
+    if (this.shouldUseFileCatalog()) {
+      const fileCatalog = this.loadFileCatalogOrNull();
+      if (fileCatalog) {
+        const product = fileCatalog.find((item) => item.slug === slug);
+        return product?.creditCosts.find((cost) => cost.operation === operation)?.credits ?? null;
+      }
+    }
+
     const cost = await this.prisma.productCreditCost.findFirst({
       where: { product: { slug }, operation },
     });
@@ -406,6 +471,107 @@ export class ProductCatalogService {
 
   private invalidateCache(): void {
     this.cache = null;
+    this.fileCache = null;
+  }
+
+  private shouldUseFileCatalog(): boolean {
+    const source = process.env.DHANAM_PUBLIC_CATALOG_SOURCE?.trim().toLowerCase();
+    if (source === 'db') {
+      return false;
+    }
+    if (source === 'file') {
+      return true;
+    }
+    return process.env.NODE_ENV === 'production';
+  }
+
+  private loadFileCatalogOrNull(): CatalogProduct[] | null {
+    try {
+      return this.loadFileCatalog();
+    } catch (error) {
+      this.logger.warn(
+        `File-backed catalog unavailable; falling back to DB catalog: ${(error as Error).message}`
+      );
+      return null;
+    }
+  }
+
+  private loadFileCatalog(): CatalogProduct[] {
+    if (this.fileCache && Date.now() < this.fileCache.expiresAt) {
+      return this.fileCache.data;
+    }
+
+    const catalogPath = this.resolveCatalogPath();
+    const raw = fs.readFileSync(catalogPath, 'utf-8');
+    const parsed = yaml.load(raw) as CatalogYaml;
+    if (!parsed?.products || typeof parsed.products !== 'object') {
+      throw new Error(`catalog.yaml has no products section: ${catalogPath}`);
+    }
+
+    const products = Object.entries(parsed.products)
+      .map(([slug, config], index) => ({
+        product: this.mapYamlProduct(slug, config),
+        sortOrder: config.sort_order ?? index,
+      }))
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map(({ product }) => product);
+
+    this.fileCache = { data: products, expiresAt: Date.now() + CACHE_TTL_MS };
+    return products;
+  }
+
+  private resolveCatalogPath(): string {
+    const configured = process.env.DHANAM_CATALOG_YAML_PATH?.trim();
+    const candidates = [
+      configured,
+      path.resolve(process.cwd(), '../../catalog.yaml'),
+      path.resolve(process.cwd(), 'catalog.yaml'),
+      path.resolve(__dirname, '../../../../../../catalog.yaml'),
+      '/app/catalog.yaml',
+    ].filter(Boolean) as string[];
+
+    const found = candidates.find((candidate) => fs.existsSync(candidate));
+    if (!found) {
+      throw new Error(`catalog.yaml not found. Checked: ${candidates.join(', ')}`);
+    }
+    return found;
+  }
+
+  private mapYamlProduct(slug: string, config: YamlProduct): CatalogProduct {
+    return {
+      slug,
+      name: config.name,
+      description: config.description ?? null,
+      category: config.category ?? 'platform',
+      iconUrl: config.iconUrl ?? config.icon_url ?? null,
+      websiteUrl: config.websiteUrl ?? config.website ?? null,
+      tiers: Object.entries(config.tiers ?? {}).map(([tierSlug, tier]) => ({
+        tierSlug,
+        dhanamTier: tier.dhanam_tier as SubscriptionTier,
+        displayName: tier.display_name ?? null,
+        description: tier.description ?? null,
+        metadata: tier.metadata ?? {},
+        prices: Object.fromEntries(
+          Object.entries(tier.prices ?? {}).map(([currency, price]) => [
+            currency,
+            {
+              monthly: price.monthly ?? null,
+              yearly: price.yearly ?? null,
+            },
+          ])
+        ) as CatalogProduct['tiers'][number]['prices'],
+        features: tier.features ?? [],
+      })),
+      creditCosts: Object.entries(config.credit_costs ?? {}).map(([operation, credits]) => ({
+        operation,
+        credits,
+        label: this.humanizeOperation(operation),
+      })),
+    };
+  }
+
+  private humanizeOperation(operation: string): string {
+    return operation.replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 
   private mapProduct(p: any): CatalogProduct {
