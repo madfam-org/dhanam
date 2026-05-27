@@ -205,7 +205,7 @@ products:
   selva:
     name: "Selva"
     description: "AI agent swarm orchestration — AutoSwarm Office"
-    category: infrastructure
+    category: platform
     website: "https://selva.town"
     sort_order: 3
     tiers:
@@ -556,6 +556,809 @@ products:
       trip_plan_generation: 5
       event_score_compute: 2
       itinerary_optimization: 3
+
+  enclii:
+    name: "Enclii"
+    description: "Self-hosted DevOps platform for deploying, scaling, and operating containerized services"
+    category: infrastructure
+    website: "https://enclii.dev"
+    sort_order: 8
+    tiers:
+      open_source:
+        dhanam_tier: essentials
+        display_name: "Open Source"
+        prices: {}
+        features:
+          - "AGPL self-hosted control plane"
+          - "GitOps deployment workflows"
+          - "Custom domains with automated TLS"
+          - "Janua OIDC integration"
+          - "Kubernetes-native workload operations"
+      managed:
+        dhanam_tier: pro
+        display_name: "Managed"
+        prices: {}
+        features:
+          - "Hosted control plane"
+          - "Production deployment automation"
+          - "Observability and domain operations"
+          - "Secrets and environment management"
+          - "Commercial support"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices: {}
+        features:
+          - "Dedicated/self-hosted deployment support"
+          - "Enterprise SSO and governance"
+          - "Custom compliance posture"
+          - "Migration support from SaaS PaaS providers"
+          - "Dedicated success and platform engineering support"
+    credit_costs:
+      deployment: 5
+      domain_provision: 2
+      secret_rotation: 2
+
+  cotiza:
+    name: "Cotiza Studio"
+    description: "Digital manufacturing quoting platform connecting design to factory"
+    category: fabrication
+    website: "https://cotiza.studio"
+    sort_order: 9
+    tiers:
+      maker:
+        dhanam_tier: essentials
+        display_name: "Maker"
+        prices: {}
+        features:
+          - "Representative quoting workflow"
+          - "Basic upload and manufacturability checks"
+          - "Community support"
+      creator_pro:
+        dhanam_tier: pro
+        display_name: "Creator Pro"
+        prices:
+          MXN: { monthly: 39900 }
+        features:
+          - "Unlimited quote drafts"
+          - "Manufacturing cost breakdowns"
+          - "PDF quote exports"
+          - "Dhanam checkout integration"
+      business:
+        dhanam_tier: pro
+        display_name: "Business"
+        prices:
+          MXN: { monthly: 169900 }
+        features:
+          - "Team quoting workspace"
+          - "Vendor shortlist management"
+          - "Quote history and approvals"
+          - "Priority support"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices:
+          MXN: { monthly: 849900 }
+        features:
+          - "Custom vendor and material taxonomy"
+          - "Private quoting workflows"
+          - "SSO / SAML"
+          - "SLA guarantees"
+    credit_costs:
+      quote_generation: 5
+      dfm_analysis: 3
+
+  forj:
+    name: "Forj"
+    description: "Decentralized fabrication storefronts with phygital NFT integration"
+    category: fabrication
+    website: "https://forj.design"
+    sort_order: 10
+    tiers:
+      maker:
+        dhanam_tier: essentials
+        display_name: "Maker"
+        prices:
+          MXN: { monthly: 29900 }
+        features:
+          - "3D storefront builder"
+          - "Basic product publishing"
+          - "Fabrication handoff"
+      studio:
+        dhanam_tier: pro
+        display_name: "Studio"
+        prices:
+          MXN: { monthly: 99900 }
+        features:
+          - "Advanced storefront customization"
+          - "Analytics dashboard"
+          - "Phygital commerce workflows"
+      pro_collective:
+        dhanam_tier: premium
+        display_name: "Pro Collective"
+        prices:
+          MXN: { monthly: 299900 }
+        features:
+          - "Multi-creator collaboration"
+          - "Fabrication node dashboards"
+          - "Priority support"
+    credit_costs:
+      storefront_publish: 3
+      model_process: 2
+
+  avala:
+    name: "Avala"
+    description: "Learning and competency cloud for EC/CONOCER, DC-3/SIRCE, and verifiable credentials"
+    category: platform
+    website: "https://avala.studio"
+    sort_order: 11
+    tiers:
+      issuer:
+        dhanam_tier: essentials
+        display_name: "Issuer"
+        prices:
+          MXN: { monthly: 99900 }
+        features:
+          - "Credential issuance"
+          - "Training evidence capture"
+          - "Basic compliance exports"
+      institution:
+        dhanam_tier: pro
+        display_name: "Institution"
+        prices:
+          MXN: { monthly: 499900 }
+        features:
+          - "Multi-program management"
+          - "Instructor and trainee portals"
+          - "DC-3/SIRCE workflows"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices:
+          MXN: { monthly: 1499900 }
+        features:
+          - "SSO / SCIM"
+          - "Custom competency frameworks"
+          - "SLA guarantees"
+    credit_costs:
+      credential_issue: 2
+      assessment_score: 2
+
+  primavera3d:
+    name: "Primavera3D"
+    description: "Professional 3D modeling platform with parametric design"
+    category: fabrication
+    website: "https://primavera3d.com"
+    sort_order: 12
+    tiers:
+      creator:
+        dhanam_tier: essentials
+        display_name: "Creator"
+        prices: {}
+        features:
+          - "3D modeling workspace"
+          - "Basic model storage"
+          - "Community support"
+      pro:
+        dhanam_tier: pro
+        display_name: "Pro"
+        prices:
+          MXN: { monthly: 19900 }
+        features:
+          - "Advanced parametric modeling"
+          - "Model exports"
+          - "Private projects"
+      studio:
+        dhanam_tier: premium
+        display_name: "Studio"
+        prices:
+          MXN: { monthly: 59900 }
+        features:
+          - "Team collaboration"
+          - "Asset libraries"
+          - "Priority support"
+    credit_costs:
+      model_render: 2
+      export: 1
+
+  coforma:
+    name: "Coforma Studio"
+    description: "Customer advisory board platform for structured feedback collection"
+    category: crm
+    website: "https://coforma.studio"
+    sort_order: 13
+    tiers:
+      startup:
+        dhanam_tier: essentials
+        display_name: "Startup"
+        prices:
+          MXN: { monthly: 99900 }
+        features:
+          - "Feedback board"
+          - "Customer panel recruitment"
+          - "Basic engagement dashboards"
+      growth:
+        dhanam_tier: pro
+        display_name: "Growth"
+        prices:
+          MXN: { monthly: 399900 }
+        features:
+          - "Structured advisory sessions"
+          - "Revenue influence tracking"
+          - "Executive-ready reports"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices:
+          MXN: { monthly: 1199900 }
+        features:
+          - "SSO / SAML"
+          - "Custom panel workflows"
+          - "Dedicated success"
+    credit_costs:
+      feedback_session: 3
+      report_generation: 4
+
+  yantra4d:
+    name: "Yantra4D"
+    description: "Parametric CAD and hyperobject design platform"
+    category: fabrication
+    website: "https://yantra4d.com"
+    sort_order: 14
+    tiers:
+      creator:
+        dhanam_tier: essentials
+        display_name: "Creator"
+        prices: {}
+        features:
+          - "Studio access"
+          - "Commons catalog browsing"
+          - "Basic project exports"
+      pro:
+        dhanam_tier: pro
+        display_name: "Pro"
+        prices:
+          MXN: { monthly: 59900 }
+        features:
+          - "Private parametric projects"
+          - "AI-assisted synthesis"
+          - "Advanced export formats"
+      studio:
+        dhanam_tier: premium
+        display_name: "Studio"
+        prices:
+          MXN: { monthly: 299900 }
+        features:
+          - "Team workspaces"
+          - "Admin console"
+          - "Priority support"
+    credit_costs:
+      synthesis: 5
+      project_export: 2
+
+  rondelio:
+    name: "Rondelio"
+    description: "Game intelligence cloud for tabletop and TCG search, benchmarks, and exports"
+    category: intelligence
+    website: "https://rondel.io"
+    sort_order: 15
+    tiers:
+      free:
+        dhanam_tier: essentials
+        display_name: "Free"
+        prices: {}
+        features:
+          - "Public search"
+          - "Limited benchmarks"
+          - "Basic exports"
+      developer:
+        dhanam_tier: pro
+        display_name: "Developer"
+        prices:
+          MXN: { monthly: 199900 }
+        features:
+          - "REST API access"
+          - "Benchmark recipes"
+          - "Clean exports"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices:
+          MXN: { monthly: 999900 }
+        features:
+          - "Bulk data workflows"
+          - "Custom dataset contracts"
+          - "SLA guarantees"
+    credit_costs:
+      benchmark_run: 5
+      export: 3
+
+  ceq:
+    name: "CEQ"
+    description: "Creative AI rendering and ComfyUI-powered studio"
+    category: platform
+    website: "https://ceq.lol"
+    sort_order: 16
+    tiers:
+      creator:
+        dhanam_tier: essentials
+        display_name: "Creator"
+        prices: {}
+        metadata:
+          monthly_credits: 100
+        features:
+          - "100 credits/month"
+          - "Landing/demo access"
+          - "Community support"
+      pro_artist:
+        dhanam_tier: pro
+        display_name: "Pro Artist"
+        prices:
+          MXN: { monthly: 34900 }
+        metadata:
+          monthly_credits: 2000
+        features:
+          - "2,000 credits/month"
+          - "Studio access"
+          - "Private generations"
+      studio:
+        dhanam_tier: premium
+        display_name: "Studio"
+        prices:
+          MXN: { monthly: 129900 }
+        metadata:
+          monthly_credits: 10000
+        features:
+          - "10,000 credits/month"
+          - "Team workflows"
+          - "Priority support"
+    credit_costs:
+      render: 5
+      upscale: 3
+
+  pravara-mes:
+    name: "Pravara MES"
+    description: "Cloud-native manufacturing execution system for phygital workflows"
+    category: fabrication
+    website: "https://mes.madfam.io/landing"
+    sort_order: 17
+    tiers:
+      starter:
+        dhanam_tier: essentials
+        display_name: "Starter"
+        prices:
+          MXN: { monthly: 499900 }
+        features:
+          - "Machine connectivity"
+          - "Kanban scheduling"
+          - "Basic telemetry"
+      growth:
+        dhanam_tier: pro
+        display_name: "Growth"
+        prices:
+          MXN: { monthly: 1499900 }
+        features:
+          - "Multi-machine digital twin"
+          - "Quality workflows"
+          - "Real-time telemetry"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices:
+          MXN: { monthly: 4999900 }
+        features:
+          - "Unlimited machine integrations"
+          - "SSO / SAML"
+          - "SLA guarantees"
+    credit_costs:
+      machine_event: 1
+      work_order: 3
+
+  madlab:
+    name: "MADLAB"
+    description: "Gamified science and technology education lab for schools"
+    category: platform
+    website: "https://madlab.quest"
+    sort_order: 18
+    tiers:
+      launcher:
+        dhanam_tier: essentials
+        display_name: "Launcher"
+        prices: {}
+        features:
+          - "Pilot program packaging"
+          - "Basic event planning"
+          - "Public project dashboard"
+      lab:
+        dhanam_tier: pro
+        display_name: "Lab"
+        prices:
+          MXN: { monthly: 499900 }
+        features:
+          - "School event planning"
+          - "Learning module assets"
+          - "Operational dashboard"
+      factory:
+        dhanam_tier: premium
+        display_name: "Factory"
+        prices:
+          MXN: { monthly: 1999900 }
+        features:
+          - "Multi-school rollout"
+          - "Sponsorship reporting"
+          - "Custom educational modules"
+    credit_costs:
+      event_plan: 5
+      report_generation: 3
+
+  janua:
+    name: "Janua"
+    description: "Self-hosted authentication, OIDC/SSO, and identity federation platform"
+    category: platform
+    website: "https://janua.dev"
+    sort_order: 19
+    tiers:
+      open_source:
+        dhanam_tier: essentials
+        display_name: "Open Source"
+        prices: {}
+        features:
+          - "Self-hosted OAuth2/OIDC provider"
+          - "RS256 JWT/JWKS support"
+          - "SAML, MFA, passkeys, and RBAC primitives"
+          - "SDKs and migration tooling"
+      managed:
+        dhanam_tier: pro
+        display_name: "Managed"
+        prices: {}
+        features:
+          - "Hosted production identity control plane"
+          - "OIDC client and callback management"
+          - "Webhooks, SCIM, and operational dashboards"
+          - "Commercial support"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices: {}
+        features:
+          - "Dedicated or self-hosted deployment support"
+          - "Enterprise SSO and federation"
+          - "Migration support from Auth0, Clerk, or Keycloak"
+          - "SLA-backed identity operations"
+    credit_costs:
+      auth_request: 1
+      token_issue: 1
+      webhook_dispatch: 1
+
+  nuit-one:
+    name: "Nuit.one"
+    description: "Audio-processing platform for stem separation, pitch detection, and remix/music education workflows"
+    category: platform
+    website: "https://nuit.one"
+    sort_order: 20
+    tiers:
+      creator:
+        dhanam_tier: essentials
+        display_name: "Creator"
+        prices:
+          MXN: { monthly: 0 }
+        features:
+          - "Personal audio workspace"
+          - "Basic stem separation workflow"
+          - "Pitch-detection experiments"
+      artist_pro:
+        dhanam_tier: pro
+        display_name: "Artist Pro"
+        prices:
+          MXN: { monthly: 24900 }
+        features:
+          - "Expanded processing quota"
+          - "YouTube import workflow"
+          - "Cloud audio storage"
+          - "Janua-authenticated workspace"
+      label:
+        dhanam_tier: premium
+        display_name: "Label"
+        prices:
+          MXN: { monthly: 99900 }
+        features:
+          - "Team audio workspaces"
+          - "Batch processing workflows"
+          - "Priority processing support"
+          - "Commercial education/remix operations"
+    credit_costs:
+      stem_separation_job: 10
+      pitch_detection_job: 5
+      audio_download_job: 2
+
+  bloom-scroll:
+    name: "Bloom Scroll"
+    description: "Finite, intentional content digest platform for constructive perspective and frontier-science discovery"
+    category: intelligence
+    website: "https://almanac.solar"
+    sort_order: 21
+    tiers:
+      reader:
+        dhanam_tier: essentials
+        display_name: "Reader"
+        prices:
+          MXN: { monthly: 0 }
+        features:
+          - "Finite daily digest"
+          - "Constructive perspective feed"
+          - "Science and culture curation"
+      curator:
+        dhanam_tier: pro
+        display_name: "Curator"
+        prices: {}
+        features:
+          - "Personalized source mix"
+          - "Saved research trails"
+          - "Digest delivery controls"
+      studio:
+        dhanam_tier: premium
+        display_name: "Studio"
+        prices: {}
+        features:
+          - "Team curation workflows"
+          - "Custom source bundles"
+          - "Audience reporting"
+    credit_costs:
+      digest_generation: 3
+      source_refresh: 1
+
+  blueprint-harvester:
+    name: "Blueprint Harvester"
+    description: "3D-model indexing, geometry search, and fabrication benchmark platform"
+    category: fabrication
+    website: "https://blueprint.tube"
+    sort_order: 22
+    tiers:
+      public_catalog:
+        dhanam_tier: essentials
+        display_name: "Public Catalog"
+        prices: {}
+        features:
+          - "Public 3D-model index"
+          - "Geometry metadata browsing"
+          - "Reference printability signals"
+      workbench:
+        dhanam_tier: pro
+        display_name: "Workbench"
+        prices: {}
+        features:
+          - "Search and comparison workflows"
+          - "Geometry quality scoring"
+          - "Fabrication benchmark exports"
+      data_partner:
+        dhanam_tier: premium
+        display_name: "Data Partner"
+        prices: {}
+        features:
+          - "Bulk catalog access"
+          - "Custom benchmark datasets"
+          - "Partner API support"
+    credit_costs:
+      model_index: 2
+      geometry_search: 4
+      benchmark_run: 8
+
+  factlas:
+    name: "Factlas"
+    description: "Geographic fact graph for bitemporal geospatial intelligence and provenance-backed APIs"
+    category: intelligence
+    website: "https://factl.as"
+    sort_order: 23
+    tiers:
+      pilot:
+        dhanam_tier: essentials
+        display_name: "Pilot"
+        prices: {}
+        features:
+          - "Pilot geospatial fact graph"
+          - "Provenance-backed assertions"
+          - "API access for selected datasets"
+      analyst:
+        dhanam_tier: pro
+        display_name: "Analyst"
+        prices: {}
+        features:
+          - "Bitemporal query workflows"
+          - "Tile and API access"
+          - "Private workspaces"
+      institutional:
+        dhanam_tier: premium
+        display_name: "Institutional"
+        prices: {}
+        features:
+          - "Custom data integrations"
+          - "Dedicated provenance pipelines"
+          - "Operational support"
+    credit_costs:
+      fact_query: 2
+      tile_render: 3
+      provenance_assertion: 5
+
+  phynd-crm:
+    name: "PhyndCRM"
+    description: "Federated phygital CRM and client deliverables portal across MADFAM ecosystem platforms"
+    category: crm
+    website: "https://phynd.app"
+    sort_order: 24
+    tiers:
+      open_source:
+        dhanam_tier: essentials
+        display_name: "Open Source"
+        prices: {}
+        features:
+          - "CRM-native contacts, leads, and opportunities"
+          - "Federated client profile foundation"
+          - "Self-hosted core"
+      saas:
+        dhanam_tier: pro
+        display_name: "SaaS"
+        prices: {}
+        features:
+          - "Hosted client portal"
+          - "MADFAM platform federation"
+          - "Engagement and deliverables history"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices: {}
+        features:
+          - "White-labeled client dashboards"
+          - "Custom federation providers"
+          - "SLA-backed operations"
+    credit_costs:
+      profile_refresh: 3
+      federation_query: 2
+      webhook_event: 1
+
+  sim4d:
+    name: "Sim4D"
+    description: "Browser-native parametric CAD studio with OCCT.wasm geometry and collaboration workflows"
+    category: fabrication
+    website: "https://sim4d.com"
+    sort_order: 25
+    tiers:
+      maker:
+        dhanam_tier: essentials
+        display_name: "Maker"
+        prices: {}
+        features:
+          - "Browser-native CAD studio"
+          - "Parametric graph editor"
+          - "STEP/STL/IGES export"
+      studio:
+        dhanam_tier: pro
+        display_name: "Studio"
+        prices:
+          USD: { yearly: 300000 }
+        features:
+          - "Production OCCT.wasm geometry backend"
+          - "Collaboration layer"
+          - "Cloud project workflows"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices: {}
+        features:
+          - "Custom CAD workflows"
+          - "Dedicated support"
+          - "Manufacturing integration"
+    credit_costs:
+      geometry_operation: 2
+      export_job: 3
+      collaboration_session: 1
+
+  subtext:
+    name: "Subtext"
+    description: "Conversational intelligence infrastructure for emotional-signal and psychological-state analysis from audio"
+    category: intelligence
+    website: "https://subtext.live"
+    sort_order: 26
+    tiers:
+      open_source:
+        dhanam_tier: essentials
+        display_name: "Open Source"
+        prices: {}
+        features:
+          - "Audio analysis core"
+          - "Conversation dynamics extraction"
+          - "Self-hosted deployment"
+      team:
+        dhanam_tier: pro
+        display_name: "Team"
+        prices: {}
+        features:
+          - "Hosted analysis workflows"
+          - "Meeting and interview processing"
+          - "Team EQ augmentation reports"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices: {}
+        features:
+          - "Custom signal models"
+          - "Private audio processing"
+          - "SLA-backed operations"
+    credit_costs:
+      audio_analysis_minute: 2
+      signal_report: 5
+
+  symbiosis-hcm:
+    name: "Symbiosis HCM"
+    description: "People-first HCM platform for Mexican enterprises and tenant operations"
+    category: platform
+    website: "https://hcm.madfam.io"
+    sort_order: 27
+    tiers:
+      pilot:
+        dhanam_tier: essentials
+        display_name: "Pilot"
+        prices: {}
+        features:
+          - "People-first HCM foundation"
+          - "Employee records"
+          - "Tenant-ready API"
+      tenant:
+        dhanam_tier: pro
+        display_name: "Tenant"
+        prices: {}
+        features:
+          - "Tenant HCM workspace"
+          - "Admin and API surfaces"
+          - "Janua authentication"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices: {}
+        features:
+          - "Enterprise HCM rollout"
+          - "Custom integrations"
+          - "Operational support"
+    credit_costs:
+      employee_record: 1
+      hcm_workflow: 3
+
+  zavlo:
+    name: "Zavlo"
+    description: "Loyalty infrastructure that turns CFDI-compliant invoices into stamped receipt credentials"
+    category: platform
+    website: "https://zavlo.io"
+    sort_order: 28
+    tiers:
+      starter:
+        dhanam_tier: essentials
+        display_name: "Starter"
+        prices: {}
+        features:
+          - "Stamped receipt foundation"
+          - "Basic loyalty events"
+          - "Tenant setup"
+      pro:
+        dhanam_tier: pro
+        display_name: "Pro"
+        prices:
+          USD: { monthly: 9900 }
+        features:
+          - "White-labeling"
+          - "Custom loyalty tiers"
+          - "Branded loyalty workflows"
+          - "SLA support"
+      enterprise:
+        dhanam_tier: premium
+        display_name: "Enterprise"
+        prices: {}
+        features:
+          - "Enterprise loyalty infrastructure"
+          - "Bulk stamped receipt operations"
+          - "Custom compliance support"
+    credit_costs:
+      stamped_receipt: 1
+      loyalty_event: 1
+      credential_issue: 2
 
 coupons:
   founding_member_mx:
