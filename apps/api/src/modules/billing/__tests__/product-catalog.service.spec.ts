@@ -159,9 +159,11 @@ describe('ProductCatalogService', () => {
 
       const catalog = await service.getFullCatalog();
 
-      expect(catalog.length).toBeGreaterThanOrEqual(28);
+      expect(catalog).toHaveLength(26);
       expect(catalog.find((product) => product.slug === 'enclii')).toBeDefined();
       expect(catalog.find((product) => product.slug === 'dhanam')?.tiers).toHaveLength(3);
+      expect(catalog.find((product) => product.slug === 'primavera3d')).toBeUndefined();
+      expect(catalog.find((product) => product.slug === 'sim4d')).toBeUndefined();
       expect(prisma.product.findMany).not.toHaveBeenCalled();
     });
   });
