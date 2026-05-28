@@ -7,7 +7,8 @@
 Dhanam's billing system supports:
 
 - **Multi-Provider Payments**: Janua (Conekta MX, Polar international), Stripe (fallback)
-- **Multi-Product Billing**: Consolidated billing across MADFAM ecosystem products (Enclii, Tezca, Yantra4D, Dhanam)
+- **Multi-Product Billing**: Consolidated billing across MADFAM ecosystem products (Enclii, Tezca, Yantra4D, Cotiza, Dhanam)
+- **Product Boundary**: Sim4D is billed through Yantra4D; Primavera3D maker-node quoting is handled through Cotiza Studio and is not an independent billing product.
 - **Subscription Tiers**: Free and Premium with usage-based limits
 - **Usage Tracking**: Per-feature metering with daily limits
 - **Webhook Processing**: Real-time subscription and payment events
@@ -16,12 +17,13 @@ Dhanam's billing system supports:
 
 The billing system supports consolidated billing across multiple MADFAM products. Each product is identified by a `ProductId`:
 
-| ProductId  | Product  | Description                  |
-| ---------- | -------- | ---------------------------- |
-| `enclii`   | Enclii   | DevOps platform              |
-| `tezca`    | Tezca    | Legal tech platform          |
-| `yantra4d` | Yantra4D | 3D/CAD platform              |
-| `dhanam`   | Dhanam   | Financial planning (default) |
+| ProductId  | Product       | Description                                                             |
+| ---------- | ------------- | ----------------------------------------------------------------------- |
+| `enclii`   | Enclii        | DevOps platform                                                         |
+| `tezca`    | Tezca         | Legal tech platform                                                     |
+| `yantra4d` | Yantra4D      | 3D/CAD platform, including bundled Sim4D capability                     |
+| `cotiza`   | Cotiza Studio | Manufacturing quoting platform and Primavera3D maker-node quoting owner |
+| `dhanam`   | Dhanam        | Financial planning (default)                                            |
 
 ### Product-Prefixed Plan Slugs
 

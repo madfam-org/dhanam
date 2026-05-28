@@ -5,9 +5,9 @@
  * `EcosystemBanner` from `@dhanam/ui`.
  *
  * Verified live on 2026-05-04 via HEAD probe (200/301/302/405-method-allowed).
- * Two known-good platforms (sim4d.io, phynd-crm.madfam.io) were OMITTED from
- * the v1 default list because their apex domains were not resolving at audit
- * time. Re-add them once they're live by uncommenting the entries below.
+ * PhyndCRM was omitted from the v1 default list because its apex domain was
+ * not resolving at audit time. Re-add it once it is live by uncommenting the
+ * entry below. Sim4D is bundled into Yantra4D, not listed independently.
  */
 export interface EcosystemPlatform {
   /** Short uppercase keyword shown before the colon, e.g. "BUDGETING & WEALTH". */
@@ -32,5 +32,4 @@ export const DEFAULT_ECOSYSTEM_PLATFORMS: readonly EcosystemPlatform[] = [
   { keyword: 'GAMES', name: 'Rondelio', url: 'https://rondel.io' },
   { keyword: 'ROUTING & LOGISTICS', name: 'RouteCraft', url: 'https://routecraft.app' },
   // { keyword: 'CLIENT PORTAL & CRM', name: 'PhyndCRM', url: 'https://phynd-crm.madfam.io' }, // 2026-05-04: connection refused
-  // { keyword: 'PARAMETRIC CAD', name: 'Sim4D', url: 'https://sim4d.io' },                    // 2026-05-04: connection refused
 ] as const;

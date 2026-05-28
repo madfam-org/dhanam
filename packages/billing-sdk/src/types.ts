@@ -11,6 +11,7 @@ export type ProductId =
   | 'enclii'
   | 'tezca'
   | 'yantra4d'
+  | 'cotiza'
   | 'dhanam'
   | 'karafiel'
   | 'forgesight'

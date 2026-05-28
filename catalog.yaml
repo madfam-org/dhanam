@@ -724,42 +724,6 @@ products:
       credential_issue: 2
       assessment_score: 2
 
-  primavera3d:
-    name: "Primavera3D"
-    description: "Professional 3D modeling platform with parametric design"
-    category: fabrication
-    website: "https://primavera3d.com"
-    sort_order: 12
-    tiers:
-      creator:
-        dhanam_tier: essentials
-        display_name: "Creator"
-        prices: {}
-        features:
-          - "3D modeling workspace"
-          - "Basic model storage"
-          - "Community support"
-      pro:
-        dhanam_tier: pro
-        display_name: "Pro"
-        prices:
-          MXN: { monthly: 19900 }
-        features:
-          - "Advanced parametric modeling"
-          - "Model exports"
-          - "Private projects"
-      studio:
-        dhanam_tier: premium
-        display_name: "Studio"
-        prices:
-          MXN: { monthly: 59900 }
-        features:
-          - "Team collaboration"
-          - "Asset libraries"
-          - "Priority support"
-    credit_costs:
-      model_render: 2
-      export: 1
 
   coforma:
     name: "Coforma Studio"
@@ -831,6 +795,7 @@ products:
         features:
           - "Team workspaces"
           - "Admin console"
+          - "Bundled Sim4D browser CAD/simulation capability"
           - "Priority support"
     credit_costs:
       synthesis: 5
@@ -1215,42 +1180,6 @@ products:
       federation_query: 2
       webhook_event: 1
 
-  sim4d:
-    name: "Sim4D"
-    description: "Browser-native parametric CAD studio with OCCT.wasm geometry and collaboration workflows"
-    category: fabrication
-    website: "https://sim4d.com"
-    sort_order: 25
-    tiers:
-      maker:
-        dhanam_tier: essentials
-        display_name: "Maker"
-        prices: {}
-        features:
-          - "Browser-native CAD studio"
-          - "Parametric graph editor"
-          - "STEP/STL/IGES export"
-      studio:
-        dhanam_tier: pro
-        display_name: "Studio"
-        prices:
-          USD: { yearly: 300000 }
-        features:
-          - "Production OCCT.wasm geometry backend"
-          - "Collaboration layer"
-          - "Cloud project workflows"
-      enterprise:
-        dhanam_tier: premium
-        display_name: "Enterprise"
-        prices: {}
-        features:
-          - "Custom CAD workflows"
-          - "Dedicated support"
-          - "Manufacturing integration"
-    credit_costs:
-      geometry_operation: 2
-      export_job: 3
-      collaboration_session: 1
 
   subtext:
     name: "Subtext"

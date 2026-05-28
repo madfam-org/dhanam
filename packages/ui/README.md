@@ -146,13 +146,13 @@ const buttonVariants = cva(
 
 Each MADFAM app has its own visual identity while sharing the golden ratio foundation:
 
-| App     | Primary Color    | Aesthetic              |
-| ------- | ---------------- | ---------------------- |
-| Dhanam  | Green (#22c55e)  | Finance, trust, growth |
-| Fortuna | Purple (#8b5cf6) | Insight, intelligence  |
-| sim4d   | Blue (#3b82f6)   | Technical, precise     |
-| Forj    | Orange (#f97316) | Marketplace, energy    |
-| Janua   | Slate (#64748b)  | Security, neutral      |
+| App      | Primary Color    | Aesthetic              |
+| -------- | ---------------- | ---------------------- |
+| Dhanam   | Green (#22c55e)  | Finance, trust, growth |
+| Fortuna  | Purple (#8b5cf6) | Insight, intelligence  |
+| Yantra4D | Blue (#3b82f6)   | Technical, precise     |
+| Forj     | Orange (#f97316) | Marketplace, energy    |
+| Janua    | Slate (#64748b)  | Security, neutral      |
 
 ## File Structure
 

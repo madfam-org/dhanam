@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
  * Categories follow the MADFAM layer architecture:
  * - SOIL: Infrastructure (Janua, Enclii)
  * - STEM: Shared capabilities (geom-core, AVALA)
- * - FRUIT: Revenue-generating products (sim4d, Primavera3D, Dhanam, etc.)
+ * - FRUIT: Revenue-generating products (Yantra4D, Cotiza Studio, Dhanam, etc.)
  */
 
 async function main() {
@@ -89,13 +89,13 @@ async function main() {
         create: [
           // === REVENUE CATEGORIES (Income) ===
           {
-            name: '💰 Revenue: sim4d Studio',
+            name: '💰 Revenue: Yantra4D Studio',
             budgetedAmount: 0, // Revenue tracked, not budgeted
             color: '#22c55e',
             icon: 'trending-up',
           },
           {
-            name: '💰 Revenue: Primavera3D Factory',
+            name: '💰 Revenue: Cotiza Studio',
             budgetedAmount: 0,
             color: '#16a34a',
             icon: 'trending-up',
@@ -141,13 +141,13 @@ async function main() {
 
           // === PRODUCT COSTS (FRUIT Layer) ===
           {
-            name: '🎨 Product: sim4d Operations',
+            name: '🎨 Product: Yantra4D Operations',
             budgetedAmount: 3000,
             color: '#a855f7',
             icon: 'cube',
           },
           {
-            name: '🏭 Product: Primavera3D Materials',
+            name: '🏭 Product: Cotiza Maker Nodes',
             budgetedAmount: 10000,
             color: '#9333ea',
             icon: 'box',
@@ -292,8 +292,8 @@ async function main() {
 
   // Create product-specific sub-spaces for detailed tracking
   const productSpaces = [
-    { id: 'madfam-sim4d', name: 'sim4d Business Unit', currency: 'USD' },
-    { id: 'madfam-primavera', name: 'Primavera3D Factory', currency: 'MXN' },
+    { id: 'madfam-yantra4d', name: 'Yantra4D Business Unit', currency: 'USD' },
+    { id: 'madfam-cotiza', name: 'Cotiza Studio Maker Nodes', currency: 'MXN' },
     { id: 'madfam-forgesight', name: 'ForgeSight Intelligence', currency: 'USD' },
   ];
 
@@ -326,7 +326,7 @@ async function main() {
   console.log('   - Main space: MADFAM Operations');
   console.log('   - Budget categories: 23 (revenue, infra, product, team, marketing, legal, ESG)');
   console.log('   - Accounts: USD Operations, MXN Operations, Crypto Holdings');
-  console.log('   - Product spaces: sim4d, Primavera3D, ForgeSight');
+  console.log('   - Product spaces: Yantra4D, Cotiza Studio, ForgeSight');
   console.log('');
   console.log('🔐 Next steps:');
   console.log('   1. Link finance@madfam.org to Janua SSO');

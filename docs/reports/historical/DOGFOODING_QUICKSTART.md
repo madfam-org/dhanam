@@ -81,6 +81,10 @@ pnpm dev
 
 The MADFAM seed creates a pre-configured business space with ecosystem-aligned categories:
 
+Historical note: current taxonomy tracks Sim4D through Yantra4D and Primavera3D
+maker-node quoting through Cotiza Studio. The examples below predate that
+catalogue correction.
+
 ### Revenue Categories
 
 - 💰 Revenue: sim4d Studio
