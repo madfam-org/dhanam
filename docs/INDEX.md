@@ -14,6 +14,9 @@ open `docs/INDEX.md`.
 - [Roadmap](ROADMAP.md) - stability priorities P0–P8 and milestones M1–M7
 - [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md) - billing
   router and internal MADFAM POS completion plan
+- [Tulana SKU and Catalog Handoff](TULANA_SKU_AND_CATALOG_HANDOFF_2026-05-29.md) -
+  Tulana readiness, billing catalogue mirror, and Selva-approved price apply
+  contract
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md) - current
   production/staging stability truth
 - [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md) - latest
