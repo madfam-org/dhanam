@@ -1,7 +1,17 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ApplyCatalogPriceDto } from './dto/apply-catalog-price.dto';
+import { LookupCatalogPricesDto } from './dto/lookup-catalog-prices.dto';
 import { CatalogApplySecretGuard } from './guards/catalog-apply-secret.guard';
 import { ProductCatalogService } from './services/product-catalog.service';
 
@@ -46,5 +56,38 @@ export class InternalCatalogController {
       metadata,
       source: body.source,
     });
+  }
+
+  @Post('prices/lookup')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(CatalogApplySecretGuard)
+  @ApiOperation({
+    summary: 'Lookup applied catalog prices by ProductPrice id (internal)',
+    description:
+      'Batch read of product_prices rows for Tulana post-apply reconciliation. ' +
+      'Public GET /billing/catalog may serve catalog.yaml in production; use this for DB truth.',
+  })
+  @ApiHeader({
+    name: 'X-Dhanam-Catalog-Apply-Secret',
+    required: true,
+  })
+  async lookupPrices(@Body() body: LookupCatalogPricesDto) {
+    const prices = await this.catalog.lookupPricesByIds(body.ids);
+    return { prices };
+  }
+
+  @Get('prices/:id')
+  @UseGuards(CatalogApplySecretGuard)
+  @ApiOperation({ summary: 'Lookup one applied catalog price by ProductPrice id (internal)' })
+  @ApiHeader({
+    name: 'X-Dhanam-Catalog-Apply-Secret',
+    required: true,
+  })
+  async lookupPrice(@Param('id') id: string) {
+    const [price] = await this.catalog.lookupPricesByIds([id]);
+    if (!price) {
+      return { price: null };
+    }
+    return { price };
   }
 }

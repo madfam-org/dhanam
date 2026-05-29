@@ -311,6 +311,36 @@ export class ProductCatalogService {
   /**
    * Internal apply after Selva HITL: upsert product + price by ecosystem slugs.
    */
+  async lookupPricesByIds(ids: string[]): Promise<
+    Array<{
+      id: string;
+      productSlug: string;
+      tierSlug: string;
+      amountCents: number;
+      currency: Currency;
+      interval: string;
+    }>
+  > {
+    const uniqueIds = [...new Set(ids.map((id) => id.trim()).filter(Boolean))];
+    if (uniqueIds.length === 0) {
+      return [];
+    }
+
+    const rows = await this.prisma.productPrice.findMany({
+      where: { id: { in: uniqueIds } },
+      include: { product: { select: { slug: true } } },
+    });
+
+    return rows.map((row) => ({
+      id: row.id,
+      productSlug: row.product.slug,
+      tierSlug: row.tierSlug,
+      amountCents: row.amountCents,
+      currency: row.currency as Currency,
+      interval: row.interval,
+    }));
+  }
+
   async applyApprovedCatalogPrice(input: {
     productSlug: string;
     tierSlug: string;

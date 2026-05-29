@@ -19,6 +19,16 @@ describe('InternalCatalogController', () => {
     },
     created: true,
   });
+  const lookupPricesByIds = jest.fn().mockResolvedValue([
+    {
+      id: 'price-1',
+      productSlug: 'karafiel',
+      tierSlug: 'contador',
+      amountCents: 129900,
+      currency: Currency.MXN,
+      interval: 'monthly',
+    },
+  ]);
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -26,7 +36,7 @@ describe('InternalCatalogController', () => {
       providers: [
         {
           provide: ProductCatalogService,
-          useValue: { applyApprovedCatalogPrice },
+          useValue: { applyApprovedCatalogPrice, lookupPricesByIds },
         },
         {
           provide: ConfigService,
@@ -41,6 +51,7 @@ describe('InternalCatalogController', () => {
 
     controller = module.get(InternalCatalogController);
     applyApprovedCatalogPrice.mockClear();
+    lookupPricesByIds.mockClear();
   });
 
   it('applies price when secret matches', async () => {
@@ -77,5 +88,13 @@ describe('InternalCatalogController', () => {
     expect(applyApprovedCatalogPrice).toHaveBeenCalledWith(
       expect.objectContaining({ interval: 'monthly' })
     );
+  });
+
+  it('looks up prices by id batch', async () => {
+    const result = await controller.lookupPrices({
+      ids: ['price-1'],
+    });
+    expect(lookupPricesByIds).toHaveBeenCalledWith(['price-1']);
+    expect(result.prices[0].amountCents).toBe(129900);
   });
 });
