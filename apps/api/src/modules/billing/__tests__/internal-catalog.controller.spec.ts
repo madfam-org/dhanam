@@ -59,11 +59,23 @@ describe('InternalCatalogController', () => {
         productSlug: 'karafiel',
         tierSlug: 'contador',
         amountCents: 129900,
+        interval: 'month',
         source: 'tulana_selva_hitl',
       })
     );
     expect(result.ok).toBe(true);
     expect(result.price.amountCents).toBe(129900);
     expect(result.product.slug).toBe('karafiel');
+  });
+
+  it('defaults interval to monthly when omitted', async () => {
+    await controller.applyPrice({
+      product_slug: 'karafiel',
+      tier_slug: 'contador',
+      amount_cents: 129900,
+    });
+    expect(applyApprovedCatalogPrice).toHaveBeenCalledWith(
+      expect.objectContaining({ interval: 'monthly' })
+    );
   });
 });

@@ -40,7 +40,7 @@ export class InternalCatalogController {
       tierSlug: body.tier_slug,
       amountCents: body.amount_cents,
       currency: (body.currency as 'MXN' | 'USD' | 'EUR' | 'CAD') || 'MXN',
-      interval: body.interval || 'month',
+      interval: body.interval || 'monthly',
       dhanamTier: body.dhanam_tier,
       displayName: body.display_name,
       metadata,
