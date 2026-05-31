@@ -70,7 +70,11 @@ hardening, production migration recovery, and failed-job cleanup.
    deployment records, until the Enclii namespace mapping gap is repaired.
 7. Web Docker builds must not depend on external font downloads; the app now
    uses a local system font stack instead of `next/font/google`.
-8. Local test startup still warns when optional local SMTP/PostHog/Sentry and
+8. Web Docker builds set `SKIP_ENV_VALIDATION=true` during the builder stage so
+   `next.config.js` env checks do not fail Enclii/Kaniko when only build-args
+   are injected. Runtime validation still runs in the production container unless
+   operators use the break-glass `SKIP_ENV_VALIDATION=1` ConfigMap escape hatch.
+9. Local test startup still warns when optional local SMTP/PostHog/Sentry and
    provider credentials are absent; production should treat required
    observability and email credentials as deploy-time checks.
 
