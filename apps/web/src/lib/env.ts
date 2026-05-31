@@ -91,6 +91,12 @@ export type Env = z.infer<typeof envSchema>;
 
 let cachedEnv: Env | null = null;
 
+function shouldSkipEnvValidation(): boolean {
+  const flag = process.env.SKIP_ENV_VALIDATION;
+  // Build-time (next.config.js + Dockerfile) uses 'true'; runtime break-glass uses '1'.
+  return flag === '1' || flag === 'true';
+}
+
 export function getEnv(): Env {
   if (cachedEnv) return cachedEnv;
 
@@ -99,9 +105,9 @@ export function getEnv(): Env {
   // entirely and recover the web tier in seconds. The schema is still parsed
   // partially via getEnvUnsafe() at use sites, so type narrowing still works.
   // Use only as a break-glass — log loudly so it's visible in incident review.
-  if (process.env.SKIP_ENV_VALIDATION === '1') {
+  if (shouldSkipEnvValidation()) {
     console.warn(
-      '[dhanam-web] SKIP_ENV_VALIDATION=1 — Zod env schema bypassed. ' +
+      '[dhanam-web] SKIP_ENV_VALIDATION set — Zod env schema bypassed. ' +
         'This is a break-glass for prod incidents only; remove it once recovered.'
     );
     cachedEnv = envSchemaBase.partial().parse(process.env) as Env;

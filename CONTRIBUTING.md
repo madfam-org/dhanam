@@ -44,6 +44,32 @@ We use a trunk-based development model:
 - `chore/` - Maintenance tasks
 - `docs/` - Documentation updates
 
+### Keeping local `main` in sync
+
+Never commit directly on `main`. Always branch first:
+
+```bash
+git checkout main
+git pull --ff-only origin main
+git checkout -b fix/your-change
+```
+
+After a PR merges, refresh local `main`:
+
+```bash
+git checkout main
+git pull --ff-only origin main
+```
+
+If `git pull --ff-only` fails, local `main` has diverged (usually from an old direct commit). Reset it:
+
+```bash
+git fetch origin
+git reset --hard origin/main
+```
+
+Then recreate your work on a feature branch. The pre-push hook blocks pushes from `main` to prevent repeat drift.
+
 ## Commit Messages
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):

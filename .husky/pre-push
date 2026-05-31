@@ -1,5 +1,13 @@
 echo "Running pre-push checks..."
 
+current_branch="$(git symbolic-ref --short HEAD 2>/dev/null || true)"
+if [ "$current_branch" = "main" ]; then
+  echo "❌ Direct pushes from main are blocked."
+  echo "   Branch from main, open a PR, and merge via GitHub."
+  echo "   To refresh local main: git fetch origin && git reset --hard origin/main"
+  exit 1
+fi
+
 ORIGINAL_DATABASE_URL="${DATABASE_URL:-}"
 HOOK_DATABASE_URL="${DATABASE_URL:-postgresql://dummy:dummy@localhost:5432/dhanam_hook?schema=public}"
 export DATABASE_URL="$HOOK_DATABASE_URL"

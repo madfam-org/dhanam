@@ -62,8 +62,12 @@ ARG NEXT_PUBLIC_ADMIN_URL
 ARG NEXT_PUBLIC_OIDC_ISSUER
 ARG NEXT_PUBLIC_OIDC_CLIENT_ID
 ARG NEXT_PUBLIC_JANUA_API_URL
+# next.config.js validates env at build time; Enclii/Kaniko injects NEXT_PUBLIC_*
+# via ARG above but must not fail when optional vars are absent during image build.
+ARG SKIP_ENV_VALIDATION=true
 
 # Persist build-args as ENV for Next.js build process
+ENV SKIP_ENV_VALIDATION=$SKIP_ENV_VALIDATION
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
