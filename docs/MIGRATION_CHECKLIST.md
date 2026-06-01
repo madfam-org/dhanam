@@ -55,12 +55,12 @@
 
 - [ ] **Generate API Keys**
   - STRIPE_MX_PUBLISHABLE_KEY: `pk_live_____________`
-  - STRIPE_MX_SECRET_KEY: `sk_live_____________`
+  - STRIPE_MX_SECRET_KEY: `DUMMY_STRIPE_LIVE_KEY_DO_NOT_USE`
 
 - [ ] **Configure Webhook**
   - Endpoint: `https://api.dhan.am/billing/webhooks/stripe`
   - Events: `checkout.session.completed`, `invoice.paid`, `customer.subscription.*`
-  - STRIPE_MX_WEBHOOK_SECRET: `whsec_____________`
+  - STRIPE_MX_WEBHOOK_SECRET: `DUMMY_WEBHOOK_SECRET_DO_NOT_USE`
 
 - [ ] **Enable Payment Methods**
   - [x] Card payments

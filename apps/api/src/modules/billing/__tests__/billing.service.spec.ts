@@ -1045,7 +1045,7 @@ describe('BillingService', () => {
     it('should not flag legitimate secret values', async () => {
       const svc = await buildServiceWithConfig((key: string, defaultValue?: any) => {
         if (key === 'NODE_ENV') return 'production';
-        if (key === 'STRIPE_MX_WEBHOOK_SECRET') return 'whsec_abc123realvalue';
+        if (key === 'STRIPE_MX_WEBHOOK_SECRET') return 'DUMMY_WEBHOOK_SECRET_DO_NOT_USE';
         if (key === 'PADDLE_API_KEY') return 'pdl_live_abc123';
         if (key === 'PADDLE_VENDOR_ID') return '12345';
         if (key === 'PADDLE_CLIENT_TOKEN') return 'ctok_live_abc';

@@ -21,7 +21,7 @@ const samplePayload = JSON.stringify({
 });
 
 describe('verifyWebhookSignature', () => {
-  const secret = 'whsec_test_secret_key';
+  const secret = 'DUMMY_WEBHOOK_SECRET_DO_NOT_USE';
 
   it('returns true for a valid signature', async () => {
     const sig = sign(samplePayload, secret);
@@ -49,7 +49,7 @@ describe('verifyWebhookSignature', () => {
 });
 
 describe('parseWebhookPayload', () => {
-  const secret = 'whsec_parse_test';
+  const secret = 'DUMMY_WEBHOOK_SECRET_DO_NOT_USE';
 
   it('parses and verifies a valid payload', async () => {
     const sig = sign(samplePayload, secret);
