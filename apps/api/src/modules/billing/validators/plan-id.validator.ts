@@ -3,12 +3,12 @@
  *
  * Accepts any plan following the convention:
  *   - Bare tiers: "essentials", "pro", "premium", "madfam"
- *   - Product-prefixed: "{product}_{tier}" (e.g., "karafiel_pro", "newservice_essentials")
- *   - With billing period: "{product}_{tier}_{period}" (e.g., "karafiel_pro_yearly")
+ *   - Product-prefixed catalog tiers: "{product}_{tier}" (e.g., "karafiel_contador")
+ *   - With billing period: "{product}_{tier}_{period}" (e.g., "karafiel_contador_yearly")
  *   - Legacy exact-match plans for backwards compatibility
  *
- * This replaces the hardcoded VALID_PLANS array so new ecosystem services
- * can use billing without modifying Dhanam's codebase.
+ * This validator only checks syntax. PriceResolver/ProductCatalogService remain
+ * the source of truth for whether a product/tier actually exists.
  */
 
 import {
@@ -32,7 +32,8 @@ const LEGACY_PLANS = new Set([
 
 const BILLING_PERIODS = new Set(['monthly', 'yearly', 'annual']);
 
-const PRODUCT_RE = /^[a-z][a-z0-9]*$/;
+const PRODUCT_RE = /^[a-z][a-z0-9-]*$/;
+const CATALOG_TIER_RE = /^[a-z][a-z0-9_]*$/;
 
 export function isValidPlanId(value: unknown): boolean {
   if (!value || typeof value !== 'string') return false;
@@ -57,14 +58,15 @@ export function isValidPlanId(value: unknown): boolean {
   // Bare tier after stripping period: "pro_yearly" → "pro"
   if (KNOWN_TIERS.has(core)) return true;
 
-  // {product}_{tier}: "karafiel_pro", "newservice_essentials"
+  // {product}_{tier}: "karafiel_contador", "newservice_launch"
+  // Existence is checked later by catalog-backed price resolution.
   const idx = core.indexOf('_');
   if (idx <= 0) return false;
 
   const product = core.slice(0, idx);
   const tier = core.slice(idx + 1);
 
-  return PRODUCT_RE.test(product) && KNOWN_TIERS.has(tier);
+  return PRODUCT_RE.test(product) && CATALOG_TIER_RE.test(tier);
 }
 
 @ValidatorConstraint({ name: 'isValidPlanId', async: false })
@@ -74,7 +76,7 @@ class IsValidPlanIdConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(_args: ValidationArguments): string {
-    return 'plan must be a valid plan ID ({product}_{tier} format, e.g. "karafiel_pro")';
+    return 'plan must be a valid plan ID ({product}_{tier} format, e.g. "karafiel_contador")';
   }
 }
 
@@ -91,4 +93,4 @@ export function IsValidPlanId(validationOptions?: ValidationOptions) {
 }
 
 /** Validates a product name: lowercase alphanumeric, at least 1 char. */
-export const PRODUCT_PATTERN = /^[a-z][a-z0-9]*$/;
+export const PRODUCT_PATTERN = PRODUCT_RE;

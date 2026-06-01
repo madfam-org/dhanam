@@ -8,8 +8,8 @@ export class AdminPosCheckoutDto {
   userId!: string;
 
   @ApiProperty({
-    description: 'Plan slug to sell, e.g. pro, pro_yearly, karafiel_pro',
-    example: 'pro',
+    description: 'Plan slug to sell, e.g. pro, pro_yearly, karafiel_contador',
+    example: 'karafiel_contador',
   })
   @IsString()
   @Matches(/^[a-z][a-z0-9_]*(?:_(?:monthly|yearly|annual))?$/, {
@@ -23,7 +23,7 @@ export class AdminPosCheckoutDto {
     example: 'karafiel',
   })
   @IsOptional()
-  @Matches(/^[a-z][a-z0-9]*$/, { message: 'product must be lowercase alphanumeric' })
+  @Matches(/^[a-z][a-z0-9-]*$/, { message: 'product must be a lowercase catalog slug' })
   product?: string;
 
   @ApiPropertyOptional({ description: 'Janua/MADFAM organization id to link on checkout' })

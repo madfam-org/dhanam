@@ -9,7 +9,7 @@ describe('StripeService', () => {
   let configService: jest.Mocked<ConfigService>;
 
   const STRIPE_SECRET_KEY = 'sk_test_mock_key';
-  const STRIPE_WEBHOOK_SECRET = 'whsec_test_secret';
+  const STRIPE_WEBHOOK_SECRET = 'DUMMY_WEBHOOK_SECRET_DO_NOT_USE';
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
