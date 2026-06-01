@@ -32,6 +32,22 @@ redirect and should not become the source of truth again.
   emergencies when Enclii is unavailable or lacks an implemented adapter.
 - Record any missing Enclii adapter gap instead of normalizing raw production
   access in docs or runbooks.
+- Treat bank transactions, balances, budgets, household ownership data,
+  net-worth assets, documents, estate-planning records, billing events, payment
+  processor payloads, subscription entitlements, referral/reward data, ESG/crypto
+  positions, user identity data, and webhooks as sensitive financial data. Do
+  not expose sample records, account identifiers, payloads, exports, screenshots,
+  logs, or credentials in commits, PRs, issues, chat, CI logs, or MCP memory.
+- Treat payment-provider actions, billing/subscription changes, reconciliation,
+  outbound webhooks, bank/crypto/provider syncs, imports/exports, package
+  publishing, load tests, database migrations/seeds/resets, local docker stacks,
+  and GitOps deploy/promote/rollback workflows as side-effectful. Require an
+  explicit operator request plus the appropriate local guard env before running
+  mutating commands.
+- Keep examples placeholder-only: Janua, Stripe, Paddle, Conekta, Belvo, Plaid,
+  Bitso, Zapper, Zillow, PostHog, Sentry, R2/S3, database, Redis, webhook,
+  npm, GitHub, and Enclii credentials must stay in approved secret stores or
+  local operator environments.
 
 ## Repo entrypoints
 

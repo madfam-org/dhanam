@@ -19,8 +19,8 @@ services:
       PORT: 4000
       DATABASE_URL: ${DHANAM_DATABASE_URL}
       REDIS_URL: ${DHANAM_REDIS_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      JANUA_JWT_SECRET: ${JANUA_JWT_SECRET}
+      JWT_SECRET:"${JWT_SECRET:?set JWT_SECRET in an untracked local env file}"
+      JANUA_JWT_SECRET:"${JWT_SECRET:?set JWT_SECRET in an untracked local env file}"
       JANUA_API_URL: ${JANUA_API_URL:-http://janua-api:8001}
       JANUA_ENABLED: "true"
       # Financial integrations

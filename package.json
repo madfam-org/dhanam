@@ -11,7 +11,7 @@
   },
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "node scripts/require-local-services.mjs && turbo dev",
     "dev:api": "pnpm --filter @dhanam/api dev",
     "dev:web": "pnpm --filter @dhanam/web dev",
     "dev:admin": "pnpm --filter @dhanam/admin dev",
@@ -28,17 +28,17 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "clean": "turbo clean && rm -rf node_modules",
-    "db:generate": "turbo db:generate",
-    "db:migrate:dev": "turbo db:migrate:dev",
-    "db:migrate:deploy": "turbo db:migrate:deploy",
-    "db:migrate:status": "turbo db:migrate:status",
-    "db:push": "turbo db:push",
-    "db:seed": "turbo db:seed",
-    "db:studio": "turbo db:studio",
+    "clean": "node scripts/require-local-destructive.mjs && turbo clean && rm -rf node_modules",
+    "db:generate": "node scripts/require-local-db.mjs && turbo db:generate",
+    "db:migrate:dev": "node scripts/require-local-db.mjs && turbo db:migrate:dev",
+    "db:migrate:deploy": "node scripts/require-local-db.mjs && turbo db:migrate:deploy",
+    "db:migrate:status": "node scripts/require-local-db.mjs && turbo db:migrate:status",
+    "db:push": "node scripts/require-local-db.mjs && turbo db:push",
+    "db:seed": "node scripts/require-local-db.mjs && turbo db:seed",
+    "db:studio": "node scripts/require-local-db.mjs && turbo db:studio",
     "dev:infra": "docker compose -f infra/docker/docker-compose.yml up -d",
-    "dev:infra:down": "docker compose -f infra/docker/docker-compose.yml down",
-    "publish:packages": "turbo publish --filter='./packages/*'"
+    "dev:infra:down": "node scripts/require-local-destructive.mjs && docker compose -f infra/docker/docker-compose.yml down",
+    "publish:packages": "node scripts/require-local-financial-ops.mjs && turbo publish --filter='./packages/*'"
   },
   "lint-staged": {
     "apps/web/**/*.{ts,tsx}": [

@@ -4,7 +4,7 @@ services:
     container_name: dhanam-postgres
     environment:
       POSTGRES_USER: dhanam
-      POSTGRES_PASSWORD: localdev
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in an untracked local env file}"
       POSTGRES_DB: dhanam
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:

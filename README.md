@@ -1,5 +1,12 @@
 # Dhanam Ledger
 
+> [!IMPORTANT]
+> Dhanam handles sensitive financial, identity, billing, entitlement, household,
+> document, crypto/asset, and estate-planning data. Keep examples placeholder-only;
+> do not commit or paste bank/provider payloads, account identifiers, exports,
+> webhook bodies, payment processor secrets, database URLs, npm tokens, GitHub
+> tokens, or production credentials.
+
 > **A comprehensive budget and wealth tracking application with ESG crypto insights, targeting LATAM-first users with multilingual support.**
 
 [![Test Coverage](https://github.com/madfam-org/dhanam/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/madfam-org/dhanam/actions/workflows/test-coverage.yml)

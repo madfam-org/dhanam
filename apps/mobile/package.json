@@ -8,7 +8,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "dev": "expo start --dev-client",
+    "dev": "node ../../scripts/require-local-services.mjs && expo start --dev-client",
     "build:android": "eas build --platform android",
     "build:ios": "eas build --platform ios",
     "build:all": "eas build --platform all",
@@ -20,7 +20,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest --config jest.config.js",
     "test:watch": "jest --config jest.config.js --watch",
-    "clean": "rm -rf .expo node_modules"
+    "clean": "node ../../scripts/require-local-destructive.mjs && rm -rf .expo node_modules"
   },
   "dependencies": {
     "@dhanam/shared": "workspace:*",

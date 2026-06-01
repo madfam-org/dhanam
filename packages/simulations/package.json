@@ -20,12 +20,12 @@
   },
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
+    "dev": "node ../../scripts/require-local-services.mjs && tsup --watch",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo node_modules"
+    "clean": "node ../../scripts/require-local-destructive.mjs && rm -rf dist .turbo node_modules"
   },
   "dependencies": {
     "@dhanam/shared": "workspace:*",

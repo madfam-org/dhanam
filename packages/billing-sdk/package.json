@@ -27,10 +27,10 @@
   ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
+    "dev": "node ../../scripts/require-local-services.mjs && tsup --watch",
     "test": "jest --passWithNoTests",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo node_modules"
+    "clean": "node ../../scripts/require-local-destructive.mjs && rm -rf dist .turbo node_modules"
   },
   "devDependencies": {
     "@dhanam/config": "workspace:*",

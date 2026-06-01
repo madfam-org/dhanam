@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3400",
+    "dev": "node ../../scripts/require-local-services.mjs && next dev -p 3400",
     "build": "next build",
     "start": "next start -p 3400",
     "lint": "eslint ./src --ext .ts,.tsx --no-error-on-unmatched-pattern",

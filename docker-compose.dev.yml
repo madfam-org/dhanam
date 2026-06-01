@@ -27,9 +27,9 @@ services:
       NODE_ENV: development
       PORT: 3000
       # Database - Shared PostgreSQL
-      DATABASE_URL: postgresql://madfam:madfam_dev_password@madfam-postgres-shared:5432/dhanam_db?schema=public
+      DATABASE_URL: "${DATABASE_URL:?set DATABASE_URL in an untracked local env file}"
       # Redis - Shared
-      REDIS_URL: redis://:redis_dev_password@madfam-redis-shared:6379/3
+      REDIS_URL: "${REDIS_URL:?set REDIS_URL in an untracked local env file}"
       # MinIO/S3 - Shared
       S3_ENDPOINT: http://madfam-minio-shared:9000
       S3_ACCESS_KEY: minioadmin
@@ -38,7 +38,7 @@ services:
       # Janua Auth
       JANUA_URL: http://janua-api:4000
       JANUA_API_KEY: ${JANUA_API_KEY:-dev-api-key}
-      JWT_SECRET: ${JWT_SECRET:-dev-shared-janua-secret-32chars!!}
+      JWT_SECRET:"${JWT_SECRET:?set JWT_SECRET in an untracked local env file}"
       # Email - MailHog
       SMTP_HOST: madfam-mailhog
       SMTP_PORT: 1025
