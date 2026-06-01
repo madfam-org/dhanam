@@ -18,9 +18,9 @@ overrides:
   next: 15.5.15
   pino: '>=10.1.0'
   react: 18.3.1
-  react-dom: 19.2.6
+  react-dom: 18.3.1
   '@types/react': 18.3.28
-  '@types/react-dom': 19.2.3
+  '@types/react-dom': 18.3.7
   '@remix-run/router': '>=1.23.2'
   tar: '>=7.5.11'
   diff: '>=7.0.0'
