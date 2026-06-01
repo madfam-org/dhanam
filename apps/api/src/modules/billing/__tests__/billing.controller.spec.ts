@@ -67,7 +67,7 @@ describe('BillingController', () => {
           provide: ConfigService,
           useValue: {
             get: jest.fn((key: string) => {
-              if (key === 'STRIPE_WEBHOOK_SECRET') return 'whsec_test_secret';
+              if (key === 'STRIPE_WEBHOOK_SECRET') return 'DUMMY_WEBHOOK_SECRET_DO_NOT_USE';
               return null;
             }),
           },
@@ -452,7 +452,7 @@ describe('BillingController', () => {
       expect(stripeService.constructWebhookEvent).toHaveBeenCalledWith(
         mockRequest.rawBody,
         signature,
-        'whsec_test_secret'
+        'DUMMY_WEBHOOK_SECRET_DO_NOT_USE'
       );
       expect(billingService.handleSubscriptionCreated).toHaveBeenCalledWith(mockEvent);
       expect(result).toEqual({ received: true });

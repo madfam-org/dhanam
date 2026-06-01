@@ -46,7 +46,7 @@ describe('ConektaService', () => {
 
   const CONEKTA_PRIVATE_KEY = 'key_test_private_xxx';
   const CONEKTA_PUBLIC_KEY = 'key_test_public_xxx';
-  const CONEKTA_WEBHOOK_SIGNING_KEY = 'whsec_test_signing_key_abc123';
+  const CONEKTA_WEBHOOK_SIGNING_KEY = 'DUMMY_WEBHOOK_SECRET_DO_NOT_USE';
   const CONEKTA_API_VERSION = '2.1.0';
 
   const buildModule = async (overrides: Partial<Record<string, string>> = {}) => {
