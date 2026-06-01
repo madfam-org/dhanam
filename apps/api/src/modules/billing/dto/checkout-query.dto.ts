@@ -6,8 +6,8 @@ import { IsValidPlanId } from '../validators/plan-id.validator';
 export class CheckoutQueryDto {
   @ApiProperty({
     description:
-      'Subscription plan ID. Format: {product}_{tier} (e.g. "karafiel_pro"), bare tier (e.g. "pro"), or legacy plan name.',
-    example: 'karafiel_pro',
+      'Subscription plan ID. Format: {product}_{tier} (e.g. "karafiel_contador"), bare tier (e.g. "pro"), or legacy plan name.',
+    example: 'karafiel_contador',
   })
   @IsValidPlanId()
   plan: string;
@@ -23,10 +23,10 @@ export class CheckoutQueryDto {
 
   @ApiPropertyOptional({
     description:
-      'Product being upgraded (lowercase alphanumeric, e.g. "karafiel"). Defaults to "dhanam".',
+      'Product being upgraded (lowercase catalog slug, e.g. "karafiel"). Defaults to "dhanam".',
     example: 'karafiel',
   })
   @IsOptional()
-  @Matches(/^[a-z][a-z0-9]*$/, { message: 'product must be lowercase alphanumeric' })
+  @Matches(/^[a-z][a-z0-9-]*$/, { message: 'product must be a lowercase catalog slug' })
   product?: string;
 }

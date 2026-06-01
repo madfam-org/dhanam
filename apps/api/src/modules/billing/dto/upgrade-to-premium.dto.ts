@@ -18,7 +18,7 @@ export class UpgradeToPremiumDto {
   orgId?: string;
 
   /**
-   * Plan ID (e.g., 'enclii_pro', 'tezca_pro', 'karafiel_essentials')
+   * Plan ID (e.g., 'enclii_pro', 'tezca_pro', 'karafiel_contador')
    * Used to select the appropriate product/price in the payment provider
    */
   @IsOptional()
@@ -26,11 +26,11 @@ export class UpgradeToPremiumDto {
   plan?: string;
 
   /**
-   * Product being upgraded (lowercase alphanumeric, e.g. 'karafiel').
+   * Product being upgraded (lowercase catalog slug, e.g. 'karafiel').
    * Defaults to 'dhanam'.
    */
   @IsOptional()
-  @Matches(/^[a-z][a-z0-9]*$/, { message: 'product must be lowercase alphanumeric' })
+  @Matches(/^[a-z][a-z0-9-]*$/, { message: 'product must be a lowercase catalog slug' })
   product?: string;
 
   /**
