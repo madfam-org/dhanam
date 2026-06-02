@@ -67,3 +67,4 @@ and DOF provider credentials plus freshness monitoring for `/v1/fx/rate`.
 - `GET /v1/fx-rates/health` returns `200` with public USD/MXN `testRate`.
 - `GET /v1/fx-rates/rate` returns `401` without bearer token.
 - `GET /v1/fx-rates/currencies` returns `200` and `count > 0`.
+- `GET /v1/fx/rates` and `GET /v1/fx/history` return `401` without bearer token.
