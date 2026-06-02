@@ -906,7 +906,7 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@9.39.0)
       eslint:
-        specifier: ^9.17.0
+        specifier: ^9.39.0
         version: 9.39.0
       globals:
         specifier: ^17.5.0
