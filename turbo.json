@@ -28,32 +28,32 @@
     },
     "db:generate": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "db:migrate:dev": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "db:migrate:deploy": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "db:migrate:status": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "db:push": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "db:seed": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "db:studio": {
       "cache": false,
       "persistent": true,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "clean": {
       "cache": false
