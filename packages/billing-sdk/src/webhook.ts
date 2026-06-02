@@ -1,5 +1,22 @@
 import type { DhanamWebhookPayload } from './types';
 
+type WebCryptoSubtle = {
+  importKey(
+    format: 'raw',
+    keyData: Uint8Array,
+    algorithm: { name: 'HMAC'; hash: 'SHA-256' },
+    extractable: boolean,
+    keyUsages: 'sign'[]
+  ): Promise<unknown>;
+  sign(algorithm: 'HMAC', key: unknown, data: Uint8Array): Promise<ArrayBuffer>;
+};
+
+type GlobalWithCrypto = typeof globalThis & {
+  crypto?: {
+    subtle?: WebCryptoSubtle;
+  };
+};
+
 /**
  * Verify a Dhanam webhook signature using HMAC-SHA256 with timing-safe comparison.
  *
@@ -17,16 +34,17 @@ export async function verifyWebhookSignature(
   secret: string
 ): Promise<boolean> {
   // --- Web Crypto path (works in Edge, Cloudflare Workers, Deno, modern Node) ---
-  if (globalThis.crypto?.subtle) {
+  const subtle = (globalThis as GlobalWithCrypto).crypto?.subtle;
+  if (subtle) {
     const encoder = new TextEncoder();
-    const key = await globalThis.crypto.subtle.importKey(
+    const key = await subtle.importKey(
       'raw',
       encoder.encode(secret),
       { name: 'HMAC', hash: 'SHA-256' },
       false,
       ['sign']
     );
-    const mac = await globalThis.crypto.subtle.sign('HMAC', key, encoder.encode(rawBody));
+    const mac = await subtle.sign('HMAC', key, encoder.encode(rawBody));
     const expected = bufferToHex(mac);
     return timingSafeEqual(expected, signature);
   }
@@ -35,8 +53,14 @@ export async function verifyWebhookSignature(
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- Reason: Fallback for Node.js environments without Web Crypto API; conditional require is the correct pattern
   const crypto = require('crypto') as typeof import('crypto');
   const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  const encoder = new TextEncoder();
+  const expectedBytes = encoder.encode(expected);
+  const signatureBytes = encoder.encode(signature);
 
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  return (
+    expectedBytes.length === signatureBytes.length &&
+    crypto.timingSafeEqual(expectedBytes, signatureBytes)
+  );
 }
 
 /**

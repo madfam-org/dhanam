@@ -2,6 +2,8 @@ import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
+import { STRIPE_API_VERSION } from './stripe-api-version';
+
 @Injectable()
 export class StripeService {
   private stripe?: Stripe;
@@ -16,7 +18,7 @@ export class StripeService {
     }
 
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2026-02-25.clover',
+      apiVersion: STRIPE_API_VERSION,
       typescript: true,
     });
 

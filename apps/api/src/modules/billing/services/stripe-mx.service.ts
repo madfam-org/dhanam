@@ -20,6 +20,7 @@ import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
 import { InfrastructureException } from '../../../core/exceptions/domain-exceptions';
+import { STRIPE_API_VERSION } from '../stripe-api-version';
 
 export interface StripeMxCheckoutParams {
   customerId?: string;
@@ -55,7 +56,7 @@ export class StripeMxService {
     }
 
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2026-02-25.clover',
+      apiVersion: STRIPE_API_VERSION,
       typescript: true,
       appInfo: {
         name: 'Dhanam',

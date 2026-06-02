@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/commo
 import { ConfigService } from '@nestjs/config';
 import * as Sentry from '@sentry/node';
 import { Queue, Worker, Job, QueueEvents } from 'bullmq';
+import type { ConnectionOptions } from 'bullmq';
 import { Redis } from 'ioredis';
 
 import { InfrastructureException } from '@core/exceptions/domain-exceptions';
@@ -135,6 +136,10 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  private get bullConnection(): ConnectionOptions {
+    return this.redis as unknown as ConnectionOptions;
+  }
+
   async onModuleInit() {
     try {
       // Only connect if not already connected or connecting
@@ -192,7 +197,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
     // Initialize dead letter queue first
     this.deadLetterQueue = new Queue('dead-letter', {
-      connection: this.redis,
+      connection: this.bullConnection,
       defaultJobOptions: {
         removeOnComplete: false, // Keep all DLQ jobs for manual review
         removeOnFail: false,
@@ -202,7 +207,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     for (const queueName of queueNames) {
       const maxAttempts = this.getMaxAttemptsForQueue(queueName);
       const queue = new Queue(queueName, {
-        connection: this.redis,
+        connection: this.bullConnection,
         defaultJobOptions: {
           removeOnComplete: 100,
           removeOnFail: 50,
@@ -220,7 +225,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       });
 
       const queueEvents = new QueueEvents(queueName, {
-        connection: this.redis,
+        connection: this.bullConnection,
       });
 
       this.queues.set(queueName, queue);
@@ -728,7 +733,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
   registerWorker(queueName: string, processor: (job: Job) => Promise<any>): Worker {
     const workerOptions: ConstructorParameters<typeof Worker>[2] = {
-      connection: this.redis,
+      connection: this.bullConnection,
       concurrency: this.configService.get(
         `QUEUE_${queueName.toUpperCase().replace('-', '_')}_CONCURRENCY`,
         5
