@@ -51,7 +51,7 @@ export class FxController {
       type: q.type,
       at: q.at ? new Date(q.at) : undefined,
       paymentId: q.payment_id,
-      allowStale: q.allow_stale === 'true',
+      allowStale: q.allow_stale === undefined || q.allow_stale === 'true',
     });
   }
 

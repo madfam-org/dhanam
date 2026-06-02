@@ -58,7 +58,7 @@ export class GetFxRateQueryDto {
 
   @ApiPropertyOptional({
     description:
-      'When true, allow returning a stale cached value if the provider chain is exhausted. Defaults to false.',
+      'When true, allow returning a stale cached value if the provider chain is exhausted. Defaults to true.',
   })
   @IsOptional()
   @IsBooleanString()
