@@ -1,4 +1,4 @@
-# Dhanam FX provisioning readiness - 2026-06-01
+# Dhanam FX provisioning readiness - 2026-06-02
 
 ## Executive state
 
@@ -14,7 +14,14 @@ Current production proof:
 - `GET /v1/fx/rate?from=USD&to=MXN&type=spot` from Tulana returns `200` (defaults `allow_stale=true`).
 - `GET /v1/fx/rate?from=USD&to=MXN&type=spot&allow_stale=false` returns `502` only when no fresh rate is available.
 - Current platform spot source is provenance-aware, typically `dhanam:fx:spot:<provider>` when the authenticated `/v1/fx` flow succeeds, or `dhanam:fx-rates:health` on fallback.
-- `dhanam-secrets` contains `BANXICO_API_TOKEN`, but the encoded value length is `0`; live DOF provider credentials are not provisioned.
+- `dhanam-secrets` contains `BANXICO_API_TOKEN`, but the encoded value length is `0` in the referenced proof window; live DOF provider credentials are not provisioned.
+
+Launch validation scope for production reads is currently Depth-3 public domains:
+
+- `dhan.am`
+- `app.dhan.am`
+- `admin.dhan.am`
+- `api.dhan.am`
 
 No secret values were printed or copied during this audit.
 
@@ -60,6 +67,8 @@ Dhanam is live and capable of serving authenticated platform USD/MXN `spot`
 from Tulana through a Dhanam-owned last-known-good observation seeded from the
 legacy Dhanam FX health path. Full platform readiness still requires live spot
 and DOF provider credentials plus freshness monitoring for `/v1/fx/rate`.
+Until those credentials and monitoring are enforced, campaign policy should not
+treat stale or fallback FX snapshots as the default pricing mode.
 
 ## Production contract check (2026-06-02)
 
