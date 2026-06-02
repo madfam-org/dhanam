@@ -6,6 +6,11 @@
 
 The FX Rates module provides real-time and historical exchange rate data, primarily sourced from Banxico's official API. It supports MXN, USD, and EUR currencies with automatic rate updates, caching for performance, and fallback mechanisms for reliability.
 
+Access model in this module is intentionally split:
+
+- `GET /v1/fx-rates/health` and `GET /v1/fx-rates/currencies` are public.
+- All monetary rate endpoints (`rate`, `convert`, `historical`) require JWT authentication.
+
 ## Key Entities
 
 | Entity               | Description                               |

@@ -259,4 +259,57 @@ describe('Remote Smoke Tests', () => {
     const body = await response.json();
     expect(body.alive).toBe(true);
   });
+
+  conditionalIt('Remote FX health endpoint should be public', async () => {
+    if (!baseUrl) return;
+
+    const response = await fetch(`${baseUrl}/v1/fx-rates/health`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    expect(body).toHaveProperty('service', 'fx-rates');
+    expect(body).toHaveProperty('status');
+    expect(body).toHaveProperty('testRate');
+  });
+
+  conditionalIt('Remote FX auth posture should be protected for rate endpoints', async () => {
+    if (!baseUrl) return;
+
+    const fxRate = await fetch(`${baseUrl}/v1/fx/rate?from=USD&to=MXN&type=spot&allow_stale=true`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const fxRatesRate = await fetch(`${baseUrl}/v1/fx-rates/rate?from=USD&to=MXN`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const fxRates = await fetch(
+      `${baseUrl}/v1/fx/rates?base=USD&targets=MXN&type=spot&allow_stale=true`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+
+    const currencies = await fetch(`${baseUrl}/v1/fx-rates/currencies`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    expect(fxRate.status).toBe(401);
+    expect(fxRatesRate.status).toBe(401);
+    expect(fxRates.status).toBe(401);
+    expect(currencies.status).toBe(200);
+
+    const payload = await currencies.json();
+    expect(payload).toHaveProperty('currencies');
+    expect(payload).toHaveProperty('count');
+    expect(payload.count).toBeGreaterThan(0);
+  });
 });

@@ -30,6 +30,7 @@ provisioned with Banxico credentials.
 Legacy compatibility endpoint:
 
 - `/v1/fx-rates/health`: public USD/MXN health proof.
+- `/v1/fx-rates/currencies`: public supported-currency list.
 - `/v1/fx-rates/rate`: JWT-protected legacy rate endpoint.
 
 Platform endpoint:
@@ -59,3 +60,10 @@ Dhanam is live and capable of serving authenticated platform USD/MXN `spot`
 from Tulana through a Dhanam-owned last-known-good observation seeded from the
 legacy Dhanam FX health path. Full platform readiness still requires live spot
 and DOF provider credentials plus freshness monitoring for `/v1/fx/rate`.
+
+## Production contract check (2026-06-02)
+
+- `GET /v1/fx/rate?from=USD&to=MXN&type=spot` returns `401` without bearer token.
+- `GET /v1/fx-rates/health` returns `200` with public USD/MXN `testRate`.
+- `GET /v1/fx-rates/rate` returns `401` without bearer token.
+- `GET /v1/fx-rates/currencies` returns `200` and `count > 0`.
