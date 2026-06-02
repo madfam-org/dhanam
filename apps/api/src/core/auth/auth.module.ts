@@ -62,6 +62,15 @@ function resolveAuthMode(): AuthMode {
   return process.env.JANUA_ENABLED === 'true' ? 'janua' : 'local';
 }
 
+function resolveJwtAccessExpiry(configService: ConfigService): string {
+  return (
+    configService.get<string>('JWT_ACCESS_EXPIRY')?.trim() ||
+    configService.get<string>('JWT_EXPIRES_IN')?.trim() ||
+    configService.get<string>('jwt.accessExpiry')?.trim() ||
+    AUTH_DEFAULTS.JWT_EXPIRY
+  );
+}
+
 @Module({
   imports: [
     // Default strategy is 'janua' when in janua mode, else 'jwt'
@@ -76,8 +85,7 @@ function resolveAuthMode(): AuthMode {
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secret'),
         signOptions: {
-          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') ??
-            AUTH_DEFAULTS.JWT_EXPIRY) as typeof AUTH_DEFAULTS.JWT_EXPIRY,
+          expiresIn: resolveJwtAccessExpiry(configService),
           issuer: 'dhanam-api',
           audience: 'dhanam-web',
         },

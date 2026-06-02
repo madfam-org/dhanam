@@ -17,6 +17,7 @@ export const validationSchema = Joi.object({
     otherwise: Joi.string().optional().allow(''),
   }),
   JWT_ACCESS_EXPIRY: Joi.string().default('15m'),
+  JWT_EXPIRES_IN: Joi.string().optional().allow(''),
   JWT_REFRESH_EXPIRY: Joi.string().default('30d'),
   AUTH_MODE: Joi.string().valid('janua', 'local').default('local'),
 

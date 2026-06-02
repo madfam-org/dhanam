@@ -44,7 +44,7 @@ export const configuration = () => ({
   // Legacy local JWT (for standalone mode)
   jwt: {
     secret: process.env.JWT_SECRET,
-    accessExpiry: process.env.JWT_ACCESS_EXPIRY || '15m',
+    accessExpiry: process.env.JWT_ACCESS_EXPIRY || process.env.JWT_EXPIRES_IN || '15m',
     refreshExpiry: process.env.JWT_REFRESH_EXPIRY || '30d',
   },
 
