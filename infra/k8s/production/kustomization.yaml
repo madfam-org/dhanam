@@ -8,6 +8,7 @@ resources:
 - web-deployment.yaml
 - external-secret.yaml
 - external-secret-janua.yaml
+- fx-spot-refresh-cronjob.yaml
 - network-policies.yaml
 - pdb.yaml
 
