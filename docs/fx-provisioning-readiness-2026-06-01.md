@@ -68,3 +68,4 @@ and DOF provider credentials plus freshness monitoring for `/v1/fx/rate`.
 - `GET /v1/fx-rates/rate` returns `401` without bearer token.
 - `GET /v1/fx-rates/currencies` returns `200` and `count > 0`.
 - `GET /v1/fx/rates` and `GET /v1/fx/history` return `401` without bearer token.
+- API host base (`https://api.dhan.am`) responds `307` to root requests and `200` on `/v1/monitoring/health` in normal operation.

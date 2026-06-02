@@ -297,6 +297,14 @@ describe('Remote Smoke Tests', () => {
       }
     );
 
+    const fxHistory = await fetch(
+      `${baseUrl}/v1/fx/history?from=USD&to=MXN&type=spot&from_date=2026-01-01&to_date=2026-01-10`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+
     const currencies = await fetch(`${baseUrl}/v1/fx-rates/currencies`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -305,6 +313,7 @@ describe('Remote Smoke Tests', () => {
     expect(fxRate.status).toBe(401);
     expect(fxRatesRate.status).toBe(401);
     expect(fxRates.status).toBe(401);
+    expect(fxHistory.status).toBe(401);
     expect(currencies.status).toBe(200);
 
     const payload = await currencies.json();
