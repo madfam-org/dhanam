@@ -201,25 +201,18 @@ pnpm typecheck
 
 ---
 
-## Ecosystem Banner — copy-paste path for sibling landings
+## Ecosystem Banner
 
-`<EcosystemBanner />` is the shared cross-product ticker that lives at the bottom of every MADFAM landing (dhan.am, karafiel.mx, selva.town, cotiza.studio, …). Until `npm.madfam.io` re-publishes `@dhanam/ui`, sibling landings adopt it by **copying the directory**:
+`<EcosystemBanner />` is the shared cross-product ticker that lives at the bottom of MADFAM landing surfaces. The canonical package is now `@madfam/ecosystem-banner` from `npm.madfam.io`, maintained in `solarpunk-foundry/packages/ecosystem-banner`.
 
 ```bash
-# from another madfam-org repo (e.g. karafiel, cotiza, forj):
-mkdir -p packages/ui/src/components/ecosystem-banner
-cp -R \
-  ../dhanam/packages/ui/src/components/ecosystem-banner/* \
-  packages/ui/src/components/ecosystem-banner/
-# then export from your local barrel
-echo "export * from './components/ecosystem-banner';" \
-  >> packages/ui/src/index.ts
+pnpm add @madfam/ecosystem-banner
 # mount once in your root layout, after the body's main content
 ```
 
-**Source-of-truth platform list**: `packages/ui/src/components/ecosystem-banner/platforms.ts`. Edit `DEFAULT_ECOSYSTEM_PLATFORMS` to add/remove a platform; bump `BANNER_VERSION` in `ecosystem-banner.tsx` to force previously-dismissed users to see the new lineup.
+`@dhanam/ui` keeps its local banner export for compatibility with older consumers, but new adoption should import from `@madfam/ecosystem-banner`.
 
-**Drift policy**: when `@madfam/ecosystem-banner` lands on `npm.madfam.io`, swap the copy for a dependency. Until then, the platforms list should be re-synced from dhanam's copy on each landing's release cadence.
+**Source-of-truth platform list**: `solarpunk-foundry/packages/ecosystem-banner/src/platforms.ts`. Edit `DEFAULT_ECOSYSTEM_PLATFORMS` there and bump `BANNER_VERSION` in `ecosystem-banner.tsx` to force previously-dismissed users to see the new lineup.
 
 ---
 
