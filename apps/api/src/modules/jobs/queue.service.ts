@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Sentry from '@sentry/node';
-import { Queue, Worker, Job, QueueEvents } from 'bullmq';
+import { Queue, Worker, Job, QueueEvents, type ConnectionOptions } from 'bullmq';
 import { Redis } from 'ioredis';
 
 import { InfrastructureException } from '@core/exceptions/domain-exceptions';
@@ -113,6 +113,11 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   // Dead letter queue key prefix for Redis storage
   private readonly DLQ_KEY = 'dhanam:dlq:jobs';
 
+  private get bullMqConnection(): ConnectionOptions {
+    // BullMQ's public types bind to its own ioredis package identity.
+    return this.redis as unknown as ConnectionOptions;
+  }
+
   constructor(private readonly configService: ConfigService) {
     const redisUrl = this.configService.get('REDIS_URL', 'redis://localhost:6379');
     this.redis = new Redis(redisUrl, {
@@ -192,7 +197,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
     // Initialize dead letter queue first
     this.deadLetterQueue = new Queue('dead-letter', {
-      connection: this.redis,
+      connection: this.bullMqConnection,
       defaultJobOptions: {
         removeOnComplete: false, // Keep all DLQ jobs for manual review
         removeOnFail: false,
@@ -202,7 +207,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     for (const queueName of queueNames) {
       const maxAttempts = this.getMaxAttemptsForQueue(queueName);
       const queue = new Queue(queueName, {
-        connection: this.redis,
+        connection: this.bullMqConnection,
         defaultJobOptions: {
           removeOnComplete: 100,
           removeOnFail: 50,
@@ -220,7 +225,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       });
 
       const queueEvents = new QueueEvents(queueName, {
-        connection: this.redis,
+        connection: this.bullMqConnection,
       });
 
       this.queues.set(queueName, queue);
@@ -728,7 +733,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
   registerWorker(queueName: string, processor: (job: Job) => Promise<any>): Worker {
     const workerOptions: ConstructorParameters<typeof Worker>[2] = {
-      connection: this.redis,
+      connection: this.bullMqConnection,
       concurrency: this.configService.get(
         `QUEUE_${queueName.toUpperCase().replace('-', '_')}_CONCURRENCY`,
         5

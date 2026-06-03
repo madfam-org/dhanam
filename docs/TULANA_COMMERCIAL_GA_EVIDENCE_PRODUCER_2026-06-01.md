@@ -13,12 +13,12 @@ Dhanam should prioritize evidence for `karafiel__contador` first, then
 
 ## Gates owned by Dhanam
 
-| Gate | Evidence condition | Minimum payload |
-| --- | --- | --- |
-| `G0` Catalog truth | SKU exists in the production billing catalog. | catalog version, SKU key, product slug, tier slug, price, currency |
-| `G5` Live checkout proof | A production checkout/session can be created for the SKU. | checkout/session ID, SKU key, amount, currency, environment |
-| `G6` Payment and ledger proof | Provider payment event and Dhanam ledger entry exist. | provider event ID, Dhanam billing event ID, ledger entry ID |
-| `G8` BBVA payout proof | Provider payout reached BBVA. | payout ID, BBVA arrival timestamp, net amount, currency |
+| Gate                          | Evidence condition                                        | Minimum payload                                                    |
+| ----------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------ |
+| `G0` Catalog truth            | SKU exists in the production billing catalog.             | catalog version, SKU key, product slug, tier slug, price, currency |
+| `G5` Live checkout proof      | A production checkout/session can be created for the SKU. | checkout/session ID, SKU key, amount, currency, environment        |
+| `G6` Payment and ledger proof | Provider payment event and Dhanam ledger entry exist.     | provider event ID, Dhanam billing event ID, ledger entry ID        |
+| `G8` BBVA payout proof        | Provider payout reached BBVA.                             | payout ID, BBVA arrival timestamp, net amount, currency            |
 
 ## Tulana write target
 
