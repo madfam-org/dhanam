@@ -1,5 +1,18 @@
 import type { DhanamWebhookPayload } from './types';
 
+type WebCryptoProvider = {
+  subtle?: {
+    importKey(
+      format: 'raw',
+      keyData: Uint8Array,
+      algorithm: { name: 'HMAC'; hash: 'SHA-256' },
+      extractable: boolean,
+      keyUsages: readonly ['sign']
+    ): Promise<unknown>;
+    sign(algorithm: 'HMAC', key: unknown, data: Uint8Array): Promise<ArrayBuffer>;
+  };
+};
+
 /**
  * Verify a Dhanam webhook signature using HMAC-SHA256 with timing-safe comparison.
  *
@@ -17,16 +30,17 @@ export async function verifyWebhookSignature(
   secret: string
 ): Promise<boolean> {
   // --- Web Crypto path (works in Edge, Cloudflare Workers, Deno, modern Node) ---
-  if (globalThis.crypto?.subtle) {
+  const webCrypto = (globalThis as typeof globalThis & { crypto?: WebCryptoProvider }).crypto;
+  if (webCrypto?.subtle) {
     const encoder = new TextEncoder();
-    const key = await globalThis.crypto.subtle.importKey(
+    const key = await webCrypto.subtle.importKey(
       'raw',
       encoder.encode(secret),
       { name: 'HMAC', hash: 'SHA-256' },
       false,
       ['sign']
     );
-    const mac = await globalThis.crypto.subtle.sign('HMAC', key, encoder.encode(rawBody));
+    const mac = await webCrypto.subtle.sign('HMAC', key, encoder.encode(rawBody));
     const expected = bufferToHex(mac);
     return timingSafeEqual(expected, signature);
   }
@@ -36,7 +50,12 @@ export async function verifyWebhookSignature(
   const crypto = require('crypto') as typeof import('crypto');
   const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
 
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  if (expected.length !== signature.length) return false;
+
+  return crypto.timingSafeEqual(
+    Uint8Array.from(Buffer.from(expected)),
+    Uint8Array.from(Buffer.from(signature))
+  );
 }
 
 /**

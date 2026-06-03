@@ -92,7 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Ecosystem banner mounts at the very bottom of <body>, OUTSIDE the
           providers tree on purpose: it is a global, non-localized,
           non-authenticated chrome element. Sticky-bottom, dismissible,
-          versioned via packages/ui/src/components/ecosystem-banner/.
+          versioned via @madfam/ecosystem-banner.
         */}
         <EcosystemBannerClient />
       </body>
