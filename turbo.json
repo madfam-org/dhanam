@@ -28,7 +28,7 @@
     },
     "db:generate": {
       "cache": false,
-      "env": ["DATABASE_URL"]
+      "env": ["DATABASE_URL", "LOCAL_DB"]
     },
     "db:migrate:dev": {
       "cache": false,

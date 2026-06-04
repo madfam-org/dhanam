@@ -22,7 +22,12 @@ export class SecurityConfigService {
   // ── JWT ──────────────────────────────────────────────────────────────────
 
   getJwtExpiry(): string {
-    return this.config.get<string>('JWT_EXPIRES_IN') ?? AUTH_DEFAULTS.JWT_EXPIRY;
+    return (
+      this.config.get<string>('jwt.accessExpiry') ??
+      this.config.get<string>('JWT_EXPIRES_IN') ??
+      this.config.get<string>('JWT_ACCESS_EXPIRY') ??
+      AUTH_DEFAULTS.JWT_EXPIRY
+    );
   }
 
   getJwtExpirySeconds(): number {
