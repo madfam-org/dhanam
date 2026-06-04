@@ -76,7 +76,7 @@ function resolveAuthMode(): AuthMode {
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secret'),
         signOptions: {
-          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') ??
+          expiresIn: (configService.get<string>('jwt.accessExpiry') ??
             AUTH_DEFAULTS.JWT_EXPIRY) as typeof AUTH_DEFAULTS.JWT_EXPIRY,
           issuer: 'dhanam-api',
           audience: 'dhanam-web',

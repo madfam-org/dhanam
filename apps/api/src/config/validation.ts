@@ -1,5 +1,7 @@
 import Joi from 'joi';
 
+const jwtDuration = Joi.string().pattern(/^\d+(?:\.\d+)?(?:ms|s|m|h|d|w|y)$/);
+
 export const validationSchema = Joi.object({
   NODE_ENV: Joi.string()
     .valid('development', 'production', 'test', 'staging')
@@ -16,8 +18,9 @@ export const validationSchema = Joi.object({
     then: Joi.string().required().min(32),
     otherwise: Joi.string().optional().allow(''),
   }),
-  JWT_ACCESS_EXPIRY: Joi.string().default('15m'),
-  JWT_REFRESH_EXPIRY: Joi.string().default('30d'),
+  JWT_EXPIRES_IN: jwtDuration.default('15m'),
+  JWT_ACCESS_EXPIRY: jwtDuration.default('15m'),
+  JWT_REFRESH_EXPIRY: jwtDuration.default('30d'),
   AUTH_MODE: Joi.string().valid('janua', 'local').default('local'),
 
   ENCRYPTION_KEY: Joi.string().required().length(32),
