@@ -13,7 +13,7 @@ concurrency:
 permissions:
   contents: read
   issues: write
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   test:
@@ -148,6 +148,7 @@ jobs:
 
       - name: Comment PR with coverage
         if: github.event_name == 'pull_request'
+        continue-on-error: true
         uses: romeovs/lcov-reporter-action@v0.4.0
         with:
           lcov-file: ./apps/api/coverage/lcov.info
