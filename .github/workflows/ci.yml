@@ -67,8 +67,10 @@ jobs:
       - name: Lint K8s manifests for value/valueFrom conflicts
         run: python3 scripts/lint-k8s-env.py infra/k8s
 
-      - name: Run linter unit tests
-        run: python3 -m unittest discover -s tests/fixtures/k8s-env-lint -p 'test_*.py' -v
+      - name: Run infrastructure guard unit tests
+        run: |
+          python3 -m unittest discover -s tests/fixtures/k8s-env-lint -p 'test_*.py' -v
+          python3 -m unittest discover -s tests/fixtures/workflow-guards -p 'test_*.py' -v
 
   doc-links:
     name: Documentation link hygiene
@@ -303,6 +305,7 @@ jobs:
           echo "JWT_SECRET=$(openssl rand -hex 32)" >> apps/api/.env
           echo "JWT_REFRESH_SECRET=$(openssl rand -hex 32)" >> apps/api/.env
           echo "ENCRYPTION_KEY=ci-test-encryption-key-exactly32" >> apps/api/.env
+          echo "POSTHOG_HOST=https://analytics.madfam.io" >> apps/api/.env
 
       - name: Generate Prisma Client
         working-directory: apps/api
@@ -650,6 +653,7 @@ jobs:
           echo "JWT_SECRET=$(openssl rand -hex 32)" >> apps/api/.env
           echo "JWT_REFRESH_SECRET=$(openssl rand -hex 32)" >> apps/api/.env
           echo "ENCRYPTION_KEY=ci-test-encryption-key-exactly32" >> apps/api/.env
+          echo "POSTHOG_HOST=https://analytics.madfam.io" >> apps/api/.env
 
       - name: Generate Prisma Client
         working-directory: apps/api

@@ -116,6 +116,8 @@ jobs:
             NEXT_PUBLIC_OIDC_ISSUER=${{ vars.STAGING_OIDC_ISSUER || '' }}
             NEXT_PUBLIC_OIDC_CLIENT_ID=${{ vars.STAGING_OIDC_CLIENT_ID || '' }}
             NEXT_PUBLIC_JANUA_API_URL=${{ vars.STAGING_JANUA_API_URL || '' }}
+          secrets: |
+            npm_madfam_token=${{ secrets.NPM_MADFAM_TOKEN }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,scope=web,mode=max
       - name: Sign Web staging image
