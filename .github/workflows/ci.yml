@@ -59,7 +59,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: '3.11'
 
       - name: Install PyYAML
         run: pip install --quiet "pyyaml>=6.0"
@@ -217,6 +217,7 @@ jobs:
         run: pnpm db:generate
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+          LOCAL_DB: 'yes'
 
       - name: Build packages
         run: pnpm build:packages
@@ -391,6 +392,7 @@ jobs:
         run: pnpm db:generate
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+          LOCAL_DB: 'yes'
 
       - name: Build packages
         run: pnpm build:packages
@@ -500,6 +502,7 @@ jobs:
         run: pnpm db:generate
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+          LOCAL_DB: 'yes'
 
       - name: Build packages
         run: pnpm build:packages
@@ -557,6 +560,7 @@ jobs:
         run: pnpm db:generate
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+          LOCAL_DB: 'yes'
 
       - name: Build all apps and packages
         run: pnpm build
@@ -729,6 +733,7 @@ jobs:
         run: pnpm db:generate
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+          LOCAL_DB: 'yes'
 
       - name: Run contract tests
         working-directory: apps/api
