@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # =============================================================================
 # DHANAM WEB - Production Dockerfile
 # =============================================================================
@@ -37,8 +38,15 @@ COPY packages/esg/package.json ./packages/esg/
 COPY packages/simulations/package.json ./packages/simulations/
 COPY packages/billing-sdk/package.json ./packages/billing-sdk/
 
-# Install dependencies (DATABASE_URL needed for Prisma generate postinstall)
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" pnpm install --frozen-lockfile
+# Install dependencies (DATABASE_URL needed for Prisma generate postinstall).
+# The web app depends on private MADFAM packages; pass npm auth as a BuildKit
+# secret so the token is not baked into an image layer.
+RUN --mount=type=secret,id=npm_madfam_token,required=true \
+    set -eu; \
+    token="$(cat /run/secrets/npm_madfam_token)"; \
+    printf '\n//npm.madfam.io/:_authToken=%s\n' "$token" >> .npmrc; \
+    DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" pnpm install --frozen-lockfile; \
+    rm -f .npmrc
 
 # =============================================================================
 # Builder Stage

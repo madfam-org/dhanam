@@ -116,11 +116,13 @@ jobs:
             NEXT_PUBLIC_OIDC_ISSUER=${{ vars.NEXT_PUBLIC_OIDC_ISSUER }}
             NEXT_PUBLIC_OIDC_CLIENT_ID=${{ vars.NEXT_PUBLIC_OIDC_CLIENT_ID }}
             NEXT_PUBLIC_JANUA_API_URL=${{ vars.NEXT_PUBLIC_JANUA_API_URL }}
+          secrets: |
+            npm_madfam_token=${{ secrets.NPM_MADFAM_TOKEN }}
 
       - name: Sign image with cosign
         if: steps.build.outcome == 'success'
         env:
-          COSIGN_EXPERIMENTAL: "true"
+          COSIGN_EXPERIMENTAL: 'true'
         run: |
           cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
 

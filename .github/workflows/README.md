@@ -129,6 +129,10 @@ Required secrets in GitHub repository settings:
 | `ENCLII_API_KEY`   | Enclii deployment trigger  |
 | `KUBECONFIG`       | K8s deployment (fallback)  |
 
+Web image builds pass `NPM_MADFAM_TOKEN` into `apps/web/Dockerfile` as the
+`npm_madfam_token` BuildKit secret because the web app consumes private MADFAM
+packages during `pnpm install`. Do not pass the token as a Docker build arg.
+
 ## Branch Protection
 
 Recommended branch protection rules for `main`:
