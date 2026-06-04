@@ -166,6 +166,24 @@ describe('ProductCatalogService', () => {
       expect(catalog.find((product) => product.slug === 'sim4d')).toBeUndefined();
       expect(prisma.product.findMany).not.toHaveBeenCalled();
     });
+
+    it('should expose only current Janua tiers from catalog.yaml', async () => {
+      process.env.DHANAM_PUBLIC_CATALOG_SOURCE = 'file';
+
+      const catalog = await service.getFullCatalog();
+      const janua = catalog.find((product) => product.slug === 'janua');
+
+      expect(janua?.tiers.map((tier) => tier.tierSlug)).toEqual(['open_source']);
+      expect(janua?.tiers[0].features).toEqual([
+        'Self-hosted OAuth2/OIDC provider',
+        'RS256 JWT/JWKS support',
+        'SAML, MFA, passkeys, and RBAC primitives',
+        'SDKs and migration tooling',
+      ]);
+      expect(janua?.tiers[0].metadata).toMatchObject({
+        launch_scope: 'current',
+      });
+    });
   });
 
   describe('getProductBySlug', () => {

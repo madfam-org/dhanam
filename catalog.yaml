@@ -967,29 +967,14 @@ products:
         dhanam_tier: essentials
         display_name: "Open Source"
         prices: {}
+        metadata:
+          launch_scope: "current"
+          catalog_truth_note: "Janua is currently self-hosted/open-source only; managed hosting, enterprise support contracts, and SLA-backed operations are roadmap items until explicit evidence exists."
         features:
           - "Self-hosted OAuth2/OIDC provider"
           - "RS256 JWT/JWKS support"
           - "SAML, MFA, passkeys, and RBAC primitives"
           - "SDKs and migration tooling"
-      managed:
-        dhanam_tier: pro
-        display_name: "Managed"
-        prices: {}
-        features:
-          - "Hosted production identity control plane"
-          - "OIDC client and callback management"
-          - "Webhooks, SCIM, and operational dashboards"
-          - "Commercial support"
-      enterprise:
-        dhanam_tier: premium
-        display_name: "Enterprise"
-        prices: {}
-        features:
-          - "Dedicated or self-hosted deployment support"
-          - "Enterprise SSO and federation"
-          - "Migration support from Auth0, Clerk, or Keycloak"
-          - "SLA-backed identity operations"
     credit_costs:
       auth_request: 1
       token_issue: 1

@@ -69,6 +69,12 @@ database catalog remains the Stripe/checkout reconciliation store populated by
 stale DB rows or connection pressure would otherwise hide the canonical MADFAM
 SKU catalogue from downstream systems such as Tulana.
 
+Janua's active catalogue scope is intentionally limited to the self-hosted Open
+Source tier. Janua public docs currently mark managed SaaS hosting, enterprise
+support contracts, and guaranteed uptime SLAs as unavailable or future roadmap
+items, so those tiers must not be exposed in the active Dhanam catalogue until
+the product repo and operator evidence prove they are current offers.
+
 Current Dhanam managed-cloud tiers in the catalog:
 
 | Tier       | USD monthly | MXN monthly |
