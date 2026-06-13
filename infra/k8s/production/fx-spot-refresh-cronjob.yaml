@@ -1,0 +1,149 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dhanam-fx-spot-refresh
+  namespace: dhanam
+  labels:
+    app: dhanam-fx-spot-refresh
+    app.kubernetes.io/component: scheduled-job
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: dhanam-fx-readiness
+spec:
+  schedule: "*/15 * * * *"
+  timeZone: "Etc/UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      activeDeadlineSeconds: 180
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app: dhanam-fx-spot-refresh
+            app.kubernetes.io/component: scheduled-job
+            app.kubernetes.io/part-of: dhanam-fx-readiness
+        spec:
+          serviceAccountName: dhanam-api
+          restartPolicy: Never
+          imagePullSecrets:
+            - name: ghcr-credentials
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: refresh
+              image: dhanam-api
+              imagePullPolicy: Always
+              command:
+                - sh
+                - -lc
+                - |
+                  node <<'JS'
+                  const crypto = require('crypto');
+                  const https = require('https');
+                  const { Client } = require('pg');
+
+                  function sleep(ms) {
+                    return new Promise((resolve) => setTimeout(resolve, ms));
+                  }
+
+                  function getJson(url) {
+                    return new Promise((resolve, reject) => {
+                      const req = https.get(url, { timeout: 15000, headers: { Accept: 'application/json' } }, (res) => {
+                        let body = '';
+                        res.setEncoding('utf8');
+                        res.on('data', (chunk) => body += chunk);
+                        res.on('end', () => {
+                          if (res.statusCode !== 200) return reject(new Error(`status_${res.statusCode}`));
+                          try { resolve(JSON.parse(body)); } catch (err) { reject(err); }
+                        });
+                      });
+                      req.on('timeout', () => req.destroy(new Error('timeout')));
+                      req.on('error', reject);
+                    });
+                  }
+
+                  async function connectWithRetry(connectionString, attempts = 60) {
+                    let lastError;
+                    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+                      const client = new Client({ connectionString });
+                      try {
+                        await client.connect();
+                        if (attempt > 1) {
+                          console.log(JSON.stringify({ db_connect_ready: true, attempt }));
+                        }
+                        return client;
+                      } catch (err) {
+                        lastError = err;
+                        try { await client.end(); } catch (_) {}
+                        const errorType = err && err.message ? err.message : String(err);
+                        if (attempt === attempts) break;
+                        console.log(JSON.stringify({ db_connect_ready: false, attempt, error_type: errorType }));
+                        await sleep(2000);
+                      }
+                    }
+                    throw lastError;
+                  }
+
+                  (async () => {
+                    const payload = await getJson('https://open.er-api.com/v6/latest/USD');
+                    const rate = payload && payload.rates && payload.rates.MXN;
+                    if (payload.result !== 'success' || typeof rate !== 'number' || !Number.isFinite(rate)) {
+                      throw new Error('open_er_api_without_mxn_rate');
+                    }
+                    const providerEffective = payload.time_last_update_unix ? new Date(payload.time_last_update_unix * 1000) : new Date();
+                    const observedNow = new Date();
+                    const providerId = `open_er_api:v6:${payload.time_last_update_unix || providerEffective.toISOString()}`;
+                    const client = await connectWithRetry(process.env.DATABASE_URL);
+                    try {
+                      await client.query(
+                        'INSERT INTO fx_rate_observations (id, from_currency, to_currency, rate_type, rate, source, provider_id, observed_at, effective_at, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
+                        [crypto.randomUUID(), 'USD', 'MXN', 'spot', rate.toString(), 'open_er_api_public', providerId, observedNow, providerEffective, observedNow]
+                      );
+                    } finally {
+                      await client.end();
+                    }
+                    console.log(JSON.stringify({ seeded: true, source: 'open_er_api_public', provider_id: providerId, observed_at: observedNow.toISOString(), effective_at: providerEffective.toISOString(), has_rate: true }));
+                  })().catch((err) => {
+                    console.log(JSON.stringify({ seeded: false, error_type: err && err.message ? err.message : String(err) }));
+                    process.exit(1);
+                  });
+                  JS
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: dhanam-secrets
+                      key: DATABASE_URL
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 250m
+                  memory: 256Mi
+              readinessProbe:
+                exec:
+                  command:
+                    - "true"
+                periodSeconds: 10
+              securityContext:
+                privileged: false
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}

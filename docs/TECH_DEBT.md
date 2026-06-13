@@ -105,7 +105,18 @@ Production currently needs live verification through ArgoCD and public probes.
 Close this by making Enclii `prod` target the live production namespace or by
 migrating public routes cleanly to an Enclii-managed namespace.
 
-Until that migration is complete, run `scripts/production-rollout-proof.js`
+Mitigations shipped on main:
+
+- `infra/k8s/production/kyverno-policy-exception.yaml` — scoped PolicyException
+  so Kyverno `verify-image-signatures` no longer blocks routine GitOps digest
+  rollouts for Dhanam pods.
+- Optional SMTP/Banxico `secretKeyRef`s on `dhanam-api` — pods start when ESO
+  partial sync omits non-critical keys.
+- `promote-to-prod.yml` rebases on `main` before push and runs
+  `scripts/production-preflight.sh` after promotion (informational until cluster
+  reconciles).
+
+Until Enclii owns live rollout, run `scripts/production-rollout-proof.js`
 after promotion to prove `dhanam-services` is Healthy/Synced and live images
 match `infra/k8s/production/kustomization.yaml`.
 

@@ -401,6 +401,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           token: ${{ github.token }}
+          fetch-depth: 0
 
       - name: Patch prod kustomization digests
         env:
@@ -457,7 +458,8 @@ jobs:
             echo "No digest change — already at target"
             exit 0
           }
-          git push
+          git pull --rebase origin main
+          git push origin main
 
   manifest-proof:
     name: Validate production manifest digests
@@ -564,8 +566,29 @@ jobs:
             exit 0
           fi
           kubectl -n argocd annotate application dhanam argocd.argoproj.io/refresh=hard --overwrite || true
+          kubectl -n dhanam rollout status deployment/dhanam-web --timeout=300s || \
+            echo "::warning::dhanam-web rollout did not complete within timeout — verify via Enclii/ArgoCD."
           kubectl -n dhanam rollout status deployment/dhanam-api --timeout=300s || \
             echo "::warning::dhanam-api rollout did not complete within timeout — verify via Enclii/ArgoCD."
+
+  prod-surface-smoke:
+    name: Production public surface smoke (informational)
+    needs: [validate, promote]
+    if: needs.validate.outputs.should_promote == 'true'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify prod hostnames do not leak staging URLs
+        run: |
+          set -euo pipefail
+          chmod +x scripts/production-preflight.sh
+          if ! ./scripts/production-preflight.sh; then
+            echo "::warning::Production surface preflight failed — live pods may still be rolling."
+            echo "::warning::Reconcile ArgoCD app dhanam via Enclii if git manifest is ahead of cluster."
+            exit 1
+          fi
 
   catalog-drift-gate:
     name: Catalog drift gate (informational)
