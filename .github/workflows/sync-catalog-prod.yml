@@ -1,14 +1,16 @@
 # Operator workflow: sync catalog.yaml → Dhanam DB + Stripe (production).
 #
-# Runs scripts/sync-catalog.ts with production secrets from the GitHub
-# `production` environment. Idempotent — safe to re-run after catalog.yaml merges.
+# Enclii-first: production credentials live in the GitHub Production environment
+# (copy from Enclii Lockbox / Vault). Do not duplicate secrets into repo secrets.
 #
-# Required for live sync (first match wins):
-#   1. GitHub Settings → Environments → Production:
-#        DATABASE_URL, STRIPE_SECRET_KEY, STRIPE_MX_SECRET_KEY
-#   2. Break-glass fallback via repo secret KUBECONFIG_PRODUCTION → kubectl read
-#        dhanam-secrets + dhanam-billing-secrets in namespace dhanam
+# Required secrets (Settings → Environments → Production):
+#   DATABASE_URL
+#   STRIPE_SECRET_KEY
+#   STRIPE_MX_SECRET_KEY
 #   NPM_MADFAM_TOKEN (repo/org secret — needed for pnpm install)
+#
+# After live sync, catalog:drift verifies the public API matches catalog.yaml.
+# See scripts/sync-catalog-prod.md and docs/CATALOG_TRUTH_2026-05-20.md.
 
 name: Sync production catalog
 
@@ -61,69 +63,24 @@ jobs:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm install --frozen-lockfile
 
-      - name: Setup kubectl
-        if: inputs.dry_run == false
-        uses: azure/setup-kubectl@v5
-
-      - name: Resolve production credentials
+      - name: Preflight Production secrets
         if: inputs.dry_run == false
         env:
-          GH_DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          GH_STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          GH_STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
-          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PRODUCTION }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
         run: |
           set -euo pipefail
-          DATABASE_URL="$GH_DATABASE_URL"
-          STRIPE_SECRET_KEY="$GH_STRIPE_SECRET_KEY"
-          STRIPE_MX_SECRET_KEY="$GH_STRIPE_MX_SECRET_KEY"
-
-          if [ -z "$DATABASE_URL" ] || [ -z "$STRIPE_SECRET_KEY" ] || [ -z "$STRIPE_MX_SECRET_KEY" ]; then
-            if [ -z "$KUBECONFIG_B64" ]; then
-              echo "ERROR: Production credentials missing and KUBECONFIG_PRODUCTION is not configured."
-              echo "Add DATABASE_URL, STRIPE_SECRET_KEY, and STRIPE_MX_SECRET_KEY under Settings → Environments → Production."
-              exit 1
-            fi
-            echo "GitHub Production secrets unavailable — loading from cluster (break-glass)."
-            mkdir -p ~/.kube
-            echo "$KUBECONFIG_B64" | base64 -d > ~/.kube/config
-            chmod 600 ~/.kube/config
-
-            ready=false
-            for attempt in 1 2 3 4 5; do
-              if kubectl version --request-timeout=10s >/dev/null 2>&1; then
-                ready=true
-                break
-              fi
-              echo "Cluster API not reachable yet (attempt ${attempt}/5); retrying in 15s..."
-              sleep 15
-            done
-            if [ "$ready" != "true" ]; then
-              echo "ERROR: Cluster API unreachable from GitHub Actions."
-              echo "Add Production environment secrets or run scripts/sync-catalog.ts from an operator workstation (see scripts/sync-catalog-prod.md)."
-              exit 1
-            fi
-
-            if [ -z "$DATABASE_URL" ]; then
-              DATABASE_URL=$(kubectl get secret dhanam-secrets -n dhanam -o jsonpath='{.data.DATABASE_URL}' | base64 -d)
-            fi
-            if [ -z "$STRIPE_SECRET_KEY" ]; then
-              STRIPE_SECRET_KEY=$(kubectl get secret dhanam-secrets -n dhanam -o jsonpath='{.data.STRIPE_SECRET_KEY}' | base64 -d)
-            fi
-            if [ -z "$STRIPE_MX_SECRET_KEY" ]; then
-              STRIPE_MX_SECRET_KEY=$(kubectl get secret dhanam-billing-secrets -n dhanam -o jsonpath='{.data.STRIPE_MX_SECRET_KEY}' | base64 -d)
-            fi
-          fi
-
           missing=()
-          [ -z "$DATABASE_URL" ] && missing+=("DATABASE_URL")
-          [ -z "$STRIPE_SECRET_KEY" ] && missing+=("STRIPE_SECRET_KEY")
-          [ -z "$STRIPE_MX_SECRET_KEY" ] && missing+=("STRIPE_MX_SECRET_KEY")
+          [ -z "${DATABASE_URL:-}" ] && missing+=("DATABASE_URL")
+          [ -z "${STRIPE_SECRET_KEY:-}" ] && missing+=("STRIPE_SECRET_KEY")
+          [ -z "${STRIPE_MX_SECRET_KEY:-}" ] && missing+=("STRIPE_MX_SECRET_KEY")
           if [ "${#missing[@]}" -gt 0 ]; then
-            echo "ERROR: Missing production credentials: ${missing[*]}"
+            echo "ERROR: GitHub Production environment is missing secrets: ${missing[*]}"
+            echo "Add them under Settings → Environments → Production (from Enclii Lockbox)."
+            echo "Operator fallback: scripts/sync-catalog-prod.md → internal-devops runbook."
             exit 1
           fi
-
           echo "::add-mask::$DATABASE_URL"
           echo "::add-mask::$STRIPE_SECRET_KEY"
           echo "::add-mask::$STRIPE_MX_SECRET_KEY"
@@ -145,19 +102,6 @@ jobs:
           echo "Reason: ${{ inputs.reason }}"
           pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts
 
-      - name: Verify voxa in live catalog API
+      - name: Verify catalog drift (live)
         if: inputs.dry_run == false
-        run: |
-          python3 - <<'PY'
-          import json, sys, urllib.request
-          with urllib.request.urlopen("https://api.dhan.am/v1/billing/catalog") as resp:
-              data = json.load(resp)
-          products = data.get("products", data if isinstance(data, list) else [])
-          slugs = {p.get("slug") for p in products}
-          if "voxa" not in slugs:
-              print("ERROR: voxa still missing from live catalog after sync", file=sys.stderr)
-              sys.exit(1)
-          voxa = next(p for p in products if p.get("slug") == "voxa")
-          tiers = [t.get("tierSlug") for t in voxa.get("tiers") or []]
-          print(f"OK: voxa tiers={tiers}")
-          PY
+        run: pnpm catalog:drift -- --json

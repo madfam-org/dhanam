@@ -69,12 +69,10 @@ Commercial plan truth lives in [`catalog.yaml`](../../../../../catalog.yaml) and
 is synced into Dhanam's product catalog. Do not hard-code commercial pricing in
 new billing code or docs.
 
-The public catalog endpoints serve `catalog.yaml` directly in production
-(`DHANAM_PUBLIC_CATALOG_SOURCE=file` or unset with `NODE_ENV=production`). The
-database catalog remains the Stripe/checkout reconciliation store populated by
-`scripts/sync-catalog.ts`; it must not be the only public catalog source because
-stale DB rows or connection pressure would otherwise hide the canonical MADFAM
-SKU catalogue from downstream systems such as Tulana.
+The public catalog endpoints read the **database catalog** in production
+(`DHANAM_PUBLIC_CATALOG_SOURCE=db`). Repo `catalog.yaml` is the authoring source;
+`scripts/sync-catalog.ts` materialises it into Postgres and Stripe. Verify with
+`pnpm catalog:drift -- --json` against `GET /v1/billing/catalog`.
 
 Janua's active catalogue scope is intentionally limited to the self-hosted Open
 Source tier. Janua public docs currently mark managed SaaS hosting, enterprise
