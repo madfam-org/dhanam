@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Patch,
   Body,
   Param,
@@ -42,6 +44,7 @@ import {
   AdminRouteOverrideClearDto,
   AdminRouteOverrideDto,
   AdminRoutePreviewDto,
+  AdminRouteFeeScheduleUpsertDto,
   OnboardingFunnelDto,
   FeatureFlagDto,
   UpdateFeatureFlagDto,
@@ -373,6 +376,30 @@ export class AdminController {
     @Request() req: AuthenticatedRequest
   ) {
     return this.adminPosBillingService.clearCheckoutRouteOverride(dto, req.user.id);
+  }
+
+  @Get('billing/route/fee-schedule')
+  @ApiOperation({ summary: 'View checkout route fee schedule (bundled or platform override)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Fee schedule returned' })
+  async getRouteFeeSchedule(@Request() req: AuthenticatedRequest) {
+    return this.adminPosBillingService.getRouteFeeSchedule(req.user.id);
+  }
+
+  @Put('billing/route/fee-schedule')
+  @ApiOperation({ summary: 'Upsert platform_config fee schedule override' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Fee schedule updated' })
+  async upsertRouteFeeSchedule(
+    @Body() dto: AdminRouteFeeScheduleUpsertDto,
+    @Request() req: AuthenticatedRequest
+  ) {
+    return this.adminPosBillingService.upsertRouteFeeSchedule(dto, req.user.id);
+  }
+
+  @Delete('billing/route/fee-schedule')
+  @ApiOperation({ summary: 'Clear platform_config fee schedule override (revert to bundled JSON)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Fee schedule override cleared' })
+  async clearRouteFeeSchedule(@Request() req: AuthenticatedRequest) {
+    return this.adminPosBillingService.clearRouteFeeSchedule(req.user.id);
   }
 
   @Post('billing/pos/charge')

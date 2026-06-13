@@ -175,4 +175,29 @@ export class PlatformConfigService {
     }
     return entry;
   }
+
+  async deleteKey(
+    key: string,
+    adminUserId: string,
+    scope: PlatformConfigScope = PlatformConfigScope.platform,
+    scopeId = ''
+  ): Promise<void> {
+    const existing = await this.get(key, scope, scopeId);
+    if (!existing) {
+      return;
+    }
+
+    await this.prisma.platformConfig.delete({
+      where: { key_scope_scopeId: { key, scope, scopeId } },
+    });
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.delete_platform_config',
+      resource: 'PlatformConfig',
+      resourceId: key,
+      metadata: { scope, scopeId },
+      severity: 'high',
+    });
+  }
 }

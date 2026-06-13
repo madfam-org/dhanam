@@ -37,13 +37,16 @@ import { ThrottleAuthGuard } from '../../core/security/guards/throttle-auth.guar
 import { AuthenticatedRequest } from '../../core/types/authenticated-request';
 
 import { BillingService } from './billing.service';
+import type { PaymentInstrumentId } from './config/payment-route-fee-schedule';
 import { CheckoutQueryDto, StartTrialDto, UpgradeToPremiumDto } from './dto';
 import { CancelConfirmDto } from './dto/cancel-confirm.dto';
 import { CancelIntentDto } from './dto/cancel-intent.dto';
+import { CheckoutRouteRecommendationQueryDto } from './dto/checkout-route-recommendation.dto';
 import { JanuaWebhookPayloadDto, JanuaWebhookEventType } from './dto/janua-webhook.dto';
 import { PauseSubscriptionDto } from './dto/pause-subscription.dto';
 import { JanuaBillingService } from './janua-billing.service';
 import { CancellationService } from './services/cancellation.service';
+import { CheckoutRoutingPolicyService } from './services/checkout-routing-policy.service';
 import { PricingEngineService } from './services/pricing-engine.service';
 import { RevenueMetricsService } from './services/revenue-metrics.service';
 import { TrialService } from './services/trial.service';
@@ -63,6 +66,7 @@ export class BillingController {
     private trialService: TrialService,
     private cancellationService: CancellationService,
     private revenueMetricsService: RevenueMetricsService,
+    private checkoutRouting: CheckoutRoutingPolicyService,
     private config: ConfigService
   ) {}
 
@@ -131,6 +135,7 @@ export class BillingController {
       successUrl: dto.successUrl,
       cancelUrl: dto.cancelUrl,
       countryCode: dto.countryCode,
+      paymentMethod: dto.paymentMethod,
     });
   }
 
@@ -222,6 +227,26 @@ export class BillingController {
   async getPricing(@Query('country') country?: string) {
     const countryCode = country || 'US';
     return this.pricingEngine.getPricingForCountry(countryCode);
+  }
+
+  /**
+   * Fee-aware checkout route recommendation for visitors and upgrade UI.
+   * Public — no auth required.
+   */
+  @Get('checkout/route-recommendation')
+  @ApiOperation({
+    summary: 'Get fee-optimal checkout route and payment instrument suggestions',
+  })
+  @ApiOkResponse({ description: 'Route recommendation with fee estimates' })
+  getCheckoutRouteRecommendation(@Query() query: CheckoutRouteRecommendationQueryDto) {
+    return this.checkoutRouting.getPublicRouteRecommendation({
+      countryCode: query.country,
+      plan: query.plan,
+      product: query.product,
+      amountMinor: query.amountMinor,
+      currency: query.currency,
+      paymentMethod: query.paymentMethod as PaymentInstrumentId | undefined,
+    });
   }
 
   /**

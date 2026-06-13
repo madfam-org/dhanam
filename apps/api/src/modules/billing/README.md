@@ -1,6 +1,6 @@
 # Billing Module
 
-Last updated: 2026-05-22
+Last updated: 2026-06-12
 
 The billing module is Dhanam's commercial boundary for the MADFAM ecosystem.
 It owns subscription checkout, catalog price resolution, usage metering,
@@ -33,28 +33,35 @@ checkout surface.
   billing is disabled (`FEATURE_UNIFIED_CHECKOUT_ROUTING=true`, default). MX
   routes to Stripe MX; non-MX routes to Paddle. Legacy US Stripe remains the
   fallback when hybrid providers are not configured.
+- **Fee-aware routing:** `PaymentRouteOptimizerService` ranks provider × payment
+  instrument by estimated merchant + FX cost using
+  `config/payment-route-fee-schedule.json` (bundled) or an optional
+  `platform_config` override (`billing.route_fee_schedule`). Public
+  `GET /billing/checkout/route-recommendation` and upgrade `paymentMethod`
+  flow through the optimizer when unified routing is enabled.
 
 See [ADR-008](../../../docs/adr/008-integration-planes-janua-vs-direct.md) for
 the identity vs financial-data vs money-movement separation model.
 
 ## Architecture
 
-| Concern                  | Primary files                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------------ |
-| Facade and REST API      | `billing.service.ts`, `billing.controller.ts`                                        |
-| Subscription lifecycle   | `services/subscription-lifecycle.service.ts`                                         |
-| Catalog price resolution | `services/price-resolver.service.ts`, `services/product-catalog.service.ts`          |
-| Checkout policy          | `services/checkout-routing-policy.service.ts`                                        |
-| Payment gateway port     | `gateways/payment-gateway.port.ts`, `gateways/payment-gateway.registry.ts`           |
-| Hybrid router            | `services/payment-router.service.ts`                                                 |
-| Stripe SDK wrapper       | `stripe.service.ts`                                                                  |
-| Stripe MX/SPEI           | `stripe-mx.controller.ts`, `services/stripe-mx*.ts`, `gateways/stripe-mx.gateway.ts` |
-| Paddle                   | `services/paddle.service.ts`, `gateways/paddle.gateway.ts`                           |
-| Conekta direct           | `services/conekta.service.ts`, `gateways/conekta.gateway.ts`                         |
-| Janua billing adapter    | `janua-billing.service.ts`, `gateways/janua-billing.gateway.ts`                      |
-| Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                               |
-| Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                               |
-| Internal POS checkout    | `modules/admin/admin-pos-billing.service.ts`, `services/internal-pos.service.ts`     |
+| Concern                  | Primary files                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Facade and REST API      | `billing.service.ts`, `billing.controller.ts`                                                                                             |
+| Subscription lifecycle   | `services/subscription-lifecycle.service.ts`                                                                                              |
+| Catalog price resolution | `services/price-resolver.service.ts`, `services/product-catalog.service.ts`                                                               |
+| Checkout policy          | `services/checkout-routing-policy.service.ts`                                                                                             |
+| Fee schedule + optimizer | `config/payment-route-fee-schedule.json`, `services/payment-route-fee-schedule.service.ts`, `services/payment-route-optimizer.service.ts` |
+| Payment gateway port     | `gateways/payment-gateway.port.ts`, `gateways/payment-gateway.registry.ts`                                                                |
+| Hybrid router            | `services/payment-router.service.ts`                                                                                                      |
+| Stripe SDK wrapper       | `stripe.service.ts`                                                                                                                       |
+| Stripe MX/SPEI           | `stripe-mx.controller.ts`, `services/stripe-mx*.ts`, `gateways/stripe-mx.gateway.ts`                                                      |
+| Paddle                   | `services/paddle.service.ts`, `gateways/paddle.gateway.ts`                                                                                |
+| Conekta direct           | `services/conekta.service.ts`, `gateways/conekta.gateway.ts`                                                                              |
+| Janua billing adapter    | `janua-billing.service.ts`, `gateways/janua-billing.gateway.ts`                                                                           |
+| Product webhook DLQ      | `services/webhook-dlq.service.ts`, `dlq.controller.ts`                                                                                    |
+| Usage and credits        | `services/usage-*.ts`, `jobs/overage-invoicing.job.ts`                                                                                    |
+| Internal POS checkout    | `modules/admin/admin-pos-billing.service.ts`, `services/internal-pos.service.ts`                                                          |
 
 ## Pricing Source Of Truth
 
@@ -88,6 +95,7 @@ Current Dhanam managed-cloud tiers in the catalog:
 | Endpoint                                                                              | Auth             | Status               | Purpose                                    |
 | ------------------------------------------------------------------------------------- | ---------------- | -------------------- | ------------------------------------------ |
 | `GET /billing/pricing`                                                                | Public           | Live                 | Regional pricing                           |
+| `GET /billing/checkout/route-recommendation`                                          | Public           | Live                 | Fee-optimal route + instrument suggestions |
 | `GET /billing/catalog`                                                                | Public           | Live                 | Product catalog                            |
 | `GET /billing/catalog/:slug`                                                          | Public           | Live                 | Product detail                             |
 | `GET /billing/checkout`                                                               | Public/allowlist | Live                 | External checkout redirect                 |
@@ -105,6 +113,11 @@ Current Dhanam managed-cloud tiers in the catalog:
 | `POST /admin/billing/pos/checkout`                                                    | Admin JWT        | Live                 | Internal operator checkout link creation   |
 | `POST /admin/billing/pos/status`                                                      | Admin JWT        | Live                 | Stripe checkout session status lookup      |
 | `POST /admin/billing/route/preview`                                                   | Admin JWT        | Live                 | Dry-run checkout routing matrix            |
+| `GET /admin/billing/route/fee-schedule`                                               | Admin JWT        | Live                 | View bundled or platform fee schedule      |
+| `PUT /admin/billing/route/fee-schedule`                                               | Admin JWT        | Live                 | Upsert platform fee schedule override      |
+| `DELETE /admin/billing/route/fee-schedule`                                            | Admin JWT        | Live                 | Clear platform override (revert to JSON)   |
+| `POST /admin/billing/route/override`                                                  | Admin JWT        | Live                 | Audited per-user provider override         |
+| `POST /admin/billing/route/override/clear`                                            | Admin JWT        | Live                 | Clear per-user provider override           |
 | `POST /admin/billing/pos/charge`                                                      | Admin JWT        | Live                 | Operator PaymentIntent charge              |
 | `POST /admin/billing/pos/refund`                                                      | Admin JWT        | Live                 | Operator refund (full/partial)             |
 | `GET /admin/billing/pos/timeline/:correlationId`                                      | Admin JWT        | Live                 | POS correlation billing-event timeline     |
@@ -115,12 +128,19 @@ Current Dhanam managed-cloud tiers in the catalog:
 1. `SubscriptionLifecycleService`: self-service, external, and operator checkout
    orchestrator. Janua when enabled; otherwise hybrid router via
    `CheckoutRoutingPolicyService`, then legacy Stripe fallback.
-2. `CheckoutRoutingPolicyService`: records provider, country, currency, and route
-   reason; executes hybrid checkout through `PaymentRouterService`.
-3. `PaymentRouterService`: `MX -> stripe_mx`, non-MX -> `paddle` implementation.
+2. `CheckoutRoutingPolicyService`: records provider, country, currency, route
+   reason, and optional fee optimization metadata; executes hybrid checkout
+   through `PaymentRouterService`.
+3. `PaymentRouteOptimizerService`: ranks checkout instruments by estimated PSP
+   fees; used by route preview, public recommendations, and upgrade when
+   `paymentMethod` is supplied.
+4. `PaymentRouterService`: `MX -> stripe_mx`, non-MX -> `paddle` implementation.
 
 Use `POST /admin/billing/route/preview` to dry-run routing for a user/plan/country
-matrix before changing production flags.
+matrix before changing production flags. Maintain PSP rate assumptions via the
+admin **Fee Schedule** tab or `PUT /admin/billing/route/fee-schedule`. Validate
+bundled JSON in CI with
+[`scripts/validate-payment-route-fee-schedule.mjs`](../../../../../scripts/validate-payment-route-fee-schedule.mjs).
 
 ## Internal POS Status
 
@@ -134,20 +154,21 @@ The current internal POS surface supports:
 - direct PaymentIntent charge and full/partial refund (Stripe MX / legacy Stripe);
 - correlation timelines and flagged reconciliation mismatches;
 - admin-only access through the platform admin guard;
-- tabbed admin UI at `/pos` (subscription, route preview, charge/refund,
-  timeline/reconcile).
+- tabbed admin UI at `/pos` (subscription, route preview, fee schedule,
+  charge/refund, timeline/reconcile);
+- web landing pricing and `/billing/upgrade` show fee-optimal instrument
+  recommendations; upgrade passes `countryCode` + `paymentMethod` to checkout.
 
 See [Commercial GA Execution](../../../docs/COMMERCIAL_GA_EXECUTION.md) for
 staging soak and production promotion checklists.
 
 Still missing before **commercial GA (G2)** sign-off:
 
-- Karafiel CFDI / egreso proof in the admin POS timeline;
+- Karafiel CFDI / egreso proof in the admin POS timeline on staging;
 - Conekta charge/refund in the operator POS path (Scope B);
-- audited provider route override API;
-- golden end-to-end revenue probes per MADFAM product;
+- golden end-to-end revenue probes executed per MADFAM product on staging;
 - production DLQ replay drill evidence;
-- `@dhanam/billing-sdk` POS client methods for trusted internal callers.
+- G2 sign-off checklist execution (see WS6).
 
 Track progress in [Commercial GA Execution](../../../docs/COMMERCIAL_GA_EXECUTION.md).
 
@@ -229,9 +250,11 @@ CHECKOUT_ALLOWED_HOSTS=karafiel.mx,tezca.mx,janua.dev
 
 ```bash
 pnpm --dir apps/api test -- billing
-pnpm --dir apps/api test -- admin-ops.service.spec.ts
+pnpm --dir apps/api test -- admin-pos-billing.service.spec.ts
+pnpm --dir apps/api test -- payment-route-
+node scripts/validate-payment-route-fee-schedule.mjs
 pnpm --dir apps/admin test -- pos-page.test.tsx
-pnpm --dir packages/billing-sdk test -- client.spec.ts
+pnpm --dir packages/billing-sdk test
 bash scripts/staging-commercial-smoke.test.sh
 # optional live staging probe:
 # RUN_STAGING_COMMERCIAL_SMOKE_LIVE=true bash scripts/staging-commercial-smoke.test.sh

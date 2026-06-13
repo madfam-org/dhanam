@@ -22,6 +22,7 @@ import { AuditModule } from '../../core/audit/audit.module';
 import { MonitoringModule } from '../../core/monitoring/monitoring.module';
 import { PrismaModule } from '../../core/prisma/prisma.module';
 import { EmailModule } from '../email/email.module';
+import { PlatformConfigModule } from '../platform-config/platform-config.module';
 
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
@@ -65,6 +66,8 @@ import { CustomerFederationService } from './services/customer-federation.servic
 import { InternalPosService } from './services/internal-pos.service';
 import { OperatorCheckoutStatusService } from './services/operator-checkout-status.service';
 import { PaddleService } from './services/paddle.service';
+import { PaymentRouteFeeScheduleService } from './services/payment-route-fee-schedule.service';
+import { PaymentRouteOptimizerService } from './services/payment-route-optimizer.service';
 import { PaymentRouterService } from './services/payment-router.service';
 import { PhyndCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
 import { PriceResolverService } from './services/price-resolver.service';
@@ -103,6 +106,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     // MonitoringModule provides the 'SentryService' string token used
     // by WebhookDlqService for per-failure structured Sentry events.
     MonitoringModule,
+    PlatformConfigModule,
     HttpModule.register({
       timeout: 30000,
       maxRedirects: 5,
@@ -132,6 +136,8 @@ import { UsageAlertsController } from './usage-alerts.controller';
     UsageTrackingService,
     CheckoutRoutingPolicyService,
     CheckoutRouteOverrideService,
+    PaymentRouteFeeScheduleService,
+    PaymentRouteOptimizerService,
     InternalPosService,
     OperatorCheckoutStatusService,
     SubscriptionJanuaNotifierService,
@@ -218,6 +224,8 @@ import { UsageAlertsController } from './usage-alerts.controller';
     UsageTrackingService,
     CheckoutRoutingPolicyService,
     CheckoutRouteOverrideService,
+    PaymentRouteFeeScheduleService,
+    PaymentRouteOptimizerService,
     InternalPosService,
     OperatorCheckoutStatusService,
     SubscriptionJanuaNotifierService,

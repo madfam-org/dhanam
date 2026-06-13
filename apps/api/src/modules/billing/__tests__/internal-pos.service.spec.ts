@@ -122,4 +122,68 @@ describe('InternalPosService', () => {
       ).rejects.toBeInstanceOf(BadRequestException);
     });
   });
+
+  describe('getTimeline', () => {
+    it('returns CFDI uuid and product webhook deliveries for correlated events', async () => {
+      const createdAt = new Date('2026-06-12T10:00:00.000Z');
+      (prisma.billingEvent.findMany as jest.Mock).mockResolvedValue([
+        {
+          id: 'be-pos-1',
+          type: 'pos_charge',
+          status: 'completed',
+          amount: { toString: () => '199.00' },
+          currency: 'MXN',
+          createdAt,
+          metadata: {
+            correlationId: 'corr-timeline-1',
+            paymentIntentId: 'pi_timeline_mx',
+            cfdiUuid: 'cfdi-uuid-from-karafiel',
+          },
+        },
+      ]);
+      (prisma.webhookDeliveryFailure.findMany as jest.Mock).mockResolvedValue([
+        {
+          consumer: 'karafiel',
+          eventType: 'payment.succeeded',
+          lastErrorMessage: 'timeout',
+          resolvedAt: null,
+          payload: { type: 'payment.succeeded', data: { payment_id: 'pi_timeline_mx' } },
+        },
+      ]);
+
+      const timeline = await service.getTimeline('corr-timeline-1');
+
+      expect(timeline).toHaveLength(1);
+      expect(timeline[0].cfdiUuid).toBe('cfdi-uuid-from-karafiel');
+      expect(timeline[0].productWebhookDeliveries).toEqual([
+        expect.objectContaining({
+          consumer: 'karafiel',
+          status: 'failed',
+          eventType: 'payment.succeeded',
+        }),
+      ]);
+    });
+
+    it('reads snake_case cfdi_uuid from legacy metadata', async () => {
+      (prisma.billingEvent.findMany as jest.Mock).mockResolvedValue([
+        {
+          id: 'be-pos-2',
+          type: 'pos_charge',
+          status: 'completed',
+          amount: { toString: () => '50.00' },
+          currency: 'MXN',
+          createdAt: new Date(),
+          metadata: {
+            correlationId: 'corr-timeline-2',
+            payment_id: 'pi_legacy',
+            cfdi_uuid: 'legacy-cfdi-uuid',
+          },
+        },
+      ]);
+
+      const timeline = await service.getTimeline('corr-timeline-2');
+
+      expect(timeline[0].cfdiUuid).toBe('legacy-cfdi-uuid');
+    });
+  });
 });

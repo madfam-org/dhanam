@@ -1,6 +1,6 @@
 'use client';
 
-import { EcosystemBanner } from '@madfam/ecosystem-banner';
+import { EcosystemBanner } from '@dhanam/ui';
 
 export function EcosystemBannerClient() {
   return <EcosystemBanner />;

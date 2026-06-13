@@ -39,7 +39,6 @@ jest.mock('stripe', () => {
   return { __esModule: true, default: MockStripe };
 });
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const StripeMock = require('stripe').default;
 
 describe('StripeConnectService', () => {

@@ -1,6 +1,6 @@
 # Commercial GA Execution Plan (G2)
 
-Last updated: 2026-05-22
+Last updated: 2026-06-12
 
 This is the **operator and engineering runbook** for reaching MADFAM billing
 commercial GA (gate **G2**). It complements the program overview in
@@ -20,15 +20,15 @@ All PSP adapters implement `PaymentGatewayPort` via `PaymentGatewayRegistry`
 
 ## Workstream status
 
-| WS    | Name                           | Status (2026-05-22) | Next action                                                |
-| ----- | ------------------------------ | ------------------- | ---------------------------------------------------------- |
-| 0     | Rollout truth                  | In progress         | Enclii vs Argo decision + three promote cycles             |
-| **1** | **Deploy & prove routing/POS** | **In progress**     | Configure staging vendor secrets + strict commercial smoke |
-| 2     | POS completion + CFDI          | **In progress**     | CFDI timeline + route override landed; soak on staging     |
-| 3     | Golden probes + DLQ drills     | Not started         | Karafiel probe first                                       |
-| 4     | Conekta parity (Scope B)       | Deferred (Scope A)  | Revisit after G2 Scope A sign-off                          |
-| 5     | SDK + docs + semantics         | In progress         | Keep README / TECH_DEBT synced                             |
-| 6     | G2 sign-off evidence           | Not started         | Commercial drill log                                       |
+| WS    | Name                           | Status (2026-06-12) | Next action                                             |
+| ----- | ------------------------------ | ------------------- | ------------------------------------------------------- |
+| 0     | Rollout truth                  | In progress         | Enclii vs Argo decision + three promote cycles          |
+| **1** | **Deploy & prove routing/POS** | **In progress**     | Enable `STAGING_COMMERCIAL_STRICT=true` + admin secrets |
+| 2     | POS completion + CFDI          | **In progress**     | Staging charge smoke + Karafiel CFDI on timeline        |
+| 3     | Golden probes + DLQ drills     | **In progress**     | CI envelope probe green; staging DLQ drill execution    |
+| 4     | Conekta parity (Scope B)       | Deferred (Scope A)  | Revisit after G2 Scope A sign-off                       |
+| 5     | SDK + docs + semantics         | **In progress**     | Billing README + fee schedule docs synced with source   |
+| 6     | G2 sign-off evidence           | Not started         | Commercial drill log after staging soak                 |
 
 ---
 
@@ -67,7 +67,10 @@ STAGING_API_URL=https://staging-api.dhan.am \
 
 - [ ] Public commercial smoke green in latest `Deploy to Staging` run
 - [ ] Admin `/pos` loads on `staging-admin.dhan.am`
-- [ ] Route preview: MX → `stripe_mx`, US → `paddle`
+- [ ] Route preview: MX → `stripe_mx`, US → `paddle` or `legacy_stripe`
+- [ ] Fee schedule tab loads bundled JSON; override round-trip optional
+- [ ] Landing `/` pricing block shows fee recommendation when geo cookie set
+- [ ] `/billing/upgrade` instrument picker passes `paymentMethod` to checkout
 - [ ] Operator checkout link creates session (sandbox)
 - [ ] Reconciliation endpoint returns summary (may be zero flagged)
 - [ ] Record staging deploy run id for promote workflow
@@ -85,13 +88,15 @@ STAGING_API_URL=https://staging-api.dhan.am \
 
 ## WS2 — POS completion + CFDI (weeks 2–4)
 
-| Priority | Deliverable                              | Acceptance                                           |
-| -------- | ---------------------------------------- | ---------------------------------------------------- |
-| P0       | Partial refund amount in admin `/pos` UI | Operator can refund partial MXN amount               |
-| P0       | CFDI id in POS timeline                  | Karafiel receipt reference visible after MXN success |
-| P0       | Conekta path in `InternalPosService`     | Sandbox charge when Scope B selected                 |
-| P1       | `POST /admin/billing/route/override`     | Audited operator override                            |
-| P1       | Staging + prod E2E for charge/refund     | Playwright + API E2E green                           |
+| Priority | Deliverable                              | Acceptance                                             |
+| -------- | ---------------------------------------- | ------------------------------------------------------ |
+| P0       | Partial refund amount in admin `/pos` UI | **Done** — optional `amountMinor` on refund form       |
+| P0       | CFDI id in POS timeline                  | **Done (source)** — staging Karafiel proof pending     |
+| P0       | Conekta path in `InternalPosService`     | Deferred (Scope A); gateway wired when selected        |
+| P1       | `POST /admin/billing/route/override`     | **Done** — API + admin UI on Route Preview tab         |
+| P1       | Fee schedule admin maintenance           | **Done** — GET/PUT/DELETE + admin Fee Schedule tab     |
+| P1       | Web fee recommendations                  | **Done** — landing pricing + upgrade instrument picker |
+| P1       | Staging + prod E2E for charge/refund     | **Partial** — API timeline/override/fee-schedule E2E   |
 
 ---
 

@@ -19,6 +19,8 @@ function makePrismaMock() {
     billingEvent: {
       findFirst: jest.fn(),
       create: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
+      update: jest.fn(),
     },
   };
 }
@@ -497,6 +499,43 @@ describe('StripeMxSpeiRelayService', () => {
       const urls = fetchMock.mock.calls.map(([u]) => u);
       expect(urls).toEqual(
         expect.arrayContaining(['https://api.karafiel.mx/a', 'https://api.tezca.mx/b'])
+      );
+    });
+
+    it('records Karafiel CFDI uuid on billing timeline after successful relay', async () => {
+      const cfdiUuid = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+      config.get.mockImplementation((k: string, d?: any) => {
+        if (k === 'PRODUCT_WEBHOOK_URLS') {
+          return 'karafiel:https://api.karafiel.mx/api/v1/webhooks/dhanam';
+        }
+        if (k === 'DHANAM_WEBHOOK_SECRET') return 'test-secret';
+        return d;
+      });
+      fetchMock.mockResolvedValue({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ cfdi_uuid: cfdiUuid }),
+      });
+      prisma.billingEvent.findMany.mockResolvedValue([
+        {
+          id: 'be-1',
+          metadata: { paymentIntentId: 'pi_test_123', correlationId: 'corr-karafiel' },
+        },
+      ]);
+      const event = piEvent('payment_intent.succeeded');
+
+      await service.relay(event);
+
+      expect(prisma.billingEvent.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'be-1' },
+          data: expect.objectContaining({
+            metadata: expect.objectContaining({
+              cfdiUuid,
+              karafielDelivered: true,
+            }),
+          }),
+        })
       );
     });
   });

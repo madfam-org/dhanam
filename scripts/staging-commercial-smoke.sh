@@ -154,6 +154,49 @@ else
     us_preview="$(admin_post "/admin/billing/route/preview" \
       "{\"userId\":\"${SMOKE_USER_ID}\",\"plan\":\"pro\",\"product\":\"dhanam\",\"countryCode\":\"US\"}")"
     assert_json_field "US route preview returns provider" "$us_preview" '.provider | type == "string"'
+
+    if command -v jq >/dev/null 2>&1; then
+      mx_provider="$(printf '%s' "$preview_body" | jq -r '.provider // empty')"
+      us_provider="$(printf '%s' "$us_preview" | jq -r '.provider // empty')"
+      case "$mx_provider" in
+        stripe_mx|legacy_stripe|paddle|conekta)
+          log_pass "MX provider matrix returns known provider (${mx_provider})"
+          ;;
+        *)
+          log_fail "MX provider matrix — unexpected provider: ${mx_provider}"
+          ;;
+      esac
+      case "$us_provider" in
+        paddle|legacy_stripe|stripe_mx)
+          log_pass "US provider matrix returns known provider (${us_provider})"
+          ;;
+        *)
+          log_fail "US provider matrix — unexpected provider: ${us_provider}"
+          ;;
+      esac
+    fi
+
+    override_smoke_id="staging-override-$(date +%s)"
+    admin_post "/admin/billing/route/override" \
+      "{\"userId\":\"${SMOKE_USER_ID}\",\"product\":\"dhanam\",\"provider\":\"paddle\",\"reason\":\"${override_smoke_id}\",\"ttlHours\":1}" >/dev/null
+    overridden_preview="$(admin_post "/admin/billing/route/preview" \
+      "{\"userId\":\"${SMOKE_USER_ID}\",\"plan\":\"pro\",\"product\":\"dhanam\",\"countryCode\":\"MX\"}")"
+    assert_json_field "Route override forces paddle provider" "$overridden_preview" '.provider == "paddle"'
+    assert_json_field "Route override reason is operator_stored_override" "$overridden_preview" '.routeReason == "operator_stored_override"'
+    admin_post "/admin/billing/route/override/clear" \
+      "{\"userId\":\"${SMOKE_USER_ID}\",\"product\":\"dhanam\",\"reason\":\"${override_smoke_id} cleanup\"}" >/dev/null
+    cleared_preview="$(admin_post "/admin/billing/route/preview" \
+      "{\"userId\":\"${SMOKE_USER_ID}\",\"plan\":\"pro\",\"product\":\"dhanam\",\"countryCode\":\"MX\"}")"
+    if command -v jq >/dev/null 2>&1; then
+      cleared_provider="$(printf '%s' "$cleared_preview" | jq -r '.provider // empty')"
+      if [ "$cleared_provider" = "paddle" ]; then
+        log_fail "Route override clear — provider still paddle after cleanup"
+      else
+        log_pass "Route override cleared (provider=${cleared_provider})"
+      fi
+    else
+      log_skip "Route override clear verification (jq not installed)"
+    fi
   fi
 
   if [ "$CHARGE_ENABLED" = "true" ]; then
@@ -162,14 +205,25 @@ else
     else
       correlation_id="staging-smoke-$(date +%s)"
       charge_body="$(admin_post "/admin/billing/pos/charge" \
-        "{\"userId\":\"${SMOKE_USER_ID}\",\"amountMinor\":1000,\"currency\":\"MXN\",\"description\":\"staging commercial smoke\",\"correlationId\":\"${correlation_id}\",\"countryCode\":\"MX\"}")"
+        "{\"userId\":\"${SMOKE_USER_ID}\",\"amountMinor\":2000,\"currency\":\"MXN\",\"description\":\"staging commercial smoke\",\"correlationId\":\"${correlation_id}\",\"countryCode\":\"MX\"}")"
       if command -v jq >/dev/null 2>&1; then
         pi_id="$(printf '%s' "$charge_body" | jq -r '.paymentIntentId // empty')"
         if [ -n "$pi_id" ] && [ "$pi_id" != "null" ]; then
           log_pass "POS charge returned paymentIntentId"
+          partial_refund_body="$(admin_post "/admin/billing/pos/refund" \
+            "{\"paymentIntentId\":\"${pi_id}\",\"amountMinor\":400,\"correlationId\":\"${correlation_id}\",\"reason\":\"staging smoke partial refund\"}")"
+          assert_json_field "POS partial refund returned refundId" "$partial_refund_body" '.refundId | type == "string"'
+          if command -v jq >/dev/null 2>&1; then
+            partial_amount="$(printf '%s' "$partial_refund_body" | jq -r '.amountMinor // empty')"
+            if [ "$partial_amount" = "400" ]; then
+              log_pass "POS partial refund amountMinor=400"
+            else
+              log_fail "POS partial refund — expected amountMinor 400, got ${partial_amount}"
+            fi
+          fi
           refund_body="$(admin_post "/admin/billing/pos/refund" \
-            "{\"paymentIntentId\":\"${pi_id}\",\"correlationId\":\"${correlation_id}\",\"reason\":\"staging smoke refund\"}")"
-          assert_json_field "POS refund returned refundId" "$refund_body" '.refundId | type == "string"'
+            "{\"paymentIntentId\":\"${pi_id}\",\"correlationId\":\"${correlation_id}\",\"reason\":\"staging smoke full refund\"}")"
+          assert_json_field "POS full refund returned refundId" "$refund_body" '.refundId | type == "string"'
         else
           log_fail "POS charge — missing paymentIntentId (Stripe may be unconfigured on staging)"
           printf '%s\n' "$charge_body" >&2

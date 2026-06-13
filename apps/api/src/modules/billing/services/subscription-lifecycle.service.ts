@@ -27,6 +27,10 @@ export interface UpgradeOptions {
   countryCode?: string;
   source?: string;
   operatorId?: string;
+  /** Preferred payment instrument — routes to lowest-fee provider/method when set. */
+  paymentMethod?: string;
+  amountMinor?: number;
+  currency?: string;
 }
 
 export interface OperatorCheckoutOptions extends UpgradeOptions {

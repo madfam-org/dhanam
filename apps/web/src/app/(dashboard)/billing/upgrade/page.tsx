@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+import { CheckoutPaymentRecommendations } from '~/components/billing/CheckoutPaymentRecommendations';
 import { useAnalytics } from '~/hooks/useAnalytics';
 import { billingApi } from '~/lib/api/billing';
 
@@ -27,6 +28,7 @@ export default function UpgradePage() {
   const router = useRouter();
   const analytics = useAnalytics();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | undefined>();
 
   const { data: status } = useQuery({
     queryKey: ['billing-status'],
@@ -96,6 +98,20 @@ export default function UpgradePage() {
     },
   ];
 
+  const geoCountry =
+    typeof document !== 'undefined'
+      ? document.cookie
+          .split('; ')
+          .find((c) => c.startsWith('dhanam_geo='))
+          ?.split('=')[1]
+          ?.toUpperCase()
+      : undefined;
+
+  const resolvedCountry = geoCountry || (pricing?.currency === 'MXN' ? 'MX' : 'US');
+  const checkoutPlan = 'pro';
+  const checkoutTier = tiers.find((t) => t.id === checkoutPlan) ?? tiers[0];
+  const amountMinorForPlan = checkoutTier ? Math.round(checkoutTier.monthlyPrice * 100) : undefined;
+
   const handleSubscribe = async (plan: string) => {
     if (plan === currentTier) return;
 
@@ -108,6 +124,8 @@ export default function UpgradePage() {
         plan,
         successUrl: `${window.location.origin}/billing/success`,
         cancelUrl: `${window.location.origin}/billing/upgrade`,
+        countryCode: resolvedCountry,
+        paymentMethod: selectedPaymentMethod,
       });
       window.location.href = checkoutUrl;
     } catch {
@@ -156,6 +174,16 @@ export default function UpgradePage() {
           </p>
         </div>
       )}
+
+      <CheckoutPaymentRecommendations
+        countryCode={resolvedCountry}
+        plan={checkoutPlan}
+        amountMinor={amountMinorForPlan}
+        currency={checkoutTier?.currency}
+        selectable
+        selectedPaymentMethod={selectedPaymentMethod}
+        onSelectPaymentMethod={setSelectedPaymentMethod}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {tiers.map((tier) => {

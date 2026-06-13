@@ -11,6 +11,7 @@ import { BillingController } from '../billing.controller';
 import { BillingService } from '../billing.service';
 import { JanuaBillingService } from '../janua-billing.service';
 import { CancellationService } from '../services/cancellation.service';
+import { CheckoutRoutingPolicyService } from '../services/checkout-routing-policy.service';
 import { PricingEngineService } from '../services/pricing-engine.service';
 import { RevenueMetricsService } from '../services/revenue-metrics.service';
 import { TrialService } from '../services/trial.service';
@@ -122,6 +123,15 @@ describe('BillingController', () => {
           provide: RevenueMetricsService,
           useValue: {
             getRevenueMetrics: jest.fn(),
+          },
+        },
+        {
+          provide: CheckoutRoutingPolicyService,
+          useValue: {
+            getRouteRecommendation: jest.fn(),
+            previewRouting: jest.fn(),
+            resolveProvider: jest.fn(),
+            tryHybridCheckout: jest.fn(),
           },
         },
       ],

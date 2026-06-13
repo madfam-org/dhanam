@@ -9,23 +9,29 @@ import { AuditService } from '@core/audit/audit.service';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { BillingService, type OperatorCheckoutStatus } from '@modules/billing/billing.service';
+import { parseFeeScheduleEntries } from '@modules/billing/config/payment-route-fee-schedule';
 import {
   CheckoutRouteOverrideService,
   type StoredRouteOverride,
 } from '@modules/billing/services/checkout-route-override.service';
-import type { CheckoutRoutingPreview } from '@modules/billing/services/checkout-routing-policy.service';
+import type {
+  CheckoutRoutingContext,
+  CheckoutRoutingPreview,
+} from '@modules/billing/services/checkout-routing-policy.service';
 import type {
   PosChargeResult,
   PosRefundResult,
   PosReconciliationSummary,
   PosTimelineEntry,
 } from '@modules/billing/services/internal-pos.service';
+import { PaymentRouteFeeScheduleService } from '@modules/billing/services/payment-route-fee-schedule.service';
 
 import {
   AdminPosChargeDto,
   AdminPosCheckoutDto,
   AdminPosRefundDto,
   AdminPosStatusDto,
+  AdminRouteFeeScheduleUpsertDto,
   AdminRouteOverrideClearDto,
   AdminRouteOverrideDto,
   AdminRoutePreviewDto,
@@ -38,7 +44,8 @@ export class AdminPosBillingService {
     private logger: LoggerService,
     private auditService: AuditService,
     @Optional() private billingService?: BillingService,
-    @Optional() private routeOverride?: CheckoutRouteOverrideService
+    @Optional() private routeOverride?: CheckoutRouteOverrideService,
+    @Optional() private feeSchedule?: PaymentRouteFeeScheduleService
   ) {}
 
   async createPosCheckout(
@@ -161,6 +168,8 @@ export class AdminPosBillingService {
       cancelUrl: `${webUrl}/billing/cancel`,
       providerOverride: dto.providerOverride,
       overrideKind: dto.providerOverride ? 'preview' : undefined,
+      amountMinor: dto.amountMinor,
+      paymentMethod: dto.paymentMethod as CheckoutRoutingContext['paymentMethod'],
     });
 
     await this.auditService.logEvent({
@@ -350,5 +359,75 @@ export class AdminPosBillingService {
     });
 
     return { cleared: true };
+  }
+
+  async getRouteFeeSchedule(adminUserId: string) {
+    if (!this.feeSchedule) {
+      throw new InternalServerErrorException('Fee schedule service is not available');
+    }
+
+    const schedule = this.feeSchedule.getSchedule();
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.billing_route_fee_schedule_viewed',
+      resource: 'Billing',
+      metadata: {
+        version: schedule.version,
+        source: schedule.source,
+        entryCount: schedule.entries.length,
+      },
+      severity: 'low',
+    });
+
+    return schedule;
+  }
+
+  async upsertRouteFeeSchedule(
+    dto: AdminRouteFeeScheduleUpsertDto,
+    adminUserId: string
+  ): Promise<{ version: string; entryCount: number; source: string }> {
+    if (!this.feeSchedule) {
+      throw new InternalServerErrorException('Fee schedule service is not available');
+    }
+
+    const entries = parseFeeScheduleEntries(dto.entries);
+    const result = await this.feeSchedule.upsertPlatformOverride({
+      version: dto.version,
+      entries,
+      updatedBy: adminUserId,
+    });
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.billing_route_fee_schedule_updated',
+      resource: 'Billing',
+      metadata: result,
+      severity: 'high',
+    });
+
+    return {
+      ...result,
+      source: 'platform_config',
+    };
+  }
+
+  async clearRouteFeeSchedule(adminUserId: string): Promise<{ cleared: true; version: string }> {
+    if (!this.feeSchedule) {
+      throw new InternalServerErrorException('Fee schedule service is not available');
+    }
+
+    await this.feeSchedule.clearPlatformOverride(adminUserId);
+    const schedule = this.feeSchedule.getSchedule();
+
+    await this.auditService.logEvent({
+      userId: adminUserId,
+      action: 'admin.billing_route_fee_schedule_cleared',
+      resource: 'Billing',
+      metadata: { version: schedule.version, source: schedule.source },
+      severity: 'medium',
+    });
+
+    return { cleared: true, version: schedule.version };
   }
 }

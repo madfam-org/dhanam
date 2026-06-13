@@ -1,0 +1,126 @@
+{
+  "version": "2026-06-12",
+  "source": "MADFAM PSP contract estimates — update when Stripe/Paddle/Conekta rates change",
+  "entries": [
+    {
+      "provider": "stripe_mx",
+      "paymentMethod": "card",
+      "currency": "MXN",
+      "percentBps": 360,
+      "fixedMinor": 300,
+      "customerFxBps": 0,
+      "label": "Card (Stripe MX)",
+      "countries": ["MX"]
+    },
+    {
+      "provider": "stripe_mx",
+      "paymentMethod": "customer_balance",
+      "currency": "MXN",
+      "percentBps": 300,
+      "fixedMinor": 150,
+      "customerFxBps": 0,
+      "label": "SPEI bank transfer (Stripe MX)",
+      "countries": ["MX"]
+    },
+    {
+      "provider": "stripe_mx",
+      "paymentMethod": "spei",
+      "currency": "MXN",
+      "percentBps": 300,
+      "fixedMinor": 150,
+      "customerFxBps": 0,
+      "label": "SPEI bank transfer (Stripe MX)",
+      "countries": ["MX"]
+    },
+    {
+      "provider": "stripe_mx",
+      "paymentMethod": "oxxo",
+      "currency": "MXN",
+      "percentBps": 350,
+      "fixedMinor": 1000,
+      "customerFxBps": 0,
+      "label": "OXXO cash (Stripe MX)",
+      "countries": ["MX"]
+    },
+    {
+      "provider": "conekta",
+      "paymentMethod": "card",
+      "currency": "MXN",
+      "percentBps": 345,
+      "fixedMinor": 300,
+      "customerFxBps": 0,
+      "label": "Card (Conekta)",
+      "countries": ["MX"]
+    },
+    {
+      "provider": "conekta",
+      "paymentMethod": "spei",
+      "currency": "MXN",
+      "percentBps": 290,
+      "fixedMinor": 100,
+      "customerFxBps": 0,
+      "label": "SPEI (Conekta)",
+      "countries": ["MX"]
+    },
+    {
+      "provider": "conekta",
+      "paymentMethod": "oxxo_cash",
+      "currency": "MXN",
+      "percentBps": 300,
+      "fixedMinor": 900,
+      "customerFxBps": 0,
+      "label": "OXXO cash (Conekta)",
+      "countries": ["MX"]
+    },
+    {
+      "provider": "paddle",
+      "paymentMethod": "card",
+      "currency": "USD",
+      "percentBps": 500,
+      "fixedMinor": 50,
+      "customerFxBps": 0,
+      "label": "Card (Paddle)",
+      "countries": "*"
+    },
+    {
+      "provider": "paddle",
+      "paymentMethod": "paypal",
+      "currency": "USD",
+      "percentBps": 520,
+      "fixedMinor": 50,
+      "customerFxBps": 0,
+      "label": "PayPal (Paddle)",
+      "countries": "*"
+    },
+    {
+      "provider": "paddle",
+      "paymentMethod": "apple_pay",
+      "currency": "USD",
+      "percentBps": 500,
+      "fixedMinor": 50,
+      "customerFxBps": 0,
+      "label": "Apple Pay (Paddle)",
+      "countries": "*"
+    },
+    {
+      "provider": "paddle",
+      "paymentMethod": "google_pay",
+      "currency": "USD",
+      "percentBps": 500,
+      "fixedMinor": 50,
+      "customerFxBps": 0,
+      "label": "Google Pay (Paddle)",
+      "countries": "*"
+    },
+    {
+      "provider": "legacy_stripe",
+      "paymentMethod": "card",
+      "currency": "USD",
+      "percentBps": 290,
+      "fixedMinor": 30,
+      "customerFxBps": 0,
+      "label": "Card (Stripe US)",
+      "countries": "*"
+    }
+  ]
+}
