@@ -1,0 +1,201 @@
+# Runs after promote-to-prod pushes a deploy(prod): commit to main.
+#
+# Sibling jobs in promote-to-prod.yml are skipped when the promote job pushes
+# to main (GITHUB_TOKEN ref update). This workflow is a separate run on that push.
+
+name: Post-promote reconcile
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - infra/k8s/production/kustomization.yaml
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why run post-promote reconcile now?"
+        required: true
+        type: string
+
+concurrency:
+  group: prod-post-promote
+  cancel-in-progress: false
+
+jobs:
+  manifest-proof:
+    name: Validate production manifest digests
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'deploy(prod):')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert prod kustomization has signed digests
+        run: node scripts/production-rollout-proof.js --manifest-only
+
+  notify-enclii:
+    name: Notify Enclii of prod promotion
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'deploy(prod):')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Report promotion lifecycle event
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+          if [ -z "${{ secrets.ENCLII_CALLBACK_TOKEN }}" ]; then
+            echo "::warning::ENCLII_CALLBACK_TOKEN not configured — skipping Enclii promotion callback."
+            exit 0
+          fi
+          payload="$(python3 - <<'PY'
+          import json, os, pathlib, re, subprocess
+          text = pathlib.Path("infra/k8s/production/kustomization.yaml").read_text()
+          def digest(name):
+              m = re.search(r"name:\s+" + re.escape(name) + r"\n\s+newName:[^\n]+\n\s+digest:\s+(sha256:[a-f0-9]+)", text)
+              if not m:
+                  m = re.search(r"digest:\s+(sha256:[a-f0-9]+)\n\s+name:\s+" + re.escape(name), text)
+              return m.group(1) if m else ""
+          print(json.dumps({
+              "repo_full_name": "madfam-org/dhanam",
+              "commit_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+              "branch": "main",
+              "ref": "refs/heads/main",
+              "event_type": "promotion_completed",
+              "source": "prod_post_promote_workflow",
+              "message": os.environ.get("COMMIT_MESSAGE", ""),
+              "metadata": {
+                  "workflow": "prod-post-promote",
+                  "api_digest": digest("dhanam-api"),
+                  "web_digest": digest("dhanam-web"),
+                  "admin_digest": digest("dhanam-admin"),
+              },
+          }))
+          PY
+          )"
+          if ! curl -sf -X POST "https://api.enclii.dev/v1/callbacks/lifecycle-event" \
+            -H "Authorization: Bearer ${{ secrets.ENCLII_CALLBACK_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$payload"; then
+            echo "::warning::Enclii lifecycle callback failed — record Enclii adapter gap for prod promotion reconcile."
+          fi
+
+  argocd-refresh-best-effort:
+    name: Best-effort ArgoCD refresh (break-glass)
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'deploy(prod):')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: azure/setup-kubectl@v5
+
+      - name: Configure kubeconfig
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PRODUCTION }}
+        run: |
+          set -euo pipefail
+          if [ -z "${KUBECONFIG_B64:-}" ]; then
+            echo "::warning::KUBECONFIG_PRODUCTION not configured; skipping ArgoCD refresh."
+            exit 0
+          fi
+          mkdir -p "$HOME/.kube"
+          echo "$KUBECONFIG_B64" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Refresh dhanam Application
+        run: |
+          set -euo pipefail
+          if ! kubectl version --request-timeout=10s >/dev/null 2>&1; then
+            echo "::warning::Cluster API unreachable from GitHub Actions — ArgoCD refresh skipped."
+            echo "::warning::Enclii adapter gap: prod GitOps reconcile must be triggered from Enclii or in-cluster."
+            exit 0
+          fi
+          kubectl -n argocd annotate application dhanam argocd.argoproj.io/refresh=hard --overwrite || true
+          kubectl -n dhanam rollout status deployment/dhanam-web --timeout=300s || \
+            echo "::warning::dhanam-web rollout did not complete within timeout — verify via Enclii/ArgoCD."
+          kubectl -n dhanam rollout status deployment/dhanam-api --timeout=300s || \
+            echo "::warning::dhanam-api rollout did not complete within timeout — verify via Enclii/ArgoCD."
+
+  prod-surface-smoke:
+    name: Production public surface smoke (informational)
+    needs: [argocd-refresh-best-effort]
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'deploy(prod):')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify prod hostnames do not leak staging URLs
+        run: |
+          set -euo pipefail
+          chmod +x scripts/production-preflight.sh
+          if ! ./scripts/production-preflight.sh; then
+            echo "::warning::Production surface preflight failed — live pods may still be rolling."
+            echo "::warning::Reconcile ArgoCD app dhanam via Enclii if git manifest is ahead of cluster."
+            exit 1
+          fi
+
+  catalog-drift-gate:
+    name: Catalog drift gate (informational)
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, 'deploy(prod):')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+          standalone: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Install dependencies
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+        run: pnpm install --frozen-lockfile
+
+      - name: Check live catalog vs catalog.yaml
+        run: |
+          set -euo pipefail
+          if ! pnpm catalog:drift -- --json; then
+            echo "::warning::Catalog drift detected after promotion."
+            echo "::warning::Run Sync production catalog (dry_run=false) after Production env secrets are configured."
+            exit 1
+          fi
+
+  rollout-proof:
+    name: Prove live prod matches promoted digests (Enclii)
+    needs: [manifest-proof, argocd-refresh-best-effort]
+    if: |
+      (github.event_name == 'workflow_dispatch' ||
+       contains(github.event.head_commit.message, 'deploy(prod):')) &&
+      vars.ENCLII_ROLLOUT_PROOF_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Enclii CLI
+        run: |
+          if ! command -v enclii >/dev/null 2>&1; then
+            echo "::error::Enclii CLI not found on runner — set ENCLII_ROLLOUT_PROOF_ENABLED=false or install enclii"
+            exit 1
+          fi
+      - name: Compare live ArgoCD digests to production manifest
+        run: node scripts/production-rollout-proof.js dhanam-services
