@@ -68,7 +68,8 @@ export function middleware(request: NextRequest) {
   const hostHeader =
     request.headers.get('x-forwarded-host') || request.headers.get('host') || request.nextUrl.host;
   const hostname = getHostnameFromHostHeader(hostHeader);
-  const token = request.cookies.get('auth-storage');
+  const authCookie = request.cookies.get('auth-storage');
+  const hasAuthSession = authCookie?.value === 'authenticated' || authCookie?.value === 'true';
 
   // === WWW → APEX REDIRECT ===
   const apexRedirectUrl = getWwwApexRedirectUrl(request.url, hostHeader);
@@ -82,7 +83,7 @@ export function middleware(request: NextRequest) {
   if (isAdminSubdomain) {
     // Root on admin subdomain → dashboard (authenticated) or app login (unauthenticated)
     if (path === '/') {
-      if (token) {
+      if (hasAuthSession) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
       }
       const appUrl = resolvePublicAppUrl(hostname, process.env.NEXT_PUBLIC_BASE_URL);
@@ -94,7 +95,7 @@ export function middleware(request: NextRequest) {
 
     // Unauthenticated users on admin subdomain → redirect to app login
     const isPublicPath = publicPaths.some((p) => path.startsWith(p));
-    if (!token && !isPublicPath) {
+    if (!hasAuthSession && !isPublicPath) {
       const appUrl = resolvePublicAppUrl(hostname, process.env.NEXT_PUBLIC_BASE_URL);
       return withPublicSurfaceHeaders(
         NextResponse.redirect(new URL(`/login?from=https://admin.dhan.am${path}`, appUrl)),
@@ -210,7 +211,7 @@ export function middleware(request: NextRequest) {
     const isAppSubdomain = hostname.includes('app.dhan.am');
 
     if (isAppSubdomain) {
-      if (token) {
+      if (hasAuthSession) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
       } else {
         return NextResponse.redirect(new URL('/login', request.url));
@@ -222,12 +223,12 @@ export function middleware(request: NextRequest) {
   const isPublicPath = publicPaths.some((p) => path.startsWith(p));
 
   // Redirect authenticated users away from auth pages (but not /demo)
-  if (isPublicPath && token && !path.startsWith('/demo')) {
+  if (isPublicPath && hasAuthSession && !path.startsWith('/demo')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // Redirect unauthenticated users to login
-  if (!isPublicPath && !token) {
+  if (!hasAuthSession && !isPublicPath) {
     const url = new URL('/login', request.url);
     url.searchParams.set('from', path);
     return NextResponse.redirect(url);

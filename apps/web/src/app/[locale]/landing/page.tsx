@@ -19,6 +19,7 @@ import { SecurityTrust } from '@/components/landing/security-trust';
 import { SocialProof } from '@/components/landing/social-proof';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePublicAppUrl } from '@/hooks/usePublicSurface';
+import { buildAppDemoLaunchUrl } from '@/lib/demo/launch-demo';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 export default function LocaleLandingPage() {
@@ -40,34 +41,9 @@ export default function LocaleLandingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Reason: analytics is stable; only re-run when auth state changes
   }, [isAuthenticated]);
 
-  const handleLiveDemoClick = async () => {
+  const handleLiveDemoClick = () => {
     analytics.track('live_demo_clicked', { source: 'hero_cta', locale });
-
-    // Read geo cookie for demo defaults
-    const geoCookie = document.cookie
-      .split('; ')
-      .find((c) => c.startsWith('dhanam_geo='))
-      ?.split('=')[1];
-
-    try {
-      const { authApi } = await import('@/lib/api/auth');
-      const { useAuth } = await import('@/lib/hooks/use-auth');
-
-      const response = await authApi.loginAsGuest({ countryCode: geoCookie });
-      useAuth.getState().setAuth(response.user, response.tokens);
-
-      analytics.track('demo_session_started', {
-        userId: response.user.id,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-        countryCode: geoCookie,
-      });
-
-      window.location.href = `${appUrl}/dashboard`;
-    } catch (error) {
-      console.error('Guest login failed:', error);
-      analytics.track('demo_session_failed', { error: String(error) });
-      window.location.href = `${appUrl}/demo`;
-    }
+    window.location.href = buildAppDemoLaunchUrl(appUrl, 'guest');
   };
 
   const handleSignUpClick = (plan?: string) => {
