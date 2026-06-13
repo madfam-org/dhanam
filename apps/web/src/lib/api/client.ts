@@ -10,8 +10,10 @@ export class ApiError extends Error {
   }
 }
 
+import { resolvePublicApiUrl } from '../routing/public-surface';
+
 export class ApiClient {
-  private baseUrl: string;
+  private configuredBaseUrl: string;
   private accessToken?: string;
   private onTokenRefresh?: (tokens: { accessToken: string }) => void;
 
@@ -19,8 +21,17 @@ export class ApiClient {
     baseUrl?: string;
     onTokenRefresh?: (tokens: { accessToken: string }) => void;
   }) {
-    this.baseUrl = config.baseUrl || process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am/v1';
+    this.configuredBaseUrl =
+      config.baseUrl || process.env.NEXT_PUBLIC_API_URL || 'https://api.dhan.am/v1';
     this.onTokenRefresh = config.onTokenRefresh;
+  }
+
+  private getBaseUrl(): string {
+    if (typeof window !== 'undefined') {
+      return resolvePublicApiUrl(window.location.hostname, this.configuredBaseUrl);
+    }
+
+    return this.configuredBaseUrl;
   }
 
   setTokens(tokens: { accessToken: string }) {
@@ -32,7 +43,7 @@ export class ApiClient {
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
+    const url = `${this.getBaseUrl()}${path}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
@@ -87,7 +98,7 @@ export class ApiClient {
   }
 
   private async refreshTokens(): Promise<{ accessToken: string; expiresIn: number }> {
-    const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+    const response = await fetch(`${this.getBaseUrl()}/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

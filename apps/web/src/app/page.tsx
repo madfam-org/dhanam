@@ -15,6 +15,7 @@ import { Pricing } from '@/components/landing/pricing';
 import { ProblemSolution } from '@/components/landing/problem-solution';
 import { SocialProof } from '@/components/landing/social-proof';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { usePublicAppUrl } from '@/hooks/usePublicSurface';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 function HomePageContent() {
@@ -22,12 +23,7 @@ function HomePageContent() {
   const analytics = useAnalytics();
   const { t } = useTranslation('landing');
 
-  const appUrl = process.env.NEXT_PUBLIC_BASE_URL;
-
-  if (!appUrl && process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
-    throw new Error('NEXT_PUBLIC_BASE_URL is missing in non-development environment');
-  }
-
+  const appUrl = usePublicAppUrl();
   const resolvedAppUrl = appUrl || 'https://app.dhan.am';
 
   useEffect(() => {

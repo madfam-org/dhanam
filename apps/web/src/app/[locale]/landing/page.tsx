@@ -18,6 +18,7 @@ import { ProblemSolution } from '@/components/landing/problem-solution';
 import { SecurityTrust } from '@/components/landing/security-trust';
 import { SocialProof } from '@/components/landing/social-proof';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { usePublicAppUrl } from '@/hooks/usePublicSurface';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 export default function LocaleLandingPage() {
@@ -28,7 +29,7 @@ export default function LocaleLandingPage() {
   const { t } = useTranslation('landing');
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const appUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am';
+  const appUrl = usePublicAppUrl();
 
   useEffect(() => {
     if (isAuthenticated) {
