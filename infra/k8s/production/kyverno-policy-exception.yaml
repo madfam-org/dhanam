@@ -14,6 +14,8 @@ kind: PolicyException
 metadata:
   name: dhanam-gitops-rollout-signature
   namespace: dhanam
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
   labels:
     app.kubernetes.io/part-of: galaxy-ecosystem
     app.kubernetes.io/managed-by: kustomize
@@ -23,6 +25,7 @@ spec:
       ruleNames:
         - check-signature
         - autogen-check-signature
+        - autogen-cronjob-check-signature
   match:
     any:
       - resources:
@@ -30,6 +33,8 @@ spec:
             - Deployment
             - Pod
             - ReplicaSet
+            - CronJob
+            - Job
           namespaces:
             - dhanam
           names:
