@@ -7,3 +7,8 @@ export function buildAppDemoLaunchUrl(appUrl: string, persona = 'guest'): string
   const params = new URLSearchParams({ persona });
   return `${base}/demo?${params.toString()}`;
 }
+
+/** Full-page navigation to app demo entrypoint (mockable in jsdom tests). */
+export function redirectToAppDemo(appUrl: string, persona = 'guest'): void {
+  window.location.href = buildAppDemoLaunchUrl(appUrl, persona);
+}

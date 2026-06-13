@@ -15,7 +15,7 @@ import { ProblemSolution } from '@/components/landing/problem-solution';
 import { SocialProof } from '@/components/landing/social-proof';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePublicAppUrl } from '@/hooks/usePublicSurface';
-import { buildAppDemoLaunchUrl } from '@/lib/demo/launch-demo';
+import { redirectToAppDemo } from '@/lib/demo/launch-demo';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 function HomePageContent() {
@@ -37,7 +37,7 @@ function HomePageContent() {
 
   const handleLiveDemoClick = () => {
     analytics.track('live_demo_clicked', { source: 'hero_cta' });
-    window.location.href = buildAppDemoLaunchUrl(resolvedAppUrl, 'guest');
+    redirectToAppDemo(resolvedAppUrl, 'guest');
   };
 
   const handleSignUpClick = (plan?: string) => {

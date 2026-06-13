@@ -19,7 +19,7 @@ import { SecurityTrust } from '@/components/landing/security-trust';
 import { SocialProof } from '@/components/landing/social-proof';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePublicAppUrl } from '@/hooks/usePublicSurface';
-import { buildAppDemoLaunchUrl } from '@/lib/demo/launch-demo';
+import { redirectToAppDemo } from '@/lib/demo/launch-demo';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 export default function LocaleLandingPage() {
@@ -43,7 +43,7 @@ export default function LocaleLandingPage() {
 
   const handleLiveDemoClick = () => {
     analytics.track('live_demo_clicked', { source: 'hero_cta', locale });
-    window.location.href = buildAppDemoLaunchUrl(appUrl, 'guest');
+    redirectToAppDemo(appUrl, 'guest');
   };
 
   const handleSignUpClick = (plan?: string) => {

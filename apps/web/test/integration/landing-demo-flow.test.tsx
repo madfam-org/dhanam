@@ -1,14 +1,24 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import HomePage from '@/app/page';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { authApi } from '@/lib/api/auth';
+import { redirectToAppDemo } from '@/lib/demo/launch-demo';
 import { useRouter } from 'next/navigation';
 
 // Mock dependencies
+jest.mock('@/lib/demo/launch-demo', () => ({
+  ...jest.requireActual('@/lib/demo/launch-demo'),
+  redirectToAppDemo: jest.fn(),
+}));
 jest.mock('@/lib/hooks/use-auth');
 jest.mock('@/hooks/useAnalytics');
+jest.mock('@/hooks/usePublicSurface', () => ({
+  usePublicAppUrl: () => 'https://app.dhan.am',
+  usePublicApiUrl: () => 'https://api.dhan.am/v1',
+  usePublicAdminUrl: () => 'https://admin.dhan.am',
+}));
 jest.mock('@/lib/api/auth');
 jest.mock('~/components/billing/CheckoutPaymentRecommendations', () => ({
   CheckoutPaymentRecommendations: () => null,
@@ -50,6 +60,7 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth> & {
 const mockUseAnalytics = useAnalytics as jest.MockedFunction<typeof useAnalytics>;
 const mockAuthApi = authApi as jest.Mocked<typeof authApi>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+const mockRedirectToAppDemo = redirectToAppDemo as jest.MockedFunction<typeof redirectToAppDemo>;
 
 describe('Landing Page Demo Flow', () => {
   const mockRouterPush = jest.fn();
@@ -57,22 +68,6 @@ describe('Landing Page Demo Flow', () => {
     track: jest.fn(),
     trackPageView: jest.fn(),
     identify: jest.fn(),
-  };
-
-  const mockGuestUser = {
-    id: 'guest-123',
-    email: 'guest@dhanam.demo',
-    name: 'Guest User',
-    locale: 'en' as const,
-    timezone: 'UTC',
-    emailVerified: true,
-    onboardingCompleted: true,
-  };
-
-  const mockGuestTokens = {
-    accessToken: 'guest-access-token',
-    refreshToken: 'guest-refresh-token',
-    expiresIn: 3600,
   };
 
   beforeEach(() => {
@@ -136,94 +131,34 @@ describe('Landing Page Demo Flow', () => {
   });
 
   describe('Demo Flow Interaction', () => {
-    it('should track analytics when "Try Live Demo" is clicked', async () => {
-      mockAuthApi.loginAsGuest.mockResolvedValue({
-        user: mockGuestUser,
-        tokens: mockGuestTokens,
-        message: 'Guest session created',
-      });
-
+    it('should track analytics when "Try Live Demo" is clicked', () => {
       render(<HomePage />);
 
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       fireEvent.click(demoButtons[0]!);
 
-      await waitFor(() => {
-        expect(mockAnalytics.track).toHaveBeenCalledWith('live_demo_clicked', {
-          source: 'hero_cta',
-        });
+      expect(mockAnalytics.track).toHaveBeenCalledWith('live_demo_clicked', {
+        source: 'hero_cta',
       });
     });
 
-    it('should call guest authentication API when demo button is clicked', async () => {
-      mockAuthApi.loginAsGuest.mockResolvedValue({
-        user: mockGuestUser,
-        tokens: mockGuestTokens,
-        message: 'Guest session created',
-      });
-
+    it('should redirect to app demo launch URL when demo button is clicked', () => {
       render(<HomePage />);
 
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       fireEvent.click(demoButtons[0]!);
 
-      await waitFor(() => {
-        expect(mockAuthApi.loginAsGuest).toHaveBeenCalled();
-      });
+      expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am', 'guest');
+      expect(mockAuthApi.loginAsGuest).not.toHaveBeenCalled();
     });
 
-    it('should set auth after successful guest login', async () => {
-      mockAuthApi.loginAsGuest.mockResolvedValue({
-        user: mockGuestUser,
-        tokens: mockGuestTokens,
-        message: 'Guest session created',
-      });
-
+    it('should not guest-login on marketing origin before redirect', () => {
       render(<HomePage />);
 
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       fireEvent.click(demoButtons[0]!);
 
-      // Verify auth is set (navigation happens via window.location which jsdom doesn't support)
-      await waitFor(() => {
-        expect(mockSetAuth).toHaveBeenCalledWith(mockGuestUser, mockGuestTokens);
-      });
-    });
-
-    it('should track demo session start analytics', async () => {
-      mockAuthApi.loginAsGuest.mockResolvedValue({
-        user: mockGuestUser,
-        tokens: mockGuestTokens,
-        message: 'Guest session created',
-      });
-
-      render(<HomePage />);
-
-      const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
-      fireEvent.click(demoButtons[0]!);
-
-      await waitFor(() => {
-        expect(mockAnalytics.track).toHaveBeenCalledWith('demo_session_started', {
-          userId: mockGuestUser.id,
-          expiresAt: expect.any(Date),
-        });
-      });
-    });
-
-    it('should track analytics on guest login failure', async () => {
-      mockAuthApi.loginAsGuest.mockRejectedValue(new Error('Guest login failed'));
-
-      render(<HomePage />);
-
-      const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
-      fireEvent.click(demoButtons[0]!);
-
-      // Verify failure is tracked (fallback navigation via window.location which jsdom doesn't support)
-      await waitFor(() => {
-        expect(mockAnalytics.track).toHaveBeenCalledWith('demo_session_failed', {
-          error: 'Error: Guest login failed',
-        });
-      });
+      expect(mockSetAuth).not.toHaveBeenCalled();
     });
   });
 
@@ -297,23 +232,14 @@ describe('Landing Page Demo Flow', () => {
       expect(demoButtons.length).toBeGreaterThanOrEqual(2);
     });
 
-    it('should have all demo buttons trigger the same flow', async () => {
-      mockAuthApi.loginAsGuest.mockResolvedValue({
-        user: mockGuestUser,
-        tokens: mockGuestTokens,
-        message: 'Guest session created',
-      });
-
+    it('should have all demo buttons trigger the same redirect', () => {
       render(<HomePage />);
 
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
 
-      // Click the second demo button (bottom CTA)
       fireEvent.click(demoButtons[1]!);
 
-      await waitFor(() => {
-        expect(mockAuthApi.loginAsGuest).toHaveBeenCalled();
-      });
+      expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am', 'guest');
     });
   });
 });
