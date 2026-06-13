@@ -33,4 +33,8 @@ Review output, then run without `DRY_RUN`.
 For the full procedure (Vault `kv get`, digest verification, rollback), see
 **internal-devops** `runbooks/dhanam-catalog-sync-prod.md`.
 
+For the **Voxa activation path** (GitHub Production env secrets, Enclii break-glass,
+Tulana bootstrap, WTP gates), see **internal-devops**
+`runbooks/voxa-pricing-activation-2026-06.md`.
+
 See also [Public Repo Security Remediation](../docs/PUBLIC_REPO_SECURITY_REMEDIATION.md).
