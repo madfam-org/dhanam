@@ -44,6 +44,25 @@ products:
     website: "https://app.dhan.am"
     sort_order: 1
     tiers:
+      free:
+        dhanam_tier: community
+        display_name: "Free"
+        # Acquisition funnel (Tulana 2026-06-13). Every comparable wealth/PFM app
+        # has a free entry (Lunch Money trial, Copilot trial, Monarch trial). Without
+        # one Dhanam has no top-of-funnel. Eng follow-up: entitlement gate for the
+        # 1-space / 2-sims-day / 1-bank-connection caps below.
+        prices: {}
+        metadata:
+          financial_spaces: 1
+          simulations_per_day: 2
+          bank_connections: 1
+          document_storage_mb: 100
+        features:
+          - "1 financial space"
+          - "1 bank connection (Belvo)"
+          - "2 simulations/day"
+          - "30-day cashflow forecast"
+          - "Community support"
       essentials:
         dhanam_tier: essentials
         display_name: "Essentials"
