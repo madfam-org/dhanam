@@ -1,6 +1,6 @@
 # Dhanam Tech Debt Register
 
-Last updated: 2026-06-12
+Last updated: 2026-06-13
 
 This is the current technical-debt register for Dhanam. It tracks debt that
 still affects stability, operations, development velocity, or release safety.
@@ -23,20 +23,21 @@ For execution order and milestone targets, read the
 
 ## Active Debt
 
-| ID      | Area                         | Severity | Status   | Current impact                                                                                                                                                                            | Primary reference                                                       |
-| ------- | ---------------------------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| TD-1002 | Staging activation           | Medium   | Active   | Staging API/web/admin smoke is green; remaining debt is repeated proof and Enclii-owned namespace-aware route apply.                                                                      | [Deployment Guide](DEPLOYMENT.md)                                       |
-| TD-1003 | Production rollout truth     | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth.                                                                | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)                    |
-| TD-1004 | Enclii adapter coverage      | Medium   | Active   | Migration repair, policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.                                                                    | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)                    |
-| TD-1005 | Provider health semantics    | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                                                                                             | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)                       |
-| TD-1006 | React 18 global pin          | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                                                                                         | [package.json](../package.json)                                         |
-| TD-1007 | Mobile test depth            | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                                                                                | [Mobile Guide](MOBILE.md)                                               |
-| TD-1008 | Historical docs cleanup      | Low      | Active   | Phase summaries archived under `docs/reports/historical/`; GA banners on guides; OpenAPI export script verified locally. Long-term: generate `API.md` sections from OpenAPI.              | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-22.md)                |
-| TD-1009 | Billing router unification   | Medium   | Active   | Fee-aware routing + schedule maintenance shipped in source. Remaining: production staging smoke proof and close legacy bypass audit.                                                      | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   |
-| TD-1010 | Internal POS completeness    | Medium   | Active   | Charge, refund, timeline, reconciliation, route override, fee schedule admin, SDK, and golden probe CI are source-landed. Remaining: staging Karafiel CFDI proof, DLQ drill, G2 sign-off. | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   |
-| TD-1011 | Janua commercial readiness   | High     | Active   | Janua billing secrets were present with zero length in production proof; Janua-routed billing must not be claimed live.                                                                   | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)                    |
-| TD-1012 | Public repo security hygiene | High     | Active   | ~48%: P0 + A6 + DEPLOYMENT redaction + PR checklist. AGENTS diet (P2) remains.                                                                                                            | [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) |
-| TD-1013 | MADFAM operator prod slice   | High     | Active   | ~65%: ledger + budget metadata + admin MADFAM Import UI. Belvo + prod PlatformConfig seed remain.                                                                                         | [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) |
+| ID      | Area                         | Severity | Status   | Current impact                                                                                                                                                                                       | Primary reference                                                       |
+| ------- | ---------------------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| TD-1002 | Staging activation           | Medium   | Active   | Staging API/web/admin smoke is green; remaining debt is repeated proof and Enclii-owned namespace-aware route apply.                                                                                 | [Deployment Guide](DEPLOYMENT.md)                                       |
+| TD-1003 | Production rollout truth     | High     | Active   | `production-rollout-proof.js` proves ArgoCD live digests, but Enclii `prod` records still do not own public rollout truth.                                                                           | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)                    |
+| TD-1004 | Enclii adapter coverage      | Medium   | Active   | Migration repair, policy waiver apply, staging tunnel route apply, and queue remediation adapters are not fully wired.                                                                               | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)                    |
+| TD-1005 | Provider health semantics    | Medium   | Active   | Plaid/Bitso/Banxico intentional unconfigured states need explicit operational classification.                                                                                                        | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)                       |
+| TD-1006 | React 18 global pin          | Low      | Deferred | Root pnpm overrides keep web/admin on React 18 until Expo/mobile can move safely.                                                                                                                    | [package.json](../package.json)                                         |
+| TD-1007 | Mobile test depth            | Low      | Active   | Mobile still has a small foundation test set relative to app surface area.                                                                                                                           | [Mobile Guide](MOBILE.md)                                               |
+| TD-1008 | Historical docs cleanup      | Low      | Active   | Phase summaries archived under `docs/reports/historical/`; GA banners on guides; OpenAPI export script verified locally. Long-term: generate `API.md` sections from OpenAPI.                         | [Documentation Audit](DOCUMENTATION_AUDIT_2026-05-22.md)                |
+| TD-1009 | Billing router unification   | Medium   | Active   | Fee-aware routing + schedule maintenance shipped in source. Remaining: production staging smoke proof and close legacy bypass audit.                                                                 | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   |
+| TD-1010 | Internal POS completeness    | Medium   | Active   | Charge, refund, timeline, reconciliation, route override, fee schedule admin, SDK, and golden probe CI are source-landed. Remaining: staging Karafiel CFDI proof, DLQ drill, G2 sign-off.            | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                   |
+| TD-1011 | Janua commercial readiness   | High     | Active   | Janua billing secrets were present with zero length in production proof; Janua-routed billing must not be claimed live.                                                                              | [Stability Wrap-Up](STABILITY_WRAP_UP_2026-05-20.md)                    |
+| TD-1012 | Public repo security hygiene | High     | Active   | ~48%: P0 + A6 + DEPLOYMENT redaction + PR checklist. AGENTS diet (P2) remains.                                                                                                                       | [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md) |
+| TD-1013 | MADFAM operator prod slice   | High     | Active   | ~65%: ledger + budget metadata + admin MADFAM Import UI. Belvo + prod PlatformConfig seed remain.                                                                                                    | [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) |
+| TD-1014 | Production catalog sync ops  | High     | Active   | GitHub Production environment lacks `DATABASE_URL`/Stripe secrets; live catalog drift (e.g. missing `voxa`) until `sync-catalog.ts` runs. Weekly drift workflow + hardened operator runbook shipped. | [Catalog Truth](CATALOG_TRUTH_2026-05-20.md)                            |
 
 ## Remediation Notes
 
@@ -203,6 +204,19 @@ Phase summaries (`PHASE2-SUMMARY`, `IMPLEMENTATION_SUMMARY`, `PHASE3-PLAN`),
 dogfooding quick wins, audit summary, and `architecture/IMPLEMENTATION_PROGRESS`
 now live under `docs/reports/historical/` with GA-linked banners. Remaining
 low-priority work: long-term `API.md` generation from OpenAPI export.
+
+### TD-1014: Production Catalog Sync Ops
+
+Close this by configuring GitHub **Production** environment secrets from Enclii
+Lockbox (`DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_MX_SECRET_KEY`), then:
+
+1. Run **Sync production catalog** with `dry_run=false`.
+2. Confirm `pnpm catalog:drift -- --json` returns `"ok": true`.
+3. Keep the weekly **Production catalog drift** workflow green.
+
+Production API now sets `DHANAM_PUBLIC_CATALOG_SOURCE=db` so public catalog and
+checkout share one reconciled store. Image-only `catalog.yaml` updates without
+DB sync will not surface new products (e.g. `voxa`).
 
 ## Recently Closed Debt
 

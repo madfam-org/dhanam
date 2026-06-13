@@ -96,6 +96,10 @@ spec:
             # this var becomes load-bearing.
             - name: WEB_URL
               value: "https://app.dhan.am"
+            # Public GET /billing/catalog reads the DB catalog populated by
+            # scripts/sync-catalog.ts. Keeps checkout and public API aligned.
+            - name: DHANAM_PUBLIC_CATALOG_SOURCE
+              value: "db"
 
             # =================================================================
             # Janua OIDC (Galaxy Ecosystem Authentication)

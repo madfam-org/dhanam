@@ -1,7 +1,9 @@
-# Break-glass: hard-refresh the production ArgoCD Application after a prod
-# digest promotion so GitOps reconciles without waiting for the poll interval.
+# Break-glass only: hard-refresh the production ArgoCD Application.
 #
-# Requires repo secret KUBECONFIG_PRODUCTION (same as deploy-staging digest proof).
+# Prefer the best-effort refresh in promote-to-prod.yml after digest promotion.
+# Routine reconciliation is Enclii-first; record an adapter gap when this path is used.
+#
+# Requires repo secret KUBECONFIG_PRODUCTION (often unreachable from GitHub-hosted runners).
 
 name: Refresh production ArgoCD
 
