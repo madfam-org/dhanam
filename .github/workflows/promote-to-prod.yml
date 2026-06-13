@@ -10,6 +10,11 @@
 # .enclii.yml declares `promotion.pattern: manual`, and the repo variable
 # AUTO_PROMOTE_ENABLED defaults to "false". To enable auto-promote in the
 # future, flip the repo variable + update .enclii.yml.
+#
+# IMPORTANT: web and admin bake NEXT_PUBLIC_* at build time. Promoting the
+# staging web/admin digest would leak staging hostnames on prod domains.
+# This workflow rebuilds web/admin with production build-args; only API
+# reuses the staging digest pointer.
 
 name: Promote staging -> prod
 
@@ -52,6 +57,11 @@ concurrency:
   group: prod-promote
   cancel-in-progress: false
 
+env:
+  REGISTRY: ghcr.io
+  WEB_IMAGE: madfam-org/dhanam/web
+  ADMIN_IMAGE: madfam-org/dhanam/admin
+
 jobs:
   validate:
     name: Validate promotion candidate(s)
@@ -67,6 +77,8 @@ jobs:
       admin_digest: ${{ steps.resolve.outputs.admin_digest }}
       short: ${{ steps.resolve.outputs.short }}
       reason: ${{ steps.resolve.outputs.reason }}
+      build_web: ${{ steps.resolve.outputs.build_web }}
+      build_admin: ${{ steps.resolve.outputs.build_admin }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -242,17 +254,31 @@ jobs:
             REASON="${REASON}; smoke-run=${INPUT_STAGING_SMOKE_RUN_ID}"
           }
 
+          verify_staging_promote_candidate() {
+            resolve_one "$1" >/dev/null
+          }
+
           API_D=""
           WEB_D=""
           ADMIN_D=""
+          BUILD_WEB=false
+          BUILD_ADMIN=false
           case "$COMPONENT" in
             api)   API_D=$(resolve_one api) ;;
-            web)   WEB_D=$(resolve_one web) ;;
-            admin) ADMIN_D=$(resolve_one admin) ;;
+            web)
+              verify_staging_promote_candidate web
+              BUILD_WEB=true
+              ;;
+            admin)
+              verify_staging_promote_candidate admin
+              BUILD_ADMIN=true
+              ;;
             all)
               API_D=$(resolve_one api)
-              WEB_D=$(resolve_one web)
-              ADMIN_D=$(resolve_one admin)
+              verify_staging_promote_candidate web
+              verify_staging_promote_candidate admin
+              BUILD_WEB=true
+              BUILD_ADMIN=true
               ;;
             *)
               echo "::error::Unknown component $COMPONENT"; exit 1 ;;
@@ -265,15 +291,114 @@ jobs:
             echo "api_digest=$API_D"
             echo "web_digest=$WEB_D"
             echo "admin_digest=$ADMIN_D"
+            echo "build_web=$BUILD_WEB"
+            echo "build_admin=$BUILD_ADMIN"
             echo "short=$SHORT"
             echo "reason=$REASON"
             echo "should_promote=true"
           } >> "$GITHUB_OUTPUT"
 
+  build-prod-web:
+    name: Build production web image
+    needs: validate
+    if: needs.validate.outputs.should_promote == 'true' && needs.validate.outputs.build_web == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
+      - id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - id: push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE }}:prod-${{ steps.sha.outputs.short }}
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.dhan.am/v1
+            NEXT_PUBLIC_BASE_URL=https://app.dhan.am
+            NEXT_PUBLIC_ADMIN_URL=https://admin.dhan.am
+            NEXT_PUBLIC_OIDC_ISSUER=https://auth.madfam.io
+            NEXT_PUBLIC_OIDC_CLIENT_ID=${{ vars.NEXT_PUBLIC_OIDC_CLIENT_ID || 'jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t' }}
+            NEXT_PUBLIC_JANUA_API_URL=https://auth.madfam.io
+          secrets: |
+            npm_madfam_token=${{ secrets.NPM_MADFAM_TOKEN }}
+          cache-from: type=gha,scope=web-prod
+          cache-to: type=gha,scope=web-prod,mode=max
+      - name: Sign production web image
+        if: steps.push.outcome == 'success'
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.WEB_IMAGE }}@${{ steps.push.outputs.digest }}
+
+  build-prod-admin:
+    name: Build production admin image
+    needs: validate
+    if: needs.validate.outputs.should_promote == 'true' && needs.validate.outputs.build_admin == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
+      - id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+      - id: push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/admin/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.ADMIN_IMAGE }}:prod-${{ steps.sha.outputs.short }}
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.dhan.am/v1
+            NEXT_PUBLIC_APP_URL=https://app.dhan.am
+            NEXT_PUBLIC_OIDC_ISSUER=https://auth.madfam.io
+          cache-from: type=gha,scope=admin-prod
+          cache-to: type=gha,scope=admin-prod,mode=max
+      - name: Sign production admin image
+        if: steps.push.outcome == 'success'
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.ADMIN_IMAGE }}@${{ steps.push.outputs.digest }}
+
   promote:
     name: Write prod kustomization
-    needs: validate
-    if: needs.validate.outputs.should_promote == 'true'
+    needs: [validate, build-prod-web, build-prod-admin]
+    if: |
+      always() &&
+      needs.validate.outputs.should_promote == 'true' &&
+      (needs.build-prod-web.result == 'success' || needs.build-prod-web.result == 'skipped') &&
+      (needs.build-prod-admin.result == 'success' || needs.build-prod-admin.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -285,8 +410,8 @@ jobs:
       - name: Patch prod kustomization digests
         env:
           API_DIGEST: ${{ needs.validate.outputs.api_digest }}
-          WEB_DIGEST: ${{ needs.validate.outputs.web_digest }}
-          ADMIN_DIGEST: ${{ needs.validate.outputs.admin_digest }}
+          WEB_DIGEST: ${{ needs.build-prod-web.outputs.digest }}
+          ADMIN_DIGEST: ${{ needs.build-prod-admin.outputs.digest }}
           SHORT: ${{ needs.validate.outputs.short }}
           REASON: ${{ needs.validate.outputs.reason }}
           ACTOR: ${{ github.actor }}
@@ -332,7 +457,8 @@ jobs:
           git commit -m "deploy(prod): promote $SHORT
 
           Reason: $REASON
-          Promoted-by: $ACTOR" || {
+          Promoted-by: $ACTOR
+          Note: web/admin digests are prod-rebuilt (NEXT_PUBLIC_*); api may reuse staging digest." || {
             echo "No digest change — already at target"
             exit 0
           }
@@ -378,8 +504,8 @@ jobs:
         env:
           PROMOTE_REASON: ${{ needs.validate.outputs.reason }}
           API_DIGEST: ${{ needs.validate.outputs.api_digest }}
-          WEB_DIGEST: ${{ needs.validate.outputs.web_digest }}
-          ADMIN_DIGEST: ${{ needs.validate.outputs.admin_digest }}
+          WEB_DIGEST: ${{ needs.build-prod-web.outputs.digest }}
+          ADMIN_DIGEST: ${{ needs.build-prod-admin.outputs.digest }}
         run: |
           set -euo pipefail
           if [ -z "${{ secrets.ENCLII_CALLBACK_TOKEN }}" ]; then

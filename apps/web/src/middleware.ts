@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import { AUTH_CONSTANTS } from './lib/constants';
+import { buildContentSecurityPolicy } from './lib/routing/csp';
 import { getHostnameFromHostHeader, getWwwApexRedirectUrl } from './lib/routing/hosts';
+import { resolvePublicAdminUrl, resolvePublicAppUrl } from './lib/routing/public-surface';
 
 // Paths that don't require authentication
 const publicPaths = [
@@ -53,6 +55,14 @@ function getLocaleFromCountry(country: string | null): string {
   return COUNTRY_LOCALE[country.toUpperCase()] || 'es';
 }
 
+function withPublicSurfaceHeaders(response: NextResponse, hostname: string): NextResponse {
+  response.headers.set(
+    'Content-Security-Policy',
+    buildContentSecurityPolicy(hostname, process.env.NEXT_PUBLIC_API_URL)
+  );
+  return response;
+}
+
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const hostHeader =
@@ -75,23 +85,32 @@ export function middleware(request: NextRequest) {
       if (token) {
         return NextResponse.redirect(new URL('/dashboard', request.url));
       }
-      const appUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am';
-      return NextResponse.redirect(new URL(`/login?from=https://admin.dhan.am`, appUrl));
+      const appUrl = resolvePublicAppUrl(hostname, process.env.NEXT_PUBLIC_BASE_URL);
+      return withPublicSurfaceHeaders(
+        NextResponse.redirect(new URL(`/login?from=https://admin.dhan.am`, appUrl)),
+        hostname
+      );
     }
 
     // Unauthenticated users on admin subdomain → redirect to app login
     const isPublicPath = publicPaths.some((p) => path.startsWith(p));
     if (!token && !isPublicPath) {
-      const appUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am';
-      return NextResponse.redirect(new URL(`/login?from=https://admin.dhan.am${path}`, appUrl));
+      const appUrl = resolvePublicAppUrl(hostname, process.env.NEXT_PUBLIC_BASE_URL);
+      return withPublicSurfaceHeaders(
+        NextResponse.redirect(new URL(`/login?from=https://admin.dhan.am${path}`, appUrl)),
+        hostname
+      );
     }
 
     // Rewrite admin subdomain paths to internal /admin/* routes
     if (adminPages.some((p) => path === p || path.startsWith(p + '/'))) {
-      return NextResponse.rewrite(new URL(`/admin${path}`, request.url));
+      return withPublicSurfaceHeaders(
+        NextResponse.rewrite(new URL(`/admin${path}`, request.url)),
+        hostname
+      );
     }
 
-    return NextResponse.next();
+    return withPublicSurfaceHeaders(NextResponse.next(), hostname);
   }
 
   // === REDIRECT /dashboard/<subpath> to /<subpath> ===
@@ -104,9 +123,9 @@ export function middleware(request: NextRequest) {
 
   // === REDIRECT OLD /admin PATHS TO ADMIN SUBDOMAIN ===
   if (path.startsWith('/admin')) {
-    const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.dhan.am';
+    const adminUrl = resolvePublicAdminUrl(hostname, process.env.NEXT_PUBLIC_ADMIN_URL);
     const newPath = path.replace(/^\/admin/, '') || '/';
-    return NextResponse.redirect(new URL(newPath, adminUrl));
+    return withPublicSurfaceHeaders(NextResponse.redirect(new URL(newPath, adminUrl)), hostname);
   }
 
   // === DEMO MODE HANDLING ===
@@ -118,7 +137,7 @@ export function middleware(request: NextRequest) {
       maxAge: AUTH_CONSTANTS.DEMO_COOKIE_MAX_AGE_S,
       sameSite: 'lax',
     });
-    return response;
+    return withPublicSurfaceHeaders(response, hostname);
   }
 
   // === GEO DETECTION (for all routes) ===
@@ -182,7 +201,7 @@ export function middleware(request: NextRequest) {
           sameSite: 'lax',
         });
       }
-      return rewrite;
+      return withPublicSurfaceHeaders(rewrite, hostname);
     }
   }
 
@@ -197,7 +216,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
       }
     }
-    return response;
+    return withPublicSurfaceHeaders(response, hostname);
   }
 
   const isPublicPath = publicPaths.some((p) => path.startsWith(p));
@@ -214,7 +233,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return response;
+  return withPublicSurfaceHeaders(response, hostname);
 }
 
 export const config = {

@@ -60,6 +60,31 @@ check_redirect() {
   echo "REDIR OK   $url -> $location"
 }
 
+check_prod_public_surface() {
+  local url="$1"
+  local html
+  local csp
+
+  html="$(curl -LsS --max-time 20 "$url" || true)"
+  if [[ -z "$html" ]]; then
+    echo "SURFACE FAIL $url empty response body"
+    return 1
+  fi
+
+  if echo "$html" | grep -q 'staging\.dhan\.am'; then
+    echo "SURFACE FAIL $url HTML references staging.dhan.am"
+    return 1
+  fi
+
+  csp="$(curl -sSI --max-time 20 "$url" | awk 'BEGIN{IGNORECASE=1} /^content-security-policy:/ {sub(/^content-security-policy:[[:space:]]*/i, ""); sub(/\r$/, ""); print; exit}')"
+  if [[ -n "$csp" && "$csp" == *staging-api.dhan.am* ]]; then
+    echo "SURFACE FAIL $url CSP connect-src still allows staging-api.dhan.am"
+    return 1
+  fi
+
+  echo "SURFACE OK $url"
+}
+
 prod_hosts=(dhan.am www.dhan.am app.dhan.am admin.dhan.am api.dhan.am)
 for host in "${prod_hosts[@]}"; do
   check_dns "$host"
@@ -70,6 +95,8 @@ check_http "https://app.dhan.am/api/health"
 check_http "https://admin.dhan.am/api/health"
 check_http "https://dhan.am/"
 check_redirect "https://www.dhan.am/" "https://dhan.am/"
+check_prod_public_surface "https://dhan.am/es"
+check_prod_public_surface "https://app.dhan.am/login"
 
 if [[ "$include_staging" == true ]]; then
   staging_hosts=(staging.dhan.am staging-api.dhan.am staging-admin.dhan.am)

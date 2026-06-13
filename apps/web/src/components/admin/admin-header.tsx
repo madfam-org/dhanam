@@ -3,21 +3,21 @@
 import { Button } from '@dhanam/ui';
 import { Shield, LogOut, Home } from 'lucide-react';
 
+import { usePublicAppUrl } from '~/hooks/usePublicSurface';
 import { useAuth } from '~/lib/hooks/use-auth';
 
 export function AdminHeader() {
   const { user, logout } = useAuth();
+  const appUrl = usePublicAppUrl();
 
   const handleLogout = async () => {
     await logout();
     // Redirect to app subdomain login after logout for cross-subdomain consistency
-    const appUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am';
     window.location.href = `${appUrl}/login`;
   };
 
   const handleBackToDashboard = () => {
     // Navigate to app subdomain dashboard for cross-subdomain navigation
-    const appUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://app.dhan.am';
     window.location.href = `${appUrl}/dashboard`;
   };
 
