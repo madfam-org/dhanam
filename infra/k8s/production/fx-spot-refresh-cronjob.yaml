@@ -3,6 +3,8 @@ kind: CronJob
 metadata:
   name: dhanam-fx-spot-refresh
   namespace: dhanam
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     app: dhanam-fx-spot-refresh
     app.kubernetes.io/component: scheduled-job

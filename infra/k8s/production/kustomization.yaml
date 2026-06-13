@@ -6,10 +6,7 @@ resources:
 - api-deployment.yaml
 - admin-deployment.yaml
 - web-deployment.yaml
-# Deferred: fx-spot-refresh CronJob blocks Argo sync (Kyverno GHCR pull for
-# signature verify on private api image). Re-enable after ghcr-credentials or
-# PolicyException ordering is proven — see TD-1003 / #506 follow-up.
-# - fx-spot-refresh-cronjob.yaml
+- fx-spot-refresh-cronjob.yaml
 - kyverno-policy-exception.yaml
 - external-secret.yaml
 - external-secret-janua.yaml
