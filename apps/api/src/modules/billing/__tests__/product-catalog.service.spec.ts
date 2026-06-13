@@ -162,7 +162,7 @@ describe('ProductCatalogService', () => {
       expect(catalog).toHaveLength(27);
       expect(catalog.find((product) => product.slug === 'enclii')).toBeDefined();
       expect(catalog.find((product) => product.slug === 'voxa')).toBeDefined();
-      expect(catalog.find((product) => product.slug === 'dhanam')?.tiers).toHaveLength(3);
+      expect(catalog.find((product) => product.slug === 'dhanam')?.tiers).toHaveLength(4);
       expect(catalog.find((product) => product.slug === 'primavera3d')).toBeUndefined();
       expect(catalog.find((product) => product.slug === 'sim4d')).toBeUndefined();
       expect(prisma.product.findMany).not.toHaveBeenCalled();
