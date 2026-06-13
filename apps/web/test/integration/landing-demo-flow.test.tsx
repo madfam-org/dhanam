@@ -10,6 +10,9 @@ import { useRouter } from 'next/navigation';
 jest.mock('@/lib/hooks/use-auth');
 jest.mock('@/hooks/useAnalytics');
 jest.mock('@/lib/api/auth');
+jest.mock('~/components/billing/CheckoutPaymentRecommendations', () => ({
+  CheckoutPaymentRecommendations: () => null,
+}));
 jest.mock('@dhanam/shared', () => {
   const React = require('react');
   // eslint-disable-next-line @typescript-eslint/no-var-requires

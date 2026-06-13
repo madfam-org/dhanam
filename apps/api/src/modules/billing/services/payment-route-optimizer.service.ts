@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
 import {
   estimateProcessingFeeMinor,
   PaymentInstrumentId,
   RoutableCheckoutProvider,
   scheduleAppliesToCountry,
 } from '../config/payment-route-fee-schedule';
+import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
 
 import type { CheckoutRouteProvider } from './checkout-routing-policy.service';
 import { PaymentRouteFeeScheduleService } from './payment-route-fee-schedule.service';

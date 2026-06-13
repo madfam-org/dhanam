@@ -9,6 +9,7 @@ import { AuditService } from '@core/audit/audit.service';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { BillingService, type OperatorCheckoutStatus } from '@modules/billing/billing.service';
+import { parseFeeScheduleEntries } from '@modules/billing/config/payment-route-fee-schedule';
 import {
   CheckoutRouteOverrideService,
   type StoredRouteOverride,
@@ -24,7 +25,6 @@ import type {
   PosTimelineEntry,
 } from '@modules/billing/services/internal-pos.service';
 import { PaymentRouteFeeScheduleService } from '@modules/billing/services/payment-route-fee-schedule.service';
-import { parseFeeScheduleEntries } from '@modules/billing/config/payment-route-fee-schedule';
 
 import {
   AdminPosChargeDto,

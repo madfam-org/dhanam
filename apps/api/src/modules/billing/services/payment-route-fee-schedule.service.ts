@@ -1,9 +1,10 @@
-import { Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-import { PlatformConfigService } from '../../platform-config/platform-config.service';
+import { Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
+
 import { BILLING_ROUTE_FEE_SCHEDULE_KEY } from '../../platform-config/platform-config.keys';
+import { PlatformConfigService } from '../../platform-config/platform-config.service';
 import {
   type FeeScheduleEntry,
   type FeeScheduleFile,

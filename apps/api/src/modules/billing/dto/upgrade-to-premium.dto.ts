@@ -1,5 +1,5 @@
-import { IsOptional, IsString, Matches } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional, IsString, Matches } from 'class-validator';
 
 export class UpgradeToPremiumDto {
   @IsOptional()

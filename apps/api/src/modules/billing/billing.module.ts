@@ -60,14 +60,14 @@ import { MadfamEventsController } from './madfam-events.controller';
 import { CancellationService } from './services/cancellation.service';
 import { CheckoutRouteOverrideService } from './services/checkout-route-override.service';
 import { CheckoutRoutingPolicyService } from './services/checkout-routing-policy.service';
-import { PaymentRouteOptimizerService } from './services/payment-route-optimizer.service';
-import { PaymentRouteFeeScheduleService } from './services/payment-route-fee-schedule.service';
 import { ConektaService } from './services/conekta.service';
 import { CustomerFederationService } from './services/customer-federation.service';
 // Hybrid Router Services (Stripe MX + Paddle)
 import { InternalPosService } from './services/internal-pos.service';
 import { OperatorCheckoutStatusService } from './services/operator-checkout-status.service';
 import { PaddleService } from './services/paddle.service';
+import { PaymentRouteFeeScheduleService } from './services/payment-route-fee-schedule.service';
+import { PaymentRouteOptimizerService } from './services/payment-route-optimizer.service';
 import { PaymentRouterService } from './services/payment-router.service';
 import { PhyndCrmEngagementNotifierService } from './services/phyndcrm-engagement-notifier.service';
 import { PriceResolverService } from './services/price-resolver.service';

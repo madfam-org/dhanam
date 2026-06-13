@@ -1,13 +1,13 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import type { PaymentInstrumentId } from '../config/payment-route-fee-schedule';
 import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
 
 import { CheckoutRouteOverrideService } from './checkout-route-override.service';
 import { PaymentRouteOptimizerService } from './payment-route-optimizer.service';
 import { PaymentRouterService } from './payment-router.service';
 import { PriceResolverService } from './price-resolver.service';
-import type { PaymentInstrumentId } from '../config/payment-route-fee-schedule';
 
 /** Canonical checkout route targets exposed to operators and audit logs. */
 export type CheckoutRouteProvider = 'janua' | 'stripe_mx' | 'paddle' | 'legacy_stripe';
