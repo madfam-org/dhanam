@@ -1299,8 +1299,8 @@ products:
         # Tulana v0.1 anchor (2026-06-12): 0.8× AAC sub median ≈177 MXN;
         # operator value-anchored at 199 MXN (Tezca Essentials peer).
         prices:
-          USD: { monthly: 1176, annual: 11176 }
-          MXN: { monthly: 19900, annual: 189900 }
+          USD: { monthly: 1176, yearly: 11176 }
+          MXN: { monthly: 19900, yearly: 189900 }
         metadata:
           boards: 10
           team_seats: 3

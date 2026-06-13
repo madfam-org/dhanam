@@ -23,7 +23,7 @@ interface YamlTier {
   dhanam_tier: string;
   display_name?: string;
   description?: string;
-  prices: Record<string, { monthly?: number; yearly?: number }>;
+  prices: Record<string, { monthly?: number; yearly?: number; annual?: number }>;
   metadata?: Record<string, unknown>;
   features?: string[];
 }
@@ -49,6 +49,29 @@ function featureSlug(feature: string): string {
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_|_$/g, '')
     .slice(0, 80);
+}
+
+function normalizeBillingInterval(interval: string): 'monthly' | 'yearly' {
+  if (interval === 'annual') {
+    return 'yearly';
+  }
+  if (interval === 'monthly' || interval === 'yearly') {
+    return interval;
+  }
+  throw new Error(`Unsupported billing interval in catalog.yaml: ${interval}`);
+}
+
+function priceAmountForInterval(
+  prices: { monthly?: number; yearly?: number; annual?: number },
+  interval: string
+): number | undefined {
+  if (interval === 'monthly') {
+    return prices.monthly;
+  }
+  if (interval === 'yearly' || interval === 'annual') {
+    return prices.yearly ?? prices.annual;
+  }
+  return undefined;
 }
 
 export async function seedCatalogForE2E(prisma: PrismaService): Promise<void> {
@@ -108,10 +131,13 @@ export async function seedCatalogForE2E(prisma: PrismaService): Promise<void> {
       });
 
       for (const [currency, prices] of Object.entries(tierConfig.prices ?? {})) {
-        for (const [interval, amount] of Object.entries(prices)) {
+        for (const intervalKey of ['monthly', 'yearly'] as const) {
+          const amount = priceAmountForInterval(prices, intervalKey);
           if (!amount || amount === 0) {
             continue;
           }
+
+          const interval = normalizeBillingInterval(intervalKey);
 
           await prisma.productPrice.upsert({
             where: {
@@ -119,7 +145,7 @@ export async function seedCatalogForE2E(prisma: PrismaService): Promise<void> {
                 productId: product.id,
                 tierSlug,
                 currency,
-                interval: interval as any,
+                interval,
               },
             },
             create: {
@@ -127,7 +153,7 @@ export async function seedCatalogForE2E(prisma: PrismaService): Promise<void> {
               tierSlug,
               dhanamTier: tierConfig.dhanam_tier as any,
               currency,
-              interval: interval as any,
+              interval,
               amountCents: amount,
               displayName: tierConfig.display_name,
               metadata: tierConfig.metadata as any,

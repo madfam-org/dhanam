@@ -48,7 +48,10 @@ interface YamlTier {
   display_name?: string;
   description?: string;
   metadata?: Record<string, unknown>;
-  prices?: Record<string, { monthly?: number | null; yearly?: number | null }>;
+  prices?: Record<
+    string,
+    { monthly?: number | null; yearly?: number | null; annual?: number | null }
+  >;
   features?: string[];
 }
 
@@ -586,7 +589,7 @@ export class ProductCatalogService {
             currency,
             {
               monthly: price.monthly ?? null,
-              yearly: price.yearly ?? null,
+              yearly: price.yearly ?? price.annual ?? null,
             },
           ])
         ) as CatalogProduct['tiers'][number]['prices'],
