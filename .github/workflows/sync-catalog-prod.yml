@@ -34,7 +34,11 @@ concurrency:
 jobs:
   sync:
     name: sync-catalog.ts
-    runs-on: ubuntu-latest
+    # The prod DB is only reachable in-cluster (postgres.data.svc.cluster.local),
+    # so run on the self-hosted ARC runner when bootstrapped; GitHub-hosted
+    # runners cannot resolve cluster DNS. Falls back to ubuntu-latest pre-ARC
+    # (dry-run still works there; live sync requires the in-cluster runner).
+    runs-on: ${{ vars.ARC_BOOTSTRAP_COMPLETE == 'true' && 'madfam-runners-blue' || 'ubuntu-latest' }}
     environment: Production
     steps:
       - uses: actions/checkout@v4
