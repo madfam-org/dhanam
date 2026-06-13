@@ -6,7 +6,7 @@ import type { FeeScheduleFile } from '../config/payment-route-fee-schedule';
 
 describe('PaymentRouteFeeScheduleService', () => {
   const bundled: FeeScheduleFile = JSON.parse(
-    readFileSync(join(__dirname, '..', 'config', 'payment-route-fee-schedule.json'), 'utf8')
+    readFileSync(join(__dirname, '..', 'config', 'payment-route-fee-schedule.bundled.json'), 'utf8')
   );
 
   it('loads bundled schedule on reload when no platform override exists', async () => {

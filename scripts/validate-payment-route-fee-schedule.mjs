@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Validates apps/api/src/modules/billing/config/payment-route-fee-schedule.json
+ * Validates apps/api/src/modules/billing/config/payment-route-fee-schedule.bundled.json
  * Run: node scripts/validate-payment-route-fee-schedule.mjs
  */
 
@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const schedulePath = join(
   __dirname,
-  '../apps/api/src/modules/billing/config/payment-route-fee-schedule.json'
+  '../apps/api/src/modules/billing/config/payment-route-fee-schedule.bundled.json'
 );
 
 const VALID_PROVIDERS = new Set(['stripe_mx', 'paddle', 'legacy_stripe', 'conekta']);
@@ -106,5 +106,5 @@ if (entries.length === 0) {
 }
 
 console.log(
-  `✅ payment-route-fee-schedule.json valid (v${parsed.version}, ${entries.length} entries)`
+  `✅ payment-route-fee-schedule.bundled.json valid (v${parsed.version}, ${entries.length} entries)`
 );

@@ -101,7 +101,7 @@ export class PaymentRouteFeeScheduleService implements OnModuleInit {
   }
 
   private loadFileSchedule(): FeeScheduleFile {
-    const filePath = join(__dirname, '..', 'config', 'payment-route-fee-schedule.json');
+    const filePath = join(__dirname, '..', 'config', 'payment-route-fee-schedule.bundled.json');
     const raw = readFileSync(filePath, 'utf8');
     const parsed = JSON.parse(raw) as FeeScheduleFile;
     validateFeeScheduleEntries(parsed.entries);

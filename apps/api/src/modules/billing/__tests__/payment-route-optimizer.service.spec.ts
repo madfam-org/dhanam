@@ -12,7 +12,7 @@ describe('PaymentRouteOptimizerService', () => {
   let service: PaymentRouteOptimizerService;
 
   const bundled: FeeScheduleFile = JSON.parse(
-    readFileSync(join(__dirname, '..', 'config', 'payment-route-fee-schedule.json'), 'utf8')
+    readFileSync(join(__dirname, '..', 'config', 'payment-route-fee-schedule.bundled.json'), 'utf8')
   );
 
   beforeEach(async () => {
