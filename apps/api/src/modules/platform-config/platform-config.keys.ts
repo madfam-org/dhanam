@@ -13,6 +13,9 @@ export type MadfamImportConfigKey =
 
 export const MADFAM_IMPORT_KEY_PREFIX = 'madfam.import.';
 
+/** JSON fee schedule override for checkout route optimizer (admin-maintained). */
+export const BILLING_ROUTE_FEE_SCHEDULE_KEY = 'billing.route_fee_schedule';
+
 /** Map platform_config keys → import script env vars (env wins when already set). */
 export const MADFAM_IMPORT_ENV_MAP: Record<MadfamImportConfigKey, string> = {
   [MADFAM_IMPORT_CONFIG_KEYS.businessRfc]: 'MADFAM_BUSINESS_RFC',

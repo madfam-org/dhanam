@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsInt, IsOptional, IsString, Length, Matches, Min } from 'class-validator';
+import { IsIn, IsInt, IsArray, IsOptional, IsString, Length, Matches, Min } from 'class-validator';
 
 export class AdminPosChargeDto {
   @ApiProperty({ description: 'Dhanam user id to charge' })
@@ -98,6 +98,17 @@ export class AdminRoutePreviewDto {
   @IsOptional()
   @IsIn(['janua', 'stripe_mx', 'paddle', 'legacy_stripe'])
   providerOverride?: 'janua' | 'stripe_mx' | 'paddle' | 'legacy_stripe';
+
+  @ApiPropertyOptional({ description: 'Amount in minor units for fee-aware routing preview' })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  amountMinor?: number;
+
+  @ApiPropertyOptional({ description: 'Preferred payment instrument for fee ranking' })
+  @IsOptional()
+  @IsIn(['card', 'spei', 'customer_balance', 'oxxo', 'paypal', 'apple_pay', 'google_pay'])
+  paymentMethod?: string;
 }
 
 export class AdminRouteOverrideDto {
@@ -149,4 +160,15 @@ export class AdminRouteOverrideClearDto {
   @IsString()
   @Length(1, 256)
   reason?: string;
+}
+
+export class AdminRouteFeeScheduleUpsertDto {
+  @ApiProperty({ description: 'Schedule version label', example: '2026-06-12' })
+  @IsString()
+  @Length(1, 64)
+  version!: string;
+
+  @ApiProperty({ description: 'Fee schedule entries (validated server-side)' })
+  @IsArray()
+  entries!: unknown[];
 }

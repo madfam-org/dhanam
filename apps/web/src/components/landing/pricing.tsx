@@ -5,6 +5,7 @@ import { Button } from '@dhanam/ui';
 import { CheckCircle, Sparkles, Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { CheckoutPaymentRecommendations } from '~/components/billing/CheckoutPaymentRecommendations';
 import { billingApi, PricingResponse } from '~/lib/api/billing';
 
 interface PricingProps {
@@ -27,6 +28,7 @@ function formatPrice(amount: number, currency: string): string {
 export function Pricing({ onSignUpClick }: PricingProps) {
   const { t } = useTranslation('landing');
   const [pricing, setPricing] = useState<PricingResponse | null>(null);
+  const [geoCountry, setGeoCountry] = useState<string | undefined>();
 
   useEffect(() => {
     // Try to detect country from cookie or default to MX (LATAM-first; MXN is the
@@ -36,6 +38,8 @@ export function Pricing({ onSignUpClick }: PricingProps) {
       .split('; ')
       .find((c) => c.startsWith('dhanam_geo='))
       ?.split('=')[1];
+
+    setGeoCountry(geoCookie?.toUpperCase() || 'MX');
 
     billingApi
       .getPricing(geoCookie || undefined)
@@ -77,6 +81,11 @@ export function Pricing({ onSignUpClick }: PricingProps) {
   ];
   const trial = pricing?.trial || { daysWithoutCC: 14, daysWithCC: 30, promoMonths: 3 };
   const hasPromo = tiers.some((t) => t.promoPrice !== null);
+  const recommendedTier = tiers.find((t) => t.id === 'copilot_pro' || t.id === 'pro') ?? tiers[1];
+  const recommendationPlan = recommendedTier?.id === 'copilot_pro' ? 'copilot_pro' : 'pro';
+  const recommendationAmountMinor = recommendedTier
+    ? Math.round((recommendedTier.promoPrice ?? recommendedTier.monthlyPrice) * 100)
+    : undefined;
 
   return (
     <section className="container mx-auto px-6 py-16" id="pricing">
@@ -173,6 +182,16 @@ export function Pricing({ onSignUpClick }: PricingProps) {
               </div>
             );
           })}
+        </div>
+
+        <div className="max-w-2xl mx-auto mt-8">
+          <CheckoutPaymentRecommendations
+            countryCode={geoCountry}
+            plan={recommendationPlan}
+            amountMinor={recommendationAmountMinor}
+            currency={recommendedTier?.currency ?? pricing?.currency ?? 'MXN'}
+            variant="compact"
+          />
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-6">

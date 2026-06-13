@@ -25,6 +25,9 @@ export function buildCheckoutRoutingContext(
     orgId: options.orgId,
     source: options.source,
     operatorId: options.operatorId,
+    paymentMethod: options.paymentMethod as CheckoutRoutingContext['paymentMethod'],
+    amountMinor: options.amountMinor,
+    currency: options.currency?.toUpperCase(),
   };
 }
 

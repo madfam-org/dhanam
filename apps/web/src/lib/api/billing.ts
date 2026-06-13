@@ -59,6 +59,32 @@ export interface UpgradeResponse {
   provider: string;
 }
 
+export interface CheckoutInstrumentSuggestion {
+  paymentMethod: string;
+  label: string;
+  provider: string;
+  merchantFeeMinor: number;
+  totalEconomicCostMinor: number;
+  recommended: boolean;
+  savingsVsWorstMinor: number;
+}
+
+export interface CheckoutRouteRecommendation {
+  provider: string;
+  routeReason: string;
+  countryCode: string;
+  currency: string;
+  amountMinor: number;
+  paymentMethods: string[];
+  feeOptimization?: {
+    merchantFeeMinor: number;
+    totalEconomicCostMinor: number;
+    savingsVsCardMinor: number | null;
+    recommendedPaymentMethod: string;
+    instrumentSuggestions: CheckoutInstrumentSuggestion[];
+  } | null;
+}
+
 export const billingApi = {
   /**
    * Get current usage metrics for the authenticated user
@@ -90,6 +116,7 @@ export const billingApi = {
     successUrl?: string;
     cancelUrl?: string;
     countryCode?: string;
+    paymentMethod?: string;
   }): Promise<UpgradeResponse> {
     return apiClient.post<UpgradeResponse>('/billing/upgrade', options);
   },
@@ -107,6 +134,27 @@ export const billingApi = {
   async getPricing(countryCode?: string): Promise<PricingResponse> {
     return apiClient.get<PricingResponse>('/billing/pricing', {
       country: countryCode,
+    });
+  },
+
+  /**
+   * Fee-optimal checkout route + payment instrument suggestions (public).
+   */
+  async getCheckoutRouteRecommendation(params: {
+    country: string;
+    plan?: string;
+    product?: string;
+    amountMinor?: number;
+    currency?: string;
+    paymentMethod?: string;
+  }): Promise<CheckoutRouteRecommendation> {
+    return apiClient.get<CheckoutRouteRecommendation>('/billing/checkout/route-recommendation', {
+      country: params.country,
+      plan: params.plan,
+      product: params.product,
+      amountMinor: params.amountMinor,
+      currency: params.currency,
+      paymentMethod: params.paymentMethod,
     });
   },
 

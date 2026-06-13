@@ -1,6 +1,21 @@
 // Client
 export { DhanamClient } from './client';
 
+// Internal POS client (platform-admin JWT required)
+export { DhanamPosClient } from './pos';
+export type {
+  PosChargeRequest,
+  PosChargeResult,
+  PosClientConfig,
+  PosReconciliationSummary,
+  PosRefundRequest,
+  PosRefundResult,
+  PosRouteOverrideRequest,
+  PosRoutePreviewRequest,
+  PosRoutePreviewResult,
+  PosTimelineEntry,
+} from './pos';
+
 // Usage metering client
 export { DhanamUsageClient } from './usage';
 export type { UsageClientConfig } from './usage';

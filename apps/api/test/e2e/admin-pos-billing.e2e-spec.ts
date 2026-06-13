@@ -113,6 +113,67 @@ describe('Admin POS Billing Journey', () => {
     });
   });
 
+  describe('Route fee schedule', () => {
+    it('returns bundled fee schedule for admin', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/v1/admin/billing/route/fee-schedule')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(response.body.version).toBeDefined();
+      expect(['file', 'platform_config']).toContain(response.body.source);
+      expect(Array.isArray(response.body.entries)).toBe(true);
+      expect(response.body.entries.length).toBeGreaterThan(0);
+    });
+
+    it('blocks non-admin from fee schedule endpoints', async () => {
+      await request(app.getHttpServer())
+        .get('/v1/admin/billing/route/fee-schedule')
+        .set('Authorization', `Bearer ${regularToken}`)
+        .expect(403);
+    });
+
+    it('upserts and clears platform fee schedule override', async () => {
+      const getBundled = await request(app.getHttpServer())
+        .get('/v1/admin/billing/route/fee-schedule')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      const overrideEntries = getBundled.body.entries.slice(0, 2);
+
+      await request(app.getHttpServer())
+        .put('/v1/admin/billing/route/fee-schedule')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          version: 'e2e-fee-schedule',
+          entries: overrideEntries,
+        })
+        .expect(200);
+
+      const overridden = await request(app.getHttpServer())
+        .get('/v1/admin/billing/route/fee-schedule')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(overridden.body.source).toBe('platform_config');
+      expect(overridden.body.version).toBe('e2e-fee-schedule');
+      expect(overridden.body.entries).toHaveLength(2);
+
+      await request(app.getHttpServer())
+        .delete('/v1/admin/billing/route/fee-schedule')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      const reverted = await request(app.getHttpServer())
+        .get('/v1/admin/billing/route/fee-schedule')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(reverted.body.source).toBe('file');
+      expect(reverted.body.entries.length).toBeGreaterThan(2);
+    });
+  });
+
   describe('Route override', () => {
     it('stores and applies checkout route override', async () => {
       const setResponse = await request(app.getHttpServer())
@@ -162,6 +223,32 @@ describe('Admin POS Billing Journey', () => {
 
       expect(Array.isArray(response.body)).toBe(true);
       expect(response.body).toHaveLength(0);
+    });
+
+    it('returns CFDI uuid on timeline entries when Karafiel correlation exists', async () => {
+      const correlationId = `corr-cfdi-e2e-${Date.now()}`;
+      await prisma.billingEvent.create({
+        data: {
+          userId: targetUserId,
+          type: 'payment_succeeded',
+          status: 'succeeded',
+          amount: 199,
+          currency: 'MXN',
+          metadata: {
+            correlationId,
+            paymentIntentId: 'pi_cfdi_e2e',
+            cfdiUuid: '11111111-2222-3333-4444-555555555555',
+          },
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .get(`/v1/admin/billing/pos/timeline/${correlationId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .expect(200);
+
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0].cfdiUuid).toBe('11111111-2222-3333-4444-555555555555');
     });
 
     it('returns reconciliation summary for admin', async () => {

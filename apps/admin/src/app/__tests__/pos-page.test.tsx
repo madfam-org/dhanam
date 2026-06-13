@@ -60,10 +60,15 @@ jest.mock('@/lib/api/admin', () => ({
     createPosCheckout: jest.fn(),
     getPosCheckoutStatus: jest.fn(),
     previewCheckoutRoute: jest.fn(),
+    setCheckoutRouteOverride: jest.fn(),
+    clearCheckoutRouteOverride: jest.fn(),
     createPosCharge: jest.fn(),
     createPosRefund: jest.fn(),
     getPosTimeline: jest.fn(),
     getBillingReconciliation: jest.fn(),
+    getRouteFeeSchedule: jest.fn(),
+    upsertRouteFeeSchedule: jest.fn(),
+    clearRouteFeeSchedule: jest.fn(),
   },
 }));
 
@@ -79,6 +84,7 @@ describe('PosPage', () => {
     render(<PosPage />);
     expect(screen.getByText('Subscription')).toBeInTheDocument();
     expect(screen.getByText('Route Preview')).toBeInTheDocument();
+    expect(screen.getByText('Fee Schedule')).toBeInTheDocument();
     expect(screen.getByText('Charge / Refund')).toBeInTheDocument();
     expect(screen.getByText('Timeline / Reconcile')).toBeInTheDocument();
   });
@@ -105,5 +111,19 @@ describe('PosPage', () => {
     expect(screen.getByText('Refund')).toBeInTheDocument();
     expect(screen.getByText('POS Timeline')).toBeInTheDocument();
     expect(screen.getByText('Reconciliation')).toBeInTheDocument();
+  });
+
+  it('renders route override controls on the route tab', () => {
+    render(<PosPage />);
+    expect(screen.getByText('Operator Route Override')).toBeInTheDocument();
+    expect(screen.getByText('Set override')).toBeInTheDocument();
+    expect(screen.getByText('Clear override')).toBeInTheDocument();
+  });
+
+  it('renders fee schedule panel in tab content', () => {
+    render(<PosPage />);
+    expect(screen.getByText('Route Fee Schedule')).toBeInTheDocument();
+    expect(screen.getByText('Save platform override')).toBeInTheDocument();
+    expect(screen.getByText('Revert to bundled JSON')).toBeInTheDocument();
   });
 });

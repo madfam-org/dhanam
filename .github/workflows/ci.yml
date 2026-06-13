@@ -739,6 +739,9 @@ jobs:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
           LOCAL_DB: 'yes'
 
+      - name: Validate payment route fee schedule JSON
+        run: node scripts/validate-payment-route-fee-schedule.mjs
+
       - name: Run contract tests
         working-directory: apps/api
         run: npx jest --config test/contract/jest-contract.json

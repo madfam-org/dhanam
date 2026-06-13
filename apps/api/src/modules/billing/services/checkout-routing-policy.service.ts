@@ -4,8 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { PaymentGatewayRegistry } from '../gateways/payment-gateway.registry';
 
 import { CheckoutRouteOverrideService } from './checkout-route-override.service';
+import { PaymentRouteOptimizerService } from './payment-route-optimizer.service';
 import { PaymentRouterService } from './payment-router.service';
 import { PriceResolverService } from './price-resolver.service';
+import type { PaymentInstrumentId } from '../config/payment-route-fee-schedule';
 
 /** Canonical checkout route targets exposed to operators and audit logs. */
 export type CheckoutRouteProvider = 'janua' | 'stripe_mx' | 'paddle' | 'legacy_stripe';
@@ -20,10 +22,32 @@ export interface CheckoutRoutingContext {
   orgId?: string;
   source?: string;
   operatorId?: string;
+  /** Checkout amount in minor units — improves fee-aware routing when set. */
+  amountMinor?: number;
+  /** ISO 4217 currency for amountMinor. */
+  currency?: string;
+  /** Preferred payment instrument for fee-optimal routing. */
+  paymentMethod?: PaymentInstrumentId;
   /** Operator-only override for dry-run or forced routing. */
   providerOverride?: CheckoutRouteProvider;
   /** Distinguishes preview dry-run vs persisted operator override. */
   overrideKind?: 'stored' | 'preview';
+}
+
+export interface CheckoutFeeOptimizationPreview {
+  merchantFeeMinor: number;
+  totalEconomicCostMinor: number;
+  savingsVsCardMinor: number | null;
+  recommendedPaymentMethod: PaymentInstrumentId;
+  instrumentSuggestions: Array<{
+    paymentMethod: PaymentInstrumentId;
+    label: string;
+    provider: string;
+    merchantFeeMinor: number;
+    totalEconomicCostMinor: number;
+    recommended: boolean;
+    savingsVsWorstMinor: number;
+  }>;
 }
 
 export interface CheckoutRoutingPreview {
@@ -38,6 +62,7 @@ export interface CheckoutRoutingPreview {
   legacyStripeAvailable: boolean;
   priceIdResolvable: boolean;
   catalogPlanId: string;
+  feeOptimization?: CheckoutFeeOptimizationPreview | null;
 }
 
 export interface HybridCheckoutResult {
@@ -62,7 +87,8 @@ export class CheckoutRoutingPolicyService {
     private gatewayRegistry: PaymentGatewayRegistry,
     private paymentRouter: PaymentRouterService,
     @Optional() private priceResolver?: PriceResolverService,
-    @Optional() private routeOverride?: CheckoutRouteOverrideService
+    @Optional() private routeOverride?: CheckoutRouteOverrideService,
+    @Optional() private routeOptimizer?: PaymentRouteOptimizerService
   ) {}
 
   isUnifiedRoutingEnabled(): boolean {
@@ -108,19 +134,29 @@ export class CheckoutRoutingPolicyService {
     const gateway = this.gatewayRegistry.get(this.gatewayRegistry.toGatewayId(provider));
     const providerConfig = gateway?.getProviderConfig?.(countryCode) ?? null;
     const priceId = await this.resolvePriceId(resolvedContext.plan, resolvedContext.product);
+    const currency =
+      resolvedContext.currency?.toUpperCase() ??
+      (provider === 'legacy_stripe'
+        ? 'USD'
+        : provider === 'janua'
+          ? countryCode === 'MX'
+            ? 'MXN'
+            : 'USD'
+          : (providerConfig?.currency ?? 'USD'));
+    const amountMinor = resolvedContext.amountMinor ?? this.defaultAmountMinor(countryCode);
+    const feeOptimization = this.buildFeeOptimizationPreview({
+      countryCode,
+      currency,
+      amountMinor,
+      paymentMethod: resolvedContext.paymentMethod,
+      provider,
+    });
 
     return {
       provider,
       routeReason: reason,
       countryCode,
-      currency:
-        provider === 'legacy_stripe'
-          ? 'USD'
-          : provider === 'janua'
-            ? countryCode === 'MX'
-              ? 'MXN'
-              : 'USD'
-            : (providerConfig?.currency ?? 'USD'),
+      currency,
       paymentMethods:
         provider === 'legacy_stripe'
           ? ['card']
@@ -135,6 +171,98 @@ export class CheckoutRoutingPolicyService {
       legacyStripeAvailable: this.isLegacyStripeConfigured(),
       priceIdResolvable: Boolean(priceId),
       catalogPlanId: this.normalizeCatalogPlanId(resolvedContext.plan, resolvedContext.product),
+      feeOptimization,
+    };
+  }
+
+  /**
+   * Public fee-aware recommendation for visitors and checkout UI (no auth).
+   */
+  getPublicRouteRecommendation(params: {
+    countryCode: string;
+    plan?: string;
+    product?: string;
+    amountMinor?: number;
+    currency?: string;
+    paymentMethod?: PaymentInstrumentId;
+  }): CheckoutRoutingPreview & { amountMinor: number } {
+    const countryCode = params.countryCode.toUpperCase();
+    const currency = params.currency?.toUpperCase() ?? (countryCode === 'MX' ? 'MXN' : 'USD');
+    const amountMinor = params.amountMinor ?? this.defaultAmountMinor(countryCode);
+    const context: CheckoutRoutingContext = {
+      userId: 'public-route-recommendation',
+      plan: params.plan ?? 'pro',
+      product: params.product,
+      countryCode,
+      currency,
+      amountMinor,
+      paymentMethod: params.paymentMethod,
+      successUrl: 'https://app.dhan.am/billing/success',
+      cancelUrl: 'https://app.dhan.am/billing/cancel',
+    };
+
+    const { provider, reason } = this.resolveProvider(context);
+    const feeOptimization = this.buildFeeOptimizationPreview({
+      countryCode,
+      currency,
+      amountMinor,
+      paymentMethod: params.paymentMethod,
+      provider,
+    });
+
+    const gateway = this.gatewayRegistry.get(this.gatewayRegistry.toGatewayId(provider));
+    const providerConfig = gateway?.getProviderConfig?.(countryCode) ?? null;
+
+    return {
+      provider,
+      routeReason: reason,
+      countryCode,
+      currency,
+      amountMinor,
+      paymentMethods: providerConfig?.paymentMethods ?? ['card'],
+      januaEnabled: this.gatewayRegistry.isConfigured('janua'),
+      unifiedRoutingEnabled: this.isUnifiedRoutingEnabled(),
+      hybridRouterAvailable: this.isHybridRouterAvailable(countryCode),
+      legacyStripeAvailable: this.isLegacyStripeConfigured(),
+      priceIdResolvable: true,
+      catalogPlanId: this.normalizeCatalogPlanId(context.plan, context.product),
+      feeOptimization,
+    };
+  }
+
+  private defaultAmountMinor(countryCode: string): number {
+    return countryCode === 'MX' ? 19_900 : 1_199;
+  }
+
+  private buildFeeOptimizationPreview(params: {
+    countryCode: string;
+    currency: string;
+    amountMinor: number;
+    paymentMethod?: PaymentInstrumentId;
+    provider: CheckoutRouteProvider;
+  }): CheckoutFeeOptimizationPreview | null {
+    if (!this.routeOptimizer || !this.isUnifiedRoutingEnabled()) {
+      return null;
+    }
+
+    const recommendation = this.routeOptimizer.recommend({
+      countryCode: params.countryCode,
+      amountMinor: params.amountMinor,
+      currency: params.currency,
+      paymentMethod: params.paymentMethod,
+      subscriptionCheckout: true,
+    });
+
+    if (!recommendation) {
+      return null;
+    }
+
+    return {
+      merchantFeeMinor: recommendation.merchantFeeMinor,
+      totalEconomicCostMinor: recommendation.totalEconomicCostMinor,
+      savingsVsCardMinor: recommendation.savingsVsCardMinor,
+      recommendedPaymentMethod: recommendation.paymentMethod,
+      instrumentSuggestions: recommendation.instrumentSuggestions,
     };
   }
 
@@ -174,6 +302,32 @@ export class CheckoutRoutingPolicyService {
     }
 
     const countryCode = context.countryCode.toUpperCase();
+    const currency = context.currency?.toUpperCase() ?? (countryCode === 'MX' ? 'MXN' : 'USD');
+    const amountMinor = context.amountMinor ?? this.defaultAmountMinor(countryCode);
+
+    if (this.isUnifiedRoutingEnabled() && this.routeOptimizer) {
+      const feeOptimal = this.routeOptimizer.recommend({
+        countryCode,
+        amountMinor,
+        currency,
+        paymentMethod: context.paymentMethod,
+        subscriptionCheckout: true,
+      });
+
+      if (feeOptimal) {
+        const configured =
+          (feeOptimal.provider === 'stripe_mx' && this.gatewayRegistry.isConfigured('stripe_mx')) ||
+          (feeOptimal.provider === 'paddle' && this.gatewayRegistry.isConfigured('paddle')) ||
+          (feeOptimal.provider === 'legacy_stripe' && this.isLegacyStripeConfigured());
+
+        if (configured) {
+          return {
+            provider: feeOptimal.provider,
+            reason: feeOptimal.routeReason,
+          };
+        }
+      }
+    }
 
     if (this.isUnifiedRoutingEnabled() && this.isHybridRouterAvailable(countryCode)) {
       const gatewayId = this.gatewayRegistry.resolveHybridCheckoutGateway(countryCode);

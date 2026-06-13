@@ -308,6 +308,38 @@ export interface RoutePreviewResult {
   legacyStripeAvailable: boolean;
   priceIdResolvable: boolean;
   catalogPlanId: string;
+  feeOptimization?: {
+    merchantFeeMinor: number;
+    totalEconomicCostMinor: number;
+    savingsVsCardMinor: number | null;
+    recommendedPaymentMethod: string;
+    instrumentSuggestions: Array<{
+      paymentMethod: string;
+      label: string;
+      provider: string;
+      merchantFeeMinor: number;
+      totalEconomicCostMinor: number;
+      recommended: boolean;
+      savingsVsWorstMinor: number;
+    }>;
+  } | null;
+}
+
+export interface RouteFeeScheduleEntry {
+  provider: string;
+  paymentMethod: string;
+  currency: string;
+  percentBps: number;
+  fixedMinor: number;
+  customerFxBps: number;
+  label: string;
+  countries: string[] | '*';
+}
+
+export interface RouteFeeSchedule {
+  version: string;
+  source: 'file' | 'platform_config';
+  entries: RouteFeeScheduleEntry[];
 }
 
 export interface PosChargeRequest {
@@ -574,6 +606,26 @@ export const adminApi = {
     reason?: string;
   }): Promise<{ cleared: true }> {
     return apiClient.post<{ cleared: true }>('/admin/billing/route/override/clear', body);
+  },
+
+  async getRouteFeeSchedule(): Promise<RouteFeeSchedule> {
+    return apiClient.get<RouteFeeSchedule>('/admin/billing/route/fee-schedule');
+  },
+
+  async upsertRouteFeeSchedule(body: {
+    version: string;
+    entries: RouteFeeScheduleEntry[];
+  }): Promise<{ version: string; entryCount: number; source: string }> {
+    return apiClient.put<{ version: string; entryCount: number; source: string }>(
+      '/admin/billing/route/fee-schedule',
+      body
+    );
+  },
+
+  async clearRouteFeeSchedule(): Promise<{ cleared: true; version: string }> {
+    return apiClient.delete<{ cleared: true; version: string }>(
+      '/admin/billing/route/fee-schedule'
+    );
   },
 
   async createPosCharge(body: PosChargeRequest): Promise<PosChargeResult> {

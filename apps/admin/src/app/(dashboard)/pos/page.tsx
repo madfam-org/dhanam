@@ -24,10 +24,10 @@ import {
   type PosRefundResult,
   type PosTimelineEntry,
   type ReconciliationSummary,
-  type RoutePreviewResult,
 } from '@/lib/api/admin';
 
 import { CheckoutResultPanel, CheckoutStatusPanel } from './pos-checkout-panels';
+import { PosFeeScheduleTab } from './pos-fee-schedule-tab';
 import { PosRouteTab } from './pos-route-tab';
 import {
   PRODUCTS,
@@ -38,19 +38,14 @@ import {
   EmptyState,
   ResultList,
 } from './pos-shared';
+import { usePosFeeSchedule } from './use-pos-fee-schedule';
+import { usePosRoute } from './use-pos-route';
 
 const initialCheckoutForm = {
   userId: '',
   product: 'dhanam',
   plan: 'pro',
   orgId: '',
-  countryCode: 'MX',
-};
-
-const initialRouteForm = {
-  userId: '',
-  product: 'dhanam',
-  plan: 'pro',
   countryCode: 'MX',
 };
 
@@ -85,10 +80,38 @@ export default function PosPage() {
   const [statusError, setStatusError] = useState<string | null>(null);
   const [statusLoading, setStatusLoading] = useState(false);
 
-  const [routeForm, setRouteForm] = useState(initialRouteForm);
-  const [routePreview, setRoutePreview] = useState<RoutePreviewResult | null>(null);
-  const [routeError, setRouteError] = useState<string | null>(null);
-  const [routeLoading, setRouteLoading] = useState(false);
+  const {
+    routeForm,
+    setRouteForm,
+    routePreview,
+    routeError,
+    routeLoading,
+    overrideProvider,
+    setOverrideProvider,
+    overrideReason,
+    setOverrideReason,
+    overrideTtlHours,
+    setOverrideTtlHours,
+    overrideLoading,
+    overrideError,
+    overrideMessage,
+    previewRoute,
+    setRouteOverride,
+    clearRouteOverride,
+  } = usePosRoute();
+
+  const {
+    feeSchedule,
+    feeScheduleJson,
+    setFeeScheduleJson,
+    feeScheduleError,
+    feeScheduleLoading,
+    feeScheduleSaving,
+    feeScheduleMessage,
+    loadFeeSchedule,
+    saveFeeSchedule,
+    clearFeeScheduleOverride,
+  } = usePosFeeSchedule(activeTab);
 
   const [chargeForm, setChargeForm] = useState(initialChargeForm);
   const [chargeResult, setChargeResult] = useState<PosChargeResult | null>(null);
@@ -184,33 +207,6 @@ export default function PosPage() {
       setStatusError('Unable to load checkout status.');
     } finally {
       setStatusLoading(false);
-    }
-  };
-
-  const previewRoute = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setRouteError(null);
-    setRoutePreview(null);
-
-    if (!routeForm.userId.trim()) {
-      setRouteError('User ID is required.');
-      return;
-    }
-
-    setRouteLoading(true);
-    try {
-      setRoutePreview(
-        await adminApi.previewCheckoutRoute({
-          userId: routeForm.userId.trim(),
-          plan: routeForm.plan,
-          product: routeForm.product,
-          countryCode: routeForm.countryCode.trim().toUpperCase() || undefined,
-        })
-      );
-    } catch {
-      setRouteError('Unable to preview checkout route.');
-    } finally {
-      setRouteLoading(false);
     }
   };
 
@@ -322,9 +318,10 @@ export default function PosPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
           <TabsTrigger value="checkout">Subscription</TabsTrigger>
           <TabsTrigger value="route">Route Preview</TabsTrigger>
+          <TabsTrigger value="fee-schedule">Fee Schedule</TabsTrigger>
           <TabsTrigger value="charge">Charge / Refund</TabsTrigger>
           <TabsTrigger value="ops">Timeline / Reconcile</TabsTrigger>
         </TabsList>
@@ -417,6 +414,32 @@ export default function PosPage() {
             routeError={routeError}
             routeLoading={routeLoading}
             onPreview={previewRoute}
+            overrideProvider={overrideProvider}
+            setOverrideProvider={setOverrideProvider}
+            overrideReason={overrideReason}
+            setOverrideReason={setOverrideReason}
+            overrideTtlHours={overrideTtlHours}
+            setOverrideTtlHours={setOverrideTtlHours}
+            overrideLoading={overrideLoading}
+            overrideError={overrideError}
+            overrideMessage={overrideMessage}
+            onSetOverride={setRouteOverride}
+            onClearOverride={clearRouteOverride}
+          />
+        </TabsContent>
+
+        <TabsContent value="fee-schedule">
+          <PosFeeScheduleTab
+            schedule={feeSchedule}
+            scheduleJson={feeScheduleJson}
+            setScheduleJson={setFeeScheduleJson}
+            scheduleError={feeScheduleError}
+            scheduleLoading={feeScheduleLoading}
+            scheduleSaving={feeScheduleSaving}
+            scheduleMessage={feeScheduleMessage}
+            onReload={() => void loadFeeSchedule()}
+            onSave={saveFeeSchedule}
+            onClearOverride={() => void clearFeeScheduleOverride()}
           />
         </TabsContent>
 

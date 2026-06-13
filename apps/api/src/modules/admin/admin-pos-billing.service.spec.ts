@@ -4,6 +4,7 @@ import { AuditService } from '@core/audit/audit.service';
 import { LoggerService } from '@core/logger/logger.service';
 import { PrismaService } from '@core/prisma/prisma.service';
 import { BillingService } from '@modules/billing/billing.service';
+import { PaymentRouteFeeScheduleService } from '@modules/billing/services/payment-route-fee-schedule.service';
 
 import { AdminPosBillingService } from './admin-pos-billing.service';
 
@@ -26,6 +27,12 @@ describe('AdminPosBillingService', () => {
     getBillingReconciliationSummary: jest.fn(),
   };
 
+  const mockFeeScheduleService = {
+    getSchedule: jest.fn(),
+    upsertPlatformOverride: jest.fn(),
+    clearPlatformOverride: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -34,6 +41,7 @@ describe('AdminPosBillingService', () => {
         { provide: LoggerService, useValue: mockLoggerService },
         { provide: AuditService, useValue: mockAuditService },
         { provide: BillingService, useValue: mockBillingService },
+        { provide: PaymentRouteFeeScheduleService, useValue: mockFeeScheduleService },
       ],
     }).compile();
 
@@ -113,6 +121,60 @@ describe('AdminPosBillingService', () => {
       expect(result.status).toBe('complete');
       expect(mockAuditService.logEvent).toHaveBeenCalledWith(
         expect.objectContaining({ action: 'admin.billing_pos_status_viewed' })
+      );
+    });
+  });
+
+  describe('route fee schedule', () => {
+    it('returns schedule and records a low-severity audit entry', async () => {
+      mockFeeScheduleService.getSchedule.mockReturnValue({
+        version: '2026-06-12',
+        source: 'file',
+        entries: [{ provider: 'stripe_mx', paymentMethod: 'card' }],
+      });
+
+      const result = await service.getRouteFeeSchedule('admin1');
+
+      expect(result.entries).toHaveLength(1);
+      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'admin.billing_route_fee_schedule_viewed' })
+      );
+    });
+
+    it('upserts platform override and records a high-severity audit entry', async () => {
+      mockFeeScheduleService.upsertPlatformOverride.mockResolvedValue({
+        version: 'ops-2026',
+        entryCount: 2,
+      });
+
+      const result = await service.upsertRouteFeeSchedule(
+        {
+          version: 'ops-2026',
+          entries: [{ provider: 'stripe_mx', paymentMethod: 'spei' }],
+        },
+        'admin1'
+      );
+
+      expect(result.entryCount).toBe(2);
+      expect(mockFeeScheduleService.upsertPlatformOverride).toHaveBeenCalled();
+      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'admin.billing_route_fee_schedule_updated' })
+      );
+    });
+
+    it('clears platform override and records an audit entry', async () => {
+      mockFeeScheduleService.clearPlatformOverride.mockResolvedValue(undefined);
+      mockFeeScheduleService.getSchedule.mockReturnValue({
+        version: '2026-06-12',
+        source: 'file',
+        entries: [],
+      });
+
+      const result = await service.clearRouteFeeSchedule('admin1');
+
+      expect(result.cleared).toBe(true);
+      expect(mockAuditService.logEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'admin.billing_route_fee_schedule_cleared' })
       );
     });
   });

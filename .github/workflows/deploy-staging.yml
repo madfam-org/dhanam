@@ -400,3 +400,6 @@ jobs:
           STAGING_COMMERCIAL_CHARGE_ENABLED="${{ vars.STAGING_COMMERCIAL_CHARGE_ENABLED || 'false' }}" \
           STAGING_COMMERCIAL_STRICT="${{ vars.STAGING_COMMERCIAL_STRICT || 'false' }}" \
             ./scripts/staging-commercial-smoke.sh
+
+      - name: Golden product webhook envelope probe (WS3)
+        run: node scripts/golden-probes/verify-product-webhook-envelope.mjs

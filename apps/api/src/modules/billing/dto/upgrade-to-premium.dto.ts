@@ -1,4 +1,5 @@
 import { IsOptional, IsString, Matches } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpgradeToPremiumDto {
   @IsOptional()
@@ -40,4 +41,11 @@ export class UpgradeToPremiumDto {
   @IsOptional()
   @IsString()
   countryCode?: string;
+
+  @ApiPropertyOptional({
+    description: 'Preferred payment instrument for fee-optimal routing (e.g. spei, card)',
+  })
+  @IsOptional()
+  @IsString()
+  paymentMethod?: string;
 }

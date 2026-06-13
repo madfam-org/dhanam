@@ -27,7 +27,7 @@ export class ReconciliationJob {
     if (this.stripeClient) return this.stripeClient;
     const key = this.config.get<string>('STRIPE_SECRET_KEY');
     if (!key) return null;
-    this.stripeClient = new Stripe(key, { apiVersion: '2026-01-28.clover' });
+    this.stripeClient = new Stripe(key, { apiVersion: '2026-02-25.clover' });
     return this.stripeClient;
   }
 

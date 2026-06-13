@@ -1,6 +1,6 @@
 # Commercial Stability Roadmap
 
-Last updated: 2026-05-22
+Last updated: 2026-06-12
 
 This document tracks Dhanam's path from production-stable billing backbone to a
 full MADFAM internal billing router and POS. Read it with
@@ -14,22 +14,22 @@ English only. Product UI strings use i18n.
 
 ## Current Status
 
-| Capability                        | Status         | Notes                                                                                  |
-| --------------------------------- | -------------- | -------------------------------------------------------------------------------------- |
-| Catalog-backed checkout           | Live           | Product plan slugs resolve through `PriceResolver` and fail closed.                    |
-| Stripe MX/SPEI relay              | Live           | Signed webhook, canonical `payment.*` fan-out, DLQ on delivery failure.                |
-| Public/external checkout redirect | Live           | Return-host allowlist protects unauthenticated checkout.                               |
-| Unified provider routing          | Source on main | `CheckoutRoutingPolicyService` + hybrid router when Janua off; WS1 staging proof.      |
-| Admin POS checkout link creation  | Source on main | `POST /v1/admin/billing/pos/checkout` plus admin `/pos` subscription tab.              |
-| Admin POS status lookup           | Source on main | `POST /v1/admin/billing/pos/status` inspects Stripe checkout sessions.                 |
-| Admin POS charge / refund         | Source on main | `POST /v1/admin/billing/pos/charge` and `/refund`; partial via `amountMinor`.          |
-| Admin route preview               | Source on main | `POST /v1/admin/billing/route/preview` dry-run matrix.                                 |
-| Admin timeline / reconciliation   | Source on main | Timeline + flagged mismatch summary in admin `/pos`.                                   |
-| Staging commercial smoke          | WS1 active     | [`scripts/staging-commercial-smoke.sh`](../scripts/staging-commercial-smoke.sh) in CI. |
-| Admin product-webhook DLQ         | Source landed  | Admin `/webhook-dlq` lists, replays, and resolves product webhook delivery failures.   |
-| Janua-routed billing              | Blocked        | Production Janua billing secrets must be non-empty and verified.                       |
-| CFDI proof in POS timeline        | Not complete   | Karafiel receipt correlation — WS2.                                                    |
-| Conekta direct commercial parity  | Partial        | Webhook ledger/fan-out/DLQ source-landed; POS + live proof remain (Scope B).           |
+| Capability                        | Status         | Notes                                                                           |
+| --------------------------------- | -------------- | ------------------------------------------------------------------------------- |
+| Catalog-backed checkout           | Live           | Product plan slugs resolve through `PriceResolver` and fail closed.             |
+| Stripe MX/SPEI relay              | Live           | Signed webhook, canonical `payment.*` fan-out, DLQ on delivery failure.         |
+| Public/external checkout redirect | Live           | Return-host allowlist protects unauthenticated checkout.                        |
+| Unified provider routing          | Source on main | `CheckoutRoutingPolicyService` + fee optimizer by geo/instrument                |
+| Fee schedule maintenance          | Source on main | Bundled JSON + admin override + `validate-payment-route-fee-schedule.mjs` in CI |
+| Web fee recommendations           | Source on main | Landing pricing + `/billing/upgrade` instrument picker                          |
+| Admin POS checkout link creation  | Source on main | `POST /v1/admin/billing/pos/checkout` plus admin `/pos` subscription tab.       |
+| Admin POS status lookup           | Source on main | `POST /v1/admin/billing/pos/status` inspects Stripe checkout sessions.          |
+| Admin POS charge / refund         | Source on main | Partial refund UI + API `amountMinor` shipped.                                  |
+| Admin route override              | Source on main | API + admin Route Preview tab UI shipped.                                       |
+| `@dhanam/billing-sdk` POS client  | Source on main | `DhanamPosClient` for trusted internal callers.                                 |
+| Golden envelope probe (CI)        | Source on main | `scripts/golden-probes/` + Jest contract tests in CI.                           |
+| CFDI proof in POS timeline        | Source on main | Write/read path + tests; **staging Karafiel proof open**                        |
+| Conekta direct commercial parity  | Partial        | Webhook ledger/fan-out/DLQ source-landed; POS + live proof remain (Scope B).    |
 
 ## Remediation Plan
 
@@ -47,6 +47,10 @@ English only. Product UI strings use i18n.
 
 - **Done (source):** `CheckoutRoutingPolicyService` is authoritative when Janua
   billing is disabled.
+- **Done (source):** `PaymentRouteOptimizerService` ranks provider × instrument
+  by estimated PSP fees; bundled schedule in
+  `payment-route-fee-schedule.json`; optional admin override via
+  `billing.route_fee_schedule`.
 - Record provider, country, currency, product, plan, price source, route reason,
   and operator override in metadata/audit logs.
 - Janua remains a separate optional path until production secrets and checkout

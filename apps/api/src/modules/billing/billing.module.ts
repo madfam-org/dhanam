@@ -22,6 +22,7 @@ import { AuditModule } from '../../core/audit/audit.module';
 import { MonitoringModule } from '../../core/monitoring/monitoring.module';
 import { PrismaModule } from '../../core/prisma/prisma.module';
 import { EmailModule } from '../email/email.module';
+import { PlatformConfigModule } from '../platform-config/platform-config.module';
 
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
@@ -59,6 +60,8 @@ import { MadfamEventsController } from './madfam-events.controller';
 import { CancellationService } from './services/cancellation.service';
 import { CheckoutRouteOverrideService } from './services/checkout-route-override.service';
 import { CheckoutRoutingPolicyService } from './services/checkout-routing-policy.service';
+import { PaymentRouteOptimizerService } from './services/payment-route-optimizer.service';
+import { PaymentRouteFeeScheduleService } from './services/payment-route-fee-schedule.service';
 import { ConektaService } from './services/conekta.service';
 import { CustomerFederationService } from './services/customer-federation.service';
 // Hybrid Router Services (Stripe MX + Paddle)
@@ -103,6 +106,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     // MonitoringModule provides the 'SentryService' string token used
     // by WebhookDlqService for per-failure structured Sentry events.
     MonitoringModule,
+    PlatformConfigModule,
     HttpModule.register({
       timeout: 30000,
       maxRedirects: 5,
@@ -132,6 +136,8 @@ import { UsageAlertsController } from './usage-alerts.controller';
     UsageTrackingService,
     CheckoutRoutingPolicyService,
     CheckoutRouteOverrideService,
+    PaymentRouteFeeScheduleService,
+    PaymentRouteOptimizerService,
     InternalPosService,
     OperatorCheckoutStatusService,
     SubscriptionJanuaNotifierService,
@@ -218,6 +224,8 @@ import { UsageAlertsController } from './usage-alerts.controller';
     UsageTrackingService,
     CheckoutRoutingPolicyService,
     CheckoutRouteOverrideService,
+    PaymentRouteFeeScheduleService,
+    PaymentRouteOptimizerService,
     InternalPosService,
     OperatorCheckoutStatusService,
     SubscriptionJanuaNotifierService,

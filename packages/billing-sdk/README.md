@@ -3,9 +3,9 @@
 Typed client for the Dhanam billing API: checkout flows, subscription
 management, catalog access, usage reporting, and webhook verification.
 
-Current scope: this SDK supports product checkout and subscription operations.
-It does not yet expose internal POS, refund, DLQ replay, or settlement APIs;
-those contracts are tracked in `docs/COMMERCIAL_STABILITY_ROADMAP.md`.
+Current scope: this SDK supports product checkout, subscription operations, and
+**internal POS / routing** via `DhanamPosClient` (platform-admin JWT required).
+DLQ replay remains admin-UI/API only.
 
 Zero runtime dependencies. Works in Node.js, edge runtimes, and browsers.
 
@@ -72,6 +72,20 @@ const payload = await parseWebhookPayload(rawBody, signature, secret);
 
 `getHistory()` normalizes both the current API array response and the older
 `{ events: [...] }` shape into `{ events }` for callers.
+
+### `DhanamPosClient` (platform-admin)
+
+Requires a platform-admin JWT. For MADFAM internal automation only.
+
+| Method                       | Description                            |
+| ---------------------------- | -------------------------------------- |
+| `previewRoute(body)`         | Dry-run checkout routing matrix        |
+| `setRouteOverride(body)`     | Audited operator provider override     |
+| `clearRouteOverride(body)`   | Clear stored override                  |
+| `createCharge(body)`         | One-time POS charge                    |
+| `createRefund(body)`         | Full or partial refund (`amountMinor`) |
+| `getTimeline(correlationId)` | Correlation timeline incl. CFDI uuid   |
+| `getReconciliation(limit?)`  | Flagged mismatch summary               |
 
 ### Webhook Utilities
 

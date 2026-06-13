@@ -8,6 +8,10 @@
       {
         "include": "modules/email/templates/**/*",
         "outDir": "dist"
+      },
+      {
+        "include": "modules/billing/config/**/*.json",
+        "outDir": "dist"
       }
     ],
     "watchAssets": true,
