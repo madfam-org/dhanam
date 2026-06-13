@@ -127,7 +127,11 @@ function log(step: string, msg: string): void {
 
 function getStripeForCurrency(currency: string): Stripe | null {
   if (currency.toUpperCase() === 'MXN') return stripeMx;
-  return stripeGlobal;
+  // Non-MXN (USD, etc.): use the dedicated global account when configured,
+  // otherwise fall back to the MX account. The Mexico account settles to MXN
+  // (BBVA) but can present USD/other currencies — single-account, multi-currency
+  // global selling. Drop the fallback once a dedicated global Stripe entity exists.
+  return stripeGlobal ?? stripeMx;
 }
 
 async function findStripeProduct(stripe: Stripe, slug: string): Promise<Stripe.Product | null> {

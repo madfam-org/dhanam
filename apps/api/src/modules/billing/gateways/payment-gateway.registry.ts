@@ -68,8 +68,17 @@ export class PaymentGatewayRegistry {
     if (normalized === 'MX' && this.isConfigured('stripe_mx')) {
       return 'stripe_mx';
     }
-    if (normalized !== 'MX' && this.isConfigured('paddle')) {
-      return 'paddle';
+    if (normalized !== 'MX') {
+      // International: prefer Paddle (Merchant of Record) once configured; until
+      // then fall back to the Mexico Stripe account (multi-currency presentment,
+      // settles MXN→BBVA) so global card sales work on a single account. This
+      // auto-switches to Paddle MoR when it is provisioned — no further change.
+      if (this.isConfigured('paddle')) {
+        return 'paddle';
+      }
+      if (this.isConfigured('stripe_mx')) {
+        return 'stripe_mx';
+      }
     }
     return null;
   }
