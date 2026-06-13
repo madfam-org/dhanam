@@ -21,12 +21,15 @@ spec:
   exceptions:
     - policyName: verify-image-signatures
       ruleNames:
+        - check-signature
         - autogen-check-signature
   match:
     any:
       - resources:
           kinds:
+            - Deployment
             - Pod
+            - ReplicaSet
           namespaces:
             - dhanam
           names:
