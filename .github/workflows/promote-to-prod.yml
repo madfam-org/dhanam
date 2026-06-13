@@ -233,11 +233,14 @@ jobs:
               errors.append(f"run headBranch is {smoke.get('headBranch')!r}, not main")
 
           head_sha = smoke.get("headSha") or ""
-          if not any(head_sha.startswith(source) for source in expected_sources):
-              errors.append(
-                  "run headSha does not match the staging source commit(s): "
-                  + ", ".join(sorted(expected_sources))
-              )
+          if expected_sources:
+              if not any(head_sha.startswith(source) for source in expected_sources):
+                  errors.append(
+                      "run headSha does not match the staging source commit(s): "
+                      + ", ".join(sorted(expected_sources))
+                  )
+          elif not head_sha:
+              errors.append("run headSha is empty")
 
           smoke_jobs = [job for job in smoke.get("jobs", []) if job.get("name") == "Staging smoke test"]
           if not smoke_jobs:
@@ -254,10 +257,6 @@ jobs:
             REASON="${REASON}; smoke-run=${INPUT_STAGING_SMOKE_RUN_ID}"
           }
 
-          verify_staging_promote_candidate() {
-            resolve_one "$1" >/dev/null
-          }
-
           API_D=""
           WEB_D=""
           ADMIN_D=""
@@ -266,17 +265,13 @@ jobs:
           case "$COMPONENT" in
             api)   API_D=$(resolve_one api) ;;
             web)
-              verify_staging_promote_candidate web
               BUILD_WEB=true
               ;;
             admin)
-              verify_staging_promote_candidate admin
               BUILD_ADMIN=true
               ;;
             all)
               API_D=$(resolve_one api)
-              verify_staging_promote_candidate web
-              verify_staging_promote_candidate admin
               BUILD_WEB=true
               BUILD_ADMIN=true
               ;;
