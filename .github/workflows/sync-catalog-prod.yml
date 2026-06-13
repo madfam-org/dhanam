@@ -54,6 +54,8 @@ jobs:
           echo "//npm.madfam.io/:_authToken=${{ secrets.NPM_MADFAM_TOKEN }}" >> ~/.npmrc
 
       - name: Install dependencies
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm install --frozen-lockfile
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
