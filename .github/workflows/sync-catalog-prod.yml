@@ -61,6 +61,10 @@ jobs:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm install --frozen-lockfile
 
+      - name: Setup kubectl
+        if: inputs.dry_run == false
+        uses: azure/setup-kubectl@v5
+
       - name: Resolve production credentials
         if: inputs.dry_run == false
         env:
@@ -77,12 +81,29 @@ jobs:
           if [ -z "$DATABASE_URL" ] || [ -z "$STRIPE_SECRET_KEY" ] || [ -z "$STRIPE_MX_SECRET_KEY" ]; then
             if [ -z "$KUBECONFIG_B64" ]; then
               echo "ERROR: Production credentials missing and KUBECONFIG_PRODUCTION is not configured."
+              echo "Add DATABASE_URL, STRIPE_SECRET_KEY, and STRIPE_MX_SECRET_KEY under Settings → Environments → Production."
               exit 1
             fi
             echo "GitHub Production secrets unavailable — loading from cluster (break-glass)."
             mkdir -p ~/.kube
             echo "$KUBECONFIG_B64" | base64 -d > ~/.kube/config
             chmod 600 ~/.kube/config
+
+            ready=false
+            for attempt in 1 2 3 4 5; do
+              if kubectl version --request-timeout=10s >/dev/null 2>&1; then
+                ready=true
+                break
+              fi
+              echo "Cluster API not reachable yet (attempt ${attempt}/5); retrying in 15s..."
+              sleep 15
+            done
+            if [ "$ready" != "true" ]; then
+              echo "ERROR: Cluster API unreachable from GitHub Actions."
+              echo "Add Production environment secrets or run scripts/sync-catalog.ts from an operator workstation (see scripts/sync-catalog-prod.md)."
+              exit 1
+            fi
+
             if [ -z "$DATABASE_URL" ]; then
               DATABASE_URL=$(kubectl get secret dhanam-secrets -n dhanam -o jsonpath='{.data.DATABASE_URL}' | base64 -d)
             fi
