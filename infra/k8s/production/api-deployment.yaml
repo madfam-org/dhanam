@@ -332,26 +332,31 @@ spec:
                 secretKeyRef:
                   name: dhanam-secrets
                   key: SMTP_HOST
+                  optional: true
             - name: SMTP_PORT
               valueFrom:
                 secretKeyRef:
                   name: dhanam-secrets
                   key: SMTP_PORT
+                  optional: true
             - name: SMTP_USER
               valueFrom:
                 secretKeyRef:
                   name: dhanam-secrets
                   key: SMTP_USER
+                  optional: true
             - name: SMTP_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: dhanam-secrets
                   key: SMTP_PASSWORD
+                  optional: true
             - name: EMAIL_FROM
               valueFrom:
                 secretKeyRef:
                   name: dhanam-secrets
                   key: EMAIL_FROM
+                  optional: true
 
             # =================================================================
             # Banxico (FX rates)
@@ -361,6 +366,7 @@ spec:
                 secretKeyRef:
                   name: dhanam-secrets
                   key: BANXICO_API_TOKEN
+                  optional: true
 
             # =================================================================
             # Janua Server-Side Keys

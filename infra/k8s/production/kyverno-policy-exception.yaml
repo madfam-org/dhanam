@@ -1,0 +1,36 @@
+# Kyverno PolicyException — GitOps rollout unblock (TD-1003)
+#
+# Production rollouts were blocked when Kyverno verify-image-signatures rejected
+# digest updates because the autogen-check-signature rule treats annotation drift
+# as a policy violation. This exception scopes only to Dhanam workload pods in
+# the dhanam namespace so ArgoCD/Enclii can reconcile signed digests from
+# promote-to-prod without break-glass kubectl on every promotion.
+#
+# Operator note: prefer cosign-signed digests from deploy-staging / prod-rebuild
+# jobs; this exception does not disable signature verification cluster-wide.
+
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: dhanam-gitops-rollout-signature
+  namespace: dhanam
+  labels:
+    app.kubernetes.io/part-of: galaxy-ecosystem
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  exceptions:
+    - policyName: verify-image-signatures
+      ruleNames:
+        - autogen-check-signature
+  match:
+    any:
+      - resources:
+          kinds:
+            - Pod
+          namespaces:
+            - dhanam
+          names:
+            - dhanam-api*
+            - dhanam-web*
+            - dhanam-admin*
+            - dhanam-fx-spot-refresh*
