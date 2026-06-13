@@ -3,10 +3,11 @@
 # Runs scripts/sync-catalog.ts with production secrets from the GitHub
 # `production` environment. Idempotent — safe to re-run after catalog.yaml merges.
 #
-# Required secrets (GitHub Settings → Environments → Production):
-#   DATABASE_URL
-#   STRIPE_SECRET_KEY
-#   STRIPE_MX_SECRET_KEY
+# Required for live sync (first match wins):
+#   1. GitHub Settings → Environments → Production:
+#        DATABASE_URL, STRIPE_SECRET_KEY, STRIPE_MX_SECRET_KEY
+#   2. Break-glass fallback via repo secret KUBECONFIG_PRODUCTION → kubectl read
+#        dhanam-secrets + dhanam-billing-secrets in namespace dhanam
 #   NPM_MADFAM_TOKEN (repo/org secret — needed for pnpm install)
 
 name: Sync production catalog
@@ -60,36 +61,68 @@ jobs:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm install --frozen-lockfile
 
-      - name: Preflight production secrets
+      - name: Resolve production credentials
         if: inputs.dry_run == false
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
+          GH_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GH_STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          GH_STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PRODUCTION }}
         run: |
+          set -euo pipefail
+          DATABASE_URL="$GH_DATABASE_URL"
+          STRIPE_SECRET_KEY="$GH_STRIPE_SECRET_KEY"
+          STRIPE_MX_SECRET_KEY="$GH_STRIPE_MX_SECRET_KEY"
+
+          if [ -z "$DATABASE_URL" ] || [ -z "$STRIPE_SECRET_KEY" ] || [ -z "$STRIPE_MX_SECRET_KEY" ]; then
+            if [ -z "$KUBECONFIG_B64" ]; then
+              echo "ERROR: Production credentials missing and KUBECONFIG_PRODUCTION is not configured."
+              exit 1
+            fi
+            echo "GitHub Production secrets unavailable — loading from cluster (break-glass)."
+            mkdir -p ~/.kube
+            echo "$KUBECONFIG_B64" | base64 -d > ~/.kube/config
+            chmod 600 ~/.kube/config
+            if [ -z "$DATABASE_URL" ]; then
+              DATABASE_URL=$(kubectl get secret dhanam-secrets -n dhanam -o jsonpath='{.data.DATABASE_URL}' | base64 -d)
+            fi
+            if [ -z "$STRIPE_SECRET_KEY" ]; then
+              STRIPE_SECRET_KEY=$(kubectl get secret dhanam-secrets -n dhanam -o jsonpath='{.data.STRIPE_SECRET_KEY}' | base64 -d)
+            fi
+            if [ -z "$STRIPE_MX_SECRET_KEY" ]; then
+              STRIPE_MX_SECRET_KEY=$(kubectl get secret dhanam-billing-secrets -n dhanam -o jsonpath='{.data.STRIPE_MX_SECRET_KEY}' | base64 -d)
+            fi
+          fi
+
           missing=()
           [ -z "$DATABASE_URL" ] && missing+=("DATABASE_URL")
           [ -z "$STRIPE_SECRET_KEY" ] && missing+=("STRIPE_SECRET_KEY")
           [ -z "$STRIPE_MX_SECRET_KEY" ] && missing+=("STRIPE_MX_SECRET_KEY")
           if [ "${#missing[@]}" -gt 0 ]; then
-            echo "ERROR: GitHub Production environment is missing secrets: ${missing[*]}"
-            echo "Add them under Settings → Environments → Production (from Enclii Lockbox)."
+            echo "ERROR: Missing production credentials: ${missing[*]}"
             exit 1
           fi
 
-      - name: Run catalog sync
+          echo "::add-mask::$DATABASE_URL"
+          echo "::add-mask::$STRIPE_SECRET_KEY"
+          echo "::add-mask::$STRIPE_MX_SECRET_KEY"
+          echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
+          echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> "$GITHUB_ENV"
+          echo "STRIPE_MX_SECRET_KEY=$STRIPE_MX_SECRET_KEY" >> "$GITHUB_ENV"
+
+      - name: Run catalog sync (dry-run)
+        if: inputs.dry_run == true
         env:
-          DATABASE_URL: ${{ inputs.dry_run == true && 'postgresql://dummy:dummy@localhost:5432/dummy' || secrets.DATABASE_URL }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
-          DRY_RUN: ${{ inputs.dry_run }}
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: |
           echo "Reason: ${{ inputs.reason }}"
-          if [ "$DRY_RUN" = "true" ]; then
-            pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts --dry-run
-          else
-            pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts
-          fi
+          pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts --dry-run
+
+      - name: Run catalog sync (live)
+        if: inputs.dry_run == false
+        run: |
+          echo "Reason: ${{ inputs.reason }}"
+          pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts
 
       - name: Verify voxa in live catalog API
         if: inputs.dry_run == false
