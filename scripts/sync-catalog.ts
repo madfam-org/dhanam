@@ -75,9 +75,35 @@ interface YamlTier {
   dhanam_tier: string;
   display_name?: string;
   description?: string;
-  prices: Record<string, { monthly?: number; yearly?: number }>;
+  prices: Record<string, { monthly?: number; yearly?: number; annual?: number }>;
   metadata?: Record<string, unknown>;
   features?: string[];
+}
+
+function normalizeBillingInterval(interval: string): 'monthly' | 'yearly' {
+  if (interval === 'annual') {
+    return 'yearly';
+  }
+  if (interval === 'monthly' || interval === 'yearly') {
+    return interval;
+  }
+  throw new Error(`Unsupported billing interval in catalog.yaml: ${interval}`);
+}
+
+function priceEntries(priceConfig: {
+  monthly?: number;
+  yearly?: number;
+  annual?: number;
+}): Array<['monthly' | 'yearly', number]> {
+  const entries: Array<['monthly' | 'yearly', number]> = [];
+  if (priceConfig.monthly) {
+    entries.push(['monthly', priceConfig.monthly]);
+  }
+  const yearlyAmount = priceConfig.yearly ?? priceConfig.annual;
+  if (yearlyAmount) {
+    entries.push(['yearly', yearlyAmount]);
+  }
+  return entries;
 }
 
 interface YamlCoupon {
@@ -258,9 +284,10 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
 
     // Sync prices
     for (const [currency, priceConfig] of Object.entries(tier.prices)) {
-      for (const [interval, amount] of Object.entries(priceConfig)) {
+      for (const [interval, amount] of priceEntries(priceConfig)) {
         if (!amount || amount === 0) continue;
-        desiredPriceKeys.add(catalogPriceKey(tierSlug, currency, interval));
+        const billingInterval = normalizeBillingInterval(interval);
+        desiredPriceKeys.add(catalogPriceKey(tierSlug, currency, billingInterval));
 
         // DB upsert
         if (!DRY_RUN) {
@@ -270,7 +297,7 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
                 productId: dbProduct.id,
                 tierSlug,
                 currency,
-                interval: interval as any,
+                interval: billingInterval as any,
               },
             },
             create: {
@@ -278,7 +305,7 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
               tierSlug,
               dhanamTier: tier.dhanam_tier as any,
               currency,
-              interval: interval as any,
+              interval: billingInterval as any,
               amountCents: amount,
               displayName: tier.display_name,
               metadata: tier.metadata,
@@ -300,28 +327,31 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
               stripe,
               stripeProductId,
               currency,
-              interval,
+              billingInterval,
               tierSlug
             );
 
             if (stripePrice) {
-              log('Price', `Found ${slug}/${tierSlug} ${currency} ${interval}: ${stripePrice.id}`);
+              log(
+                'Price',
+                `Found ${slug}/${tierSlug} ${currency} ${billingInterval}: ${stripePrice.id}`
+              );
             } else {
               stripePrice = await stripe.prices.create({
                 product: stripeProductId,
                 unit_amount: amount,
                 currency: currency.toLowerCase(),
-                recurring: { interval: interval === 'yearly' ? 'year' : 'month' },
+                recurring: { interval: billingInterval === 'yearly' ? 'year' : 'month' },
                 metadata: {
                   madfam_slug: slug,
                   madfam_tier: tierSlug,
                   madfam_currency: currency,
-                  madfam_interval: interval,
+                  madfam_interval: billingInterval,
                 },
               });
               log(
                 'Price',
-                `Created ${slug}/${tierSlug} ${currency} ${interval}: ${stripePrice.id}`
+                `Created ${slug}/${tierSlug} ${currency} ${billingInterval}: ${stripePrice.id}`
               );
             }
 
@@ -334,7 +364,7 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
         } else {
           log(
             'Price',
-            `Would sync ${slug}/${tierSlug} ${currency} ${interval}: ${amount} centavos`
+            `Would sync ${slug}/${tierSlug} ${currency} ${billingInterval}: ${amount} centavos`
           );
         }
       }
