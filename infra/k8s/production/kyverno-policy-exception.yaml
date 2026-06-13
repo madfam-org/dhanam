@@ -9,7 +9,7 @@
 # Operator note: prefer cosign-signed digests from deploy-staging / prod-rebuild
 # jobs; this exception does not disable signature verification cluster-wide.
 
-apiVersion: kyverno.io/v2
+apiVersion: kyverno.io/v2beta1
 kind: PolicyException
 metadata:
   name: dhanam-gitops-rollout-signature
