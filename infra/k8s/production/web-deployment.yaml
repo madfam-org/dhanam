@@ -32,7 +32,7 @@ spec:
         component: frontend
       annotations:
         # Bumps pod template to roll out digest-pinned image after Argo sync.
-        enclii.dev/rollout-revision: "808f430f-prod-surface"
+        enclii.dev/rollout-revision: "808f430f-no-dead-secret-refs"
     spec:
       serviceAccountName: dhanam-web
       securityContext:
@@ -83,18 +83,9 @@ spec:
             # Janua OAuth API (Required for SSO button visibility)
             - name: NEXT_PUBLIC_JANUA_API_URL
               value: "https://auth.madfam.io"
-            - name: OIDC_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: dhanam-secrets
-                  key: OIDC_CLIENT_SECRET
-            - name: NEXTAUTH_URL
-              value: "https://app.dhan.am"
-            - name: NEXTAUTH_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: dhanam-secrets
-                  key: NEXTAUTH_SECRET
+            # Web auth is Janua PKCE (client-side). Server-side OIDC/NextAuth
+            # secrets live on dhanam-api only; do not mount dhanam-secrets keys
+            # here — ExternalSecret sync gaps must not block web rollouts.
 
             # =================================================================
             # Billing Frontend Configuration
