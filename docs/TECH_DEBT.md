@@ -39,7 +39,7 @@ For execution order and milestone targets, read the
 | TD-1013 | MADFAM operator prod slice     | High     | Active   | ~65%: ledger + budget metadata + admin MADFAM Import UI. Belvo + prod PlatformConfig seed remain.                                                                                                    | [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) |
 | TD-1014 | Production catalog sync ops    | High     | Active   | GitHub Production environment lacks `DATABASE_URL`/Stripe secrets; live catalog drift (e.g. missing `voxa`) until `sync-catalog.ts` runs. Weekly drift workflow + hardened operator runbook shipped. | [Catalog Truth](CATALOG_TRUTH_2026-05-20.md)                            |
 | TD-1015 | Prod public surface URL drift  | High     | Closed   | Staging-built web on prod hostnames fixed via hostname-aware URLs, prod web rebuild on promote, PR #513 rollout, preflight green on `dhan.am` / `app.dhan.am`.                                       | `scripts/production-preflight.sh`                                       |
-| TD-1016 | Vault extended secret backfill | Medium   | Active   | `external-secret-extended.yaml` deferred until Lockbox populates integration keys (SMTP, Banxico, Metamap, Sentry, etc.). Core ES uses Merge policy.                                                 | `infra/k8s/production/external-secret-extended.yaml`                    |
+| TD-1016 | Vault extended secret backfill | High     | Active   | `vault-store` cannot read `secret/dhanam`; git ES removed from kustomization. Platform ES + retained keys interim. Re-enable after Lockbox backfill.                                                 | `infra/k8s/production/external-secret.yaml`                             |
 
 ## Remediation Notes
 
@@ -247,11 +247,18 @@ Fixes shipped:
 
 ### TD-1016: Vault Extended Secret Backfill
 
-The git-managed `dhanam-secrets` ExternalSecret now syncs a **core** property set
-with `creationPolicy: Merge` so missing optional Vault keys no longer fail GitOps.
-Integration keys live in `external-secret-extended.yaml` (not in kustomization)
-until Enclii Lockbox backfills `secret/dhanam` (SMTP, Banxico, Metamap, Sentry,
-Cotiza federation, etc.).
+**Status:** Active
+
+The git-managed `dhanam-secrets` ExternalSecret is **deferred from kustomization**
+because `vault-store` cannot read `secret/dhanam` (`SecretSyncedError`). Until
+Enclii Lockbox backfill restores Vault read access:
+
+- `dhanam-ecosystem-service-auth` (platform ES) continues merging into
+  `dhanam-secrets`.
+- Retained secret keys from the last good sync remain in the cluster.
+- `external-secret.yaml` (core) and `external-secret-extended.yaml` (integration
+  keys) stay in-repo as the target contract; re-add to `kustomization.yaml` after
+  Vault proof.
 
 ## Recently Closed Debt
 
