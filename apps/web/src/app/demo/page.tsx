@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { authApi } from '~/lib/api/auth';
+import { setDemoModeCookie } from '~/lib/demo/session-cookies';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaceStore } from '~/stores/space';
 
@@ -127,7 +128,7 @@ export default function DemoPage() {
       queryClient.clear();
 
       // Set demo-mode cookie so middleware and layout detect demo mode
-      document.cookie = 'demo-mode=true; path=/; max-age=7200; SameSite=Lax';
+      setDemoModeCookie();
 
       // Client-side navigation preserves Zustand state (no rehydration race)
       router.push('/dashboard');

@@ -4,6 +4,9 @@ import { useTranslation } from '@dhanam/shared';
 import { Button } from '@dhanam/ui';
 import { ArrowRight } from 'lucide-react';
 
+import { usePublicAppUrl } from '@/hooks/usePublicSurface';
+import { buildAppDemoLaunchUrl } from '@/lib/demo/launch-demo';
+
 const personas = [
   { key: 'maria' as const, emoji: '🧑‍💼' },
   { key: 'carlos' as const, emoji: '🏪' },
@@ -13,6 +16,7 @@ const personas = [
 
 export function PersonaCards() {
   const { t } = useTranslation('landing');
+  const appUrl = usePublicAppUrl();
 
   return (
     <section className="container mx-auto px-6 py-16">
@@ -37,7 +41,7 @@ export function PersonaCards() {
             <p className="text-sm font-medium mb-4 flex-1">
               {t(`personaCards.${persona.key}.superpower`)}
             </p>
-            <a href={`/demo?persona=${persona.key}`}>
+            <a href={buildAppDemoLaunchUrl(appUrl, persona.key)}>
               <Button variant="outline" className="w-full gap-2" size="sm">
                 {t(`personaCards.${persona.key}.cta`)}
                 <ArrowRight className="h-3 w-3" />

@@ -15,6 +15,7 @@ import { MobileNav } from '~/components/layout/mobile-nav';
 import { PageTransition } from '~/components/motion/page-transition';
 import { authApi } from '~/lib/api/auth';
 import { DemoNavigationProvider } from '~/lib/contexts/demo-navigation-context';
+import { clearStaleAuthStorageCookie } from '~/lib/demo/session-cookies';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaces } from '~/lib/hooks/use-spaces';
 
@@ -108,6 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (isDemoModeCookie()) {
         attemptDemoLogin();
       } else {
+        clearStaleAuthStorageCookie();
         router.push('/login');
       }
     }

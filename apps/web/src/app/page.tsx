@@ -4,7 +4,6 @@ import { useTranslation } from '@dhanam/shared';
 import { Button } from '@dhanam/ui';
 import { Globe } from 'lucide-react';
 import { useEffect } from 'react';
-import { toast } from 'sonner';
 
 import { FeaturesGrid } from '@/components/landing/features-grid';
 import { FinalCta } from '@/components/landing/final-cta';
@@ -16,6 +15,7 @@ import { ProblemSolution } from '@/components/landing/problem-solution';
 import { SocialProof } from '@/components/landing/social-proof';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePublicAppUrl } from '@/hooks/usePublicSurface';
+import { redirectToAppDemo } from '@/lib/demo/launch-demo';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 function HomePageContent() {
@@ -35,36 +35,9 @@ function HomePageContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Reason: analytics is stable; only re-run when auth state changes
   }, [isAuthenticated]);
 
-  const handleLiveDemoClick = async () => {
+  const handleLiveDemoClick = () => {
     analytics.track('live_demo_clicked', { source: 'hero_cta' });
-
-    const geoCookie =
-      typeof document !== 'undefined'
-        ? document.cookie
-            .split('; ')
-            .find((c) => c.startsWith('dhanam_geo='))
-            ?.split('=')[1]
-        : undefined;
-
-    try {
-      const { authApi } = await import('@/lib/api/auth');
-      const { useAuth } = await import('@/lib/hooks/use-auth');
-
-      const response = await authApi.loginAsGuest({ countryCode: geoCookie });
-      useAuth.getState().setAuth(response.user, response.tokens);
-
-      analytics.track('demo_session_started', {
-        userId: response.user.id,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-      });
-
-      window.location.href = `${resolvedAppUrl}/dashboard`;
-    } catch (error) {
-      console.error('Guest login failed:', error);
-      toast.error('Failed to access demo session. Redirecting to demo menu.');
-      analytics.track('demo_session_failed', { error: String(error) });
-      window.location.href = `${resolvedAppUrl}/demo`;
-    }
+    redirectToAppDemo(resolvedAppUrl, 'guest');
   };
 
   const handleSignUpClick = (plan?: string) => {

@@ -6,6 +6,7 @@ import { create } from 'zustand';
 
 import { authApi } from '../api/auth';
 import { apiClient } from '../api/client';
+import { getDhanamCookieDomainAttr } from '../demo/session-cookies';
 
 const JANUA_API_URL = process.env.NEXT_PUBLIC_JANUA_API_URL || 'https://auth.madfam.io';
 
@@ -133,6 +134,17 @@ export const useAuth = create<AuthState>()((set, get) => ({
     apiClient.setTokens(tokens);
     set({ user, tokens, token: tokens.accessToken, isAuthenticated: true });
 
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('janua_access_token', tokens.accessToken);
+        if (tokens.refreshToken) {
+          localStorage.setItem('janua_refresh_token', tokens.refreshToken);
+        }
+      } catch {
+        // quota exceeded — ignore
+      }
+    }
+
     // Cache user profile so getInitialAuthState() can read subscriptionTier/isAdmin
     // on next page load (JWT from Janua doesn't include Dhanam-specific fields)
     if (typeof window !== 'undefined' && user) {
@@ -155,11 +167,9 @@ export const useAuth = create<AuthState>()((set, get) => ({
     }
 
     // Set cookie marker for middleware detection (prevents redirect flash)
-    // Use Domain=.dhan.am for cross-subdomain auth (app.dhan.am + admin.dhan.am)
     if (typeof document !== 'undefined') {
-      const isProduction = window.location.hostname.endsWith('.dhan.am');
-      const domainAttr = isProduction ? ' Domain=.dhan.am;' : '';
-      document.cookie = `auth-storage=true; path=/;${domainAttr} max-age=604800; SameSite=Lax`;
+      const secureAttr = window.location.hostname.endsWith('.dhan.am') ? '; Secure' : '';
+      document.cookie = `auth-storage=authenticated; path=/;${getDhanamCookieDomainAttr()} max-age=604800; SameSite=Lax${secureAttr}`;
     }
   },
 
@@ -171,17 +181,16 @@ export const useAuth = create<AuthState>()((set, get) => ({
     if (typeof window !== 'undefined') {
       try {
         localStorage.removeItem('dhanam_user_profile');
+        localStorage.removeItem('janua_access_token');
+        localStorage.removeItem('janua_refresh_token');
       } catch {
         /* ignore */
       }
     }
 
-    // Clear cookie marker for middleware detection
-    // Use Domain=.dhan.am for cross-subdomain auth (app.dhan.am + admin.dhan.am)
     if (typeof document !== 'undefined') {
-      const isProduction = window.location.hostname.endsWith('.dhan.am');
-      const domainAttr = isProduction ? ' Domain=.dhan.am;' : '';
-      document.cookie = `auth-storage=; path=/;${domainAttr} max-age=0; SameSite=Lax`;
+      const secureAttr = window.location.hostname.endsWith('.dhan.am') ? '; Secure' : '';
+      document.cookie = `auth-storage=; path=/;${getDhanamCookieDomainAttr()} max-age=0; SameSite=Lax${secureAttr}`;
     }
   },
 
