@@ -30,6 +30,9 @@ spec:
       labels:
         app: dhanam-web
         component: frontend
+      annotations:
+        # Bumps pod template to roll out digest-pinned image after Argo sync.
+        enclii.dev/rollout-revision: "808f430f-prod-surface"
     spec:
       serviceAccountName: dhanam-web
       securityContext:
