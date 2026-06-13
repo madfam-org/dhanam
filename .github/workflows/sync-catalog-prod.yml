@@ -7,6 +7,7 @@
 #   DATABASE_URL
 #   STRIPE_SECRET_KEY
 #   STRIPE_MX_SECRET_KEY
+#   NPM_MADFAM_TOKEN (repo/org secret — needed for pnpm install)
 
 name: Sync production catalog
 
@@ -35,15 +36,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "20"
           cache: pnpm
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Configure npm registry
+        run: |
+          echo "@madfam:registry=https://npm.madfam.io" >> ~/.npmrc
+          echo "@dhanam:registry=https://npm.madfam.io" >> ~/.npmrc
+          echo "@janua:registry=https://npm.madfam.io" >> ~/.npmrc
+          echo "//npm.madfam.io/:_authToken=${{ secrets.NPM_MADFAM_TOKEN }}" >> ~/.npmrc
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
 
       - name: Run catalog sync
         env:
