@@ -60,16 +60,16 @@ jobs:
 
       - name: Run catalog sync
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ inputs.dry_run == true && 'postgresql://dummy:dummy@localhost:5432/dummy' || secrets.DATABASE_URL }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
           echo "Reason: ${{ inputs.reason }}"
           if [ "$DRY_RUN" = "true" ]; then
-            pnpm tsx scripts/sync-catalog.ts --dry-run
+            pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts --dry-run
           else
-            pnpm tsx scripts/sync-catalog.ts
+            pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts
           fi
 
       - name: Verify voxa in live catalog API
