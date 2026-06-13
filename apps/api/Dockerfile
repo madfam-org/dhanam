@@ -90,6 +90,10 @@ COPY --from=builder --chown=nestjs:nodejs /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/generated ./apps/api/generated
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/package.json ./apps/api/package.json
 COPY --from=builder --chown=nestjs:nodejs /app/catalog.yaml ./catalog.yaml
+# Ops script for the in-cluster catalog sync job (catalog-sync-job.yaml). It
+# reads /app/catalog.yaml and imports the generated Prisma client at
+# apps/api/generated; tsx (devDep) is already present in apps/api/node_modules.
+COPY --from=builder --chown=nestjs:nodejs /app/scripts/sync-catalog.ts ./scripts/sync-catalog.ts
 # prisma.config.ts needed for `prisma migrate deploy` in container
 COPY --from=builder --chown=nestjs:nodejs /app/apps/api/prisma.config.ts ./apps/api/prisma.config.ts
 

@@ -1,0 +1,117 @@
+# In-cluster catalog sync (on-demand).
+#
+# Why this exists: scripts/sync-catalog.ts writes to the production Postgres,
+# which is reachable ONLY from inside the cluster (postgres.data.svc.cluster.local)
+# and admits only its consumer namespaces. CI runners cannot reach it
+# (GitHub-hosted = no cluster DNS; arc-runners = blocked by the Postgres ingress
+# NetworkPolicy). Running here, in the dhanam namespace, the DB + billing secrets
+# resolve exactly as they do for dhanam-api.
+#
+# Suspended by design — it never runs on a schedule. An operator triggers it:
+#
+#   kubectl -n dhanam create job catalog-sync-$(date +%Y%m%d-%H%M) \
+#     --from=cronjob/dhanam-catalog-sync
+#   kubectl -n dhanam logs -f job/catalog-sync-<stamp>
+#
+# Prereq: dhanam-billing-secrets must hold the live STRIPE_MX_SECRET_KEY (Step 3A),
+# otherwise the sync writes DB rows but skips Stripe price creation.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dhanam-catalog-sync
+  namespace: dhanam
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    app: dhanam-catalog-sync
+    app.kubernetes.io/component: ops-job
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/part-of: dhanam-billing
+spec:
+  # On-demand only: suspended, and a never-occurring schedule (Feb 31) as a guard.
+  suspend: true
+  schedule: "0 0 31 2 *"
+  timeZone: "Etc/UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 86400
+      activeDeadlineSeconds: 600
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: dhanam-catalog-sync
+            app.kubernetes.io/component: ops-job
+            app.kubernetes.io/part-of: dhanam-billing
+        spec:
+          serviceAccountName: dhanam-api
+          restartPolicy: Never
+          imagePullSecrets:
+            - name: ghcr-credentials
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: sync
+              image: dhanam-api
+              imagePullPolicy: Always
+              workingDir: /app/apps/api
+              command:
+                - sh
+                - -lc
+                - |
+                  echo "[catalog-sync] running scripts/sync-catalog.ts in-cluster (live)"
+                  exec /app/apps/api/node_modules/.bin/tsx /app/scripts/sync-catalog.ts
+              env:
+                - name: NODE_ENV
+                  value: "production"
+                - name: TMPDIR
+                  value: /tmp
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: dhanam-secrets
+                      key: DATABASE_URL
+                # MXN prices (Mexico account, settles to BBVA). Required for Stripe
+                # price creation; if absent the sync does DB-only.
+                - name: STRIPE_MX_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: dhanam-billing-secrets
+                      key: STRIPE_MX_SECRET_KEY
+                # Optional global account; when unset, USD prices fall back to the
+                # MX account (single-account multi-currency).
+                - name: STRIPE_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: dhanam-billing-secrets
+                      key: STRIPE_SECRET_KEY
+                      optional: true
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              securityContext:
+                privileged: false
+                allowPrivilegeEscalation: false
+                # tsx/esbuild needs a writable fs for transient compilation.
+                readOnlyRootFilesystem: false
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: tmp
+              emptyDir: {}

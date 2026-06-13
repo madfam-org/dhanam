@@ -7,6 +7,7 @@ resources:
 - admin-deployment.yaml
 - web-deployment.yaml
 - fx-spot-refresh-cronjob.yaml
+- catalog-sync-job.yaml
 - kyverno-policy-exception.yaml
 # Git-managed Vault ES deferred: vault-store cannot read secret/dhanam (TD-1016).
 # Platform ES dhanam-ecosystem-service-auth merges into dhanam-secrets instead.
