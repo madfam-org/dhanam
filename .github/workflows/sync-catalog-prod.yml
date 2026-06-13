@@ -71,9 +71,12 @@ jobs:
           STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
         run: |
           set -euo pipefail
+          # MX-only model: the Mexico Stripe account settles to BBVA (MXN) and
+          # presents USD/other currencies for global sales. Required: DATABASE_URL
+          # + STRIPE_MX_SECRET_KEY. STRIPE_SECRET_KEY (a separate global account)
+          # is OPTIONAL — only set it once a dedicated global Stripe entity exists.
           missing=()
           [ -z "${DATABASE_URL:-}" ] && missing+=("DATABASE_URL")
-          [ -z "${STRIPE_SECRET_KEY:-}" ] && missing+=("STRIPE_SECRET_KEY")
           [ -z "${STRIPE_MX_SECRET_KEY:-}" ] && missing+=("STRIPE_MX_SECRET_KEY")
           if [ "${#missing[@]}" -gt 0 ]; then
             echo "ERROR: GitHub Production environment is missing secrets: ${missing[*]}"
@@ -81,12 +84,17 @@ jobs:
             echo "Operator fallback: scripts/sync-catalog-prod.md → internal-devops runbook."
             exit 1
           fi
+          if [ -z "${STRIPE_SECRET_KEY:-}" ]; then
+            echo "NOTE: STRIPE_SECRET_KEY (global account) not set — running MX-only. USD prices are created on the MX account (multi-currency presentment)."
+          fi
           echo "::add-mask::$DATABASE_URL"
-          echo "::add-mask::$STRIPE_SECRET_KEY"
           echo "::add-mask::$STRIPE_MX_SECRET_KEY"
           echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
-          echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> "$GITHUB_ENV"
           echo "STRIPE_MX_SECRET_KEY=$STRIPE_MX_SECRET_KEY" >> "$GITHUB_ENV"
+          if [ -n "${STRIPE_SECRET_KEY:-}" ]; then
+            echo "::add-mask::$STRIPE_SECRET_KEY"
+            echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> "$GITHUB_ENV"
+          fi
 
       - name: Run catalog sync (dry-run)
         if: inputs.dry_run == true
