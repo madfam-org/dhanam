@@ -73,7 +73,7 @@ replicas:
 # is API-focused).
 images:
   - name: ghcr.io/madfam-org/dhanam/api
-    digest: sha256:bb02bb5cc6654b80833a01d9977d56e91da88faf09e2b783bc6d3f364fbe626b
+    digest: sha256:f536607b77042bea8d1c3c1b5e0666f4b78cf4c203a9ce66d74ed49df16e1aef
   - name: ghcr.io/madfam-org/dhanam/web
     digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
   - name: ghcr.io/madfam-org/dhanam/admin
