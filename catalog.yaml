@@ -1274,6 +1274,63 @@ products:
       loyalty_event: 1
       credential_issue: 2
 
+  voxa:
+    name: "Voxa"
+    description: "Cross-platform AAC — OBF, cloud sync, consent-gated AI, WCAG-native web"
+    category: platform
+    website: "https://voxa.madfam.io"
+    sort_order: 29
+    tiers:
+      free:
+        dhanam_tier: essentials
+        display_name: "Parent"
+        prices: {}
+        metadata:
+          boards: 1
+          team_seats: 1
+        features:
+          - "1 communication board"
+          - "Cloud sync & OBF import/export"
+          - "CVI themes & access methods"
+          - "Basic AI (consent-gated)"
+      family:
+        dhanam_tier: pro
+        display_name: "Family"
+        # Tulana v0.1 anchor (2026-06-12): 0.8× AAC sub median ≈177 MXN;
+        # operator value-anchored at 199 MXN (Tezca Essentials peer).
+        prices:
+          USD: { monthly: 1176, annual: 11176 }
+          MXN: { monthly: 19900, annual: 189900 }
+        metadata:
+          boards: 10
+          team_seats: 3
+        features:
+          - "Up to 10 boards"
+          - "3 team editors"
+          - "Cloud sync & OBF"
+          - "Basic AI"
+      clinic:
+        dhanam_tier: premium
+        display_name: "Institutional"
+        # Sales-assisted: org base + per-seat; checkout via operator quote.
+        prices:
+          USD: { monthly: 8999 }
+          MXN: { monthly: 149900 }
+        metadata:
+          boards: unlimited
+          team_seats: unlimited
+          per_seat_mxn_centavos: 34900
+          min_seats: 3
+        features:
+          - "Unlimited boards & team roles"
+          - "Full AI + usage reports"
+          - "SSO via Janua"
+          - "CFDI invoicing"
+          - "Priority onboarding"
+    credit_costs:
+      ai_completion: 1
+      symbol_generation: 2
+
 coupons:
   founding_member_mx:
     # Year-1 onboarding deal (was "40% forever" — PRICING_OVERHAUL_20260417.md
