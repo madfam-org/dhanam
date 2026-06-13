@@ -52,11 +52,11 @@ replicas:
 # name/newName, which masks this ordering difference.
 images:
   - name: ghcr.io/madfam-org/dhanam/api
-    digest: sha256:ab9ddfbeadce7097616e4f2ec5eae00ed0ad28f896f04c540a14bd0aeff4b897
+    digest: sha256:e72b4017a177d220702090e2d3a62294bb2a4d0f75eccffdc42239fdf0f0d277
   - name: ghcr.io/madfam-org/dhanam/web
-    digest: sha256:f4ea1c7eb6d406b049bc71bbc670bd8942b6b6d856f73a2c201f1944961a96cb
+    digest: sha256:43a7a0380ba6c6586a4239aa621cd7cdde67c4eb27e60ad2b80f881082e6bb2c
   - name: ghcr.io/madfam-org/dhanam/admin
-    digest: sha256:5997cc735f56a4f24d3ac18a39ad091ac94f5a596b2205662e37e354fdff9381
+    digest: sha256:5d24793b607f6bef333aab0101b52ba00f8fca637980ec13d186bc2264ef057f
 
 patches:
   # Staging-specific env vars on the API (feature flags off, ENVIRONMENT=staging,
