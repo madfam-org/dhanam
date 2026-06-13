@@ -3,7 +3,7 @@
 # Runs scripts/sync-catalog.ts with production secrets from the GitHub
 # `production` environment. Idempotent — safe to re-run after catalog.yaml merges.
 #
-# Required secrets (production environment):
+# Required secrets (GitHub Settings → Environments → Production):
 #   DATABASE_URL
 #   STRIPE_SECRET_KEY
 #   STRIPE_MX_SECRET_KEY
@@ -32,7 +32,7 @@ jobs:
   sync:
     name: sync-catalog.ts
     runs-on: ubuntu-latest
-    environment: production
+    environment: Production
     steps:
       - uses: actions/checkout@v4
 
@@ -59,6 +59,23 @@ jobs:
         env:
           DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
         run: pnpm install --frozen-lockfile
+
+      - name: Preflight production secrets
+        if: inputs.dry_run == false
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
+        run: |
+          missing=()
+          [ -z "$DATABASE_URL" ] && missing+=("DATABASE_URL")
+          [ -z "$STRIPE_SECRET_KEY" ] && missing+=("STRIPE_SECRET_KEY")
+          [ -z "$STRIPE_MX_SECRET_KEY" ] && missing+=("STRIPE_MX_SECRET_KEY")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "ERROR: GitHub Production environment is missing secrets: ${missing[*]}"
+            echo "Add them under Settings → Environments → Production (from Enclii Lockbox)."
+            exit 1
+          fi
 
       - name: Run catalog sync
         env:
