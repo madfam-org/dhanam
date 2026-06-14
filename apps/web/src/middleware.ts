@@ -15,6 +15,8 @@ const publicPaths = [
   '/auth/callback', // OAuth callback from Janua SSO
   '/demo',
   '/demo/',
+  '/pricing', // Public, deep-linkable pricing funnel entry
+  '/for-platforms',
   // Legal pages (rendered under (legal) route group)
   '/privacy',
   '/terms',
