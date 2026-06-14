@@ -5,6 +5,7 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": false,
     "noImplicitAny": false,
     "noUnusedLocals": false,
