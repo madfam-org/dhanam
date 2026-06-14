@@ -7,6 +7,12 @@ open `docs/INDEX.md`.
 
 ## Primary Entry Points
 
+- [Monetization Session](MONETIZATION_SESSION.md) - **agent entrypoint** for first
+  revenue, checkout, billing, catalog, and entitlement work
+- [Monetization Path Readiness](MONETIZATION_PATH_READINESS.md) - current gate
+  table, shipped work, ranked open tasks
+- [First Pesos Commercial GA](FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md) -
+  G0–G9 framework and first-peso proof bar
 - [Repository README](../README.md) - product overview and quick start
 - [Development Guide](DEVELOPMENT.md) - local setup, ports, commands, tests
 - [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md) - full stability and GA program

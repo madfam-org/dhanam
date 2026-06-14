@@ -2,13 +2,29 @@
 
 Compact LLM context index for this repository.
 
-## Read first
+## Monetization session (read first)
+
+When the goal is first revenue, checkout, billing, catalog, or entitlements:
 
 - `AGENTS.md` — canonical agent operating instructions.
+- `docs/MONETIZATION_SESSION.md` — **single monetization entrypoint**; repo vs private ops routing.
+- `docs/MONETIZATION_PATH_READINESS.md` — current G0–G9 slice, gate table, ranked open tasks.
+- `docs/FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md` — full first-peso gate framework.
+- `docs/runbooks/STRIPE_MXN_LIVE_FLIP.md` — live MXN flip (after secret restore + Stripe MX live).
+- `catalog.yaml` + `scripts/sync-catalog.ts` — SKU source of truth and Stripe/DB sync.
+- `apps/api/src/modules/billing/README.md` — billing module (checkout, ledger, webhooks).
+- `docs/TECH_DEBT.md` — active debt (TD-1009, TD-1010, TD-1014).
+
+Phase 0 platform blockers (Vault/`dhanam-secrets`, operator cutover) are tracked in
+`internal-devops` — see paths in `docs/MONETIZATION_SESSION.md`. Open that repo
+when ops remediation is in scope; stay in dhanam for product/engineering work.
+
+## General read order
+
 - `README.md` — human/product overview when present.
 - `docs/README.md` — canonical documentation map.
 - `docs/GA_REMEDIATION_ROADMAP.md` — full GA program (stability + commercial +
-  consumer); canonical implementation plan.
+  consumer); use for stability-only sessions.
 - `docs/COMMERCIAL_GA_EXECUTION.md` — G2 commercial GA runbook (WS1–WS6) and
   staging commercial smoke configuration.
 - `docs/ROADMAP.md` — stability priorities P0–P8 and milestones M1–M7.

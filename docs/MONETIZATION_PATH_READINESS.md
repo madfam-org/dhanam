@@ -1,6 +1,9 @@
 # Monetization-Path Readiness — Dhanam
 
-**Last Updated:** 2026-06-14
+**Last Updated:** 2026-06-14  
+**Agent entrypoint:** [`MONETIZATION_SESSION.md`](MONETIZATION_SESSION.md) — read that
+file first for session routing and the private ops boundary.
+
 **Scope:** Dhanam's execution slice toward first MXN revenue. Pairs with
 `docs/FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md` (the G0–G9 gate
 framework) and the cross-repo sequence in
@@ -54,19 +57,20 @@ are Phase 1, not the first transaction.
 > degradation is currently blocking new deploys, the catalog sync, and the
 > payment path (`dhanam-api` is serving on a single pod). Remediation and the
 > sequenced first-peso cutover are tracked privately in `internal-devops`:
-> `runbooks/2026-06-13-dhanam-secrets-degradation-incident.md` and
+> `runbooks/MONETIZATION_OPS_SESSION.md` (ops entrypoint),
+> `runbooks/2026-06-13-dhanam-secrets-degradation-incident.md`, and
 > `runbooks/2026-06-14-dhanam-first-peso-cutover.md`. Unblocking is Vault/ESO +
 > Stripe-MX/BBVA provisioning — no repo change clears it.
 
 ## Gates Dhanam owns (G0–G9)
 
-| Gate                     | Status | Dhanam action to close                                                                           |
-| ------------------------ | ------ | ------------------------------------------------------------------------------------------------ |
-| G0 Catalog truth         | Ready  | Keep `catalog.yaml` the single source; re-run `sync-catalog.ts` after the Free tier              |
-| G1 Pricing evidence      | Ready  | Apply Tulana proposals (see `tulana/docs/dhanam-pricing-readiness-2026-06-13.md`)                |
+| Gate                     | Status | Dhanam action to close                                                                                  |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------------------- |
+| G0 Catalog truth         | Ready  | Keep `catalog.yaml` the single source; re-run `sync-catalog.ts` after the Free tier                     |
+| G1 Pricing evidence      | Ready  | Apply Tulana proposals (see `tulana/docs/dhanam-pricing-readiness-2026-06-13.md`)                       |
 | G5 Live checkout         | OPEN   | UI shipped (#522); flip `FEATURE_STRIPE_MXN_LIVE` after Stripe MX live + secret restore (runbook below) |
-| G6 Payment + ledger      | OPEN   | Prove one idempotent `BillingEvent` per payment, no duplicate revenue                            |
-| G7 Entitlement + fan-out | OPEN   | Activate paid tier/credits + signed product webhook; close Karafiel CFDI staging proof (TD-1010) |
+| G6 Payment + ledger      | OPEN   | Prove one idempotent `BillingEvent` per payment, no duplicate revenue                                   |
+| G7 Entitlement + fan-out | OPEN   | Activate paid tier/credits + signed product webhook; close Karafiel CFDI staging proof (TD-1010)        |
 
 (G2–G4 Selva/PhyndCRM, G8 BBVA, G9 Converge are owned outside this repo.)
 

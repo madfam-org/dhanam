@@ -398,6 +398,7 @@ Comprehensive documentation is available in the [`docs/`](docs/) directory:
 
 This project provides machine-readable context files for LLM agents:
 
+- [`docs/MONETIZATION_SESSION.md`](docs/MONETIZATION_SESSION.md) — **Monetization session entrypoint** (first revenue, checkout, billing)
 - [`llms.txt`](llms.txt) — Concise project overview with documentation links ([llmstxt.org spec](https://llmstxt.org/))
 - [`llms-full.txt`](llms-full.txt) — Expanded version with inlined critical content
 - [`AGENTS.md`](AGENTS.md) — Canonical agent operating instructions
