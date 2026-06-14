@@ -77,4 +77,4 @@ redis_data/
 data/
 
 # Operator MADFAM import secrets (see apps/api/scripts/madfam-import.env.example)
-**/madfam-import.local.env
+**/madfam-import.local.env.local/
