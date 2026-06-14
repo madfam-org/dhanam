@@ -109,7 +109,7 @@
     "path-to-regexp": "8.3.0",
     "pdfkit": "^0.17.2",
     "pg": "^8.18.0",
-    "plaid": "^41.1.0",
+    "plaid": "^42.2.0",
     "posthog-node": "^5.33.2",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
