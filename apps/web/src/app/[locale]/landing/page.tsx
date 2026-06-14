@@ -43,7 +43,8 @@ export default function LocaleLandingPage() {
 
   const handleLiveDemoClick = () => {
     analytics.track('live_demo_clicked', { source: 'hero_cta', locale });
-    redirectToAppDemo(appUrl, 'guest');
+    // No forced persona — land on the picker so the visitor chooses their path.
+    redirectToAppDemo(appUrl);
   };
 
   const handleSignUpClick = (plan?: string) => {

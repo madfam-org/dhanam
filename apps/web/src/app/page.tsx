@@ -37,7 +37,8 @@ function HomePageContent() {
 
   const handleLiveDemoClick = () => {
     analytics.track('live_demo_clicked', { source: 'hero_cta' });
-    redirectToAppDemo(resolvedAppUrl, 'guest');
+    // No forced persona — land on the picker so the visitor chooses their path.
+    redirectToAppDemo(resolvedAppUrl);
   };
 
   const handleSignUpClick = (plan?: string) => {
