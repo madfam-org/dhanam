@@ -1,6 +1,6 @@
 import { subDays } from 'date-fns';
 
-import { Currency, ManualAssetType } from '@db';
+import { Currency, ManualAssetType, Prisma } from '@db';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -15,7 +15,7 @@ interface AssetDef {
   currency: Currency;
   acquisitionDate: Date;
   acquisitionCost: number;
-  metadata?: object;
+  metadata?: Prisma.InputJsonValue;
 }
 
 export class AssetsBuilder {
@@ -36,12 +36,12 @@ export class AssetsBuilder {
           currency: def.currency,
           acquisitionDate: def.acquisitionDate,
           acquisitionCost: def.acquisitionCost,
-          metadata: def.metadata ?? null,
+          metadata: def.metadata ?? Prisma.JsonNull,
         },
       });
 
       // 9 weekly valuation snapshots
-      const valuations = [];
+      const valuations: Prisma.ManualAssetValuationCreateManyInput[] = [];
       let val = def.acquisitionCost;
       const step = (def.currentValue - def.acquisitionCost) / 9;
       for (let w = 8; w >= 0; w--) {

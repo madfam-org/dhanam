@@ -158,7 +158,7 @@ export class MxService implements IFinancialProvider {
             metadata: JSON.stringify({ dhanamUserId: params.userId }),
           },
         });
-        mxUserGuid = createUserResponse.data.user?.guid;
+        mxUserGuid = createUserResponse.data.user?.guid ?? undefined;
 
         if (!mxUserGuid) {
           throw new Error('Failed to create MX user');
@@ -225,7 +225,7 @@ export class MxService implements IFinancialProvider {
       );
       const member = memberResponse.data.member;
 
-      if (!member) {
+      if (!member || !member.guid) {
         throw new Error('Invalid MX member');
       }
 
@@ -556,9 +556,9 @@ export class MxService implements IFinancialProvider {
         institutionId: inst.code || '',
         name: inst.name || '',
         provider: Provider.mx,
-        logo: inst.medium_logo_url,
+        logo: inst.medium_logo_url ?? undefined,
         primaryColor: (inst as any).brand_color,
-        url: inst.url,
+        url: inst.url ?? undefined,
         supportedProducts: ['accounts', 'transactions'],
         region: region || 'US',
       }));
@@ -591,9 +591,9 @@ export class MxService implements IFinancialProvider {
         institutionId: inst.code || '',
         name: inst.name || '',
         provider: Provider.mx,
-        logo: inst.medium_logo_url,
+        logo: inst.medium_logo_url ?? undefined,
         primaryColor: (inst as any).brand_color,
-        url: inst.url,
+        url: inst.url ?? undefined,
         supportedProducts: ['accounts', 'transactions'],
         region: 'US',
       };
@@ -608,7 +608,7 @@ export class MxService implements IFinancialProvider {
   // Helper methods
 
   private async handleMemberUpdate(payload: Record<string, unknown>) {
-    const memberGuid = payload.member_guid;
+    const memberGuid = payload.member_guid as string;
     const _userGuid = payload.user_guid;
 
     // Find connection
@@ -638,7 +638,7 @@ export class MxService implements IFinancialProvider {
   }
 
   private async handleMemberAggregated(payload: Record<string, unknown>) {
-    const memberGuid = payload.member_guid;
+    const memberGuid = payload.member_guid as string;
 
     // Find connection and trigger sync
     const connection = await this.prisma.providerConnection.findFirst({
@@ -659,7 +659,7 @@ export class MxService implements IFinancialProvider {
   }
 
   private async handleAccountUpdate(payload: Record<string, unknown>) {
-    const accountGuid = payload.account_guid;
+    const accountGuid = payload.account_guid as string;
 
     // Find and update account
     const account = await this.prisma.account.findFirst({
@@ -679,7 +679,7 @@ export class MxService implements IFinancialProvider {
       await this.prisma.account.update({
         where: { id: account.id },
         data: {
-          balance: payload.balance,
+          balance: payload.balance as number,
           lastSyncedAt: new Date(),
         },
       });

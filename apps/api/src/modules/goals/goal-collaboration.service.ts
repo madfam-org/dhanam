@@ -26,8 +26,8 @@ export interface GoalShareWithUser {
   goalId: string;
   role: GoalShareRole;
   status: GoalShareStatus;
-  message?: string;
-  acceptedAt?: Date;
+  message?: string | null;
+  acceptedAt?: Date | null;
   createdAt: Date;
   user: {
     id: string;

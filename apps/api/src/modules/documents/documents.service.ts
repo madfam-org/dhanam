@@ -9,7 +9,7 @@ import { BillingService } from '../billing/billing.service';
 import { SpacesService } from '../spaces/spaces.service';
 import { R2StorageService } from '../storage/r2.service';
 
-import { CsvPreviewService } from './csv-preview.service';
+import { CsvPreviewService, CsvPreviewResult } from './csv-preview.service';
 import {
   RequestUploadUrlDto,
   ConfirmUploadDto,
@@ -187,7 +187,7 @@ export class DocumentsService {
 
     const isCsv = dto.contentType === 'text/csv' || document.contentType === 'text/csv';
     let newStatus: DocumentStatus = DocumentStatus.uploaded;
-    let csvPreview = null;
+    let csvPreview: CsvPreviewResult | null = null;
 
     // Generate CSV preview for small files synchronously
     if (isCsv && actualSize <= CSV_SYNC_THRESHOLD) {

@@ -44,6 +44,10 @@ export class LegacyStripeGateway implements PaymentGatewayPort {
   }
 
   async createSubscriptionCheckout(input: GatewayCheckoutInput): Promise<GatewayCheckoutResult> {
+    if (!input.customerId) {
+      throw new Error('Legacy Stripe checkout requires customerId');
+    }
+
     const session = await this.stripe.createCheckoutSession({
       customerId: input.customerId,
       priceId: input.priceId,

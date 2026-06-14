@@ -202,7 +202,7 @@ export class TotpService {
   }
 
   generateBackupCodes(): string[] {
-    const codes = [];
+    const codes: string[] = [];
     for (let i = 0; i < 10; i++) {
       // Generate cryptographically secure 8-character backup codes
       const code = randomBytes(4).toString('hex').toUpperCase();

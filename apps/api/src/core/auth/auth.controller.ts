@@ -191,7 +191,7 @@ export class AuthController {
       user: {
         id: session.user.id,
         email: session.user.email,
-        name: session.user.name,
+        name: session.user.name ?? '',
         isGuest: true,
       },
       message: 'Welcome to Dhanam demo! This is a read-only guest session.',

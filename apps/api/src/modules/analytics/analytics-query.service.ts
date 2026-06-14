@@ -243,7 +243,14 @@ export class AnalyticsQueryService {
     let totalExpenses = 0;
     let totalTransactions = 0;
 
-    const monthlyData = [];
+    const monthlyData: Array<{
+      month: string;
+      income: number;
+      expenses: number;
+      net: number;
+      savingsRate: number;
+      transactionCount: number;
+    }> = [];
     for (let i = months - 1; i >= 0; i--) {
       const monthDate = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthKey = monthDate.toISOString().slice(0, 7);
@@ -455,7 +462,13 @@ export class AnalyticsQueryService {
       monthMap.set(monthKey, existing);
     }
 
-    const result = [];
+    const result: Array<{
+      group: string;
+      groupId: string;
+      sum: number;
+      count: number;
+      average: number;
+    }> = [];
     const start = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
     const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
     const current = new Date(start);

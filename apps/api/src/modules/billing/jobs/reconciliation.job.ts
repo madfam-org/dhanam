@@ -49,7 +49,8 @@ export class ReconciliationJob {
 
     const subscribedUsers = await this.prisma.user.findMany({
       where: {
-        subscriptionTier: { not: null },
+        // subscriptionTier is a non-nullable enum (defaults to community), so the
+        // meaningful "has billing" filter is a present Stripe customer id.
         stripeCustomerId: { not: null },
       },
       select: {

@@ -326,7 +326,7 @@ export class SubscriptionsService {
     await this.spacesService.verifyUserAccess(userId, spaceId, 'member');
 
     const detected = await this.detectorService.detectSubscriptions(spaceId);
-    const created = [];
+    const created: Array<ReturnType<SubscriptionsService['transformToResponse']>> = [];
 
     for (const sub of detected) {
       try {

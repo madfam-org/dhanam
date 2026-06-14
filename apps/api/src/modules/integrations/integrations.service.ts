@@ -128,13 +128,15 @@ export class IntegrationsService {
   private async checkBelvoHealth(): Promise<{ latency: number }> {
     const start = Date.now();
     try {
-      if (!this.isBelvoConfigured()) {
+      const secretKeyId = this.configService.get<string>('BELVO_SECRET_KEY_ID');
+      const secretKeyPassword = this.configService.get<string>('BELVO_SECRET_KEY_PASSWORD');
+      if (!secretKeyId || !secretKeyPassword) {
         throw new Error('Belvo not configured');
       }
 
       const client = new Belvo(
-        this.configService.get('BELVO_SECRET_KEY_ID'),
-        this.configService.get('BELVO_SECRET_KEY_PASSWORD'),
+        secretKeyId,
+        secretKeyPassword,
         this.configService.get('BELVO_ENV', 'sandbox')
       );
 
