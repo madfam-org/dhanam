@@ -66,6 +66,18 @@ updates:
     labels:
       - "dependencies"
       - "api"
+    ignore:
+      # Stripe 22.x breaks the API typecheck via the upstream stripe-node#2683
+      # issue (Stripe.* namespace types under CommonJS + tsc). Hold on the
+      # supported 20.x line until the upstream fix lands or we schedule a
+      # dedicated module-resolution (ESM) migration, then bump deliberately.
+      - dependency-name: "stripe"
+        update-types: ["version-update:semver-major"]
+    groups:
+      api-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
   # Web workspace
   - package-ecosystem: "npm"
