@@ -20,6 +20,9 @@ jobs:
     services:
       postgres:
         image: postgres:16-alpine
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
         env:
           POSTGRES_DB: dhanam_test
           POSTGRES_USER: test_user
@@ -126,6 +129,9 @@ jobs:
     services:
       postgres:
         image: postgres:16-alpine
+        credentials:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
         env:
           POSTGRES_DB: dhanam_test
           POSTGRES_USER: test_user
