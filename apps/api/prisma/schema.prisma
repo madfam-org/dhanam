@@ -65,10 +65,10 @@ enum Currency {
 }
 
 enum SubscriptionTier {
-  community // self-hosted or free cloud trial
-  essentials // $4.99/mo
-  pro // $11.99/mo
-  premium // $19.99/mo
+  community  // Free tier — acquisition funnel (MXN 0). Source of truth: catalog.yaml
+  essentials // USD 4.99 / MXN 79 per mo
+  pro        // USD 14.99 / MXN 299 per mo
+  premium    // USD 29.99 / MXN 599 per mo
 }
 
 enum BillingEventType {
