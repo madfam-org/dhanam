@@ -148,7 +148,7 @@ describe('Landing Page Demo Flow', () => {
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       fireEvent.click(demoButtons[0]!);
 
-      expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am', 'guest');
+      expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am');
       expect(mockAuthApi.loginAsGuest).not.toHaveBeenCalled();
     });
 
@@ -239,7 +239,7 @@ describe('Landing Page Demo Flow', () => {
 
       fireEvent.click(demoButtons[1]!);
 
-      expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am', 'guest');
+      expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am');
     });
   });
 });
