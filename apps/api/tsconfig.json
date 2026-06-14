@@ -2,6 +2,7 @@
   "extends": "@dhanam/config/typescript/nestjs.json",
   "compilerOptions": {
     "strictNullChecks": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "outDir": "./dist",
     "strict": false,
@@ -22,5 +23,5 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts", "src/**/__tests__/**"]
 }
