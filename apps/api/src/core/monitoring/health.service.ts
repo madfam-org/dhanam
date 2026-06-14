@@ -305,7 +305,7 @@ export class HealthService {
 
   private async checkExternalServices(): Promise<HealthCheck> {
     const start = Date.now();
-    const checks = [];
+    const checks: Array<{ name: string; status: string; statusCode?: number; error?: string }> = [];
     const banxicoToken =
       this.configService.get<string>('BANXICO_API_TOKEN', '') ||
       this.configService.get<string>('BANXICO_SIE_TOKEN', '');

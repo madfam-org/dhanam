@@ -580,7 +580,7 @@ export class AnalyticsService {
       ANALYTICS.HISTORY_DAYS
     );
 
-    const forecast = [];
+    const forecast: Array<{ date: string; income: number; expenses: number; balance: number }> = [];
     let runningBalance = currentBalance;
     const today = new Date();
 

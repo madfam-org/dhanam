@@ -309,7 +309,7 @@ export class ProviderOrchestratorService {
 
         // Log connection attempt
         await this.logConnectionAttempt({
-          spaceId: routing.spaceId,
+          spaceId: routing.spaceId ?? '',
           accountId: routing.accountId,
           provider,
           institutionId: routing.institutionId,
@@ -348,7 +348,7 @@ export class ProviderOrchestratorService {
 
         // Log failed attempt
         await this.logConnectionAttempt({
-          spaceId: routing.spaceId,
+          spaceId: routing.spaceId ?? '',
           accountId: routing.accountId,
           provider,
           institutionId: routing.institutionId,

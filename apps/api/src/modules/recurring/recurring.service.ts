@@ -276,7 +276,7 @@ export class RecurringService {
 
     const patterns = await this.detectorService.detectPatterns(spaceId);
 
-    const created = [];
+    const created: Array<ReturnType<RecurringService['transformToResponse']>> = [];
     for (const pattern of patterns) {
       try {
         const recurring = await this.prisma.recurringTransaction.create({

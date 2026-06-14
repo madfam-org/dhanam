@@ -214,6 +214,10 @@ export class HouseholdsService {
       },
     });
 
+    if (!household) {
+      throw new NotFoundException('Household not found');
+    }
+
     if (household._count.spaces > 0 || household._count.goals > 0) {
       throw new BadRequestException(
         'Cannot delete household with associated spaces or goals. Please remove them first.'
@@ -458,7 +462,13 @@ export class HouseholdsService {
     });
 
     let totalNetWorth = 0;
-    const bySpace = [];
+    const bySpace: Array<{
+      spaceId: string;
+      spaceName: string;
+      netWorth: number;
+      assets: number;
+      liabilities: number;
+    }> = [];
     const byCurrency: Record<string, number> = {};
 
     for (const space of spaces) {

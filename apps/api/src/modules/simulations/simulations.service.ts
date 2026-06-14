@@ -145,7 +145,7 @@ export class SimulationsService {
         preRetirementReturn: dto.preRetirementReturn,
         postRetirementReturn: dto.postRetirementReturn,
         returnVolatility: dto.returnVolatility,
-        iterations: Math.min(dto.iterations, retTierLimits.monteCarloMaxIterations),
+        iterations: Math.min(dto.iterations || 10000, retTierLimits.monteCarloMaxIterations),
         inflationRate: dto.inflationRate,
       };
 

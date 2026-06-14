@@ -201,7 +201,7 @@ export class SubscriptionLifecycleService {
    * Upgrade via Janua (multi-provider: Conekta for MX, Polar for international).
    */
   private async upgradeToPremiumViaJanua(
-    user: { id: string; email: string; name: string; januaCustomerId?: string },
+    user: { id: string; email: string; name: string; januaCustomerId?: string | null },
     countryCode: string,
     webUrl: string,
     options: UpgradeOptions = {}
@@ -286,7 +286,7 @@ export class SubscriptionLifecycleService {
    * Upgrade via direct Stripe (fallback).
    */
   private async upgradeToPremiumViaStripe(
-    user: { id: string; email: string; name: string; stripeCustomerId?: string },
+    user: { id: string; email: string; name: string; stripeCustomerId?: string | null },
     webUrl: string,
     options: UpgradeOptions = {}
   ): Promise<CheckoutResult> {
@@ -488,7 +488,7 @@ export class SubscriptionLifecycleService {
       },
     });
 
-    return session.url;
+    return session.url || '';
   }
 
   /**

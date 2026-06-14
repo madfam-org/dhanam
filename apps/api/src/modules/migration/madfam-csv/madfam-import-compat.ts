@@ -88,7 +88,7 @@ export async function discoverMadfamImportSpaces(
 
   for (const { space } of userSpaces) {
     for (const account of space.accounts) {
-      const role = inferRoleFromProviderAccountId(account.providerAccountId);
+      const role = inferRoleFromProviderAccountId(account.providerAccountId ?? '');
       if (!role) continue;
 
       const existing = roleToSpace.get(role);
@@ -387,7 +387,7 @@ export async function verifyMadfamImportCompat(
     select: { providerAccountId: true },
     take: 8,
   });
-  report.sampleProviderAccountIds = sampleAccounts.map((a) => a.providerAccountId);
+  report.sampleProviderAccountIds = sampleAccounts.map((a) => a.providerAccountId ?? '');
 
   const partnerSuffix = routingConfig.accountSuffixes.partner;
   const hasLegacyAfac = report.sampleProviderAccountIds.some((id) => id.endsWith('-afac'));
