@@ -1,6 +1,6 @@
 # Dhanam Full LLM Context
 
-Generated: 2026-05-22
+Generated: 2026-06-14
 
 ## Purpose
 
@@ -8,6 +8,20 @@ This file gives LLM agents a stable, tool-agnostic map for working in this
 repository without depending on vendor-specific instruction files.
 
 ## Canonical instruction order
+
+### Monetization sessions (first revenue, checkout, billing, catalog)
+
+1. `AGENTS.md`
+2. `docs/MONETIZATION_SESSION.md` — single entrypoint; repo vs private ops routing
+3. `docs/MONETIZATION_PATH_READINESS.md` — current gate table and ranked tasks
+4. `docs/FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md` — G0–G9 framework
+5. Task-specific runbooks (`docs/runbooks/STRIPE_MXN_LIVE_FLIP.md`, etc.) and
+   billing modules (`apps/api/src/modules/billing/`, `catalog.yaml`,
+   `scripts/sync-catalog.ts`)
+6. `internal-devops` (separate repo) only for Phase 0 ops — paths in
+   `docs/MONETIZATION_SESSION.md`
+
+### General / stability sessions
 
 1. `AGENTS.md`
 2. `README.md` if present
@@ -21,7 +35,7 @@ repository without depending on vendor-specific instruction files.
 10. `ECOSYSTEM.md` if present
 11. App and module docs: `apps/*/README.md`, `apps/api/src/modules/README.md`
 12. Relevant files under `docs/`, `infra/`, `.github/workflows/`, and source
-   directories for the specific task
+    directories for the specific task
 
 ## Agent compatibility
 
@@ -45,6 +59,9 @@ gap or incident link.
 
 - `README.md`
 - `docs/README.md`
+- `docs/MONETIZATION_SESSION.md`
+- `docs/MONETIZATION_PATH_READINESS.md`
+- `docs/FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md`
 - `docs/GA_REMEDIATION_ROADMAP.md`
 - `docs/ROADMAP.md`
 - `docs/STABILITY_AUDIT_2026-05-19.md`

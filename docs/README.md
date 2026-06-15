@@ -1,9 +1,29 @@
 # Dhanam Documentation
 
-Last updated: 2026-05-29
+Last updated: 2026-06-14
 
 This is the canonical human and agent documentation map for Dhanam. Prefer this
 file over older phase summaries when choosing what to read first.
+
+## Monetization and First Peso
+
+For revenue, checkout, billing, catalog, or entitlement work, start here — not the
+GA/stability section below.
+
+| Document                                                                          | Use                                                                                 |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| [Monetization Session](MONETIZATION_SESSION.md)                                   | **Agent entrypoint** — read order, code anchors, private ops boundary               |
+| [Monetization Path Readiness](MONETIZATION_PATH_READINESS.md)                     | Current gate table (G0–G9 slice), shipped work, ranked open tasks                   |
+| [First Pesos Commercial GA](FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md) | Full G0–G9 framework and first-peso proof bar                                       |
+| [Stripe MXN Live Flip](runbooks/STRIPE_MXN_LIVE_FLIP.md)                          | Operator runbook to enable live MXN checkout                                        |
+| [Catalog Truth 2026-05-20](CATALOG_TRUTH_2026-05-20.md)                           | Product catalog drift gate and production sync truth                                |
+| [Tulana SKU and Catalog Handoff](TULANA_SKU_AND_CATALOG_HANDOFF_2026-05-29.md)    | Tulana readiness, billing catalogue mirror, and Selva-approved price apply contract |
+| [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                             | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                 |
+| [Billing module](../apps/api/src/modules/billing/README.md)                       | Checkout, ledger, webhooks, entitlements (NestJS)                                   |
+| [Billing SDK](../packages/billing-sdk/README.md)                                  | Ecosystem billing client                                                            |
+
+Private operator sequencing and Phase 0 blockers (Vault/`dhanam-secrets`, cutover)
+live in `internal-devops` — paths listed in [Monetization Session](MONETIZATION_SESSION.md).
 
 ## Start Here
 
@@ -143,9 +163,9 @@ Full guide index: [guides/README.md](guides/README.md).
 | [llms-full.txt](../llms-full.txt)                   | Expanded LLM context map            |
 | [agent-manifest.json](../tools/agent-manifest.json) | Machine-readable repo metadata      |
 
-For agents: read `AGENTS.md`, this index,
-[Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md), and the
-specific app/module docs for the files you are touching.
+For agents: read `AGENTS.md`, [Monetization Session](MONETIZATION_SESSION.md) for
+revenue work (or this index for stability work), and the specific app/module docs
+for the files you are touching.
 
 ## Historical Reports
 

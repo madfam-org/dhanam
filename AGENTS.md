@@ -54,8 +54,11 @@ redirect and should not become the source of truth again.
 - `README.md`
 - `ECOSYSTEM.md`
 - `docs/`
-- `docs/STABILITY_WRAP_UP_2026-05-20.md`
-- `docs/GA_REMEDIATION_ROADMAP.md`
+- **Monetization sessions:** `docs/MONETIZATION_SESSION.md` →
+  `docs/MONETIZATION_PATH_READINESS.md` →
+  `docs/FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md`
+- **Stability / GA (non-revenue):** `docs/GA_REMEDIATION_ROADMAP.md`,
+  `docs/STABILITY_WRAP_UP_2026-05-20.md`
 - `infra/`
 - `.github/workflows/`
 
@@ -87,6 +90,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Pricing & PMF Anchoring
 
+- **Monetization sessions:** start at [`docs/MONETIZATION_SESSION.md`](docs/MONETIZATION_SESSION.md) →
+  [`docs/MONETIZATION_PATH_READINESS.md`](docs/MONETIZATION_PATH_READINESS.md).
 - **Pricing source-of-truth**: `internal-devops/decisions/2026-04-25-tulana-ecosystem-pricing.md`. Dhanam Consumer tiers (Tulana v0.1 recommended, MXN/mo): Free $0 / Copilot Pro 199 / Family Plus 499 / Teams (B2B) 1,499. Plus Dhanam B2B Platform Billing tiers: Starter $0+3.5% / Scale 499+2.5% / Enterprise 2,999+1.5%. Confidence: low — needs validation with real users.
 - **Note**: Dhanam IS the billing platform for the MADFAM ecosystem — it consumes PMF data from Tulana but its own pricing is anchored by Tulana too (no self-anchoring).
 - **PMF measurement**: per RFC 0013, NPS + Sean Ellis + retention via `@madfam/pmf-widget` → Tulana `/v1/pmf/*` endpoints. Composite PMF Score informs price moves + sunset decisions.
