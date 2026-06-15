@@ -5,12 +5,10 @@ export const landing = {
       'O Dhanam unifica orçamento, patrimônio, DeFi e planejamento probabilístico — feito para a LATAM pela MADFAM.',
   },
   hero: {
-    badge: 'Family Office Autônomo para Todos',
-    title: 'Toda a Sua Vida Financeira. Uma Plataforma.',
-    subtitle:
-      'Bancos, cripto, DeFi, imóveis, colecionáveis — rastreados com IA, projetados com Monte Carlo, protegidos com criptografia forte.',
-    subDescription:
-      'Ferramentas no estilo de gestão patrimonial, automatizadas e disponíveis para famílias.',
+    badge: 'Feito para a LATAM. Pronto para tudo o que você possui.',
+    title: 'Saiba para onde seu dinheiro vai — e para onde ele poderia ir.',
+    subtitle: 'Conecte suas contas em minutos. Uma visão clara de hoje e de amanhã.',
+    subDescription: 'Bancos, cripto, DeFi, imóveis e colecionáveis — unificados no Dhanam.',
     cta: 'Testar Demo ao Vivo',
     ctaSecondary: 'Criar Conta Grátis',
     demoNote: 'Acesso imediato • Sem cadastro • Explore todas as funcionalidades por 1 hora',
@@ -19,6 +17,11 @@ export const landing = {
       stressScenarios: '12 Cenários de Estresse',
       collectibleCategories: '7 Categorias de Colecionáveis',
     },
+  },
+  trustStrip: {
+    trial: 'Teste grátis 14 dias · Sem cartão',
+    encryption: 'Criptografia AES-256',
+    readOnly: 'Acesso bancário somente leitura',
   },
   personaCards: {
     title: 'Escolha Sua Aventura',
@@ -317,6 +320,7 @@ export const landing = {
     login: 'Entrar',
     signup: 'Cadastrar',
     getStarted: 'Começar',
+    demo: 'Demo ao Vivo',
     dashboard: 'Painel',
     documentation: 'Documentação',
     blog: 'Blog',

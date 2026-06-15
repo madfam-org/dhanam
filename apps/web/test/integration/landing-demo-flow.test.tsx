@@ -1,7 +1,12 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-import { LandingHeroStatic } from '@/components/landing/landing-hero-static';
+import {
+  LandingHeroCapabilities,
+  LandingHeroStatic,
+} from '@/components/landing/landing-hero-static';
+import { HeroProductPreview } from '@/components/landing/hero-product-preview';
+import { LandingTrustStrip } from '@/components/landing/landing-trust-strip';
 import { LandingPageClient } from '@/components/landing/landing-page-client';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -64,8 +69,14 @@ function renderLanding() {
   return render(
     <LandingPageClient
       locale="en"
-      heroStatic={<LandingHeroStatic locale="en" />}
-      heroCapabilities={null}
+      heroColumn={
+        <>
+          <LandingHeroStatic locale="en" />
+          <LandingTrustStrip locale="en" />
+        </>
+      }
+      heroPreview={<HeroProductPreview />}
+      heroCapabilities={<LandingHeroCapabilities locale="en" />}
     />
   );
 }
@@ -99,8 +110,7 @@ describe('Landing Page Demo Flow', () => {
     it('should render the landing page with hero section', () => {
       renderLanding();
 
-      expect(screen.getAllByText(/Your Entire Financial Life/i)[0]).toBeInTheDocument();
-      expect(screen.getByText(/One Platform/i)).toBeInTheDocument();
+      expect(screen.getByText(/Know where your money is going/i)).toBeInTheDocument();
     });
 
     it('should render "Try Live Demo" button', () => {

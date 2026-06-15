@@ -22,15 +22,18 @@ import { useAuth } from '@/lib/hooks/use-auth';
 
 export interface LandingPageClientProps {
   locale: LandingLocale;
-  /** Server-rendered hero copy (badge, H1, subtitles) — composed via RSC slot pattern */
-  heroStatic: React.ReactNode;
-  /** Server-rendered capability badges below hero actions */
+  /** Server-rendered hero copy + trust strip */
+  heroColumn: React.ReactNode;
+  /** Server-rendered product preview frame */
+  heroPreview: React.ReactNode;
+  /** Server-rendered capability badges below hero */
   heroCapabilities: React.ReactNode;
 }
 
 export function LandingPageClient({
   locale,
-  heroStatic,
+  heroColumn,
+  heroPreview,
   heroCapabilities,
 }: LandingPageClientProps) {
   const { isAuthenticated } = useAuth();
@@ -66,15 +69,22 @@ export function LandingPageClient({
 
       <main id="main-content">
         <section className="container mx-auto px-6 py-16 md:py-24" aria-labelledby="landing-hero">
-          {heroStatic}
-          <LandingHeroActions
-            onLiveDemoClick={() => handleLiveDemoClick('hero_cta')}
-            onSignUpClick={() => handleSignUpClick(undefined, 'hero_cta')}
-          />
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <div className="order-2 lg:order-1 space-y-2">
+              {heroColumn}
+              <LandingHeroActions
+                onLiveDemoClick={() => handleLiveDemoClick('hero_cta')}
+                onSignUpClick={() => handleSignUpClick(undefined, 'hero_cta')}
+              />
+            </div>
+            <div className="order-1 lg:order-2">{heroPreview}</div>
+          </div>
           {heroCapabilities}
         </section>
 
-        <PersonaCards />
+        <div id="personas">
+          <PersonaCards />
+        </div>
         <ProblemSolution />
         <HowItWorks />
         <SecurityTrust />

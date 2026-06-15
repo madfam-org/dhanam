@@ -3,14 +3,16 @@ import {
   LANDING_LOCALES,
   normalizeLandingLocale,
   type LandingLocale,
-} from '@dhanam/shared';
+} from '@dhanam/shared/i18n/server';
 import type { Metadata } from 'next';
 
+import { HeroProductPreview } from '@/components/landing/hero-product-preview';
 import {
   LandingHeroCapabilities,
   LandingHeroStatic,
 } from '@/components/landing/landing-hero-static';
 import { LandingPageClient } from '@/components/landing/landing-page-client';
+import { LandingTrustStrip } from '@/components/landing/landing-trust-strip';
 
 const OG_LOCALE: Record<LandingLocale, string> = {
   es: 'es_MX',
@@ -72,10 +74,18 @@ export default async function LocaleLandingPage({
   const { locale: raw } = await params;
   const locale = normalizeLandingLocale(raw);
 
+  const heroColumn = (
+    <>
+      <LandingHeroStatic locale={locale} />
+      <LandingTrustStrip locale={locale} />
+    </>
+  );
+
   return (
     <LandingPageClient
       locale={locale}
-      heroStatic={<LandingHeroStatic locale={locale} />}
+      heroColumn={heroColumn}
+      heroPreview={<HeroProductPreview />}
       heroCapabilities={<LandingHeroCapabilities locale={locale} />}
     />
   );

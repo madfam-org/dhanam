@@ -1,4 +1,4 @@
-import { getLandingTranslation, type LandingLocale } from '@dhanam/shared';
+import { getLandingTranslation, type LandingLocale } from '@dhanam/shared/i18n/server';
 import { Sparkles } from 'lucide-react';
 
 const CAPABILITY_KEYS = ['defiNetworks', 'stressScenarios', 'collectibleCategories'] as const;
@@ -11,7 +11,7 @@ export function LandingHeroStatic({ locale }: LandingHeroStaticProps) {
   const t = (key: string) => getLandingTranslation(locale, key);
 
   return (
-    <div className="text-center space-y-6 max-w-4xl mx-auto">
+    <div className="text-center lg:text-left space-y-6 max-w-4xl mx-auto lg:mx-0">
       <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-4">
         <Sparkles className="h-4 w-4 text-primary" aria-hidden />
         <span className="text-sm font-medium">{t('hero.badge')}</span>

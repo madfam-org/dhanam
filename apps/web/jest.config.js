@@ -17,6 +17,7 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^~/(.*)$': '<rootDir>/src/$1',
+    '^@dhanam/shared/i18n/server$': '<rootDir>/../../packages/shared/src/i18n/server.ts',
     '^@dhanam/(.*)$': '<rootDir>/../../packages/$1/src',
     '^zod/v4/core$': zodV4CorePath,
     '^zod/v4$': zodV4Path,
