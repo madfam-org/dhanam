@@ -36,6 +36,8 @@ open `docs/INDEX.md`.
 - [API index](api/README.md) - OpenAPI export and Swagger
 - [API module index](../apps/api/src/modules/README.md) - NestJS module docs
 - [Feature guides index](guides/README.md) - all product guides
+- [Dhanam Landing Remediation](LANDING_REMEDIATION.md) - marketing site UX program (`dhan.am`)
+- [Dhanam Landing Design System](LANDING_DESIGN_SYSTEM.md) - landing typography, tokens, components
 - [Testing index](testing/README.md) - current vs archived test docs
 - [Historical reports](reports/historical/README.md) - phase summaries and archived sessions
 - [AI/LLM Context](../llms.txt) - compact agent context

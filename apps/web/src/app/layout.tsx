@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     url: 'https://dhan.am',
     images: [
       {
-        url: '/og-image.png',
+        url: '/opengraph-image',
         width: 1200,
         height: 630,
         alt: 'Dhanam - Budget & Wealth Tracker',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     title: 'Dhanam - Budget & Wealth Tracker',
     description:
       'Track budgets, wealth, DeFi portfolios, and ESG scores — personal and business finance in one place.',
-    images: ['/og-image.png'],
+    images: ['/opengraph-image'],
   },
 };
 

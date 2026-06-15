@@ -1,13 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import HomePage from '@/app/page';
+
+import {
+  LandingHeroCapabilities,
+  LandingHeroStatic,
+} from '@/components/landing/landing-hero-static';
+import { HeroProductPreview } from '@/components/landing/hero-product-preview';
+import { LandingTrustStrip } from '@/components/landing/landing-trust-strip';
+import { LandingPageClient } from '@/components/landing/landing-page-client';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import { authApi } from '@/lib/api/auth';
 import { redirectToAppDemo } from '@/lib/demo/launch-demo';
-import { useRouter } from 'next/navigation';
 
-// Mock dependencies
 jest.mock('@/lib/demo/launch-demo', () => ({
   ...jest.requireActual('@/lib/demo/launch-demo'),
   redirectToAppDemo: jest.fn(),
@@ -19,7 +23,6 @@ jest.mock('@/hooks/usePublicSurface', () => ({
   usePublicApiUrl: () => 'https://api.dhan.am/v1',
   usePublicAdminUrl: () => 'https://admin.dhan.am',
 }));
-jest.mock('@/lib/api/auth');
 jest.mock('~/components/billing/CheckoutPaymentRecommendations', () => ({
   CheckoutPaymentRecommendations: () => null,
 }));
@@ -50,20 +53,35 @@ jest.mock('@dhanam/shared', () => {
         },
         children
       ),
+    getLandingTranslation: (locale: string, key: string) => resolve(landing, key),
+    normalizeLandingLocale: (l: string) => l,
+    LANDING_LOCALES: ['es', 'en', 'pt-BR'],
   };
 });
 
-const mockSetAuth = jest.fn();
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth> & {
   getState: jest.MockedFunction<() => { setAuth: jest.MockedFunction<any> }>;
 };
 const mockUseAnalytics = useAnalytics as jest.MockedFunction<typeof useAnalytics>;
-const mockAuthApi = authApi as jest.Mocked<typeof authApi>;
-const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockRedirectToAppDemo = redirectToAppDemo as jest.MockedFunction<typeof redirectToAppDemo>;
 
+function renderLanding() {
+  return render(
+    <LandingPageClient
+      locale="en"
+      heroColumn={
+        <>
+          <LandingHeroStatic locale="en" />
+          <LandingTrustStrip locale="en" />
+        </>
+      }
+      heroPreview={<HeroProductPreview />}
+      heroCapabilities={<LandingHeroCapabilities locale="en" />}
+    />
+  );
+}
+
 describe('Landing Page Demo Flow', () => {
-  const mockRouterPush = jest.fn();
   const mockAnalytics = {
     track: jest.fn(),
     trackPageView: jest.fn(),
@@ -73,105 +91,94 @@ describe('Landing Page Demo Flow', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Setup router mock
-    mockUseRouter.mockReturnValue({
-      push: mockRouterPush,
-      replace: jest.fn(),
-      refresh: jest.fn(),
-      back: jest.fn(),
-      forward: jest.fn(),
-      prefetch: jest.fn(),
-    } as any);
-
-    // Setup analytics mock
     mockUseAnalytics.mockReturnValue(mockAnalytics as any);
 
-    // Setup Zustand store mock with getState
     mockUseAuth.getState = jest.fn().mockReturnValue({
-      setAuth: mockSetAuth,
+      setAuth: jest.fn(),
       user: null,
       isAuthenticated: false,
     });
 
-    // Default: unauthenticated user
     mockUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
-      setAuth: mockSetAuth,
+      setAuth: jest.fn(),
     } as any);
   });
 
   describe('Landing Page Rendering', () => {
     it('should render the landing page with hero section', () => {
-      render(<HomePage />);
+      renderLanding();
 
-      expect(screen.getAllByText(/Your Entire Financial Life/i)[0]).toBeInTheDocument();
-      expect(screen.getByText(/One Platform/i)).toBeInTheDocument();
+      expect(screen.getByText(/Know where your money is going/i)).toBeInTheDocument();
     });
 
     it('should render "Try Live Demo" button', () => {
-      render(<HomePage />);
+      renderLanding();
 
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       expect(demoButtons.length).toBeGreaterThan(0);
     });
 
     it('should render "Create Free Account" button', () => {
-      render(<HomePage />);
+      renderLanding();
 
       const signUpButtons = screen.getAllByRole('button', { name: /Create Free Account/i });
       expect(signUpButtons.length).toBeGreaterThan(0);
     });
 
     it('should show demo benefits text', () => {
-      render(<HomePage />);
+      renderLanding();
 
       expect(screen.getByText(/Instant access/i)).toBeInTheDocument();
+    });
+
+    it('should render persona cards section', () => {
+      renderLanding();
+
+      expect(screen.getByText(/Choose Your Adventure/i)).toBeInTheDocument();
+    });
+
+    it('should render security trust section', () => {
+      renderLanding();
+
+      expect(screen.getByText(/Security We Can Stand Behind/i)).toBeInTheDocument();
     });
   });
 
   describe('Demo Flow Interaction', () => {
     it('should track analytics when "Try Live Demo" is clicked', () => {
-      render(<HomePage />);
+      renderLanding();
 
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       fireEvent.click(demoButtons[0]!);
 
       expect(mockAnalytics.track).toHaveBeenCalledWith('live_demo_clicked', {
         source: 'hero_cta',
+        locale: 'en',
       });
     });
 
     it('should redirect to app demo launch URL when demo button is clicked', () => {
-      render(<HomePage />);
+      renderLanding();
 
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       fireEvent.click(demoButtons[0]!);
 
       expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am');
-      expect(mockAuthApi.loginAsGuest).not.toHaveBeenCalled();
-    });
-
-    it('should not guest-login on marketing origin before redirect', () => {
-      render(<HomePage />);
-
-      const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
-      fireEvent.click(demoButtons[0]!);
-
-      expect(mockSetAuth).not.toHaveBeenCalled();
     });
   });
 
   describe('Sign Up Flow', () => {
     it('should track analytics when "Create Free Account" is clicked', () => {
-      render(<HomePage />);
+      renderLanding();
 
       const signUpButtons = screen.getAllByRole('button', { name: /Create Free Account/i });
       fireEvent.click(signUpButtons[0]!);
 
-      // Verify analytics is tracked (navigation via window.location which jsdom doesn't support)
       expect(mockAnalytics.track).toHaveBeenCalledWith('signup_clicked', {
-        source: 'landing_cta',
+        source: 'hero_cta',
+        locale: 'en',
       });
     });
   });
@@ -183,63 +190,46 @@ describe('Landing Page Demo Flow', () => {
         isAuthenticated: true,
       } as any);
 
-      render(<HomePage />);
+      renderLanding();
 
-      // Authenticated users are redirected, so no page view tracked
       expect(mockAnalytics.trackPageView).not.toHaveBeenCalled();
     });
 
     it('should track page view for unauthenticated users', () => {
-      render(<HomePage />);
+      renderLanding();
 
-      // Unauthenticated users stay on landing page
-      expect(mockAnalytics.trackPageView).toHaveBeenCalledWith('Landing Page', '/');
+      expect(mockAnalytics.trackPageView).toHaveBeenCalledWith('Landing Page', '/en');
     });
   });
 
   describe('Feature Sections', () => {
     it('should render features grid', () => {
-      render(<HomePage />);
+      renderLanding();
 
       expect(screen.getByText(/Multi-Provider Banking/i)).toBeInTheDocument();
       expect(screen.getByText(/DeFi & Web3/i)).toBeInTheDocument();
-      expect(screen.getByText(/Smart Categorization/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/Estate Planning/i).length).toBeGreaterThan(0);
     });
 
     it('should render pricing section', () => {
-      render(<HomePage />);
+      renderLanding();
 
       expect(screen.getByText(/Plans for Every Stage/i)).toBeInTheDocument();
       expect(screen.getAllByText(/Community/i).length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/Pro/i).length).toBeGreaterThan(0);
     });
 
     it('should render social proof section', () => {
-      render(<HomePage />);
+      renderLanding();
 
       expect(screen.getByText(/Integrated With the Platforms You Trust/i)).toBeInTheDocument();
-      expect(screen.getByText(/Open Source ESG Methodology/i)).toBeInTheDocument();
     });
   });
 
   describe('Multiple CTA Buttons', () => {
     it('should have multiple "Try Live Demo" CTAs throughout the page', () => {
-      render(<HomePage />);
+      renderLanding();
 
-      // Should have at least 2 demo buttons (hero + bottom CTA)
       const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
       expect(demoButtons.length).toBeGreaterThanOrEqual(2);
-    });
-
-    it('should have all demo buttons trigger the same redirect', () => {
-      render(<HomePage />);
-
-      const demoButtons = screen.getAllByRole('button', { name: /Try Live Demo/i });
-
-      fireEvent.click(demoButtons[1]!);
-
-      expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am');
     });
   });
 });

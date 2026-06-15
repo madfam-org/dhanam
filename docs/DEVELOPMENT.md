@@ -34,9 +34,13 @@ Optional tools:
 Production domains use `dhan.am`:
 
 - Web app: `https://app.dhan.am`
-- Landing page: `https://dhan.am`
+- Landing page: `https://dhan.am` (locale routes: `/es`, `/en`, `/pt-BR`)
 - Admin: `https://admin.dhan.am`
 - API: `https://api.dhan.am`
+
+Local marketing landing: `http://localhost:3040/en` (middleware rewrites to
+`/[locale]/landing`). Implementation plan:
+[LANDING_REMEDIATION.md](LANDING_REMEDIATION.md).
 
 ## Registry Setup
 
