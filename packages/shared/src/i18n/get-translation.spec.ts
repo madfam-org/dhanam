@@ -2,7 +2,7 @@ import { getLandingTranslation, getTranslation, normalizeLandingLocale } from '.
 
 describe('getTranslation', () => {
   it('resolves nested landing keys for English', () => {
-    expect(getLandingTranslation('en', 'hero.title')).toContain('Financial Life');
+    expect(getLandingTranslation('en', 'hero.title')).toContain('where your money is going');
   });
 
   it('falls back to Spanish when key missing in English', () => {
