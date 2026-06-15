@@ -136,7 +136,9 @@ describe('Landing Page Demo Flow', () => {
     it('should render persona cards section', () => {
       renderLanding();
 
-      expect(screen.getByText(/Choose Your Adventure/i)).toBeInTheDocument();
+      expect(screen.getByText(/Which financial life sounds like yours/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Explore as Sofia/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Explore as Roberto/i })).toBeInTheDocument();
     });
 
     it('should render security trust section', () => {
@@ -166,6 +168,17 @@ describe('Landing Page Demo Flow', () => {
       fireEvent.click(demoButtons[0]!);
 
       expect(mockRedirectToAppDemo).toHaveBeenCalledWith('https://app.dhan.am');
+    });
+
+    it('should track persona_card_clicked when a persona CTA is clicked', () => {
+      renderLanding();
+
+      fireEvent.click(screen.getByRole('button', { name: /Explore as Maria/i }));
+
+      expect(mockAnalytics.track).toHaveBeenCalledWith('persona_card_clicked', {
+        persona: 'maria',
+        locale: 'en',
+      });
     });
   });
 
