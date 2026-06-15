@@ -1,6 +1,6 @@
 # Break-Glass Operations Runbook
 
-Last updated: 2026-05-22
+Last updated: 2026-06-15
 
 Routine production operations are **Enclii-first**. Use Enclii web, API, or CLI
 before any raw infrastructure access.
@@ -86,12 +86,26 @@ adapter unavailable.
 ### ArgoCD hard refresh
 
 **When:** Promote workflow succeeded but live digests lag ArgoCD source
-( observed 2026-05-20 ).
+(observed 2026-05-20 and 2026-06-15).
 
-**Break-glass:** Hard refresh `dhanam-services` Application, then run:
+**Symptoms:** ArgoCD Application `dhanam-services` reports `Synced` while
+`dhanam-web` pods still reference an older `@sha256:…` digest; public HTML
+unchanged after `deploy(prod):` commit.
+
+**Required after every promote:** Dispatch `prod-post-promote.yml` manually.
+The promote job pushes with `GITHUB_TOKEN`, which **does not trigger**
+downstream workflows on push. See
+[incident 2026-06-15](../runbooks/incidents/2026-06-15-dhanam-web-prod-rollout.md).
+
+**Break-glass:** Hard refresh `dhanam-services` Application, wait for rollout,
+then run:
 
 ```bash
-./scripts/production-rollout-proof.js
+export KUBECONFIG=~/.kube/config-hetzner   # operator kubeconfig
+kubectl -n argocd annotate application dhanam-services \
+  argocd.argoproj.io/refresh=hard --overwrite
+kubectl -n dhanam rollout status deployment/dhanam-web --timeout=300s
+node scripts/production-rollout-proof.js dhanam-services
 ```
 
 **Goal:** Eliminate this step via Phase 1 rollout truth work

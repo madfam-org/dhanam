@@ -2,8 +2,9 @@
 
 **Version:** 1.0  
 **Date:** 2026-06-15  
-**Status:** Approved for execution  
-**Owner:** Dhanam product / web (Aureo Labs, a MADFAM company)
+**Status:** Phases A–G shipped to production (2026-06-15); ES hero copy fix #568 live  
+**Owner:** Dhanam product / web (Aureo Labs, a MADFAM company)  
+**Session handoff:** [SESSION_WRAP_UP_2026-06-15.md](SESSION_WRAP_UP_2026-06-15.md)
 
 ---
 

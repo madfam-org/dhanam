@@ -42,6 +42,7 @@ live in `internal-devops` — paths listed in [Monetization Session](MONETIZATIO
 | [Deployment Guide](DEPLOYMENT.md)                                              | Enclii-first deploy, staging, rollback, current rollout blockers                    |
 | [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)                    | Current truth about production, staging, DNS, health, and remaining stability gaps  |
 | [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)                | Concise final status from the latest production-stability push                      |
+| [Session Wrap-Up 2026-06-15](SESSION_WRAP_UP_2026-06-15.md)                    | **Latest handoff** — landing Phases A–G live, ES copy, deploy gaps, next picks      |
 | [Tech Debt Register](TECH_DEBT.md)                                             | Current technical debt, active stability gaps, and historical debt archive          |
 | [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md)            | Latest corpus audit: coverage, interconnection, remediation backlog                 |
 | [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md)            | Prior audit (historical context)                                                    |
@@ -51,20 +52,21 @@ live in `internal-devops` — paths listed in [Monetization Session](MONETIZATIO
 
 ## Architecture And Operations
 
-| Document                                                | Use                                                                               |
-| ------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [Architecture Overview](architecture/ARCHITECTURE.md)   | Current system shape: Next.js, NestJS, Postgres, Redis, Enclii, Cloudflare Tunnel |
-| [Software Specification](architecture/SOFTWARE_SPEC.md) | Product and technical specification; some infrastructure sections are historical  |
-| [Infrastructure Guide](INFRASTRUCTURE.md)               | Monitoring, admin, and infrastructure notes                                       |
-| [Launch Operations](LAUNCH_OPERATIONS.md)               | Launch checklist and operator tasks                                               |
-| [Backup And Restore](BACKUP_RESTORE.md)                 | Backup and restore runbooks                                                       |
-| [Admin Dashboard](ADMIN_DASHBOARD.md)                   | Admin app features and routes                                                     |
-| [Sentry Setup](SENTRY_SETUP.md)                         | Error monitoring setup                                                            |
-| [Catalog Truth 2026-05-20](CATALOG_TRUTH_2026-05-20.md) | Product catalog drift gate and production sync truth                              |
-| [Credential Onboarding](CREDENTIAL_ONBOARDING.md)       | Provider credential activation runbook                                            |
-| [PP.2 Staging Audit](PP_2_STAGING_AUDIT.md)             | Staging pipeline gap analysis (RFC 0001)                                          |
-| [Break-glass runbook](runbooks/BREAK_GLASS.md)          | Documented raw-access procedures when Enclii adapters are missing                 |
-| [Compliance appendix](../claudedocs/README.md)          | SOC2 / SRE historical procedures                                                  |
+| Document                                                                                                 | Use                                                                               |
+| -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| [Architecture Overview](architecture/ARCHITECTURE.md)                                                    | Current system shape: Next.js, NestJS, Postgres, Redis, Enclii, Cloudflare Tunnel |
+| [Software Specification](architecture/SOFTWARE_SPEC.md)                                                  | Product and technical specification; some infrastructure sections are historical  |
+| [Infrastructure Guide](INFRASTRUCTURE.md)                                                                | Monitoring, admin, and infrastructure notes                                       |
+| [Launch Operations](LAUNCH_OPERATIONS.md)                                                                | Launch checklist and operator tasks                                               |
+| [Backup And Restore](BACKUP_RESTORE.md)                                                                  | Backup and restore runbooks                                                       |
+| [Admin Dashboard](ADMIN_DASHBOARD.md)                                                                    | Admin app features and routes                                                     |
+| [Sentry Setup](SENTRY_SETUP.md)                                                                          | Error monitoring setup                                                            |
+| [Catalog Truth 2026-05-20](CATALOG_TRUTH_2026-05-20.md)                                                  | Product catalog drift gate and production sync truth                              |
+| [Credential Onboarding](CREDENTIAL_ONBOARDING.md)                                                        | Provider credential activation runbook                                            |
+| [PP.2 Staging Audit](PP_2_STAGING_AUDIT.md)                                                              | Staging pipeline gap analysis (RFC 0001)                                          |
+| [Break-glass runbook](runbooks/BREAK_GLASS.md)                                                           | Documented raw-access procedures when Enclii adapters are missing                 |
+| [Incident: dhanam-web prod rollout 2026-06-15](runbooks/incidents/2026-06-15-dhanam-web-prod-rollout.md) | Stale Argo sync after promote; post-promote dispatch required                     |
+| [Compliance appendix](../claudedocs/README.md)                                                           | SOC2 / SRE historical procedures                                                  |
 
 Production operations are Enclii-first. Raw `kubectl`, `helm`, provider CLIs,
 SSH, `docker exec`, or direct container access are break-glass/bootstrap only;
