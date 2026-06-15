@@ -42,3 +42,14 @@ spec:
             - dhanam-web*
             - dhanam-admin*
             - dhanam-fx-spot-refresh*
+            - dhanam-catalog-sync
+            - dhanam-catalog-sync*
+      - resources:
+          kinds:
+            - CronJob
+            - Job
+          namespaces:
+            - dhanam
+          selector:
+            matchLabels:
+              app: dhanam-catalog-sync
