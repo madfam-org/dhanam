@@ -228,6 +228,10 @@ export const landing = {
   pricing: {
     title: 'Plans for Every Stage',
     subtitle: 'Start free, grow into the tools you need',
+    billingMonthly: 'Monthly',
+    billingAnnual: 'Annual',
+    annualSave: 'Save ~17% · 2 months free',
+    coffeeAnchor: 'Copilot Pro from ~MX$50/week — less than two specialty coffees.',
     mostPopular: 'Most Popular',
     bestValue: 'Best Value',
     cancelAnytime: 'Cancel anytime',
@@ -401,6 +405,8 @@ export const landing = {
     title: 'Your Financial Life, Unified.',
     subtitle:
       "Whether you're Maria managing 5 accounts or Diego tracking 7 DeFi networks — start in 30 seconds.",
+    urgencyNote:
+      'Live demo sessions expire after 1 hour — explore the full product now, no signup.',
     button: 'Create Free Account',
     buttonSecondary: 'Try Live Demo',
   },
