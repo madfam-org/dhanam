@@ -36,7 +36,7 @@
     "expo-auth-session": "~55.0.14",
     "expo-camera": "~15.0.10",
     "expo-constants": "~17.0.8",
-    "expo-crypto": "~13.0.2",
+    "expo-crypto": "~56.0.4",
     "expo-device": "~8.0.10",
     "expo-font": "~55.0.6",
     "expo-linear-gradient": "^15.0.7",
