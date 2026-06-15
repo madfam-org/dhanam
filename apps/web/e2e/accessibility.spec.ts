@@ -47,6 +47,18 @@ test.describe('Accessibility (WCAG AA)', () => {
       await waitForAccessiblePage(page);
       await checkA11y(page, { disableRules });
     });
+
+    test('landing page (EN)', async ({ page }) => {
+      await page.goto('/en');
+      await waitForAccessiblePage(page);
+      await checkA11y(page, { disableRules });
+    });
+
+    test('landing page (ES)', async ({ page }) => {
+      await page.goto('/es');
+      await waitForAccessiblePage(page);
+      await checkA11y(page, { disableRules });
+    });
   });
 
   test.describe('Authenticated pages', () => {

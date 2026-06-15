@@ -258,6 +258,18 @@
   }
 }
 
+/* Landing typography — Fraunces display + DM Sans UI (Phase G) */
+.landing-root {
+  font-family: var(--font-landing-ui), ui-sans-serif, system-ui, sans-serif;
+}
+
+.landing-root h1,
+.landing-root h2,
+.landing-root h3,
+.landing-root .landing-display {
+  font-family: var(--font-landing-display), Georgia, 'Times New Roman', serif;
+}
+
 /* Respect user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

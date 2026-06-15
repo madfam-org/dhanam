@@ -43,6 +43,25 @@ test.describe('Visual Regression - Desktop', () => {
       await page.waitForLoadState('domcontentloaded');
       await expect(page).toHaveScreenshot('forgot-password-desktop.png', screenshotOptions);
     });
+
+    test('landing hero (EN)', async ({ page }) => {
+      await page.goto('/en');
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page.locator('#landing-hero')).toHaveScreenshot('landing-hero-en-desktop.png', {
+        ...screenshotOptions,
+        animations: 'disabled',
+      });
+    });
+
+    test('landing pricing (EN)', async ({ page }) => {
+      await page.goto('/en#pricing');
+      await page.waitForLoadState('domcontentloaded');
+      await page.locator('#pricing').scrollIntoViewIfNeeded();
+      await expect(page.locator('#pricing')).toHaveScreenshot('landing-pricing-en-desktop.png', {
+        ...screenshotOptions,
+        animations: 'disabled',
+      });
+    });
   });
 
   test.describe('Authenticated pages', () => {
