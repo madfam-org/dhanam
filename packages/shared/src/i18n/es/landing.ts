@@ -6,7 +6,7 @@ export const landing = {
   },
   hero: {
     badge: 'Hecho para LATAM. Listo para todo lo que tienes.',
-    title: 'Sabe hacia dónde va tu dinero — y hacia dónde podría ir.',
+    title: 'Descubre hacia dónde va tu dinero — y hacia dónde podría ir.',
     subtitle: 'Conecta tus cuentas en minutos. Una vista clara de hoy y de mañana.',
     subDescription: 'Bancos, cripto, DeFi, bienes raíces y coleccionables — unificados en Dhanam.',
     cta: 'Probar Demo en Vivo',
