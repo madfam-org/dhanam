@@ -84,7 +84,7 @@ export function LandingPageClient({
         </section>
 
         <div id="personas">
-          <PersonaCards />
+          <PersonaCards locale={locale} />
         </div>
         <ProductStorySection />
         <ProblemSolution />

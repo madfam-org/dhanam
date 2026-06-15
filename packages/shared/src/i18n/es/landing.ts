@@ -64,8 +64,9 @@ export const landing = {
     },
   },
   personaCards: {
-    title: 'Elige Tu Aventura',
-    subtitle: 'Explora Dhanam a través de una vida financiera como la tuya',
+    title: '¿Qué vida financiera se parece a la tuya?',
+    subtitle:
+      'Explora Dhanam con una historia como la tuya — cambia de persona cuando quieras en el demo.',
     maria: {
       archetype: 'Joven Profesional',
       pain: 'Malabarismo con 5 apps y aún perdida',
@@ -89,6 +90,18 @@ export const landing = {
       pain: 'Las proyecciones estáticas no muestran probabilidad',
       superpower: '10,000 simulaciones. 12 pruebas de estrés. Probabilidades reales.',
       cta: 'Explorar como Patricia',
+    },
+    sofia: {
+      archetype: 'Profesional Transfronterizo',
+      pain: 'MXN, USD y EUR repartidos entre fronteras',
+      superpower: 'Patrimonio multi-moneda, presupuestos con FX, una sola base.',
+      cta: 'Explorar como Sofia',
+    },
+    roberto: {
+      archetype: 'Freelancer y Creador',
+      pain: 'Ingresos irregulares hacen de cada mes una incógnita',
+      superpower: 'Espacio de negocio separado, flujo de caja y categorías listas para impuestos.',
+      cta: 'Explorar como Roberto',
     },
   },
   features: {
