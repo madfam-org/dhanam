@@ -42,19 +42,6 @@ export function Footer() {
               Status
             </a>
           </div>
-          <div className="flex items-center justify-center gap-3 pt-1 text-xs text-muted-foreground">
-            <a href="https://karafiel.mx" className="hover:text-foreground transition-colors">
-              Karafiel
-            </a>
-            <span aria-hidden="true">&middot;</span>
-            <a href="https://forgesight.quest" className="hover:text-foreground transition-colors">
-              Forgesight
-            </a>
-            <span aria-hidden="true">&middot;</span>
-            <a href="https://selva.town" className="hover:text-foreground transition-colors">
-              Selva
-            </a>
-          </div>
         </div>
 
         <div className="flex items-center gap-6">
