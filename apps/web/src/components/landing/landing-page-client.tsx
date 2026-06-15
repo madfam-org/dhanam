@@ -19,6 +19,7 @@ import { SecurityTrust } from '@/components/landing/security-trust';
 import { SocialProof } from '@/components/landing/social-proof';
 import { StatsBar } from '@/components/landing/stats-bar';
 import { TestimonialCarousel } from '@/components/landing/testimonial-carousel';
+import { useLandingAnalytics } from '@/hooks/use-landing-analytics';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePublicAppUrl } from '@/hooks/usePublicSurface';
 import { redirectToAppDemo } from '@/lib/demo/launch-demo';
@@ -42,6 +43,7 @@ export function LandingPageClient({
 }: LandingPageClientProps) {
   const { isAuthenticated } = useAuth();
   const analytics = useAnalytics();
+  useLandingAnalytics(locale, analytics);
 
   const appUrl = usePublicAppUrl();
   const resolvedAppUrl = appUrl || 'https://app.dhan.am';
@@ -72,7 +74,11 @@ export function LandingPageClient({
       <LandingNav locale={locale} />
 
       <main id="main-content">
-        <section className="container mx-auto px-6 py-16 md:py-24" aria-labelledby="landing-hero">
+        <section
+          className="container mx-auto px-6 py-16 md:py-24"
+          aria-labelledby="landing-hero"
+          data-landing-section="hero"
+        >
           <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
             <div className="order-2 lg:order-1 space-y-2">
               {heroColumn}
@@ -86,24 +92,48 @@ export function LandingPageClient({
           {heroCapabilities}
         </section>
 
-        <div id="personas">
+        <div id="personas" data-landing-section="personas">
           <PersonaCards locale={locale} />
         </div>
-        <ProductStorySection />
-        <ProblemSolution />
-        <HowItWorks />
-        <StatsBar />
-        <TestimonialCarousel />
-        <PressStrip />
-        <SecurityTrust />
-        <FeaturesGrid />
-        <PlatformDepth />
-        <SocialProof />
-        <Pricing onSignUpClick={(plan) => handleSignUpClick(plan, 'pricing_cta')} />
-        <FinalCta
-          onLiveDemoClick={() => handleLiveDemoClick('final_cta')}
-          onSignUpClick={() => handleSignUpClick(undefined, 'final_cta')}
-        />
+        <div data-landing-section="product_story">
+          <ProductStorySection />
+        </div>
+        <div data-landing-section="problem_solution">
+          <ProblemSolution />
+        </div>
+        <div data-landing-section="how_it_works">
+          <HowItWorks />
+        </div>
+        <div data-landing-section="stats">
+          <StatsBar />
+        </div>
+        <div data-landing-section="testimonials">
+          <TestimonialCarousel />
+        </div>
+        <div data-landing-section="press">
+          <PressStrip />
+        </div>
+        <div data-landing-section="security">
+          <SecurityTrust />
+        </div>
+        <div data-landing-section="features">
+          <FeaturesGrid />
+        </div>
+        <div data-landing-section="platform">
+          <PlatformDepth />
+        </div>
+        <div data-landing-section="social_proof">
+          <SocialProof />
+        </div>
+        <div id="pricing" data-landing-section="pricing">
+          <Pricing onSignUpClick={(plan) => handleSignUpClick(plan, 'pricing_cta')} />
+        </div>
+        <div data-landing-section="final_cta">
+          <FinalCta
+            onLiveDemoClick={() => handleLiveDemoClick('final_cta')}
+            onSignUpClick={() => handleSignUpClick(undefined, 'final_cta')}
+          />
+        </div>
       </main>
 
       <Footer />
