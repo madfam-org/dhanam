@@ -4,18 +4,11 @@ import { useTranslation } from '@dhanam/shared';
 import { Shield, KeyRound, Eye, ClipboardList } from 'lucide-react';
 
 const pillars = [
-  { key: 'encryption' as const, icon: Shield, color: 'blue' },
-  { key: 'authentication' as const, icon: KeyRound, color: 'purple' },
-  { key: 'readOnly' as const, icon: Eye, color: 'green' },
-  { key: 'auditTrail' as const, icon: ClipboardList, color: 'orange' },
+  { key: 'encryption' as const, icon: Shield, tone: 'bg-info/15 text-info' },
+  { key: 'authentication' as const, icon: KeyRound, tone: 'bg-primary/15 text-primary' },
+  { key: 'readOnly' as const, icon: Eye, tone: 'bg-success/15 text-success' },
+  { key: 'auditTrail' as const, icon: ClipboardList, tone: 'bg-warning/15 text-warning' },
 ] as const;
-
-const colorMap: Record<string, string> = {
-  blue: 'bg-blue-100 dark:bg-blue-900/50 text-blue-600',
-  purple: 'bg-purple-100 dark:bg-purple-900/50 text-purple-600',
-  green: 'bg-green-100 dark:bg-green-900/50 text-green-600',
-  orange: 'bg-orange-100 dark:bg-orange-900/50 text-orange-600',
-};
 
 export function SecurityTrust() {
   const { t } = useTranslation('landing');
@@ -24,7 +17,10 @@ export function SecurityTrust() {
     <section className="container mx-auto px-6 py-16 bg-muted/30">
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold mb-4">{t('securityTrust.title')}</h2>
-        <p className="text-muted-foreground">{t('securityTrust.subtitle')}</p>
+        <p className="text-muted-foreground max-w-2xl mx-auto">{t('securityTrust.subtitle')}</p>
+        <p className="mt-4 inline-flex rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary">
+          {t('securityTrust.neverSold')}
+        </p>
       </div>
 
       <div className="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -33,7 +29,7 @@ export function SecurityTrust() {
           return (
             <div key={pillar.key} className="rounded-lg border bg-card p-6 text-center">
               <div
-                className={`h-12 w-12 rounded-lg flex items-center justify-center mb-4 mx-auto ${colorMap[pillar.color]}`}
+                className={`h-12 w-12 rounded-lg flex items-center justify-center mb-4 mx-auto ${pillar.tone}`}
               >
                 <Icon className="h-6 w-6" />
               </div>
