@@ -11,11 +11,14 @@ import { LandingHeroActions } from '@/components/landing/landing-hero-actions';
 import { LandingNav } from '@/components/landing/landing-nav';
 import { PersonaCards } from '@/components/landing/persona-cards';
 import { PlatformDepth } from '@/components/landing/platform-depth';
+import { PressStrip } from '@/components/landing/press-strip';
 import { Pricing } from '@/components/landing/pricing';
 import { ProblemSolution } from '@/components/landing/problem-solution';
 import { ProductStorySection } from '@/components/landing/product-story-section';
 import { SecurityTrust } from '@/components/landing/security-trust';
 import { SocialProof } from '@/components/landing/social-proof';
+import { StatsBar } from '@/components/landing/stats-bar';
+import { TestimonialCarousel } from '@/components/landing/testimonial-carousel';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { usePublicAppUrl } from '@/hooks/usePublicSurface';
 import { redirectToAppDemo } from '@/lib/demo/launch-demo';
@@ -89,6 +92,9 @@ export function LandingPageClient({
         <ProductStorySection />
         <ProblemSolution />
         <HowItWorks />
+        <StatsBar />
+        <TestimonialCarousel />
+        <PressStrip />
         <SecurityTrust />
         <FeaturesGrid />
         <PlatformDepth />

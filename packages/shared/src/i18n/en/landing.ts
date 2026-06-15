@@ -193,6 +193,7 @@ export const landing = {
       description:
         'Every sensitive operation is logged. Admin impersonation requires audit trail and user consent.',
     },
+    neverSold: 'Your data is never sold — period.',
   },
   platformDepth: {
     title: 'Deep Platform Coverage',
@@ -337,6 +338,64 @@ export const landing = {
     openSource: 'Open Source ESG Methodology',
     openSourceDescription:
       'Our ESG scoring is transparent and auditable. View the methodology on GitHub.',
+  },
+  testimonials: {
+    title: 'Early users, real outcomes',
+    subtitle: 'Beta voices from Mexico City and beyond — names used with consent.',
+    previous: 'Previous testimonial',
+    next: 'Next testimonial',
+    pagination: 'Testimonials',
+    goTo: 'Go to testimonial',
+    quote1: {
+      quote:
+        'I finally see MXN and USD in one place. The demo sold me before I connected a single account.',
+      name: 'Early access user',
+      role: 'Mexico City · cross-border professional',
+    },
+    quote2: {
+      quote:
+        'Monte Carlo isn’t marketing fluff here — I can actually see the odds of hitting my retirement target.',
+      name: 'Early access user',
+      role: 'Guadalajara · high net worth',
+    },
+    quote3: {
+      quote:
+        'Separate business and personal spaces changed how I invoice clients. Cashflow forecast is scary accurate.',
+      name: 'Early access user',
+      role: 'Monterrey · freelancer',
+    },
+    quote4: {
+      quote:
+        'DeFi positions finally show up next to my SPEI accounts. That alone replaced two apps for me.',
+      name: 'Early access user',
+      role: 'CDMX · Web3 native',
+    },
+    quote5: {
+      quote:
+        'AI categorization learns fast. I correct once and it sticks — unlike every bank app I’ve tried.',
+      name: 'Early access user',
+      role: 'Querétaro · young professional',
+    },
+    quote6: {
+      quote:
+        'Life Beat and the document vault made estate planning feel approachable, not like a lawyer-only topic.',
+      name: 'Early access user',
+      role: 'Mexico City · family planner',
+    },
+  },
+  statsBar: {
+    title: 'Dhanam at a glance',
+    stat1: { value: '3', label: 'Languages · ES, EN, PT-BR' },
+    stat2: { value: '7', label: 'DeFi networks tracked' },
+    stat3: { value: '12', label: 'Historical stress scenarios' },
+    stat4: { value: '1 hr', label: 'Live demo · no signup' },
+  },
+  pressStrip: {
+    title: 'As featured in',
+    slot1: 'Press',
+    slot2: 'Press',
+    slot3: 'Press',
+    slot4: 'Press',
   },
   cta: {
     title: 'Your Financial Life, Unified.',

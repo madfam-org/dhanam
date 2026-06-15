@@ -193,6 +193,7 @@ export const landing = {
       description:
         'Cada operação sensível fica registrada. A personificação de admin requer auditoria e consentimento.',
     },
+    neverSold: 'Seus dados nunca são vendidos — ponto.',
   },
   platformDepth: {
     title: 'Cobertura Profunda da Plataforma',
@@ -338,6 +339,62 @@ export const landing = {
     openSource: 'Metodologia ESG de Código Aberto',
     openSourceDescription:
       'Nossa pontuação ESG é transparente e auditável. Veja a metodologia no GitHub.',
+  },
+  testimonials: {
+    title: 'Usuários iniciais, resultados reais',
+    subtitle: 'Vozes beta da Cidade do México e além — nomes com consentimento.',
+    previous: 'Depoimento anterior',
+    next: 'Próximo depoimento',
+    pagination: 'Depoimentos',
+    goTo: 'Ir ao depoimento',
+    quote1: {
+      quote:
+        'Finalmente vejo MXN e USD em um só lugar. O demo me convenceu antes de conectar qualquer conta.',
+      name: 'Usuário de acesso antecipado',
+      role: 'Cidade do México · profissional transfronteiriço',
+    },
+    quote2: {
+      quote:
+        'Monte Carlo aqui não é marketing — vejo as probabilidades reais da minha aposentadoria.',
+      name: 'Usuário de acesso antecipado',
+      role: 'Guadalajara · alto patrimônio',
+    },
+    quote3: {
+      quote:
+        'Espaços separados para negócio e pessoal mudaram como faturó. A previsão de fluxo de caixa assusta de precisa.',
+      name: 'Usuário de acesso antecipado',
+      role: 'Monterrey · freelancer',
+    },
+    quote4: {
+      quote: 'Posições DeFi aparecem junto com SPEI. Só isso substituiu dois apps.',
+      name: 'Usuário de acesso antecipado',
+      role: 'CDMX · nativo Web3',
+    },
+    quote5: {
+      quote: 'A categorização IA aprende rápido. Corrijo uma vez e fica — diferente do meu banco.',
+      name: 'Usuário de acesso antecipado',
+      role: 'Querétaro · jovem profissional',
+    },
+    quote6: {
+      quote:
+        'Life Beat e o cofre tornaram o planejamento patrimonial acessível, não só para advogados.',
+      name: 'Usuário de acesso antecipado',
+      role: 'Cidade do México · planejador familiar',
+    },
+  },
+  statsBar: {
+    title: 'Dhanam em números',
+    stat1: { value: '3', label: 'Idiomas · ES, EN, PT-BR' },
+    stat2: { value: '7', label: 'Redes DeFi rastreadas' },
+    stat3: { value: '12', label: 'Cenários históricos de estresse' },
+    stat4: { value: '1 h', label: 'Demo ao vivo · sem cadastro' },
+  },
+  pressStrip: {
+    title: 'Como visto em',
+    slot1: 'Imprensa',
+    slot2: 'Imprensa',
+    slot3: 'Imprensa',
+    slot4: 'Imprensa',
   },
   cta: {
     title: 'Sua Vida Financeira, Unificada.',
