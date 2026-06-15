@@ -1,5 +1,27 @@
 import '@testing-library/jest-dom';
 
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+
+  constructor(private callback: IntersectionObserverCallback) {}
+
+  observe = (target: Element) => {
+    this.callback([{ isIntersecting: true, target } as IntersectionObserverEntry], this);
+  };
+
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+  takeRecords = () => [];
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+});
+
 // Mock Next.js router
 jest.mock('next/router', () => ({
   useRouter: () => ({

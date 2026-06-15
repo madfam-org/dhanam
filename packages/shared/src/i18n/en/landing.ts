@@ -23,6 +23,46 @@ export const landing = {
     encryption: 'AES-256 encrypted',
     readOnly: 'Read-only bank access',
   },
+  productStory: {
+    title: 'One platform for every chapter of your financial life',
+    subtitle: 'From today’s balances to tomorrow’s probabilities — see it in Dhanam.',
+    chapter1: {
+      eyebrow: 'See everything',
+      title: 'Your full net worth — banks, crypto, property, and more',
+      description:
+        'Connect Belvo, Plaid, Bitso, Zapper, and manual assets. One dashboard shows what you own, where it lives, and how it moves.',
+    },
+    chapter2: {
+      eyebrow: 'Understand spending',
+      title: 'AI categorization that learns from your corrections',
+      description:
+        'Recurring bills, SPEI transfers, and subscription drift surface automatically. Review once — Dhanam remembers.',
+    },
+    chapter3: {
+      eyebrow: 'Plan with confidence',
+      title: 'Probabilistic planning, not static spreadsheets',
+      description:
+        'Run 10,000 Monte Carlo paths and 12 historical stress scenarios. Know the odds of hitting your goals — not just a best guess.',
+    },
+    chapter4: {
+      eyebrow: 'Grow together',
+      title: 'Yours, mine, and ours — without extra seats',
+      description:
+        'Household spaces with shared and private views. Couples and families stay aligned without juggling separate apps.',
+    },
+    chapter5: {
+      eyebrow: 'Protect what matters',
+      title: 'Estate planning with Life Beat',
+      description:
+        'Digital wills, encrypted document vault, and executor access that activates when it needs to — because planning is part of wealth.',
+    },
+    chapter6: {
+      eyebrow: 'Go deeper',
+      title: 'DeFi, collectibles, cashflow, and ESG — when you are ready',
+      description:
+        'Seven DeFi networks, collectible valuations, 60-day forecasts, and crypto ESG scores. Depth without switching tools.',
+    },
+  },
   personaCards: {
     title: 'Choose Your Adventure',
     subtitle: 'Explore Dhanam through a financial life like yours',
@@ -54,6 +94,8 @@ export const landing = {
   features: {
     title: 'Everything You Need to Manage Your Wealth',
     subtitle: 'Professional-grade tools for individuals and businesses',
+    showAll: 'See all features',
+    hideAll: 'Show less',
     feature1: {
       title: 'Multi-Provider Banking',
       description:
@@ -225,6 +267,12 @@ export const landing = {
     title: 'Traditional Apps Tell You Where Your Money Went.',
     titleHighlight: "Dhanam Tells You Where It's Going.",
     budgetTrackers: 'Budget Trackers',
+    row1Problem: 'Backward-looking only — no probability or stress tests',
+    row1Solution: 'Monte Carlo planning with 12 historical stress scenarios',
+    row2Problem: 'Banks only — no crypto, DeFi, collectibles, or property',
+    row2Solution: 'Unified wealth across banks, on-chain, real estate, and collectibles',
+    row3Problem: 'No household separation or estate continuity',
+    row3Solution: 'Yours / Mine / Ours spaces plus Life Beat estate planning',
     problem1: 'Static projections',
     problem2: 'No probability',
     problem3: "Can't stress test",

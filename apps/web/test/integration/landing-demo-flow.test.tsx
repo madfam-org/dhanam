@@ -206,6 +206,7 @@ describe('Landing Page Demo Flow', () => {
     it('should render features grid', () => {
       renderLanding();
 
+      fireEvent.click(screen.getByRole('button', { name: /See all features/i }));
       expect(screen.getByText(/Multi-Provider Banking/i)).toBeInTheDocument();
       expect(screen.getByText(/DeFi & Web3/i)).toBeInTheDocument();
     });
