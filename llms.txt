@@ -37,6 +37,7 @@ when ops remediation is in scope; stay in dhanam for product/engineering work.
 - `docs/DOCUMENTATION_AUDIT_2026-05-22.md` — latest documentation corpus audit.
 - `docs/runbooks/BREAK_GLASS.md` — break-glass procedures when Enclii adapters are missing.
 - `docs/api/README.md` — OpenAPI export and API reference index.
+- `docs/SESSION_WRAP_UP_2026-06-15.md` — latest session handoff (landing live, deploy ops, next picks).
 - `docs/LANDING_REMEDIATION.md` — Dhanam marketing landing (`dhan.am`) UX remediation program.
 - `docs/LANDING_DESIGN_SYSTEM.md` — landing typography, tokens, components (Dhanam product vs MADFAM company).
 - `ECOSYSTEM.md` — MADFAM ecosystem and Enclii deployment context when present.
