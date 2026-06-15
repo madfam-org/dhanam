@@ -23,6 +23,46 @@ export const landing = {
     encryption: 'Cifrado AES-256',
     readOnly: 'Acceso bancario de solo lectura',
   },
+  productStory: {
+    title: 'Una plataforma para cada capítulo de tu vida financiera',
+    subtitle: 'Desde los saldos de hoy hasta las probabilidades de mañana — en Dhanam.',
+    chapter1: {
+      eyebrow: 'Ver todo',
+      title: 'Tu patrimonio neto completo — bancos, cripto, propiedad y más',
+      description:
+        'Conecta Belvo, Plaid, Bitso, Zapper y activos manuales. Un panel muestra lo que tienes, dónde está y cómo se mueve.',
+    },
+    chapter2: {
+      eyebrow: 'Entender el gasto',
+      title: 'Categorización con IA que aprende de tus correcciones',
+      description:
+        'Facturas recurrentes, transferencias SPEI y suscripciones aparecen solas. Revisa una vez — Dhanam recuerda.',
+    },
+    chapter3: {
+      eyebrow: 'Planear con confianza',
+      title: 'Planificación probabilística, no hojas estáticas',
+      description:
+        'Ejecuta 10,000 rutas Monte Carlo y 12 escenarios de estrés históricos. Conoce las probabilidades de tus metas.',
+    },
+    chapter4: {
+      eyebrow: 'Crecer juntos',
+      title: 'Tuyo, mío y nuestro — sin asientos extra',
+      description:
+        'Espacios de hogar con vistas compartidas y privadas. Parejas y familias alineadas sin apps separadas.',
+    },
+    chapter5: {
+      eyebrow: 'Proteger lo importante',
+      title: 'Planificación patrimonial con Life Beat',
+      description:
+        'Testamentos digitales, bóveda cifrada y acceso de ejecutores cuando haga falta — porque planificar es parte del patrimonio.',
+    },
+    chapter6: {
+      eyebrow: 'Profundizar',
+      title: 'DeFi, coleccionables, flujo de caja y ESG — cuando quieras',
+      description:
+        'Siete redes DeFi, valuaciones de coleccionables, pronósticos a 60 días y puntajes ESG cripto. Profundidad sin cambiar de herramienta.',
+    },
+  },
   personaCards: {
     title: 'Elige Tu Aventura',
     subtitle: 'Explora Dhanam a través de una vida financiera como la tuya',
@@ -54,6 +94,8 @@ export const landing = {
   features: {
     title: 'Todo lo Que Necesitas para Administrar Tu Patrimonio',
     subtitle: 'Herramientas profesionales para personas y negocios',
+    showAll: 'Ver todas las funciones',
+    hideAll: 'Mostrar menos',
     feature1: {
       title: 'Banca Multi-Proveedor',
       description:
@@ -227,6 +269,12 @@ export const landing = {
     title: 'Las Apps Tradicionales Te Dicen a Dónde Fue Tu Dinero.',
     titleHighlight: 'Dhanam Te Dice a Dónde Va.',
     budgetTrackers: 'Apps de Presupuesto',
+    row1Problem: 'Solo miran al pasado — sin probabilidad ni pruebas de estrés',
+    row1Solution: 'Planificación Monte Carlo con 12 escenarios de estrés históricos',
+    row2Problem: 'Solo bancos — sin cripto, DeFi, coleccionables ni propiedad',
+    row2Solution: 'Patrimonio unificado: bancos, on-chain, bienes raíces y coleccionables',
+    row3Problem: 'Sin separación de hogar ni continuidad patrimonial',
+    row3Solution: 'Espacios Tuyo / Mío / Nuestro más planificación Life Beat',
     problem1: 'Proyecciones estáticas',
     problem2: 'Sin probabilidad',
     problem3: 'No se pueden hacer pruebas de estrés',

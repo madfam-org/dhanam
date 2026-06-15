@@ -33,7 +33,7 @@ export function LandingNav({ locale }: LandingNavProps) {
   }, []);
 
   const navLinks = [
-    { href: '#personas', label: t('nav.features') },
+    { href: '#features', label: t('nav.features') },
     { href: '#pricing', label: t('nav.pricing') },
     { href: '#landing-hero', label: t('nav.demo') },
   ];

@@ -13,6 +13,7 @@ import { PersonaCards } from '@/components/landing/persona-cards';
 import { PlatformDepth } from '@/components/landing/platform-depth';
 import { Pricing } from '@/components/landing/pricing';
 import { ProblemSolution } from '@/components/landing/problem-solution';
+import { ProductStorySection } from '@/components/landing/product-story-section';
 import { SecurityTrust } from '@/components/landing/security-trust';
 import { SocialProof } from '@/components/landing/social-proof';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -85,6 +86,7 @@ export function LandingPageClient({
         <div id="personas">
           <PersonaCards />
         </div>
+        <ProductStorySection />
         <ProblemSolution />
         <HowItWorks />
         <SecurityTrust />
