@@ -1,5 +1,10 @@
 # Dhanam Competitive Benchmarks
 
+> **Landing UX:** Feature/pricing matrices below complement the full marketing-site
+> remediation program in [../LANDING_REMEDIATION.md](../LANDING_REMEDIATION.md)
+> (competitor landing patterns, Dhanam `dhan.am` execution plan, design system:
+> [../LANDING_DESIGN_SYSTEM.md](../LANDING_DESIGN_SYSTEM.md)).
+
 ## Competitive Landscape
 
 | Product          | Free       | Monthly | Annual          | What They Offer                          |

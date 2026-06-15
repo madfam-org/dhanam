@@ -1,6 +1,6 @@
 # Dhanam Documentation
 
-Last updated: 2026-06-14
+Last updated: 2026-06-15
 
 This is the canonical human and agent documentation map for Dhanam. Prefer this
 file over older phase summaries when choosing what to read first.
@@ -84,6 +84,14 @@ record the missing Enclii adapter gap when raw access is unavoidable.
 ## Product And Feature Guides
 
 Full guide index: [guides/README.md](guides/README.md).
+
+### Dhanam marketing landing (`dhan.am`)
+
+| Document                                                            | Use                                                                                    |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [Landing Remediation Plan](LANDING_REMEDIATION.md)                  | **Canonical program** — competitive analysis, phases, tickets, tests, Dhanam vs MADFAM |
+| [Landing Design System](LANDING_DESIGN_SYSTEM.md)                   | Typography, color tokens, motion, component specs for the Dhanam marketing site        |
+| [Competitive Benchmarks](market-research/competitive-benchmarks.md) | Pricing and feature matrix (complements landing UX plan)                               |
 
 | Document                                                                       | Use                                        |
 | ------------------------------------------------------------------------------ | ------------------------------------------ |
