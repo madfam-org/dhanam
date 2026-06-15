@@ -229,6 +229,10 @@ export const landing = {
   pricing: {
     title: 'Planes para Cada Etapa',
     subtitle: 'Comienza gratis, crece con las herramientas que necesitas',
+    billingMonthly: 'Mensual',
+    billingAnnual: 'Anual',
+    annualSave: 'Ahorra ~17% · 2 meses gratis',
+    coffeeAnchor: 'Copilot Pro desde ~MX$50/semana — menos que dos cafés de especialidad.',
     mostPopular: 'Más Popular',
     bestValue: 'Mejor Valor',
     cancelAnytime: 'Cancela cuando quieras',
@@ -402,6 +406,8 @@ export const landing = {
     title: 'Tu Vida Financiera, Unificada.',
     subtitle:
       'Ya seas María administrando 5 cuentas o Diego rastreando 7 redes DeFi — comienza en 30 segundos.',
+    urgencyNote:
+      'Las sesiones demo expiran en 1 hora — explora el producto completo ahora, sin registro.',
     button: 'Crear Cuenta Gratis',
     buttonSecondary: 'Probar Demo en Vivo',
   },

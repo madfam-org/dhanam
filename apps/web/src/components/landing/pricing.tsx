@@ -29,6 +29,7 @@ export function Pricing({ onSignUpClick }: PricingProps) {
   const { t } = useTranslation('landing');
   const [pricing, setPricing] = useState<PricingResponse | null>(null);
   const [geoCountry, setGeoCountry] = useState<string | undefined>();
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   useEffect(() => {
     // Try to detect country from cookie or default to MX (LATAM-first; MXN is the
@@ -87,6 +88,21 @@ export function Pricing({ onSignUpClick }: PricingProps) {
     ? Math.round((recommendedTier.promoPrice ?? recommendedTier.monthlyPrice) * 100)
     : undefined;
 
+  const resolveDisplayPrice = (monthlyAmount: number) => {
+    if (billingPeriod === 'annual' && monthlyAmount > 0) {
+      return {
+        amount: monthlyAmount * 10,
+        suffix: '/yr',
+        equivalent: monthlyAmount * 10,
+      };
+    }
+    return { amount: monthlyAmount, suffix: '/mo', equivalent: null as number | null };
+  };
+
+  const showCoffeeAnchor =
+    (geoCountry === 'MX' || tiers.some((tier) => tier.currency === 'MXN')) &&
+    tiers.some((tier) => tier.id === 'copilot_pro' || tier.id === 'pro');
+
   return (
     <section className="container mx-auto px-6 py-16" id="pricing">
       <div className="max-w-6xl mx-auto">
@@ -106,6 +122,37 @@ export function Pricing({ onSignUpClick }: PricingProps) {
             Indicative pricing in MXN per month, anchored to the Tulana v0.1 ecosystem
             recommendation and subject to validation with real users.
           </p>
+
+          <div className="mt-6 inline-flex items-center rounded-full border bg-muted/40 p-1">
+            <button
+              type="button"
+              onClick={() => setBillingPeriod('monthly')}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                billingPeriod === 'monthly'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t('pricing.billingMonthly')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setBillingPeriod('annual')}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                billingPeriod === 'annual'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t('pricing.billingAnnual')}
+            </button>
+          </div>
+          {billingPeriod === 'annual' && (
+            <p className="mt-2 text-xs font-medium text-success">{t('pricing.annualSave')}</p>
+          )}
+          {showCoffeeAnchor && billingPeriod === 'monthly' && (
+            <p className="mt-3 text-sm text-muted-foreground">{t('pricing.coffeeAnchor')}</p>
+          )}
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -116,6 +163,8 @@ export function Pricing({ onSignUpClick }: PricingProps) {
             // 'family_plus' is the highest consumer tier; 'premium' kept for back-compat.
             const isPremium = tier.id === 'family_plus' || tier.id === 'premium';
             const isFree = tier.monthlyPrice === 0 || tier.id === 'free';
+            const baseMonthly = tier.promoPrice ?? tier.monthlyPrice;
+            const display = resolveDisplayPrice(baseMonthly);
 
             return (
               <div
@@ -139,7 +188,7 @@ export function Pricing({ onSignUpClick }: PricingProps) {
                 )}
                 <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
                 <div className="mb-4">
-                  {tier.promoPrice !== null ? (
+                  {tier.promoPrice !== null && billingPeriod === 'monthly' ? (
                     <>
                       <p className="text-3xl font-bold">
                         {formatPrice(tier.promoPrice, tier.currency)}
@@ -154,10 +203,21 @@ export function Pricing({ onSignUpClick }: PricingProps) {
                       </p>
                     </>
                   ) : (
-                    <p className="text-3xl font-bold">
-                      {formatPrice(tier.monthlyPrice, tier.currency)}
-                      <span className="text-sm font-normal text-muted-foreground">/mo</span>
-                    </p>
+                    <>
+                      <p className="text-3xl font-bold">
+                        {formatPrice(display.amount, tier.currency)}
+                        <span className="text-sm font-normal text-muted-foreground">
+                          {display.suffix}
+                        </span>
+                      </p>
+                      {billingPeriod === 'annual' &&
+                        display.equivalent !== null &&
+                        baseMonthly > 0 && (
+                          <p className="text-xs text-muted-foreground">
+                            {formatPrice(display.amount / 12, tier.currency)}/mo billed annually
+                          </p>
+                        )}
+                    </>
                   )}
                 </div>
                 <ul className="space-y-2 text-sm mb-6">

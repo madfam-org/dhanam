@@ -92,7 +92,7 @@ export function LandingNav({ locale }: LandingNavProps) {
             <a href={`${appUrl}/login`}>
               <Button variant="ghost">{t('nav.login')}</Button>
             </a>
-            <a href={`${appUrl}/register`}>
+            <a href={`${appUrl}/register?plan=copilot_pro`}>
               <Button>{t('nav.getStarted')}</Button>
             </a>
           </div>
@@ -140,7 +140,7 @@ export function LandingNav({ locale }: LandingNavProps) {
                 {t('nav.login')}
               </Button>
             </a>
-            <a href={`${appUrl}/register`} className="w-full">
+            <a href={`${appUrl}/register?plan=copilot_pro`} className="w-full">
               <Button className="w-full">{t('nav.getStarted')}</Button>
             </a>
           </div>
