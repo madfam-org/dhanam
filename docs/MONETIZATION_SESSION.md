@@ -1,6 +1,6 @@
 # Monetization Session — Agent Entrypoint
 
-**Last Updated:** 2026-06-14  
+**Last Updated:** 2026-06-16  
 **Scope:** Open **dhanam alone** for monetization engineering. This file is the
 single in-repo routing index — read it before GA/stability docs unless the task
 is explicitly stability-only.
@@ -68,17 +68,18 @@ Routine production cutover, Vault/ESO remediation, and cross-repo sequencing liv
 in **`internal-devops`**. Open that repo (alone or beside dhanam) when the session
 touches Phase 0 platform blockers or operator cutover — not for app feature work.
 
-| Aspect                             | Canonical private path                                                       |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| **Private ops session entrypoint** | `internal-devops/runbooks/MONETIZATION_OPS_SESSION.md`                       |
-| Cross-repo first-peso sequencing   | `internal-devops/roadmaps/2026-06-13-first-pesos-execution-roadmap.md`       |
-| Operator cutover (Phases 0–5)      | `internal-devops/runbooks/2026-06-14-dhanam-first-peso-cutover.md`           |
-| Secret-store degradation (OPEN)    | `internal-devops/runbooks/2026-06-13-dhanam-secrets-degradation-incident.md` |
-| Full ecosystem money architecture  | `internal-devops/ecosystem/monetization-architecture-2026-04-26.md`          |
+| Aspect                               | Canonical private path                                                                       |
+| ------------------------------------ | -------------------------------------------------------------------------------------------- |
+| **Private ops session entrypoint**   | `internal-devops/runbooks/MONETIZATION_OPS_SESSION.md`                                       |
+| Cross-repo first-peso sequencing     | `internal-devops/roadmaps/2026-06-13-first-pesos-execution-roadmap.md`                       |
+| Operator cutover (Phases 0–5)        | `internal-devops/runbooks/2026-06-14-dhanam-first-peso-cutover.md`                           |
+| Secret-store degradation             | `internal-devops/runbooks/2026-06-13-dhanam-secrets-degradation-incident.md` (**MITIGATED**) |
+| Phase 0 recovery record (2026-06-16) | `internal-devops/runbooks/2026-06-16-dhanam-secrets-recovery-session.md`                     |
+| Full ecosystem money architecture    | `internal-devops/ecosystem/monetization-architecture-2026-04-26.md`                          |
 
-**Phase 0 gate (2026-06-14):** `vault-store` ClusterSecretStore validation failure
-blocks full `dhanam-secrets` sync, new deploys, catalog sync, and live checkout.
-No dhanam repo change clears this — fix Vault/ESO first (private runbook above).
+**Phase 0 gate (2026-06-16):** Secret store **restored** — `dhanam-api` 2/2,
+`/health/full` green. **Phase 1** (Stripe MX KYC + BBVA payout) is the next gate.
+Private detail: `internal-devops/runbooks/2026-06-16-dhanam-secrets-recovery-session.md`.
 
 ## Adjacent repos (pull in only when needed)
 

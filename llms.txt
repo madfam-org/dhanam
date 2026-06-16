@@ -15,9 +15,10 @@ When the goal is first revenue, checkout, billing, catalog, or entitlements:
 - `apps/api/src/modules/billing/README.md` — billing module (checkout, ledger, webhooks).
 - `docs/TECH_DEBT.md` — active debt (TD-1009, TD-1010, TD-1014).
 
-Phase 0 platform blockers (Vault/`dhanam-secrets`, operator cutover) are tracked in
-`internal-devops` — see paths in `docs/MONETIZATION_SESSION.md`. Open that repo
-when ops remediation is in scope; stay in dhanam for product/engineering work.
+Phase 0 platform blockers **MITIGATED 2026-06-16** — see
+`internal-devops/runbooks/2026-06-16-dhanam-secrets-recovery-session.md`.
+Phase 1 (Stripe MX + BBVA) is the next gate. Open `internal-devops` for operator
+cutover; stay in dhanam for product/engineering work.
 
 ## General read order
 

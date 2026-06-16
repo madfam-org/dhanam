@@ -1,6 +1,6 @@
 # Monetization-Path Readiness — Dhanam
 
-**Last Updated:** 2026-06-14  
+**Last Updated:** 2026-06-16  
 **Agent entrypoint:** [`MONETIZATION_SESSION.md`](MONETIZATION_SESSION.md) — read that
 file first for session routing and the private ops boundary.
 
@@ -40,6 +40,14 @@ are Phase 1, not the first transaction.
 - **Prisma `SubscriptionTier` comments corrected** to match catalog truth
   (essentials 4.99/79, pro 14.99/299, premium 29.99/599). Comment-only; no migration.
 
+## Shipped 2026-06-16 (platform ops — private record)
+
+- **Phase 0 secret store restored** — `dhanam-secrets` sync green, `dhanam-api`
+  **2/2**, `/health/full` healthy. Operator detail (Vault paths, break-glass steps):
+  `internal-devops/runbooks/2026-06-16-dhanam-secrets-recovery-session.md`.
+- **No dhanam repo change required** for Phase 0; durable Enclii ExternalSecret
+  manifests land in `enclii/infra/k8s/base/external-secrets/vault-secrets/`.
+
 ## Shipped 2026-06-14 (this repo)
 
 - **Production checkout funnel** — public, catalog-driven `/pricing` page + a
@@ -53,24 +61,21 @@ are Phase 1, not the first transaction.
 - **API hardened** — `strictNullChecks` enabled with 46 null-safety fixes (#525)
   and the TypeScript 6 upgrade on top (#526).
 
-> **Immediate gate (operational, not code):** a production secret-store
-> degradation is currently blocking new deploys, the catalog sync, and the
-> payment path (`dhanam-api` is serving on a single pod). Remediation and the
-> sequenced first-peso cutover are tracked privately in `internal-devops`:
-> `runbooks/MONETIZATION_OPS_SESSION.md` (ops entrypoint),
-> `runbooks/2026-06-13-dhanam-secrets-degradation-incident.md`, and
-> `runbooks/2026-06-14-dhanam-first-peso-cutover.md`. Unblocking is Vault/ESO +
-> Stripe-MX/BBVA provisioning — no repo change clears it.
+> **Immediate gate (operational, not code):** Phase 0 secret store **MITIGATED**
+> (2026-06-16). **Phase 1** is now the binding gate: Stripe MX KYC + BBVA payout,
+> then catalog sync and `FEATURE_STRIPE_MXN_LIVE`. Private sequencing:
+> `internal-devops/runbooks/2026-06-14-dhanam-first-peso-cutover.md` and
+> `runbooks/2026-06-16-dhanam-secrets-recovery-session.md`.
 
 ## Gates Dhanam owns (G0–G9)
 
-| Gate                     | Status | Dhanam action to close                                                                                  |
-| ------------------------ | ------ | ------------------------------------------------------------------------------------------------------- |
-| G0 Catalog truth         | Ready  | Keep `catalog.yaml` the single source; re-run `sync-catalog.ts` after the Free tier                     |
-| G1 Pricing evidence      | Ready  | Apply Tulana proposals (see `tulana/docs/dhanam-pricing-readiness-2026-06-13.md`)                       |
-| G5 Live checkout         | OPEN   | UI shipped (#522); flip `FEATURE_STRIPE_MXN_LIVE` after Stripe MX live + secret restore (runbook below) |
-| G6 Payment + ledger      | OPEN   | Prove one idempotent `BillingEvent` per payment, no duplicate revenue                                   |
-| G7 Entitlement + fan-out | OPEN   | Activate paid tier/credits + signed product webhook; close Karafiel CFDI staging proof (TD-1010)        |
+| Gate                     | Status | Dhanam action to close                                                                                       |
+| ------------------------ | ------ | ------------------------------------------------------------------------------------------------------------ |
+| G0 Catalog truth         | Ready  | Keep `catalog.yaml` the single source; re-run `sync-catalog.ts` after the Free tier                          |
+| G1 Pricing evidence      | Ready  | Apply Tulana proposals (see `tulana/docs/dhanam-pricing-readiness-2026-06-13.md`)                            |
+| G5 Live checkout         | OPEN   | UI shipped (#522); flip `FEATURE_STRIPE_MXN_LIVE` after Stripe MX live (Phase 0 secrets **done** 2026-06-16) |
+| G6 Payment + ledger      | OPEN   | Prove one idempotent `BillingEvent` per payment, no duplicate revenue                                        |
+| G7 Entitlement + fan-out | OPEN   | Activate paid tier/credits + signed product webhook; close Karafiel CFDI staging proof (TD-1010)             |
 
 (G2–G4 Selva/PhyndCRM, G8 BBVA, G9 Converge are owned outside this repo.)
 

@@ -247,18 +247,19 @@ Fixes shipped:
 
 ### TD-1016: Vault Extended Secret Backfill
 
-**Status:** Active
+**Status:** MITIGATED (2026-06-16) — cluster sync green; optional keys deferred
 
-The git-managed `dhanam-secrets` ExternalSecret is **deferred from kustomization**
-because `vault-store` cannot read `secret/dhanam` (`SecretSyncedError`). Until
-Enclii Lockbox backfill restores Vault read access:
+`vault-store` reads `secret/dhanam` again after Vault rebuild + Path B ES trim.
+Enclii canonical manifests: `enclii/infra/k8s/base/external-secrets/vault-secrets/dhanam-secrets.yaml`
 
-- `dhanam-ecosystem-service-auth` (platform ES) continues merging into
-  `dhanam-secrets`.
-- Retained secret keys from the last good sync remain in the cluster.
-- `external-secret.yaml` (core) and `external-secret-extended.yaml` (integration
-  keys) stay in-repo as the target contract; re-add to `kustomization.yaml` after
-  Vault proof.
+- `dhanam-secrets-extended.yaml` (Merge into same K8s Secret). Private record:
+  `internal-devops/runbooks/2026-06-16-dhanam-secrets-recovery-session.md`.
+
+Remaining:
+
+- Dhanam repo `external-secret*.yaml` still deferred from kustomization (Enclii owns ES).
+- Optional keys (R2, Cloudflare, Sentry) via `dhanam/app-infra` intake when needed.
+- Deprecate SendGrid/SMTP after platform Resend cutover.
 
 ## Recently Closed Debt
 
