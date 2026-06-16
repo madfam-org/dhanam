@@ -290,7 +290,7 @@ describe('SubscriptionLifecycleService', () => {
         'karafiel'
       );
 
-      expect(priceResolver.resolve).toHaveBeenCalledWith('karafiel_contador', 1, false);
+      expect(priceResolver.resolve).toHaveBeenCalledWith('karafiel_contador', 3, false);
       expect(stripe.createCheckoutSession).toHaveBeenCalledWith(
         expect.objectContaining({ priceId: 'price_karafiel_contador' })
       );

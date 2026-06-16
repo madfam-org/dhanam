@@ -304,22 +304,33 @@ export class WebhookProcessorService {
   }
 
   /**
+   * Resolve Dhanam user id from checkout session metadata.
+   * Checkout paths set `userId`, `dhanam_user_id`, or legacy `janua_user_id`.
+   */
+  private resolveCheckoutUserId(metadata: Stripe.Metadata | null | undefined): string | null {
+    if (!metadata) return null;
+    return metadata.janua_user_id || metadata.userId || metadata.dhanam_user_id || null;
+  }
+
+  /**
    * Handle Stripe checkout.session.completed event.
-   * Captures metadata.janua_user_id before a subscription object may exist.
+   * Captures user + plan metadata before a subscription object may exist.
    */
   async handleCheckoutCompleted(event: Stripe.Event): Promise<void> {
     const session = event.data.object as Stripe.Checkout.Session;
-    const januaUserId = session.metadata?.janua_user_id;
+    const userId = this.resolveCheckoutUserId(session.metadata);
     const plan = session.metadata?.plan;
 
-    if (!januaUserId) {
-      this.logger.log('checkout.session.completed without janua_user_id metadata, skipping');
+    if (!userId) {
+      this.logger.log(
+        'checkout.session.completed without user metadata (userId/dhanam_user_id/janua_user_id), skipping'
+      );
       return;
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id: januaUserId } });
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      this.logger.error(`User not found for janua_user_id: ${januaUserId}`);
+      this.logger.error(`User not found for checkout metadata user id: ${userId}`);
       return;
     }
 
@@ -360,7 +371,7 @@ export class WebhookProcessorService {
 
     // Dispatch Janua role upgrade (non-blocking)
     this.lifecycle
-      .dispatchJanuaRoleUpgrade(januaUserId, productId)
+      .dispatchJanuaRoleUpgrade(userId, productId)
       .catch((err) => this.logger.error(`Janua role dispatch failed: ${err.message}`));
 
     this.logger.log(`Checkout completed for user ${user.id}, tier: ${tier}`);

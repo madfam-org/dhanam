@@ -31,7 +31,7 @@ export class PriceResolverService {
    * Resolve the Stripe price ID and optional coupon for a given tier and region.
    */
   async resolve(tier: string, region: number, isPromo: boolean): Promise<ResolvedPrice> {
-    const priceId = await this.getPriceIdForTier(tier);
+    const priceId = await this.getPriceIdForTier(tier, region);
 
     if (!priceId) {
       throw new Error(`No Stripe price configured for tier: ${tier}`);
@@ -57,9 +57,9 @@ export class PriceResolverService {
   /**
    * Resolve price ID, checking the product catalog DB first, then env vars.
    */
-  private async getPriceIdForTier(tier: string): Promise<string | undefined> {
+  private async getPriceIdForTier(tier: string, region: number): Promise<string | undefined> {
     // 1. Try DB-backed catalog resolution
-    const dbPrice = await this.resolveFromCatalog(tier);
+    const dbPrice = await this.resolveFromCatalog(tier, region);
     if (dbPrice) {
       return dbPrice;
     }
@@ -68,13 +68,20 @@ export class PriceResolverService {
     return this.getPriceIdFromEnv(tier);
   }
 
+  /** Map Commercial GA region → catalog currency (G0 pricing ladder). */
+  private currencyForRegion(region: number): string {
+    if (region === 3) return 'MXN';
+    return 'USD';
+  }
+
   /**
    * Look up Stripe price ID from the ProductPrice catalog DB.
    *
    * Parses plan slugs like "karafiel_pro", "essentials", "pro_yearly" etc.
    * Returns null if no catalog entry or no stripePriceId stored.
    */
-  private async resolveFromCatalog(tier: string): Promise<string | null> {
+  private async resolveFromCatalog(tier: string, region: number): Promise<string | null> {
+    const currency = this.currencyForRegion(region);
     const lower = tier.toLowerCase();
 
     // Strip billing period suffix for DB lookup
@@ -108,6 +115,7 @@ export class PriceResolverService {
         where: {
           product: { slug: productSlug },
           tierSlug,
+          currency,
           interval,
           status: 'active',
           stripePriceId: { not: null },

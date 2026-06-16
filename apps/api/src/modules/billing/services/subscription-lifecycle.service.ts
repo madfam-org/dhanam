@@ -128,6 +128,8 @@ export class SubscriptionLifecycleService {
    */
   async upgradeToPremium(userId: string, options: UpgradeOptions = {}): Promise<CheckoutResult> {
     const countryCode = options.countryCode || 'US';
+    const product = options.product ?? 'dhanam';
+    const normalizedOptions: UpgradeOptions = { ...options, product, countryCode };
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -177,7 +179,7 @@ export class SubscriptionLifecycleService {
 
     // Try Janua multi-provider billing first
     if (this.januaBilling.isEnabled()) {
-      return this.upgradeToPremiumViaJanua(user, countryCode, webUrl, options);
+      return this.upgradeToPremiumViaJanua(user, countryCode, webUrl, normalizedOptions);
     }
 
     const hybrid = await tryHybridSubscriptionCheckout(
@@ -187,14 +189,14 @@ export class SubscriptionLifecycleService {
       user.id,
       countryCode,
       webUrl,
-      options
+      normalizedOptions
     );
     if (hybrid) {
       return hybrid;
     }
 
     // Fallback to direct Stripe
-    return this.upgradeToPremiumViaStripe(user, webUrl, options);
+    return this.upgradeToPremiumViaStripe(user, webUrl, normalizedOptions);
   }
 
   /**
@@ -308,7 +310,11 @@ export class SubscriptionLifecycleService {
     }
 
     const plan = options.plan || 'pro';
-    const priceId = await this.resolveStripePriceId(plan, options.product);
+    const priceId = await this.resolveStripePriceId(
+      plan,
+      options.product ?? 'dhanam',
+      options.countryCode
+    );
 
     // Build metadata including orgId for external app linking
     const metadata: Record<string, string> = { userId: user.id, plan };
@@ -460,7 +466,7 @@ export class SubscriptionLifecycleService {
       });
     }
 
-    const priceId = await this.resolveStripePriceId(plan, product);
+    const priceId = await this.resolveStripePriceId(plan, product, countryCode);
 
     const session = await this.stripe.createCheckoutSession({
       customerId,
@@ -555,7 +561,7 @@ export class SubscriptionLifecycleService {
       return { checkoutUrl: hybrid.checkoutUrl, sessionId: hybrid.sessionId || '' };
     }
 
-    const priceId = await this.resolveStripePriceId(planId);
+    const priceId = await this.resolveStripePriceId(planId, undefined, countryCode);
 
     let customerId = user.stripeCustomerId;
     if (!customerId) {
@@ -699,11 +705,20 @@ export class SubscriptionLifecycleService {
     }
   }
 
-  private async resolveStripePriceId(plan: string, product?: string): Promise<string> {
+  private regionForCountry(countryCode?: string): number {
+    return (countryCode || 'US').toUpperCase() === 'MX' ? 3 : 1;
+  }
+
+  private async resolveStripePriceId(
+    plan: string,
+    product?: string,
+    countryCode?: string
+  ): Promise<string> {
     const catalogPlanId = this.normalizeCatalogPlanId(plan, product);
+    const region = this.regionForCountry(countryCode);
 
     if (this.priceResolver) {
-      const resolved = await this.priceResolver.resolve(catalogPlanId, 1, false);
+      const resolved = await this.priceResolver.resolve(catalogPlanId, region, false);
       return resolved.priceId;
     }
 

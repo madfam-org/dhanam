@@ -350,7 +350,7 @@ describe('WebhookProcessorService', () => {
       expect(lifecycle.dispatchJanuaRoleUpgrade).toHaveBeenCalledWith('user-123', 'prod_abc');
     });
 
-    it('should skip when janua_user_id metadata is absent', async () => {
+    it('should skip when user metadata is absent', async () => {
       const event = {
         id: 'evt_no_janua',
         type: 'checkout.session.completed',
@@ -360,6 +360,38 @@ describe('WebhookProcessorService', () => {
       await service.handleCheckoutCompleted(event);
 
       expect(prisma.user.findUnique).not.toHaveBeenCalled();
+    });
+
+    it('should resolve user from userId metadata (stripe_mx checkout path)', async () => {
+      const event = {
+        id: 'evt_user_id',
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            id: 'cs_user',
+            metadata: { userId: 'user-123', plan: 'essentials', product: 'dhanam' },
+            customer: 'cus_test123',
+            amount_total: 7900,
+            currency: 'mxn',
+          },
+        },
+      } as Stripe.Event;
+
+      prisma.user.findUnique.mockResolvedValue(mockUser as any);
+      prisma.user.update.mockResolvedValue({} as any);
+      prisma.billingEvent.create.mockResolvedValue({} as any);
+      stripe.retrieveCheckoutSession.mockResolvedValue({
+        line_items: { data: [{ price: { product: 'prod_dhanam' } }] },
+      } as any);
+
+      await service.handleCheckoutCompleted(event);
+
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-123' },
+        data: expect.objectContaining({
+          subscriptionTier: 'essentials',
+        }),
+      });
     });
 
     it('should default to pro tier for unknown plan', async () => {

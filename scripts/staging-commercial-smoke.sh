@@ -238,6 +238,29 @@ else
 fi
 
 echo ""
+echo "--- Essentials anchor SKU (dhanam__essentials) ---"
+
+essentials_route="$(http_body "${API_V1}/billing/checkout/route-recommendation?country=MX&plan=essentials&product=dhanam")"
+if command -v jq >/dev/null 2>&1; then
+  assert_json_field "Essentials MX route returns provider" "$essentials_route" '.provider == "stripe_mx"'
+  assert_json_field "Essentials MX priceIdResolvable" "$essentials_route" '.priceIdResolvable == true'
+else
+  log_skip "Essentials route checks (jq not installed)"
+fi
+
+mx_pricing="$(http_body "${API_V1}/billing/pricing?country=MX")"
+if command -v jq >/dev/null 2>&1; then
+  essentials_price="$(printf '%s' "$mx_pricing" | jq -r '.tiers[] | select(.id=="essentials") | .monthlyPrice // empty')"
+  if [ "$essentials_price" = "79" ]; then
+    log_pass "Essentials public pricing MXN 79/mo"
+  else
+    log_fail "Essentials pricing — expected 79 MXN/mo, got ${essentials_price}"
+  fi
+else
+  log_skip "Essentials pricing check (jq not installed)"
+fi
+
+echo ""
 echo "=== Summary: ${PASS} passed, ${FAIL} failed, ${SKIP} skipped ==="
 
 if [ "$FAIL" -gt 0 ]; then
