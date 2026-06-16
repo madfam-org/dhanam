@@ -169,7 +169,7 @@ describe('BillingService', () => {
         priceId: 'price_premium123',
         successUrl: 'http://localhost:3000/billing/success?session_id={CHECKOUT_SESSION_ID}',
         cancelUrl: 'http://localhost:3000/billing/cancel',
-        metadata: { userId: 'user-123', plan: 'pro' },
+        metadata: { userId: 'user-123', plan: 'pro', product: 'dhanam' },
         couponId: undefined,
       });
       expect(audit.log).toHaveBeenCalled();

@@ -112,12 +112,17 @@ export class CheckoutRoutingPolicyService {
     return `${normalizedProduct}_${normalizedPlan}`;
   }
 
-  async resolvePriceId(plan: string, product?: string): Promise<string | null> {
+  private regionForCountry(countryCode: string): number {
+    return countryCode.toUpperCase() === 'MX' ? 3 : 1;
+  }
+
+  async resolvePriceId(plan: string, product?: string, countryCode = 'US'): Promise<string | null> {
     const catalogPlanId = this.normalizeCatalogPlanId(plan, product);
+    const region = this.regionForCountry(countryCode);
 
     if (this.priceResolver) {
       try {
-        const resolved = await this.priceResolver.resolve(catalogPlanId, 1, false);
+        const resolved = await this.priceResolver.resolve(catalogPlanId, region, false);
         return resolved.priceId;
       } catch {
         return null;
@@ -133,7 +138,11 @@ export class CheckoutRoutingPolicyService {
     const { provider, reason } = this.resolveProvider(resolvedContext);
     const gateway = this.gatewayRegistry.get(this.gatewayRegistry.toGatewayId(provider));
     const providerConfig = gateway?.getProviderConfig?.(countryCode) ?? null;
-    const priceId = await this.resolvePriceId(resolvedContext.plan, resolvedContext.product);
+    const priceId = await this.resolvePriceId(
+      resolvedContext.plan,
+      resolvedContext.product,
+      resolvedContext.countryCode
+    );
     const currency =
       resolvedContext.currency?.toUpperCase() ??
       (provider === 'legacy_stripe'
@@ -356,7 +365,11 @@ export class CheckoutRoutingPolicyService {
       return null;
     }
 
-    const priceId = await this.resolvePriceId(resolvedContext.plan, resolvedContext.product);
+    const priceId = await this.resolvePriceId(
+      resolvedContext.plan,
+      resolvedContext.product,
+      resolvedContext.countryCode
+    );
     if (!priceId) {
       this.logger.warn(
         `Hybrid checkout skipped for user ${resolvedContext.userId}: no price for ${resolvedContext.plan}`
