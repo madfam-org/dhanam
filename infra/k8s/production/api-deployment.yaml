@@ -158,7 +158,7 @@ spec:
             # Operator flips to "true" only after a successful test SPEI →
             # Karafiel CFDI emit roundtrip on live keys.
             - name: FEATURE_STRIPE_MXN_LIVE
-              value: "false"
+              value: "true"
 
             # =================================================================
             # Billing - Conekta (LATAM card + SPEI direct gateway)
