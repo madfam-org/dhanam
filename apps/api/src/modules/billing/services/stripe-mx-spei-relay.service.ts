@@ -27,6 +27,12 @@
  *     "failure_code":    "...",           // payment.failed only
  *     "refunded_payment_id": "pi_...",    // payment.refunded only
  *     "original_payment_id": "pi_..."     // payment.refunded only, alias
+ *     "buyer_rfc":       "XAXX010101000", // MX tax id from Stripe Checkout
+ *     "buyer_name":      "...",
+ *     "buyer_zip":       "01000",
+ *     "plan_id":         "essentials",
+ *     "product":         "dhanam",
+ *     "customer_email":  "buyer@example.com"
  *   }
  * }
  * ```
@@ -83,13 +89,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type Stripe from 'stripe';
 
-import { BillingEventType, BillingStatus, Currency, Prisma } from '@db';
+import { BillingEventType, BillingStatus, Currency } from '@db';
 
 import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { parseKarafielCfdiUuid } from '../utils/karafiel-webhook-response';
 
+import { CfdiTimelineService } from './cfdi-timeline.service';
 import { PhyndCrmEngagementNotifierService } from './phyndcrm-engagement-notifier.service';
+import { StripeMxService } from './stripe-mx.service';
 import { WebhookDlqService } from './webhook-dlq.service';
 
 /** Outbound Dhanam envelope for payment.* events. */
@@ -108,6 +116,12 @@ export interface DhanamPaymentEnvelope {
     failure_code?: string;
     refunded_payment_id?: string;
     original_payment_id?: string;
+    buyer_rfc?: string;
+    buyer_name?: string;
+    buyer_zip?: string;
+    plan_id?: string;
+    product?: string;
+    customer_email?: string;
     /**
      * Optional passthrough metadata from the Stripe PI. Callers upstream
      * (e.g. Cotiza's DhanamMilestoneService) stamp these onto the
@@ -186,7 +200,9 @@ export class StripeMxSpeiRelayService {
     private readonly config: ConfigService,
     private readonly audit: AuditService,
     private readonly phyndcrmNotifier: PhyndCrmEngagementNotifierService,
-    private readonly dlq: WebhookDlqService
+    private readonly dlq: WebhookDlqService,
+    private readonly stripeMx: StripeMxService,
+    private readonly cfdiTimeline: CfdiTimelineService
   ) {}
 
   /**
@@ -307,6 +323,17 @@ export class StripeMxSpeiRelayService {
 
     const ecosystem = extractEcosystemMetadata(pi.metadata);
     if (ecosystem) base.data.ecosystem = ecosystem;
+
+    const md = (pi.metadata ?? {}) as Record<string, string>;
+    if (md.plan) base.data.plan_id = md.plan;
+    if (md.product) base.data.product = md.product;
+
+    const stripeCustomerId = typeof pi.customer === 'string' ? pi.customer : pi.customer?.id;
+    const fiscal = await this.stripeMx.getCustomerFiscalProfile(stripeCustomerId);
+    if (fiscal?.buyer_rfc) base.data.buyer_rfc = fiscal.buyer_rfc;
+    if (fiscal?.buyer_name) base.data.buyer_name = fiscal.buyer_name;
+    if (fiscal?.buyer_zip) base.data.buyer_zip = fiscal.buyer_zip;
+    if (fiscal?.customer_email) base.data.customer_email = fiscal.customer_email;
 
     if (type === 'payment.failed' && pi.last_payment_error) {
       base.data.failure_reason = pi.last_payment_error.message || '';
@@ -472,6 +499,7 @@ export class StripeMxSpeiRelayService {
             envelope_type: envelope.type,
             stripe_event_type: stripeEvent.type,
             payment_id: envelope.data.payment_id,
+            paymentIntentId: envelope.data.payment_id,
             subscription_id: envelope.data.subscription_id,
             source: 'stripe_mx_spei_relay',
           },
@@ -574,7 +602,7 @@ export class StripeMxSpeiRelayService {
           } else {
             this.logger.log(`Relayed ${envelope.type} (${envelope.id}) → ${product}`);
             if (product === 'karafiel') {
-              await this.recordKarafielCfdiOnTimeline(
+              await this.cfdiTimeline.attachCfdiUuid(
                 envelope.data.payment_id,
                 parseKarafielCfdiUuid(responseBodySnippet)
               );
@@ -610,42 +638,6 @@ export class StripeMxSpeiRelayService {
         }
       })
     );
-  }
-
-  private async recordKarafielCfdiOnTimeline(
-    paymentId: string,
-    cfdiUuid: string | null
-  ): Promise<void> {
-    if (!paymentId) {
-      return;
-    }
-
-    const events = await this.prisma.billingEvent.findMany({
-      where: {
-        metadata: {
-          path: ['paymentIntentId'],
-          equals: paymentId,
-        },
-      },
-      take: 25,
-    });
-
-    for (const event of events) {
-      const existing = (event.metadata as Record<string, unknown> | null) ?? {};
-      const mergedCfdi =
-        cfdiUuid ?? (typeof existing.cfdiUuid === 'string' ? existing.cfdiUuid : null);
-      await this.prisma.billingEvent.update({
-        where: { id: event.id },
-        data: {
-          metadata: {
-            ...existing,
-            ...(mergedCfdi ? { cfdiUuid: mergedCfdi } : {}),
-            karafielDelivered: true,
-            karafielDeliveredAt: new Date().toISOString(),
-          } as Prisma.InputJsonValue,
-        },
-      });
-    }
   }
 
   private listRelayTargets(): Array<{ product: string; url: string }> {

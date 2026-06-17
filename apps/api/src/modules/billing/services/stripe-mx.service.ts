@@ -39,6 +39,14 @@ export interface StripeMxCustomerParams {
   metadata?: Record<string, string>;
 }
 
+/** Buyer fiscal fields collected at Stripe Checkout (tax_id_collection). */
+export interface StripeMxCustomerFiscalProfile {
+  buyer_rfc?: string;
+  buyer_name?: string;
+  buyer_zip?: string;
+  customer_email?: string;
+}
+
 @Injectable()
 export class StripeMxService {
   private stripe: Stripe | null = null;
@@ -365,5 +373,52 @@ export class StripeMxService {
       reason: params.reason as Stripe.RefundCreateParams.Reason | undefined,
       metadata: params.metadata || {},
     });
+  }
+
+  /**
+   * Load Mexican buyer fiscal metadata from a Stripe customer for CFDI relay.
+   * Returns null when Stripe MX is not configured or the customer id is missing.
+   */
+  async getCustomerFiscalProfile(
+    customerId: string | null | undefined
+  ): Promise<StripeMxCustomerFiscalProfile | null> {
+    if (!this.stripe || !customerId) {
+      return null;
+    }
+
+    try {
+      const customer = await this.stripe.customers.retrieve(customerId, {
+        expand: ['tax_ids'],
+      });
+      if (!customer || ('deleted' in customer && customer.deleted)) {
+        return null;
+      }
+
+      const taxIds =
+        typeof customer.tax_ids === 'object' && customer.tax_ids && 'data' in customer.tax_ids
+          ? customer.tax_ids.data
+          : [];
+      const mxRfc = taxIds
+        .find((entry) => entry.type === 'mx_rfc')
+        ?.value?.trim()
+        .toUpperCase();
+
+      const address = customer.address ?? customer.shipping?.address;
+      const buyerZip = address?.postal_code?.trim();
+
+      const profile: StripeMxCustomerFiscalProfile = {
+        customer_email: customer.email ?? undefined,
+      };
+      if (mxRfc) profile.buyer_rfc = mxRfc;
+      if (customer.name?.trim()) profile.buyer_name = customer.name.trim();
+      if (buyerZip) profile.buyer_zip = buyerZip;
+
+      return profile;
+    } catch (err) {
+      this.logger.warn(
+        `Could not load Stripe customer fiscal profile for ${customerId}: ${(err as Error).message}`
+      );
+      return null;
+    }
   }
 }

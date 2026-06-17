@@ -6,7 +6,9 @@ import { AuditService } from '../../../core/audit/audit.service';
 import { PrismaService } from '../../../core/prisma/prisma.service';
 import { PhyndCrmEngagementNotifierService } from '../services/phyndcrm-engagement-notifier.service';
 import { StripeMxSpeiRelayService } from '../services/stripe-mx-spei-relay.service';
+import { StripeMxService } from '../services/stripe-mx.service';
 import { WebhookDlqService } from '../services/webhook-dlq.service';
+import { CfdiTimelineService } from '../services/cfdi-timeline.service';
 
 // ─── helpers ────────────────────────────────────────────────────────────
 
@@ -102,6 +104,8 @@ describe('StripeMxSpeiRelayService', () => {
   let config: ReturnType<typeof makeConfigMock>;
   let audit: { log: jest.Mock };
   let fetchMock: jest.Mock;
+  let stripeMx: { getCustomerFiscalProfile: jest.Mock };
+  let cfdiTimeline: { attachCfdiUuid: jest.Mock };
 
   beforeEach(async () => {
     prisma = makePrismaMock();
@@ -111,6 +115,15 @@ describe('StripeMxSpeiRelayService', () => {
       FEATURE_STRIPE_MXN_LIVE: 'false',
     });
     audit = { log: jest.fn().mockResolvedValue(undefined) };
+    stripeMx = {
+      getCustomerFiscalProfile: jest.fn().mockResolvedValue({
+        buyer_rfc: 'XAXX010101000',
+        buyer_name: 'Test Buyer',
+        buyer_zip: '01000',
+        customer_email: 'buyer@example.com',
+      }),
+    };
+    cfdiTimeline = { attachCfdiUuid: jest.fn().mockResolvedValue(1) };
 
     // Prisma defaults: user known by dhanam id, no existing billing event,
     // billingEvent.create succeeds.
@@ -141,6 +154,8 @@ describe('StripeMxSpeiRelayService', () => {
           provide: WebhookDlqService,
           useValue: { recordFailure: jest.fn().mockResolvedValue(undefined) },
         },
+        { provide: StripeMxService, useValue: stripeMx },
+        { provide: CfdiTimelineService, useValue: cfdiTimeline },
       ],
     }).compile();
 
@@ -183,6 +198,8 @@ describe('StripeMxSpeiRelayService', () => {
       });
       expect(body.id).toMatch(/^[0-9a-f-]{36}$/); // uuid v4
       expect(body.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+      expect(body.data.buyer_rfc).toBe('XAXX010101000');
+      expect(body.data.buyer_zip).toBe('01000');
     });
 
     it('propagates subscription_id from PaymentIntent metadata', async () => {
@@ -209,6 +226,10 @@ describe('StripeMxSpeiRelayService', () => {
           amount: 199,
           currency: 'MXN',
           stripeEventId: event.id,
+          metadata: expect.objectContaining({
+            payment_id: 'pi_test_123',
+            paymentIntentId: 'pi_test_123',
+          }),
         }),
       });
     });
@@ -516,27 +537,11 @@ describe('StripeMxSpeiRelayService', () => {
         status: 200,
         text: async () => JSON.stringify({ cfdi_uuid: cfdiUuid }),
       });
-      prisma.billingEvent.findMany.mockResolvedValue([
-        {
-          id: 'be-1',
-          metadata: { paymentIntentId: 'pi_test_123', correlationId: 'corr-karafiel' },
-        },
-      ]);
       const event = piEvent('payment_intent.succeeded');
 
       await service.relay(event);
 
-      expect(prisma.billingEvent.update).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { id: 'be-1' },
-          data: expect.objectContaining({
-            metadata: expect.objectContaining({
-              cfdiUuid,
-              karafielDelivered: true,
-            }),
-          }),
-        })
-      );
+      expect(cfdiTimeline.attachCfdiUuid).toHaveBeenCalledWith('pi_test_123', cfdiUuid);
     });
   });
 });
