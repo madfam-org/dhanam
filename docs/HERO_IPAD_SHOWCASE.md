@@ -177,15 +177,16 @@ Manual smoke:
 
 ### `ipad-pro.glb` 404 on production
 
-Next.js **monorepo standalone** serves `public/` from `apps/web/public` relative to the
-standalone root (where `apps/web/server.js` runs). The Docker runner stage must copy:
+**Layer 1 — Docker public path:** Next.js monorepo standalone serves `public/` from
+`apps/web/public`. The runner stage must copy there (not only `./public` at image root).
 
-```dockerfile
-COPY --from=builder /app/apps/web/public ./apps/web/public
-```
+**Layer 2 — Bundled fallback:** The hero loads the GLB via webpack from
+`src/assets/landing/ipad-pro.glb`, emitted under `/_next/static/media/` (always served
+correctly). Direct URL `/landing/models/ipad-pro.glb` is optional smoke only.
 
-Copying to `./public` at the image root makes every public asset 404 (`og-image.png`,
-`favicon.svg`, `landing/models/ipad-pro.glb`). Verify after deploy:
+**Layer 3 — Rollout lag:** If git manifest has a new digest but the URL still 404s,
+ArgoCD may not have rolled pods ([incident runbook](../runbooks/incidents/2026-06-15-dhanam-web-prod-rollout.md)).
+Hard-refresh `dhanam-services` from operator kubeconfig or Enclii.
 
 ```bash
 curl -fsSI https://dhan.am/landing/models/ipad-pro.glb | head -3

@@ -111,6 +111,8 @@ WORKDIR /app
 # In monorepo, standalone includes the full path structure
 # Monorepo standalone: server.js runs from apps/web/ and serves public from apps/web/public.
 COPY --from=builder /app/apps/web/public ./apps/web/public
+# Legacy/alternate static resolution — keep both paths in sync.
+COPY --from=builder /app/apps/web/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone/ ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 
