@@ -3,7 +3,7 @@
 import { useTranslation } from '@dhanam/shared';
 import { Button, Popover, PopoverContent, PopoverTrigger } from '@dhanam/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Bell, Check, AlertTriangle, Lightbulb, Trophy, Info } from 'lucide-react';
+import { Bell, Check, AlertTriangle, Lightbulb, Trophy, Info, type LucideIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -18,7 +18,7 @@ interface Notification {
   createdAt: string;
 }
 
-const typeIcons: Record<string, React.ElementType> = {
+const typeIcons: Record<string, LucideIcon> = {
   alert: AlertTriangle,
   warning: AlertTriangle,
   insight: Lightbulb,

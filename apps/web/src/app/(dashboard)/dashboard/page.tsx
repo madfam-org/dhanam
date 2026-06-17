@@ -29,6 +29,7 @@ import {
   Gamepad2,
   AlertCircle,
   RefreshCw,
+  type LucideIcon,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
@@ -178,7 +179,7 @@ export default function DashboardPage() {
   const netWorth = netWorthData?.netWorth ?? totalAssets - totalLiabilities;
   const netWorthChange = netWorthData?.changePercent ?? 0;
 
-  const accountTypeIcons: Record<string, React.ElementType> = {
+  const accountTypeIcons: Record<string, LucideIcon> = {
     checking: Building2,
     savings: PiggyBank,
     credit: CreditCard,
@@ -232,7 +233,7 @@ export default function DashboardPage() {
 
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card data-tour="net-worth">
+        <Card data-tour="net-worth" data-showcase="net-worth">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <div className="flex items-center gap-2">
               <CardTitle className="text-sm font-medium">{t('overview.netWorth')}</CardTitle>

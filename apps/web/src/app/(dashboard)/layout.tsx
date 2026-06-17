@@ -3,7 +3,7 @@
 import { useTranslation } from '@dhanam/shared';
 import { useRouter } from 'next/navigation';
 import type { ReactNode as React18Node } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 
 import { SubscriptionBanner } from '~/components/billing/SubscriptionBanner';
 import { DemoModeBanner } from '~/components/demo/demo-mode-banner';
@@ -18,6 +18,9 @@ import { DemoNavigationProvider } from '~/lib/contexts/demo-navigation-context';
 import { clearStaleAuthStorageCookie } from '~/lib/demo/session-cookies';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaces } from '~/lib/hooks/use-spaces';
+import { EmbedBootstrap } from '~/lib/showcase/embed-bootstrap';
+import { useEmbedMode } from '~/lib/showcase/embed-mode';
+import { ShowcaseProvider } from '~/lib/showcase/showcase-provider';
 
 /**
  * Loading skeleton shown during SSR and initial client hydration.
@@ -63,10 +66,16 @@ function isDemoModeCookie(): boolean {
   return document.cookie.includes('demo-mode=true');
 }
 
+function isEmbedModeCookie(): boolean {
+  if (typeof document === 'undefined') return false;
+  return document.cookie.includes('embed-mode=true');
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const content = children as React18Node;
   const { isAuthenticated, _hasHydrated, user, refreshUser, setAuth } = useAuth();
   const router = useRouter();
+  const isEmbedMode = useEmbedMode();
   // Trigger spaces fetch early so child pages have data before rendering.
   // React Query deduplicates by key, so the header's useSpaces() won't double-fetch.
   useSpaces();
@@ -107,7 +116,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     if (hasMounted && _hasHydrated && !isAuthenticated) {
       if (isDemoModeCookie()) {
-        attemptDemoLogin();
+        if (!isEmbedModeCookie()) {
+          attemptDemoLogin();
+        }
       } else {
         clearStaleAuthStorageCookie();
         router.push('/login');
@@ -133,25 +144,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <DemoNavigationProvider>
-      <div className="min-h-screen bg-background">
-        <SkipLink />
-        <DashboardHeader />
-        <SubscriptionBanner />
-        <DemoModeBanner />
-        <DemoTour />
-        <KeyboardShortcuts />
-        <div className="flex">
-          <div className="hidden md:block">
-            <DashboardNav />
-          </div>
-          <main id="main-content" className="flex-1 p-6 pb-20 md:pb-6">
-            <div className="mx-auto max-w-7xl">
-              <PageTransition>{content}</PageTransition>
+      <Suspense fallback={null}>
+        <EmbedBootstrap />
+      </Suspense>
+      <Suspense fallback={null}>
+        <ShowcaseProvider>
+          <div className={`min-h-screen bg-background ${isEmbedMode ? 'embed-mode' : ''}`}>
+            {!isEmbedMode && <SkipLink />}
+            {!isEmbedMode && <DashboardHeader />}
+            {!isEmbedMode && <SubscriptionBanner />}
+            {!isEmbedMode && <DemoModeBanner />}
+            {!isEmbedMode && <DemoTour />}
+            {!isEmbedMode && <KeyboardShortcuts />}
+            <div className="flex">
+              {!isEmbedMode && (
+                <div className="hidden md:block">
+                  <DashboardNav />
+                </div>
+              )}
+              <main
+                id="main-content"
+                className={`flex-1 ${isEmbedMode ? 'p-3 md:p-4' : 'p-6 pb-20 md:pb-6'}`}
+              >
+                <div className={isEmbedMode ? 'mx-auto max-w-full' : 'mx-auto max-w-7xl'}>
+                  <PageTransition>{content}</PageTransition>
+                </div>
+              </main>
             </div>
-          </main>
-        </div>
-        <MobileNav />
-      </div>
+            {!isEmbedMode && <MobileNav />}
+          </div>
+        </ShowcaseProvider>
+      </Suspense>
     </DemoNavigationProvider>
   );
 }

@@ -278,7 +278,7 @@ export default function GoalsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto py-8 space-y-8" data-showcase="goals-summary">
       <div>
         <h1 className="text-4xl font-bold tracking-tight">{t('main.financialGoals')}</h1>
         <p className="text-muted-foreground mt-2">{t('page.description')}</p>

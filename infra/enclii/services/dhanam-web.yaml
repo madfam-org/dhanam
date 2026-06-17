@@ -17,6 +17,8 @@ spec:
       NEXT_PUBLIC_OIDC_CLIENT_ID: jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t
       NEXT_PUBLIC_JANUA_API_URL: https://auth.madfam.io
       NEXT_PUBLIC_AUTH_MODE: janua
+      NEXT_PUBLIC_HERO_IPAD_ENABLED: "true"
+      NEXT_PUBLIC_HERO_IPAD_3D: "true"
     source:
       git:
         repository: https://github.com/madfam-org/dhanam
@@ -68,6 +70,10 @@ spec:
       value: https://auth.madfam.io
     - name: NEXT_PUBLIC_OIDC_CLIENT_ID
       value: jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t
+    - name: NEXT_PUBLIC_HERO_IPAD_ENABLED
+      value: "true"
+    - name: NEXT_PUBLIC_HERO_IPAD_3D
+      value: "true"
 
   domains:
     - domain: app.dhan.am

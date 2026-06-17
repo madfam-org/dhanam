@@ -38,6 +38,7 @@ import {
   Coins,
   ChevronDown,
   ChevronRight,
+  type LucideIcon,
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { toast } from 'sonner';
@@ -50,7 +51,7 @@ import { accountsApi } from '@/lib/api/accounts';
 import { formatCurrency } from '@/lib/utils';
 import { useSpaceStore } from '@/stores/space';
 
-const accountTypeIcons: Record<AccountType, React.ElementType> = {
+const accountTypeIcons: Record<AccountType, LucideIcon> = {
   checking: Building2,
   savings: Building2,
   credit: CreditCard,

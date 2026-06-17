@@ -101,7 +101,7 @@ export default function ScenariosPage() {
 
   return (
     <PremiumGate feature="Scenario Analysis">
-      <div className="container mx-auto py-8 space-y-8">
+      <div className="container mx-auto py-8 space-y-8" data-showcase="scenarios-panel">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">{t('scenarios.page.title')}</h1>
           <p className="text-muted-foreground mt-2">{t('scenarios.page.description')}</p>

@@ -270,6 +270,58 @@
   font-family: var(--font-landing-display), Georgia, 'Times New Roman', serif;
 }
 
+/* Embed showcase — ghost cursor + highlight pulse (landing hero iframe tour) */
+.showcase-highlight-pulse {
+  outline: 2px solid hsl(var(--primary) / 0.55);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+  animation: showcase-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes showcase-pulse {
+  0%,
+  100% {
+    outline-color: hsl(var(--primary) / 0.35);
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.2);
+  }
+  50% {
+    outline-color: hsl(var(--primary) / 0.75);
+    box-shadow: 0 0 0 6px hsl(var(--primary) / 0.08);
+  }
+}
+
+.showcase-ghost-cursor-dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 0 4px hsl(var(--primary) / 0.25);
+}
+
+.showcase-ghost-cursor-ring {
+  position: absolute;
+  inset: -10px;
+  border-radius: 9999px;
+  border: 2px solid hsl(var(--primary) / 0.35);
+  animation: showcase-cursor-ring 1.2s ease-out infinite;
+}
+
+@keyframes showcase-cursor-ring {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.embed-mode {
+  overflow: hidden;
+}
+
 /* Respect user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

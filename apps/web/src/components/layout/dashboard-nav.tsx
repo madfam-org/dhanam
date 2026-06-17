@@ -2,6 +2,7 @@
 
 import { useTranslation } from '@dhanam/shared';
 import { cn } from '@dhanam/ui';
+import type { LucideIcon } from 'lucide-react';
 import {
   LayoutDashboard,
   Wallet,
@@ -33,13 +34,13 @@ import { useDemoNavigation } from '~/lib/contexts/demo-navigation-context';
 interface NavChild {
   key: string;
   href: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
 }
 
 interface NavItem {
   key: string;
   href: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   children?: NavChild[];
 }
 
