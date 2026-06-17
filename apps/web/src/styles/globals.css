@@ -258,6 +258,22 @@
   }
 }
 
+@keyframes hero-tablet-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-tablet-flat-float {
+    animation: hero-tablet-float 4.8s ease-in-out infinite;
+  }
+}
+
 /* Landing typography — Fraunces display + DM Sans UI (Phase G) */
 .landing-root {
   font-family: var(--font-landing-ui), ui-sans-serif, system-ui, sans-serif;

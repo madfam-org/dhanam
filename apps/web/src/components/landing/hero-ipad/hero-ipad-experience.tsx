@@ -6,15 +6,16 @@ import { useEffect, useState } from 'react';
 
 import { HeroProductPreview } from '@/components/landing/hero-product-preview';
 
-import { HeroEmbedFrame } from './hero-embed-frame';
 import { isHeroIpad3dEnabled, isHeroIpadEnabled } from './hero-ipad-config';
-import { HeroIpadFallback } from './hero-ipad-fallback';
-import { HeroMobileShowcase } from './hero-mobile-showcase';
+import { HeroTabletFlat } from './hero-tablet-flat';
 
-const IpadScene = dynamic(() => import('./ipad-scene').then((mod) => mod.IpadScene), {
-  ssr: false,
-  loading: () => <HeroIpadFallback locale="en" />,
-});
+const HeroTabletCompositor = dynamic(
+  () => import('./hero-tablet-compositor').then((mod) => mod.HeroTabletCompositor),
+  {
+    ssr: false,
+    loading: () => <HeroTabletFlat locale="en" animate />,
+  }
+);
 
 interface HeroIpadExperienceProps {
   locale: LandingLocale;
@@ -77,23 +78,14 @@ export function HeroIpadExperience({ locale }: HeroIpadExperienceProps) {
     return <HeroProductPreview />;
   }
 
-  if (!isDesktop) {
-    return <HeroMobileShowcase />;
-  }
-
-  const use3d = isHeroIpad3dEnabled() && !reducedMotion && hydrate3d;
+  const useCompositor = isDesktop && isHeroIpad3dEnabled() && !reducedMotion && hydrate3d;
 
   return (
     <div data-hero-ipad-root className="relative mx-auto w-full max-w-lg lg:max-w-none">
-      {use3d ? (
-        <IpadScene locale={locale} />
+      {useCompositor ? (
+        <HeroTabletCompositor locale={locale} reducedMotion={reducedMotion} />
       ) : (
-        <div className="relative">
-          <HeroIpadFallback locale={locale} />
-          <div className="absolute inset-[12%] overflow-hidden rounded-[1.1rem]">
-            <HeroEmbedFrame locale={locale} className="h-full rounded-none border-0 shadow-none" />
-          </div>
-        </div>
+        <HeroTabletFlat locale={locale} animate={isDesktop} />
       )}
     </div>
   );
