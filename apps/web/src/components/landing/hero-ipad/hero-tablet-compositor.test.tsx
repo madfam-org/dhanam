@@ -1,28 +1,21 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { HeroTabletCompositor } from './hero-tablet-compositor';
 
-jest.mock('@react-three/fiber', () => ({
-  Canvas: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="tablet-canvas">{children}</div>
-  ),
-}));
-
-jest.mock('./procedural-tablet-mesh', () => ({
-  ProceduralTabletMesh: () => <mesh data-testid="tablet-mesh" />,
-}));
-
-jest.mock('./hero-embed-frame', () => ({
-  HeroEmbedFrame: ({ locale }: { locale: string }) => (
-    <iframe title="Dhanam live demo" data-testid="hero-embed" data-locale={locale} />
+jest.mock('./hero-tablet-shell', () => ({
+  HeroTabletShell: ({ locale }: { locale: string }) => (
+    <div data-hero-tablet-compositor data-locale={locale}>
+      <iframe title="Dhanam live demo" data-testid="hero-embed" data-locale={locale} />
+    </div>
   ),
 }));
 
 describe('HeroTabletCompositor', () => {
-  it('layers a DOM iframe above the WebGL bezel canvas', () => {
+  it('delegates to HeroTabletShell', async () => {
     render(<HeroTabletCompositor locale="es" reducedMotion />);
-    expect(screen.getByTestId('hero-embed')).toHaveAttribute('data-locale', 'es');
-    expect(screen.getByTestId('tablet-canvas')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('hero-embed')).toHaveAttribute('data-locale', 'es');
+    });
     expect(document.querySelector('[data-hero-tablet-compositor]')).toBeTruthy();
   });
 });

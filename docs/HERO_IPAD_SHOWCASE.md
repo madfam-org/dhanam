@@ -15,8 +15,8 @@ The marketing hero can display a **3D tablet** (React Three Fiber) whose screen 
 | Decision     | Choice                                                                                      |
 | ------------ | ------------------------------------------------------------------------------------------- |
 | Personas     | **María** (budgeting/AI) and **Patricia** (wealth/projections/estate) — alternate each loop |
-| Mobile       | **CSS tablet frame** (`HeroTabletFlat`) with live iframe — no WebGL (perf + stability)      |
-| Desktop      | **Compositor** (`HeroTabletCompositor`) — WebGL bezel + DOM iframe, shared CSS transforms   |
+| Mobile       | **CSS tablet frame** with live iframe — no WebGL (perf + stability)                         |
+| Desktop      | **HeroTabletShell** — one persistent iframe; WebGL bezel overlays when in view (lg+)        |
 | Tablet model | **Procedural R3F bezel** — GLB retained only as optional legacy path                        |
 | Tour pacing  | Loop forever · **14s** break after each tour · **4s** before persona switch                 |
 | Feature flag | `NEXT_PUBLIC_HERO_IPAD_ENABLED` (default off until operator enable)                         |
@@ -29,12 +29,15 @@ The marketing hero can display a **3D tablet** (React Three Fiber) whose screen 
 dhan.am (parent)                         app.dhan.am (child iframe)
 ────────────────                         ──────────────────────────
 HeroIpadExperience                       /embed/demo/dashboard?persona=&showcase=1
-  ├─ HeroTabletFlat (<lg or pre-hydrate)   middleware → dashboard routes
-  ├─ HeroTabletCompositor (lg+, 3D)       embed-mode + demo-mode cookies
-  │    ├─ HeroEmbedFrame (DOM — stable)     ShowcaseProvider + EmbedBootstrap
-  │    └─ ProceduralTabletMesh (WebGL)    (no @react-three/drei Html)
-  └─ useShowcaseTourDriver ──postMessage──► navigate / highlight / cursor
+  └─ HeroTabletShell (single iframe)      middleware → dashboard routes
+       ├─ HeroEmbedFrame (820×1100 scale)  embed-mode + demo-mode cookies
+       ├─ HeroTabletBezelCanvas (lg+)      ShowcaseProvider + EmbedBootstrap
+       └─ useShowcaseTourDriver ──postMessage──► navigate / switch-persona / highlight
 ```
+
+**Shell invariant:** one iframe mounts after client hydration — never swap flat vs compositor
+(which previously remounted the embed and tripped `demo_login` rate limits). Persona changes
+use `switch-persona` postMessage + `/auth/demo/switch`, not iframe reload.
 
 **Compositor invariant:** the live demo iframe is always a normal DOM node layered above the
 canvas. WebGL draws bezels only. Do not mount the iframe via `drei` `<Html transform>` — it
@@ -51,7 +54,7 @@ collapses to 0×0 in production and hides the demo behind an untextured gray mes
 
 Types live in `packages/shared/src/showcase/protocol.ts`.
 
-**Parent → child:** `navigate`, `highlight`, `scroll`, `cursor`, `pause`, `resume`, `restart`  
+**Parent → child:** `navigate`, `highlight`, `scroll`, `cursor`, `pause`, `resume`, `restart`, `switch-persona`  
 **Child → parent:** `ready`, `route-changed`, `error`
 
 Origin allowlist (child accepts parent from): `dhan.am`, `www.dhan.am`, `localhost:3040`, `pr-*.web.preview.dhan.am`.
@@ -205,6 +208,13 @@ Hard-refresh `dhanam-services` from operator kubeconfig or Enclii.
 **Layer 4 — Untextured materials:** `ipad-gltf-body.tsx` strips embedded GLB textures
 after clone so Three.js never creates `blob:` URLs. This keeps the tablet visible even
 if an older CSP pod is still rolling.
+
+### Rate limit / "Error loading data" in hero iframe
+
+Each iframe reload called `POST /auth/demo/login` (10/min/IP). Flat→compositor swaps remounted
+the iframe twice per page view; tour persona switches reloaded the iframe again. Fix: single
+`HeroTabletShell` iframe, `switch-persona` via `/auth/demo/switch`, tour starts only after
+child `ready`, and `demo_login` preset raised to 30/min.
 
 ### Embed iframe shows 401 on `/spaces` or `/auth/refresh`
 

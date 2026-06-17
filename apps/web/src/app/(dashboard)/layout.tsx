@@ -19,7 +19,7 @@ import { clearStaleAuthStorageCookie } from '~/lib/demo/session-cookies';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaces } from '~/lib/hooks/use-spaces';
 import { EmbedBootstrap } from '~/lib/showcase/embed-bootstrap';
-import { useEmbedMode } from '~/lib/showcase/embed-mode';
+import { useEmbedMode, useShowcaseEmbed } from '~/lib/showcase/embed-mode';
 import { ShowcaseProvider } from '~/lib/showcase/showcase-provider';
 
 /**
@@ -76,6 +76,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { isAuthenticated, _hasHydrated, user, refreshUser, setAuth } = useAuth();
   const router = useRouter();
   const isEmbedMode = useEmbedMode();
+  const isShowcaseEmbed = useShowcaseEmbed();
   // Trigger spaces fetch early so child pages have data before rendering.
   // React Query deduplicates by key, so the header's useSpaces() won't double-fetch.
   useSpaces();
@@ -161,7 +162,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </Suspense>
       <Suspense fallback={null}>
         <ShowcaseProvider>
-          <div className={`min-h-screen bg-background ${isEmbedMode ? 'embed-mode' : ''}`}>
+          <div
+            className={`min-h-screen bg-background ${isEmbedMode ? 'embed-mode' : ''} ${isShowcaseEmbed ? 'embed-showcase' : ''}`}
+          >
             {!isEmbedMode && <SkipLink />}
             {!isEmbedMode && <DashboardHeader />}
             {!isEmbedMode && <SubscriptionBanner />}

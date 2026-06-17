@@ -6,14 +6,22 @@ import {
   SHOWCASE_MESSAGE_TYPE,
   type ShowcaseChildEvent,
   type ShowcaseParentCommand,
+  type ShowcasePersona,
 } from '@dhanam/shared';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useDemoRouter } from '@/lib/hooks/use-demo-router';
+import { authApi } from '~/lib/api/auth';
+import { setDemoModeCookie } from '~/lib/demo/session-cookies';
+import { useAuth } from '~/lib/hooks/use-auth';
+import { useSpaceStore } from '~/stores/space';
 
 import { ShowcaseGhostCursor } from './showcase-ghost-cursor';
 import { ShowcaseHighlight } from './showcase-highlight';
+
+const VALID_PERSONAS: ShowcasePersona[] = ['maria', 'patricia'];
 
 function postToParent(event: ShowcaseChildEvent, parentOrigin: string) {
   if (typeof window === 'undefined' || window.parent === window) {
@@ -22,9 +30,18 @@ function postToParent(event: ShowcaseChildEvent, parentOrigin: string) {
   window.parent.postMessage(event, parentOrigin);
 }
 
+function normalizePersona(value: string | null | undefined): ShowcasePersona {
+  if (value && VALID_PERSONAS.includes(value as ShowcasePersona)) {
+    return value as ShowcasePersona;
+  }
+  return 'maria';
+}
+
 export function ShowcaseProvider({ children }: { children: React.ReactNode }) {
   const router = useDemoRouter();
   const searchParams = useSearchParams();
+  const { setAuth } = useAuth();
+  const queryClient = useQueryClient();
   const showcaseEnabled = searchParams.get('showcase') === '1';
   const [highlightTarget, setHighlightTarget] = useState<string | null>(null);
   const [cursorPoints, setCursorPoints] = useState<Array<{ x: number; y: number }>>([]);
@@ -32,22 +49,26 @@ export function ShowcaseProvider({ children }: { children: React.ReactNode }) {
   const [cursorActive, setCursorActive] = useState(false);
   const [paused, setPaused] = useState(false);
   const parentOriginRef = useRef<string | null>(null);
+  const switchingRef = useRef(false);
 
-  const emitReady = useCallback(() => {
-    const parentOrigin = parentOriginRef.current;
-    if (!parentOrigin) {
-      return;
-    }
-    postToParent(
-      {
-        type: SHOWCASE_MESSAGE_TYPE,
-        event: 'ready',
-        path: window.location.pathname,
-        persona: searchParams.get('persona') ?? undefined,
-      },
-      parentOrigin
-    );
-  }, [searchParams]);
+  const emitReady = useCallback(
+    (persona?: string) => {
+      const parentOrigin = parentOriginRef.current;
+      if (!parentOrigin) {
+        return;
+      }
+      postToParent(
+        {
+          type: SHOWCASE_MESSAGE_TYPE,
+          event: 'ready',
+          path: window.location.pathname,
+          persona: persona ?? searchParams.get('persona') ?? undefined,
+        },
+        parentOrigin
+      );
+    },
+    [searchParams]
+  );
 
   const runCommand = useCallback(
     async (command: ShowcaseParentCommand) => {
@@ -96,14 +117,44 @@ export function ShowcaseProvider({ children }: { children: React.ReactNode }) {
         case 'restart':
           router.push('/dashboard');
           break;
-        case 'switch-persona':
-          // Parent reloads iframe with new persona — no-op in child.
+        case 'switch-persona': {
+          if (switchingRef.current) {
+            return;
+          }
+          switchingRef.current = true;
+          const persona = normalizePersona(command.persona);
+          try {
+            const result = await authApi.switchPersona(persona);
+            setAuth(result.user as Parameters<typeof setAuth>[0], result.tokens);
+            useSpaceStore.getState().setCurrentSpace(null);
+            useSpaceStore.getState().setSpaces([]);
+            queryClient.clear();
+            setDemoModeCookie();
+            router.push('/dashboard');
+            window.setTimeout(() => emitReady(persona), 900);
+          } catch (error) {
+            console.error('Showcase persona switch failed:', error);
+            const parentOrigin = parentOriginRef.current;
+            if (parentOrigin) {
+              postToParent(
+                {
+                  type: SHOWCASE_MESSAGE_TYPE,
+                  event: 'error',
+                  message: error instanceof Error ? error.message : 'Persona switch failed',
+                },
+                parentOrigin
+              );
+            }
+          } finally {
+            switchingRef.current = false;
+          }
           break;
+        }
         default:
           break;
       }
     },
-    [paused, router]
+    [emitReady, paused, queryClient, router, setAuth]
   );
 
   useEffect(() => {
