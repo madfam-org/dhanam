@@ -4,7 +4,7 @@ import type { LandingLocale } from '@dhanam/shared';
 import { Center, Html, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { Component, Suspense, useMemo, useRef, useState, type ReactNode } from 'react';
-import type { Group } from 'three';
+import { Mesh, MeshStandardMaterial, type Group, type Material } from 'three';
 
 import { HeroEmbedFrame } from './hero-embed-frame';
 import { HERO_IPAD_MODEL_PATH } from './hero-ipad-config';
@@ -12,6 +12,29 @@ import { ProceduralIpadBody } from './ipad-procedural-body';
 
 /** Google Poly tablet mesh is ~54×72 units on XZ; scale to hero frame height ~3.9. */
 const GLTF_SCALE = 3.9 / 71.68;
+
+function materialBaseColor(material: Material | Material[]): number {
+  const source = Array.isArray(material) ? material[0] : material;
+  if (source instanceof MeshStandardMaterial) {
+    return source.color.getHex();
+  }
+  return 0x2a2a30;
+}
+
+/** Strip embedded GLB textures so Three.js never creates blob: URLs (CSP-safe). */
+function applyUntexturedMaterials(root: Group): void {
+  root.traverse((object) => {
+    if (!(object instanceof Mesh)) {
+      return;
+    }
+    const color = materialBaseColor(object.material);
+    object.material = new MeshStandardMaterial({
+      color,
+      metalness: 0.35,
+      roughness: 0.55,
+    });
+  });
+}
 
 class GltfErrorBoundary extends Component<
   { fallback: ReactNode; children: ReactNode },
@@ -34,7 +57,11 @@ interface IpadGltfBodyProps {
 
 function IpadGltfMesh({ locale }: IpadGltfBodyProps) {
   const { scene } = useGLTF(HERO_IPAD_MODEL_PATH);
-  const model = useMemo(() => scene.clone(true), [scene]);
+  const model = useMemo(() => {
+    const clone = scene.clone(true);
+    applyUntexturedMaterials(clone);
+    return clone;
+  }, [scene]);
 
   return (
     <Center>

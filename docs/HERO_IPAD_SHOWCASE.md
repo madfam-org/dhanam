@@ -196,9 +196,19 @@ correctly). Direct URL `/landing/models/ipad-pro.glb` is optional smoke only.
 ArgoCD may not have rolled pods ([incident runbook](../runbooks/incidents/2026-06-15-dhanam-web-prod-rollout.md)).
 Hard-refresh `dhanam-services` from operator kubeconfig or Enclii.
 
+**Layer 4 — Untextured materials:** `ipad-gltf-body.tsx` strips embedded GLB textures
+after clone so Three.js never creates `blob:` URLs. This keeps the tablet visible even
+if an older CSP pod is still rolling.
+
+### Embed iframe shows 401 on `/spaces` or `/auth/refresh`
+
+The dashboard layout used to mount `EmbedBootstrap` only after auth, but embed showcase
+needs the bootstrap to **create** auth first. Unauthenticated embed sessions now render
+`EmbedBootstrap` + skeleton immediately; `useSpaces()` stays disabled until tokens exist.
+
 ```bash
 curl -fsSI https://dhan.am/landing/models/ipad-pro.glb | head -3
-./scripts/hero-ipad-prod-smoke.sh
+./scripts/hero-tablet-prod-smoke.sh
 ```
 
 ---

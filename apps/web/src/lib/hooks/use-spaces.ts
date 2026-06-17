@@ -12,6 +12,8 @@ import { useSpaceStore } from '@/stores/space';
 
 import { apiClient } from '../api/client';
 
+import { useAuth } from './use-auth';
+
 const SPACES_KEY = ['spaces'] as const;
 
 function spacesQueryOptions(persistedSpaces: Space[]) {
@@ -37,8 +39,12 @@ function spacesQueryOptions(persistedSpaces: Space[]) {
 }
 
 export function useSpaces() {
+  const { isAuthenticated, _hasHydrated } = useAuth();
   const { spaces: persistedSpaces } = useSpaceStore();
-  return useQuery(spacesQueryOptions(persistedSpaces));
+  return useQuery({
+    ...spacesQueryOptions(persistedSpaces),
+    enabled: _hasHydrated && isAuthenticated,
+  });
 }
 
 export function useSpace(spaceId: string): UseQueryResult<Space, Error> {
