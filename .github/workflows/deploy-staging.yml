@@ -116,6 +116,8 @@ jobs:
             NEXT_PUBLIC_OIDC_ISSUER=${{ vars.STAGING_OIDC_ISSUER || '' }}
             NEXT_PUBLIC_OIDC_CLIENT_ID=${{ vars.STAGING_OIDC_CLIENT_ID || '' }}
             NEXT_PUBLIC_JANUA_API_URL=${{ vars.STAGING_JANUA_API_URL || '' }}
+            NEXT_PUBLIC_HERO_IPAD_ENABLED=true
+            NEXT_PUBLIC_HERO_IPAD_3D=true
           secrets: |
             npm_madfam_token=${{ secrets.NPM_MADFAM_TOKEN }}
           cache-from: type=gha,scope=web
