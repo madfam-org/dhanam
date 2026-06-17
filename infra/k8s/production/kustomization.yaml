@@ -25,6 +25,6 @@ images:
 - digest: sha256:49c59ea800fb787935ad7743148f87d55d8223d78ad3789aa058e2ffdf80854a
   name: dhanam-api
   newName: ghcr.io/madfam-org/dhanam/api
-- digest: sha256:a120e59b83330c255ac9ac7b43eba098b0e17cb1ba1b2d8d900bf693f6b28c72
+- digest: sha256:ed5b31446af449674ac1867213ae6b5dc35844afb6ba3a0767d91b66ae9037b1
   name: dhanam-web
   newName: ghcr.io/madfam-org/dhanam/web
