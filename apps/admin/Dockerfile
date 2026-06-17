@@ -57,7 +57,7 @@ RUN adduser --system --uid 1001 nextjs
 
 WORKDIR /app
 
-COPY --from=builder /app/apps/admin/public ./public
+COPY --from=builder /app/apps/admin/public ./apps/admin/public
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone/ ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/admin/.next/static
 

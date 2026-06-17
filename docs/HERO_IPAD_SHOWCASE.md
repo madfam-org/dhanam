@@ -173,6 +173,27 @@ Manual smoke:
 
 ---
 
+## Troubleshooting
+
+### `ipad-pro.glb` 404 on production
+
+Next.js **monorepo standalone** serves `public/` from `apps/web/public` relative to the
+standalone root (where `apps/web/server.js` runs). The Docker runner stage must copy:
+
+```dockerfile
+COPY --from=builder /app/apps/web/public ./apps/web/public
+```
+
+Copying to `./public` at the image root makes every public asset 404 (`og-image.png`,
+`favicon.svg`, `landing/models/ipad-pro.glb`). Verify after deploy:
+
+```bash
+curl -fsSI https://dhan.am/landing/models/ipad-pro.glb | head -3
+./scripts/hero-ipad-prod-smoke.sh
+```
+
+---
+
 ## Related
 
 - [LANDING_DESIGN_SYSTEM.md](./LANDING_DESIGN_SYSTEM.md)
