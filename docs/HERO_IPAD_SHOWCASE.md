@@ -12,13 +12,14 @@
 
 The marketing hero can display a **3D tablet** (React Three Fiber) whose screen runs the **live demo app** in an iframe. A cross-origin **showcase tour** drives navigation, highlights, and a ghost cursor — looping forever with long pauses between cycles and alternating **María** and **Patricia** personas.
 
-| Decision     | Choice                                                                                         |
-| ------------ | ---------------------------------------------------------------------------------------------- |
-| Personas     | **María** (budgeting/AI) and **Patricia** (wealth/projections/estate) — alternate each loop    |
-| Mobile       | **Static carousel** (`HeroMobileShowcase`) — no live iframe (perf + stability)                 |
-| Tablet model | **Bundled** GLB — Poly by Google generic tablet (CC BY 3.0); procedural fallback if load fails |
-| Tour pacing  | Loop forever · **14s** break after each tour · **4s** before persona switch                    |
-| Feature flag | `NEXT_PUBLIC_HERO_IPAD_ENABLED` (default off until operator enable)                            |
+| Decision     | Choice                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------- |
+| Personas     | **María** (budgeting/AI) and **Patricia** (wealth/projections/estate) — alternate each loop |
+| Mobile       | **CSS tablet frame** (`HeroTabletFlat`) with live iframe — no WebGL (perf + stability)      |
+| Desktop      | **Compositor** (`HeroTabletCompositor`) — WebGL bezel + DOM iframe, shared CSS transforms   |
+| Tablet model | **Procedural R3F bezel** — GLB retained only as optional legacy path                        |
+| Tour pacing  | Loop forever · **14s** break after each tour · **4s** before persona switch                 |
+| Feature flag | `NEXT_PUBLIC_HERO_IPAD_ENABLED` (default off until operator enable)                         |
 
 ---
 
@@ -28,11 +29,16 @@ The marketing hero can display a **3D tablet** (React Three Fiber) whose screen 
 dhan.am (parent)                         app.dhan.am (child iframe)
 ────────────────                         ──────────────────────────
 HeroIpadExperience                       /embed/demo/dashboard?persona=&showcase=1
-  ├─ HeroMobileShowcase (<lg)              middleware → dashboard routes
-  ├─ IpadScene (R3F, lg+)                 embed-mode + demo-mode cookies
-  │    └─ HeroEmbedFrame                    ShowcaseProvider + EmbedBootstrap
+  ├─ HeroTabletFlat (<lg or pre-hydrate)   middleware → dashboard routes
+  ├─ HeroTabletCompositor (lg+, 3D)       embed-mode + demo-mode cookies
+  │    ├─ HeroEmbedFrame (DOM — stable)     ShowcaseProvider + EmbedBootstrap
+  │    └─ ProceduralTabletMesh (WebGL)    (no @react-three/drei Html)
   └─ useShowcaseTourDriver ──postMessage──► navigate / highlight / cursor
 ```
+
+**Compositor invariant:** the live demo iframe is always a normal DOM node layered above the
+canvas. WebGL draws bezels only. Do not mount the iframe via `drei` `<Html transform>` — it
+collapses to 0×0 in production and hides the demo behind an untextured gray mesh.
 
 ### URLs
 

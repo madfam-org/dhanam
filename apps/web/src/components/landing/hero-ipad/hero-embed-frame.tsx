@@ -49,7 +49,7 @@ export function HeroEmbedFrame({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xl ${className}`}
+      className={`relative flex h-full min-h-[240px] flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xl ${className}`}
       onMouseEnter={() => {
         setPaused(true);
         pause();
@@ -65,7 +65,7 @@ export function HeroEmbedFrame({
         ref={iframeRef}
         src={src}
         title="Dhanam live demo"
-        className="aspect-[4/3] w-full border-0 bg-background"
+        className="min-h-0 flex-1 w-full border-0 bg-background"
         loading="lazy"
         sandbox="allow-scripts allow-same-origin allow-forms"
         onError={() => setFailed(true)}
