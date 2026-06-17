@@ -1,4 +1,4 @@
-# Landing hero iPad model
+# Landing hero tablet model
 
 ## Bundled asset
 
@@ -11,7 +11,7 @@ See [LICENSE.md](./LICENSE.md) for license terms (CC BY 3.0).
 
 ## CC0 sourcing
 
-A verified **CC0** iPad GLB was not available at sourcing time (June 2026). Kenney and Quaternius CC0 packs on Poly Pizza include phones and laptops but not tablet silhouettes. This Poly-by-Google tablet is the closest web-ready match.
+A verified **CC0** tablet GLB was not available at sourcing time (June 2026). Kenney and Quaternius CC0 packs on Poly Pizza include phones and laptops but not tablet silhouettes. This Poly-by-Google **generic tablet** (not an Apple iPad) is the closest web-ready match.
 
 To replace with a CC0 model later:
 

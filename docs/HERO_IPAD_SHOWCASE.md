@@ -1,4 +1,6 @@
-# Dhanam Hero iPad Showcase
+# Dhanam Hero Tablet Showcase
+
+> Env flags use `HERO_IPAD_*` for backward compatibility. The GLB is a **generic tablet** (Poly by Google), not an Apple iPad product mesh.
 
 **Status:** Implemented (feature-flagged)  
 **Surfaces:** `dhan.am/{locale}` hero · `app.dhan.am/embed/demo/*`  
@@ -8,15 +10,15 @@
 
 ## Overview
 
-The marketing hero can display a **3D iPad** (React Three Fiber) whose screen runs the **live demo app** in an iframe. A cross-origin **showcase tour** drives navigation, highlights, and a ghost cursor — looping forever with long pauses between cycles and alternating **María** and **Patricia** personas.
+The marketing hero can display a **3D tablet** (React Three Fiber) whose screen runs the **live demo app** in an iframe. A cross-origin **showcase tour** drives navigation, highlights, and a ghost cursor — looping forever with long pauses between cycles and alternating **María** and **Patricia** personas.
 
-| Decision     | Choice                                                                                                                  |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| Personas     | **María** (budgeting/AI) and **Patricia** (wealth/projections/estate) — alternate each loop                             |
-| Mobile       | **Static carousel** (`HeroMobileShowcase`) — no live iframe (perf + stability)                                          |
-| iPad model   | **Bundled** `public/landing/models/ipad-pro.glb` — Poly by Google tablet (CC BY 3.0); procedural fallback if load fails |
-| Tour pacing  | Loop forever · **14s** break after each tour · **4s** before persona switch                                             |
-| Feature flag | `NEXT_PUBLIC_HERO_IPAD_ENABLED` (default off until operator enable)                                                     |
+| Decision     | Choice                                                                                         |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| Personas     | **María** (budgeting/AI) and **Patricia** (wealth/projections/estate) — alternate each loop    |
+| Mobile       | **Static carousel** (`HeroMobileShowcase`) — no live iframe (perf + stability)                 |
+| Tablet model | **Bundled** GLB — Poly by Google generic tablet (CC BY 3.0); procedural fallback if load fails |
+| Tour pacing  | Loop forever · **14s** break after each tour · **4s** before persona switch                    |
+| Feature flag | `NEXT_PUBLIC_HERO_IPAD_ENABLED` (default off until operator enable)                            |
 
 ---
 
@@ -174,6 +176,12 @@ Manual smoke:
 ---
 
 ## Troubleshooting
+
+### `tablet` GLB fails to render (CSP / textures)
+
+Three.js `GLTFLoader` fetches embedded textures via `blob:` URLs. Marketing CSP must
+include `blob:` in `connect-src` and `img-src` or the mesh loads without materials and
+the console shows `Refused to connect because it violates CSP`.
 
 ### `ipad-pro.glb` 404 on production
 
