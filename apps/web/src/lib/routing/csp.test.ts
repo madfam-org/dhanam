@@ -25,6 +25,14 @@ describe('buildContentSecurityPolicy', () => {
     expect(policy).toContain('https://app.dhan.am');
   });
 
+  it('allows blob URLs for Three.js GLTF textures on marketing host', () => {
+    const policy = buildContentSecurityPolicy('dhan.am', 'https://api.dhan.am/v1', {
+      path: '/es',
+    });
+    expect(policy).toContain("connect-src 'self' blob:");
+    expect(policy).toContain("img-src 'self' data: blob: https:");
+  });
+
   it('allows localhost landing to frame local app', () => {
     const policy = buildContentSecurityPolicy('localhost', 'http://localhost:4010/v1', {
       path: '/en',

@@ -59,14 +59,14 @@ export function buildContentSecurityPolicy(
   const apiOrigin = getPublicApiOrigin(apiUrl);
   const oidcIssuer = process.env.NEXT_PUBLIC_OIDC_ISSUER || 'https://auth.madfam.io';
 
-  const connectSrc = ["'self'", apiOrigin, oidcIssuer, ...STATIC_CONNECT_SRC].join(' ');
+  const connectSrc = ["'self'", 'blob:', apiOrigin, oidcIssuer, ...STATIC_CONNECT_SRC].join(' ');
   const frameSrc = buildFrameSrc(hostname, process.env.NEXT_PUBLIC_BASE_URL);
 
   const directives = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.madfam.io https://challenges.cloudflare.com https://static.cloudflareinsights.com",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https:",
+    "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     `connect-src ${connectSrc}`,
     buildFrameAncestors(path),

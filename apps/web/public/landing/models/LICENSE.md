@@ -1,4 +1,4 @@
-# Hero iPad 3D model license
+# Hero tablet 3D model license
 
 ## Asset
 
@@ -19,6 +19,6 @@
 
 ## CC0 search note
 
-No verified **CC0** iPad Pro mesh was found at comparable size (<200KB, web-ready GLB) during sourcing (June 2026). Quaternius/Kenney CC0 packs on Poly Pizza provide phones and laptops but not tablet silhouettes. This Poly-by-Google tablet is the closest tablet-shaped GLB with an explicit open license.
+No verified **CC0** tablet mesh was found at comparable size (<200KB, web-ready GLB) during sourcing (June 2026). This asset is a **generic tablet** by Poly by Google — not an Apple iPad product mesh.
 
 Replace with a CC0 model when one is published; update this file and `HERO_IPAD_MODEL_PATH` if the filename changes.
