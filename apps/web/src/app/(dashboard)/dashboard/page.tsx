@@ -56,6 +56,7 @@ import { fireStreakCelebration } from '~/lib/celebrations';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaces } from '~/lib/hooks/use-spaces';
 import { analyticsKeys } from '~/lib/query-keys';
+import { useShowcaseEmbed } from '~/lib/showcase/embed-mode';
 import { formatCurrency, formatDate } from '~/lib/utils';
 import { useSpaceStore } from '~/stores/space';
 
@@ -69,6 +70,7 @@ export default function DashboardPage() {
   const netWorthTracked = useRef(false);
   const { t } = useTranslation('dashboard');
   const { t: tc } = useTranslation('common');
+  const isShowcaseEmbed = useShowcaseEmbed();
 
   // Fast data -- accounts, transactions, budgets, goals are simple DB queries
   const {
@@ -193,7 +195,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6" aria-live="polite" aria-busy={isLoading}>
-      {isDemo && <DemoTour />}
+      {isDemo && !isShowcaseEmbed && <DemoTour />}
 
       {dashboardData?._errors && dashboardData._errors.length > 0 && (
         <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950">
