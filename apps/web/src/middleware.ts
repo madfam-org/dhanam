@@ -15,6 +15,8 @@ const publicPaths = [
   '/auth/callback', // OAuth callback from Janua SSO
   '/demo',
   '/demo/',
+  '/embed/demo',
+  '/embed/demo/',
   '/pricing', // Public, deep-linkable pricing funnel entry
   '/for-platforms',
   // Legal pages (rendered under (legal) route group)
@@ -57,10 +59,14 @@ function getLocaleFromCountry(country: string | null): string {
   return COUNTRY_LOCALE[country.toUpperCase()] || 'es';
 }
 
-function withPublicSurfaceHeaders(response: NextResponse, hostname: string): NextResponse {
+function withPublicSurfaceHeaders(
+  response: NextResponse,
+  hostname: string,
+  path = '/'
+): NextResponse {
   response.headers.set(
     'Content-Security-Policy',
-    buildContentSecurityPolicy(hostname, process.env.NEXT_PUBLIC_API_URL)
+    buildContentSecurityPolicy(hostname, process.env.NEXT_PUBLIC_API_URL, { path })
   );
   return response;
 }
@@ -129,6 +135,25 @@ export function middleware(request: NextRequest) {
     const adminUrl = resolvePublicAdminUrl(hostname, process.env.NEXT_PUBLIC_ADMIN_URL);
     const newPath = path.replace(/^\/admin/, '') || '/';
     return withPublicSurfaceHeaders(NextResponse.redirect(new URL(newPath, adminUrl)), hostname);
+  }
+
+  // === EMBED DEMO (landing hero iframe) ===
+  if (path.startsWith('/embed/demo')) {
+    const subpath = path.replace(/^\/embed\/demo/, '') || '/dashboard';
+    const rewriteUrl = new URL(subpath, request.url);
+    rewriteUrl.search = request.nextUrl.search;
+    const response = NextResponse.rewrite(rewriteUrl);
+    response.cookies.set('embed-mode', 'true', {
+      path: '/',
+      maxAge: AUTH_CONSTANTS.DEMO_COOKIE_MAX_AGE_S,
+      sameSite: 'lax',
+    });
+    response.cookies.set('demo-mode', 'true', {
+      path: '/',
+      maxAge: AUTH_CONSTANTS.DEMO_COOKIE_MAX_AGE_S,
+      sameSite: 'lax',
+    });
+    return withPublicSurfaceHeaders(response, hostname, path);
   }
 
   // === DEMO MODE HANDLING ===

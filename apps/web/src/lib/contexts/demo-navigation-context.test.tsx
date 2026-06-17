@@ -64,6 +64,34 @@ describe('DemoNavigationContext', () => {
     });
   });
 
+  describe('when pathname starts with /embed/demo', () => {
+    beforeEach(() => {
+      mockUsePathname.mockReturnValue('/embed/demo/dashboard');
+    });
+
+    it('isDemoMode and isEmbedMode are true', () => {
+      function EmbedConsumer() {
+        const { isDemoMode, isEmbedMode, demoHref } = useDemoNavigation();
+        return (
+          <div>
+            <span data-testid="isDemoMode">{String(isDemoMode)}</span>
+            <span data-testid="isEmbedMode">{String(isEmbedMode)}</span>
+            <span data-testid="demoHref">{demoHref('/transactions')}</span>
+          </div>
+        );
+      }
+
+      render(
+        <DemoNavigationProvider>
+          <EmbedConsumer />
+        </DemoNavigationProvider>
+      );
+      expect(screen.getByTestId('isDemoMode').textContent).toBe('true');
+      expect(screen.getByTestId('isEmbedMode').textContent).toBe('true');
+      expect(screen.getByTestId('demoHref').textContent).toBe('/embed/demo/transactions');
+    });
+  });
+
   describe('when pathname does not start with /demo', () => {
     beforeEach(() => {
       mockUsePathname.mockReturnValue('/dashboard');

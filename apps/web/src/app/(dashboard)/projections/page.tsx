@@ -150,7 +150,7 @@ export default function ProjectionsPage() {
 
   return (
     <PremiumGate feature="Monte Carlo Simulations">
-      <div className="container mx-auto py-8 space-y-6">
+      <div className="container mx-auto py-8 space-y-6" data-showcase="projections-chart">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>

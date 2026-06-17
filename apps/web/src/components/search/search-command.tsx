@@ -19,6 +19,7 @@ import {
   Users,
   Leaf,
   Gamepad2,
+  type LucideIcon,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -53,7 +54,7 @@ interface SearchCommandProps {
 interface CommandItem {
   id: string;
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   group: 'navigate' | 'actions';
   action: () => void;
 }

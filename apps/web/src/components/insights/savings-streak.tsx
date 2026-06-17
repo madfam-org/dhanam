@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@dhanam/ui';
-import { Flame, Target, Leaf } from 'lucide-react';
+import { Flame, Target, Leaf, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
@@ -10,7 +10,7 @@ import { useAuth } from '~/lib/hooks/use-auth';
 
 interface Badge {
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   earned: boolean;
 }

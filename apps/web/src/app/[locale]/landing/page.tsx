@@ -6,7 +6,7 @@ import {
 } from '@dhanam/shared/i18n/server';
 import type { Metadata } from 'next';
 
-import { HeroProductPreview } from '@/components/landing/hero-product-preview';
+import { HeroIpadExperience } from '@/components/landing/hero-ipad/hero-ipad-experience';
 import {
   LandingHeroCapabilities,
   LandingHeroStatic,
@@ -85,7 +85,7 @@ export default async function LocaleLandingPage({
     <LandingPageClient
       locale={locale}
       heroColumn={heroColumn}
-      heroPreview={<HeroProductPreview />}
+      heroPreview={<HeroIpadExperience locale={locale} />}
       heroCapabilities={<LandingHeroCapabilities locale={locale} />}
     />
   );

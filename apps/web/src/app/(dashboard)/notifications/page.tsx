@@ -3,7 +3,16 @@
 import { useTranslation } from '@dhanam/shared';
 import { Button, Card, CardContent, Tabs, TabsContent, TabsList, TabsTrigger } from '@dhanam/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Bell, Check, AlertTriangle, Lightbulb, Trophy, Info, Clock } from 'lucide-react';
+import {
+  Bell,
+  Check,
+  AlertTriangle,
+  Lightbulb,
+  Trophy,
+  Info,
+  Clock,
+  type LucideIcon,
+} from 'lucide-react';
 
 interface Notification {
   id: string;
@@ -14,7 +23,7 @@ interface Notification {
   createdAt: string;
 }
 
-const typeIcons: Record<string, React.ElementType> = {
+const typeIcons: Record<string, LucideIcon> = {
   alert: AlertTriangle,
   warning: AlertTriangle,
   insight: Lightbulb,

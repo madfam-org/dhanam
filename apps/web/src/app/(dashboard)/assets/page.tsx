@@ -168,7 +168,7 @@ export default function AssetsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-8 space-y-6" data-showcase="assets-allocation">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

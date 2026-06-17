@@ -15,6 +15,7 @@ import {
   CreditCard,
   PiggyBank,
   X,
+  type LucideIcon,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useMemo } from 'react';
@@ -25,7 +26,7 @@ import { useSpaceStore } from '~/stores/space';
 
 interface Insight {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   iconColor: string;
   message: string;
   link: string;
