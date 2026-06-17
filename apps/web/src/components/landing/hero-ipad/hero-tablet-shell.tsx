@@ -125,10 +125,7 @@ export function HeroTabletShell({ locale }: HeroTabletShellProps) {
             className="relative z-20 h-full w-full overflow-hidden max-lg:rounded-[1.2rem] max-lg:border max-lg:border-white/5 max-lg:bg-black/40 max-lg:ring-1 max-lg:ring-white/10 lg:absolute lg:top-[9.5%] lg:right-[10.5%] lg:bottom-[13.5%] lg:left-[10.5%] lg:rounded-[0.85rem] lg:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
             data-hero-tablet-screen
           >
-            <HeroEmbedFrame
-              locale={locale}
-              className="h-full w-full rounded-none border-0 shadow-none"
-            />
+            <HeroEmbedFrame locale={locale} chromeless className="h-full w-full" />
           </div>
 
           {show3dBezel ? (

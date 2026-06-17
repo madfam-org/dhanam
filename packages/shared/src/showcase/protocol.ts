@@ -4,6 +4,10 @@
 
 export const SHOWCASE_MESSAGE_TYPE = 'dhanam:showcase' as const;
 
+/** Sent by embed iframe API calls so auth throttles can skip trusted showcase traffic. */
+export const SHOWCASE_REQUEST_HEADER = 'x-dhanam-showcase' as const;
+export const SHOWCASE_REQUEST_HEADER_VALUE = '1' as const;
+
 export type ShowcasePersona = 'maria' | 'patricia';
 
 export type ShowcaseParentCommand =
