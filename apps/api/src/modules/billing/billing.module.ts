@@ -49,6 +49,7 @@ import { SubscriptionGuard } from './guards/subscription.guard';
 import { UsageLimitGuard } from './guards/usage-limit.guard';
 import { UsageTrackingInterceptor } from './interceptors/usage-tracking.interceptor';
 import { InternalCatalogController } from './internal-catalog.controller';
+import { InternalCfdiController } from './internal-cfdi.controller';
 import { JanuaBillingService } from './janua-billing.service';
 import { OverageInvoicingJob } from './jobs/overage-invoicing.job';
 import { ReconciliationJob } from './jobs/reconciliation.job';
@@ -58,6 +59,7 @@ import { WebhookDlqRetryJob } from './jobs/webhook-dlq-retry.job';
 import { MadfamEventsController } from './madfam-events.controller';
 // Federation (PhyndCRM integration)
 import { CancellationService } from './services/cancellation.service';
+import { CfdiTimelineService } from './services/cfdi-timeline.service';
 import { CheckoutRouteOverrideService } from './services/checkout-route-override.service';
 import { CheckoutRoutingPolicyService } from './services/checkout-routing-policy.service';
 import { ConektaService } from './services/conekta.service';
@@ -115,6 +117,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
   controllers: [
     BillingController,
     InternalCatalogController,
+    InternalCfdiController,
     ConektaController,
     CreditBillingController,
     CustomerFederationController,
@@ -181,6 +184,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     PaymentRouterService,
     StripeMxService,
     StripeMxSpeiRelayService,
+    CfdiTimelineService,
     PhyndCrmEngagementNotifierService,
     PaddleService,
     // Payment gateway adapters (ADR-008 — single port for all PSPs)
@@ -217,6 +221,7 @@ import { UsageAlertsController } from './usage-alerts.controller';
     PaymentRouterService,
     StripeMxService,
     StripeMxSpeiRelayService,
+    CfdiTimelineService,
     PaddleService,
     ConektaService,
     CustomerFederationService,
