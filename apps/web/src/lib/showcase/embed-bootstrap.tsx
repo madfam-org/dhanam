@@ -78,7 +78,8 @@ export function EmbedBootstrap() {
         bootstrappedRef.current = true;
       } catch (error) {
         console.error('Embed showcase bootstrap failed:', error);
-        bootstrappedRef.current = false;
+        // Fail closed — never reset bootstrappedRef or the effect will retry and amplify 429s.
+        bootstrappedRef.current = true;
       } finally {
         bootstrappingRef.current = false;
       }

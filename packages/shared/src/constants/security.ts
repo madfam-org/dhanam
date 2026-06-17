@@ -41,7 +41,7 @@ export const RATE_LIMIT_PRESETS: Record<string, RateLimitConfig> = {
   totp_verify: { limit: 10, ttl: RATE_LIMIT_WINDOWS.MEDIUM },
   totp_disable: { limit: 5, ttl: RATE_LIMIT_WINDOWS.MEDIUM },
   totp_backup_codes: { limit: 5, ttl: RATE_LIMIT_WINDOWS.MEDIUM },
-  demo_login: { limit: 30, ttl: RATE_LIMIT_WINDOWS.SHORT },
+  demo_login: { limit: 120, ttl: RATE_LIMIT_WINDOWS.SHORT },
 } as const;
 
 // ── Security Headers ─────────────────────────────────────────────────────────

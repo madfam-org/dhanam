@@ -1,3 +1,7 @@
+import { SHOWCASE_REQUEST_HEADER, SHOWCASE_REQUEST_HEADER_VALUE } from '@dhanam/shared';
+
+import { resolvePublicApiUrl } from '../routing/public-surface';
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -10,7 +14,25 @@ export class ApiError extends Error {
   }
 }
 
-import { resolvePublicApiUrl } from '../routing/public-surface';
+function getShowcaseRequestHeaders(): Record<string, string> {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  try {
+    const { pathname, search } = window.location;
+    const isShowcase =
+      pathname.startsWith('/embed/demo') || new URLSearchParams(search).get('showcase') === '1';
+
+    if (isShowcase) {
+      return { [SHOWCASE_REQUEST_HEADER]: SHOWCASE_REQUEST_HEADER_VALUE };
+    }
+  } catch {
+    // Ignore malformed location during SSR edge cases
+  }
+
+  return {};
+}
 
 export class ApiClient {
   private configuredBaseUrl: string;
@@ -46,6 +68,7 @@ export class ApiClient {
     const url = `${this.getBaseUrl()}${path}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      ...getShowcaseRequestHeaders(),
       ...(options.headers as Record<string, string>),
     };
 

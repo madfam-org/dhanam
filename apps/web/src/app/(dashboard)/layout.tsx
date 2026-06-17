@@ -163,7 +163,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Suspense fallback={null}>
         <ShowcaseProvider>
           <div
-            className={`min-h-screen bg-background ${isEmbedMode ? 'embed-mode' : ''} ${isShowcaseEmbed ? 'embed-showcase' : ''}`}
+            className={`min-h-screen bg-background ${isEmbedMode ? 'embed-mode' : ''} ${isShowcaseEmbed ? 'embed-showcase h-full min-h-0' : ''}`}
           >
             {!isEmbedMode && <SkipLink />}
             {!isEmbedMode && <DashboardHeader />}
@@ -179,7 +179,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               )}
               <main
                 id="main-content"
-                className={`flex-1 ${isEmbedMode ? 'p-3 md:p-4' : 'p-6 pb-20 md:pb-6'}`}
+                className={`flex-1 ${isShowcaseEmbed ? 'overflow-hidden p-2' : isEmbedMode ? 'p-3 md:p-4' : 'p-6 pb-20 md:pb-6'}`}
               >
                 <div className={isEmbedMode ? 'mx-auto max-w-full' : 'mx-auto max-w-7xl'}>
                   <PageTransition>{content}</PageTransition>
