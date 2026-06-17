@@ -59,6 +59,14 @@ const nextConfig = {
     },
   },
 
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.glb$/,
+      type: 'asset/resource',
+    });
+    return config;
+  },
+
   images: {
     remotePatterns: [
       {

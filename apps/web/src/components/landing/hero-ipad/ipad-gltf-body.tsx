@@ -3,7 +3,7 @@
 import type { LandingLocale } from '@dhanam/shared';
 import { Center, Html, useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Component, Suspense, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { Group } from 'three';
 
 import { HeroEmbedFrame } from './hero-embed-frame';
@@ -12,6 +12,21 @@ import { ProceduralIpadBody } from './ipad-procedural-body';
 
 /** Google Poly tablet mesh is ~54×72 units on XZ; scale to hero frame height ~3.9. */
 const GLTF_SCALE = 3.9 / 71.68;
+
+class GltfErrorBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    return this.state.hasError ? this.props.fallback : this.props.children;
+  }
+}
 
 interface IpadGltfBodyProps {
   locale: LandingLocale;
@@ -50,13 +65,13 @@ function IpadGltfMesh({ locale }: IpadGltfBodyProps) {
 
 export function IpadGltfBody({ locale }: IpadGltfBodyProps) {
   return (
-    <Suspense fallback={<ProceduralIpadBody locale={locale} />}>
-      <IpadGltfMesh locale={locale} />
-    </Suspense>
+    <GltfErrorBoundary fallback={<ProceduralIpadBody locale={locale} />}>
+      <Suspense fallback={<ProceduralIpadBody locale={locale} />}>
+        <IpadGltfMesh locale={locale} />
+      </Suspense>
+    </GltfErrorBoundary>
   );
 }
-
-useGLTF.preload(HERO_IPAD_MODEL_PATH);
 
 interface IpadRigProps {
   locale: LandingLocale;
