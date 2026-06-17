@@ -137,6 +137,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return <DashboardSkeleton />;
   }
 
+  // Embed showcase must bootstrap persona auth before the authenticated shell renders.
+  if (!isAuthenticated && isEmbedModeCookie()) {
+    return (
+      <>
+        <Suspense fallback={null}>
+          <EmbedBootstrap />
+        </Suspense>
+        <DashboardSkeleton />
+      </>
+    );
+  }
+
   // After hydration, if not authenticated, show skeleton while redirecting or auto-logging in
   if (!isAuthenticated) {
     return <DashboardSkeleton />;
