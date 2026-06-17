@@ -11,6 +11,7 @@ When the goal is first revenue, checkout, billing, catalog, or entitlements:
 - `docs/MONETIZATION_PATH_READINESS.md` — current G0–G9 slice, gate table, ranked open tasks.
 - `docs/FIRST_PESOS_COMMERCIAL_GA_MONETIZATION_2026-06-01.md` — full first-peso gate framework.
 - `docs/runbooks/STRIPE_MXN_LIVE_FLIP.md` — live MXN flip (after secret restore + Stripe MX live).
+- `docs/runbooks/ESSENTIALS_CFDI_RELAY.md` — Dhanam ↔ Karafiel Essentials CFDI relay (PR #573).
 - `catalog.yaml` + `scripts/sync-catalog.ts` — SKU source of truth and Stripe/DB sync.
 - `apps/api/src/modules/billing/README.md` — billing module (checkout, ledger, webhooks).
 - `docs/TECH_DEBT.md` — active debt (TD-1009, TD-1010, TD-1014).
