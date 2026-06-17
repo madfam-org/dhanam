@@ -332,6 +332,8 @@ jobs:
             NEXT_PUBLIC_OIDC_ISSUER=https://auth.madfam.io
             NEXT_PUBLIC_OIDC_CLIENT_ID=${{ vars.NEXT_PUBLIC_OIDC_CLIENT_ID || 'jnc_uE2zp9ume_Fd6jMl1elL6wqjiECM711t' }}
             NEXT_PUBLIC_JANUA_API_URL=https://auth.madfam.io
+            NEXT_PUBLIC_HERO_IPAD_ENABLED=true
+            NEXT_PUBLIC_HERO_IPAD_3D=true
           secrets: |
             npm_madfam_token=${{ secrets.NPM_MADFAM_TOKEN }}
           cache-from: type=gha,scope=web-prod
