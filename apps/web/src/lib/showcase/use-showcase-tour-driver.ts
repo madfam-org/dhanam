@@ -2,7 +2,6 @@
 
 import type { ShowcasePersona } from '@dhanam/shared';
 import {
-  buildEmbedDemoUrl,
   getHeroTourForPersona,
   isShowcaseMessage,
   SHOWCASE_LOOP_BREAK_MS,
@@ -51,17 +50,13 @@ export function useShowcaseTourDriver({
     [appUrl, iframeRef]
   );
 
-  const reloadIframe = useCallback(
+  const switchPersona = useCallback(
     (persona: ShowcasePersona) => {
-      const iframe = iframeRef.current;
-      if (!iframe) {
-        return;
-      }
       readyRef.current = false;
       personaRef.current = persona;
-      iframe.src = buildEmbedDemoUrl(appUrl, { persona, path: '/dashboard' });
+      postCommand('switch-persona', { persona });
     },
-    [appUrl, iframeRef]
+    [postCommand]
   );
 
   const runTourLoop = useCallback(async () => {
@@ -75,7 +70,11 @@ export function useShowcaseTourDriver({
     while (!cancelledRef.current) {
       const persona = PERSONA_ORDER[personaIndex] ?? 'maria';
       if (personaRef.current !== persona) {
-        reloadIframe(persona);
+        switchPersona(persona);
+        await waitUntilReady(readyRef, 25_000);
+        if (cancelledRef.current) {
+          break;
+        }
       }
 
       await waitUntilReady(readyRef, 25_000);
@@ -128,11 +127,11 @@ export function useShowcaseTourDriver({
       personaIndex = (personaIndex + 1) % PERSONA_ORDER.length;
       const nextPersona = PERSONA_ORDER[personaIndex] ?? 'maria';
       await sleep(SHOWCASE_PERSONA_SWITCH_MS);
-      reloadIframe(nextPersona);
+      switchPersona(nextPersona);
     }
 
     runningRef.current = false;
-  }, [analytics, locale, postCommand, reloadIframe]);
+  }, [analytics, locale, postCommand, switchPersona]);
 
   useEffect(() => {
     if (!enabled) {
@@ -152,6 +151,9 @@ export function useShowcaseTourDriver({
       }
       if (event.data.event === 'ready') {
         readyRef.current = true;
+        if (event.data.persona) {
+          personaRef.current = event.data.persona as ShowcasePersona;
+        }
         analytics.track('showcase_iframe_ready', {
           persona: event.data.persona ?? personaRef.current,
           locale,

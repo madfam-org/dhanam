@@ -1,6 +1,6 @@
 'use client';
 
-import type { ShowcasePersona } from '@dhanam/shared';
+import type { AuthTokens, ShowcasePersona, UserProfile } from '@dhanam/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
@@ -19,42 +19,68 @@ function normalizePersona(value: string | null): ShowcasePersona {
   return 'maria';
 }
 
+function personaFromEmail(email: string | undefined): string | null {
+  if (!email) {
+    return null;
+  }
+  const local = email.split('@')[0];
+  return local ?? null;
+}
+
+async function applyPersonaSession(
+  persona: ShowcasePersona,
+  setAuth: (user: UserProfile, tokens: AuthTokens) => void,
+  queryClient: ReturnType<typeof useQueryClient>,
+  isAuthenticated: boolean,
+  currentPersona: string | null
+) {
+  const result =
+    isAuthenticated && currentPersona
+      ? await authApi.switchPersona(persona)
+      : await authApi.loginAsPersona(persona);
+
+  setAuth(result.user as UserProfile, result.tokens);
+  useSpaceStore.getState().setCurrentSpace(null);
+  useSpaceStore.getState().setSpaces([]);
+  queryClient.clear();
+  setDemoModeCookie();
+}
+
 export function EmbedBootstrap() {
   const searchParams = useSearchParams();
   const { isAuthenticated, user, setAuth } = useAuth();
   const queryClient = useQueryClient();
   const bootstrappedRef = useRef(false);
+  const bootstrappingRef = useRef(false);
 
   useEffect(() => {
-    if (bootstrappedRef.current) {
-      return;
-    }
-
     const persona = normalizePersona(searchParams.get('persona'));
     const showcase = searchParams.get('showcase') === '1';
     if (!showcase) {
       return;
     }
 
-    const currentPersona = user?.email?.split('@')[0];
+    const currentPersona = personaFromEmail(user?.email);
     if (isAuthenticated && currentPersona === persona) {
       bootstrappedRef.current = true;
       return;
     }
 
-    bootstrappedRef.current = true;
+    if (bootstrappedRef.current || bootstrappingRef.current) {
+      return;
+    }
+
+    bootstrappingRef.current = true;
 
     void (async () => {
       try {
-        const result = await authApi.loginAsPersona(persona);
-        setAuth(result.user as Parameters<typeof setAuth>[0], result.tokens);
-        useSpaceStore.getState().setCurrentSpace(null);
-        useSpaceStore.getState().setSpaces([]);
-        queryClient.clear();
-        setDemoModeCookie();
+        await applyPersonaSession(persona, setAuth, queryClient, isAuthenticated, currentPersona);
+        bootstrappedRef.current = true;
       } catch (error) {
         console.error('Embed showcase bootstrap failed:', error);
         bootstrappedRef.current = false;
+      } finally {
+        bootstrappingRef.current = false;
       }
     })();
   }, [isAuthenticated, queryClient, searchParams, setAuth, user?.email]);

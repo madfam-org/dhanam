@@ -1,18 +1,21 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { HeroTabletFlat } from './hero-tablet-flat';
 
-jest.mock('./hero-embed-frame', () => ({
-  HeroEmbedFrame: ({ locale }: { locale: string }) => (
-    <iframe title="Dhanam live demo" data-testid="hero-embed" data-locale={locale} />
+jest.mock('./hero-tablet-shell', () => ({
+  HeroTabletShell: ({ locale }: { locale: string }) => (
+    <div data-hero-tablet-flat data-locale={locale}>
+      <iframe title="Dhanam live demo" data-testid="hero-embed" data-locale={locale} />
+    </div>
   ),
 }));
 
 describe('HeroTabletFlat', () => {
-  it('renders a live demo iframe inside the CSS tablet frame', () => {
+  it('delegates to HeroTabletShell', async () => {
     render(<HeroTabletFlat locale="es" />);
-    expect(screen.getByTestId('hero-embed')).toHaveAttribute('data-locale', 'es');
-    expect(screen.getByTitle('Dhanam live demo')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('hero-embed')).toHaveAttribute('data-locale', 'es');
+    });
     expect(document.querySelector('[data-hero-tablet-flat]')).toBeTruthy();
   });
 });

@@ -16,6 +16,20 @@ export function useEmbedMode(): boolean {
   return pathname.startsWith('/embed/demo') || cookieEmbed;
 }
 
+export function useShowcaseEmbed(): boolean {
+  const pathname = usePathname();
+  const [showcase, setShowcase] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    setShowcase(new URLSearchParams(window.location.search).get('showcase') === '1');
+  }, [pathname]);
+
+  return showcase;
+}
+
 export function isEmbedPathname(pathname: string): boolean {
   return pathname.startsWith('/embed/demo');
 }
