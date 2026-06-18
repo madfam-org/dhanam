@@ -34,6 +34,12 @@ See [RFC-6](../../../docs/rfcs/owner-operator-capital-stack.md).
 
 **Production (2026-06-18):** Module deployed; MADFAM operator bootstrap applied. Karafiel bridge stub only until Karafiel ships `POST /v1/compliance/capital-flow`.
 
+**Phase 2 (2026-06-18):** Owner cockpit UI at `apps/web/src/app/(dashboard)/capital-stack/page.tsx` — lists entity groups, dashboard metrics, journal table, account classification. Sidebar nav + i18n (`capitalStack` namespace).
+
+**Phase 3 (2026-06-18):** `CapitalStackTransactionHookService` fires detector on manual txn create when `FEATURE_CAPITAL_STACK_DETECTOR=true`. Bulk account classify: `POST /v1/capital-stack/accounts/bulk-capital-purpose`.
+
+**Phase 4 (2026-06-18):** Admin review queue at `apps/admin/src/app/(dashboard)/capital-stack/page.tsx` — seal/void journal entries.
+
 ## Bootstrap
 
 ```bash

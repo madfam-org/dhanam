@@ -17,6 +17,7 @@ import {
   Users,
   ScrollText,
   Landmark,
+  Layers,
   Gamepad2,
   CreditCard,
   Calendar,
@@ -61,6 +62,7 @@ const navigation: NavItem[] = [
   },
   { key: 'goals', href: '/goals', icon: Target },
   { key: 'households', href: '/households', icon: Users },
+  { key: 'capitalStack', href: '/capital-stack', icon: Layers },
   { key: 'estatePlanning', href: '/estate-planning', icon: ScrollText },
   {
     key: 'analytics',

@@ -12,6 +12,7 @@ export const dashboard = {
     help: 'Ajuda',
     estatePlanning: 'Planejamento patrimonial',
     households: 'Lares',
+    capitalStack: 'Capital Stack',
     projections: 'Projeções',
     assets: 'Ativos',
     goals: 'Metas',

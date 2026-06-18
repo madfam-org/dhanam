@@ -16,9 +16,11 @@ import { CurrentUser, AuthenticatedUser } from '@core/auth/decorators/current-us
 import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { OwnerCapitalFlowType, OwnerCapitalJournalStatus } from '@db';
 
+import { CapitalStackAccountsService } from './capital-stack-accounts.service';
 import {
   CreateJournalDto,
   MatchJournalDto,
+  BulkCapitalPurposeDto,
   UpdateCapitalPurposeDto,
 } from './dto/capital-stack.dto';
 import { EntityGroupService } from './entity-group.service';
@@ -34,7 +36,8 @@ export class CapitalStackController {
     private readonly config: ConfigService,
     private readonly entityGroups: EntityGroupService,
     private readonly journals: OwnerCapitalJournalService,
-    private readonly karafielBridge: KarafielCapitalBridgeService
+    private readonly karafielBridge: KarafielCapitalBridgeService,
+    private readonly accounts: CapitalStackAccountsService
   ) {}
 
   private assertEnabled() {
@@ -92,6 +95,28 @@ export class CapitalStackController {
   async sendToKarafiel(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     this.assertEnabled();
     return this.karafielBridge.sendJournalToKarafiel(id, user.id);
+  }
+
+  @Get('groups/:id/accounts')
+  @ApiOperation({ summary: 'List accounts in entity group with capital purpose' })
+  async listAccounts(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    this.assertEnabled();
+    return this.accounts.listForEntityGroup(id, user.id);
+  }
+
+  @Post('accounts/bulk-capital-purpose')
+  @ApiOperation({ summary: 'Bulk classify accounts by capital purpose' })
+  async bulkCapitalPurpose(
+    @Body() dto: BulkCapitalPurposeDto,
+    @CurrentUser() user: AuthenticatedUser
+  ) {
+    this.assertEnabled();
+    return this.accounts.bulkSetCapitalPurpose(
+      dto.entityGroupId,
+      dto.updates,
+      user.id,
+      user.isAdmin
+    );
   }
 
   @Patch('accounts/:accountId/capital-purpose')

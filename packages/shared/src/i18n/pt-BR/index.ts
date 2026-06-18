@@ -27,3 +27,4 @@ export { esg } from './esg';
 export { legal } from './legal';
 export { analytics } from './analytics';
 export { reports } from './reports';
+export { capitalStack } from './capital-stack';

@@ -1,0 +1,64 @@
+export const capitalStack = {
+  title: 'Capital Stack',
+  subtitle: 'Owner–operator capital flows between personal facilities and operating entities',
+  empty: {
+    title: 'No entity groups yet',
+    description:
+      'Capital Stack links your personal credit facilities to business spaces for auditable owner capital journals.',
+    contactOps: 'Contact your platform operator to bootstrap an owner–operator group.',
+  },
+  disabled: {
+    title: 'Capital Stack unavailable',
+    description: 'This feature is not enabled for your environment.',
+  },
+  metrics: {
+    unreconciled: 'Unreconciled flows',
+    ownerFacilities: 'Owner facility accounts',
+    journals: 'Journal entries',
+  },
+  status: {
+    draft: 'Draft',
+    proposed: 'Proposed',
+    matched: 'Matched',
+    compliance_pending: 'Compliance pending',
+    compliance_sealed: 'Sealed',
+    manual_review: 'Manual review',
+    void: 'Void',
+  },
+  flowType: {
+    capital_contribution: 'Capital contribution',
+    shareholder_loan: 'Shareholder loan',
+    loan_repayment: 'Loan repayment',
+    owner_draw: 'Owner draw',
+    distribution: 'Distribution',
+  },
+  journal: {
+    title: 'Capital journal',
+    empty: 'No journal entries yet',
+    amount: 'Amount',
+    flowType: 'Flow type',
+    status: 'Status',
+    created: 'Created',
+    notes: 'Notes',
+  },
+  spaces: {
+    personal: 'Personal space',
+    business: 'Business space',
+  },
+  owner: 'Beneficial owner',
+  refresh: 'Refresh',
+  loading: 'Loading capital stack…',
+  error: 'Unable to load capital stack data',
+  accounts: {
+    title: 'Account classification',
+    description: 'Tag accounts by capital purpose for detection and reporting',
+    save: 'Save classifications',
+    saved: 'Account classifications updated',
+    purpose: {
+      personal_life: 'Personal life',
+      owner_facility: 'Owner facility',
+      entity_operating: 'Entity operating',
+      equity_stake: 'Equity stake',
+    },
+  },
+} as const;

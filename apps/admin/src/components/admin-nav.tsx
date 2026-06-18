@@ -16,6 +16,7 @@ import {
   CreditCard,
   Repeat2,
   Database,
+  Layers,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -73,7 +74,10 @@ const navGroups: NavGroup[] = [
   },
   {
     label: 'Compliance',
-    items: [{ name: 'GDPR & Retention', href: '/compliance', icon: ShieldCheck }],
+    items: [
+      { name: 'GDPR & Retention', href: '/compliance', icon: ShieldCheck },
+      { name: 'Capital Stack', href: '/capital-stack', icon: Layers },
+    ],
   },
 ];
 

@@ -211,14 +211,14 @@ env emails from Vault — never hardcoded).
 
 ## Phased delivery
 
-| Phase | Scope                                                                   | Status (2026-06-18)                                  |
-| ----- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
-| **0** | Prod hygiene: account classify, remove duplicate space, Janua for aldo@ | **Mostly done** — Janua for `aldo@madfam.io` pending |
-| **1** | Schema, module skeleton, CRUD journal, capitalPurpose                   | **Shipped** — prod API + DB bootstrap                |
-| **2** | Dashboard, match/mirror, account migration tool                         | Planned                                              |
-| **3** | Detector + backfill job                                                 | Planned                                              |
-| **4** | Karafiel bridge + admin review queue                                    | Stub shipped; Karafiel receiver pending              |
-| **5** | E2E, runbook, staging proof, GA flag                                    | Partial — runbook + unit tests                       |
+| Phase | Scope                                                                   | Status (2026-06-18)                                                        |
+| ----- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **0** | Prod hygiene: account classify, remove duplicate space, Janua for aldo@ | **Mostly done** — Janua for `aldo@madfam.io` pending                       |
+| **1** | Schema, module skeleton, CRUD journal, capitalPurpose                   | **Shipped** — prod API + DB bootstrap                                      |
+| **2** | Dashboard, match/mirror, account migration tool                         | **Shipped** — `/capital-stack` cockpit + bulk account classify API         |
+| **3** | Detector + backfill job                                                 | **Shipped** — detector rules + txn hook (`FEATURE_CAPITAL_STACK_DETECTOR`) |
+| **4** | Karafiel bridge + admin review queue                                    | **Partial** — bridge stub + admin review UI at `/capital-stack`            |
+| **5** | E2E, runbook, staging proof, GA flag                                    | Partial — runbook + unit tests                                             |
 
 ## Testing
 

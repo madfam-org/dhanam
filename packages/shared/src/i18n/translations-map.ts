@@ -33,6 +33,7 @@ export const translations = {
     analytics: en.analytics,
     reports: en.reports,
     legal: en.legal,
+    capitalStack: en.capitalStack,
   },
   es: {
     common: es.common,
@@ -60,6 +61,7 @@ export const translations = {
     analytics: es.analytics,
     reports: es.reports,
     legal: es.legal,
+    capitalStack: es.capitalStack,
   },
   'pt-BR': {
     common: ptBR.common,
@@ -87,6 +89,7 @@ export const translations = {
     analytics: ptBR.analytics,
     reports: ptBR.reports,
     legal: ptBR.legal,
+    capitalStack: ptBR.capitalStack,
   },
 } as const;
 

@@ -1,5 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 
 import { CapitalPurpose, Currency, OwnerCapitalFlowType } from '@db';
 
@@ -62,6 +72,28 @@ export class UpdateCapitalPurposeDto {
   @ApiProperty({ enum: CapitalPurpose })
   @IsEnum(CapitalPurpose)
   capitalPurpose: CapitalPurpose;
+}
+
+export class BulkCapitalPurposeItemDto {
+  @ApiProperty()
+  @IsUUID()
+  accountId: string;
+
+  @ApiProperty({ enum: CapitalPurpose })
+  @IsEnum(CapitalPurpose)
+  capitalPurpose: CapitalPurpose;
+}
+
+export class BulkCapitalPurposeDto {
+  @ApiProperty()
+  @IsUUID()
+  entityGroupId: string;
+
+  @ApiProperty({ type: [BulkCapitalPurposeItemDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BulkCapitalPurposeItemDto)
+  updates: BulkCapitalPurposeItemDto[];
 }
 
 export class ResolveJournalDto {
