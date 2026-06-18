@@ -1,6 +1,7 @@
 'use client';
 
 import type { LandingLocale } from '@dhanam/shared';
+import { BasketweaveSurface } from '@dhanam/ui';
 import { useEffect } from 'react';
 
 import { FeaturesGrid } from '@/components/landing/features-grid';
@@ -70,7 +71,12 @@ export function LandingPageClient({
   };
 
   return (
-    <div className="landing-root min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+    <div className="landing-root relative isolate min-h-screen">
+      <BasketweaveSurface
+        variant="landing"
+        drift
+        className="landing-basketweave absolute inset-0 -z-10"
+      />
       <LandingNav locale={locale} />
 
       <main id="main-content">

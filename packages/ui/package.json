@@ -25,6 +25,12 @@
       "types": "./src/tokens/tailwind-preset.ts",
       "import": "./dist/tokens/tailwind-preset.mjs",
       "require": "./dist/tokens/tailwind-preset.js"
+    },
+    "./patterns/basketweave.css": "./src/patterns/basketweave.css",
+    "./patterns": {
+      "types": "./src/patterns/index.ts",
+      "import": "./src/patterns/index.ts",
+      "require": "./src/patterns/index.ts"
     }
   },
   "files": [

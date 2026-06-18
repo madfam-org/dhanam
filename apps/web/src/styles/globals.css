@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@dhanam/ui/patterns/basketweave.css';
 
 /*
  * Explicit content sources (replaces v3 `content: [...]` from tailwind.config.ts).
@@ -277,6 +278,23 @@
 /* Landing typography — Fraunces display + DM Sans UI (Phase G) */
 .landing-root {
   font-family: var(--font-landing-ui), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Regenerative Ledger basketweave — marketing surface tokens */
+.landing-root.landing-basketweave,
+.landing-basketweave {
+  --basketweave-rib-h: 168 36% 34%;
+  --basketweave-rib-v: 32 52% 48%;
+  --basketweave-opacity: 0.065;
+  --basketweave-tile: 52px;
+}
+
+.dark .landing-root.landing-basketweave,
+.dark .landing-basketweave,
+.landing-root.landing-basketweave:where(.dark, .dark *) {
+  --basketweave-rib-h: 168 20% 58%;
+  --basketweave-rib-v: 36 40% 66%;
+  --basketweave-opacity: 0.11;
 }
 
 .landing-root h1,

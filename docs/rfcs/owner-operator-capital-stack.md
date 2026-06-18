@@ -1,6 +1,6 @@
 # RFC-6: Owner–Operator Capital Stack
 
-**Status:** Accepted (Phase 1 in progress)
+**Status:** Accepted — **Phase 1 shipped** (2026-06-18); Phases 2–5 in backlog
 **Date:** 2026-06-18
 **Authors:** Engineering
 **Stakeholders:** Platform, MADFAM operator slice, Karafiel, Compliance, Admin
@@ -211,14 +211,14 @@ env emails from Vault — never hardcoded).
 
 ## Phased delivery
 
-| Phase | Scope                                                                   | Horizon   |
-| ----- | ----------------------------------------------------------------------- | --------- |
-| **0** | Prod hygiene: account classify, remove duplicate space, Janua for aldo@ | 1 week    |
-| **1** | Schema, module skeleton, CRUD journal, capitalPurpose                   | 2–3 weeks |
-| **2** | Dashboard, match/mirror, account migration tool                         | 3–4 weeks |
-| **3** | Detector + backfill job                                                 | 2–3 weeks |
-| **4** | Karafiel bridge + admin review queue                                    | 3–4 weeks |
-| **5** | E2E, runbook, staging proof, GA flag                                    | 2 weeks   |
+| Phase | Scope                                                                   | Status (2026-06-18)                                  |
+| ----- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
+| **0** | Prod hygiene: account classify, remove duplicate space, Janua for aldo@ | **Mostly done** — Janua for `aldo@madfam.io` pending |
+| **1** | Schema, module skeleton, CRUD journal, capitalPurpose                   | **Shipped** — prod API + DB bootstrap                |
+| **2** | Dashboard, match/mirror, account migration tool                         | Planned                                              |
+| **3** | Detector + backfill job                                                 | Planned                                              |
+| **4** | Karafiel bridge + admin review queue                                    | Stub shipped; Karafiel receiver pending              |
+| **5** | E2E, runbook, staging proof, GA flag                                    | Partial — runbook + unit tests                       |
 
 ## Testing
 

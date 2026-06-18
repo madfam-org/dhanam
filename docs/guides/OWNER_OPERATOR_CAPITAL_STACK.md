@@ -19,7 +19,9 @@ identity while funding the business via personal credit facilities.
 
 1. Classify accounts: `personal_life`, `owner_facility`, or `entity_operating`.
 2. Run bootstrap script (operator): see [module README](../../apps/api/src/modules/capital-stack/README.md).
-3. Enable `FEATURE_CAPITAL_STACK_ENABLED=true` when API is deployed.
+3. ~~Enable `FEATURE_CAPITAL_STACK_ENABLED=true` when API is deployed.~~ **Done in production** (2026-06-18). Karafiel auto-send remains off until the Karafiel receiver ships.
+
+**Production status (2026-06-18):** API live at `/v1/capital-stack/*`; Innovaciones MADFAM bootstrap applied. Aldo SSO blocked until Janua account exists. See [Session Wrap-Up 2026-06-18](../SESSION_WRAP_UP_2026-06-18.md).
 
 ## Daily workflow
 

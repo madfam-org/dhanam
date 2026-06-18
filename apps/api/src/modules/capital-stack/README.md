@@ -19,11 +19,11 @@ their company via personal credit facilities while keeping separate ledgers.
 
 ## Feature flags
 
-| Env                              | Default | Effect                               |
-| -------------------------------- | ------- | ------------------------------------ |
-| `FEATURE_CAPITAL_STACK_ENABLED`  | `false` | User/admin API gate                  |
-| `FEATURE_CAPITAL_STACK_KARAFIEL` | `false` | Outbound Karafiel capital-flow       |
-| `FEATURE_CAPITAL_STACK_DETECTOR` | `false` | Auto-detection on txn sync (Phase 3) |
+| Env                              | Default | Effect                                       |
+| -------------------------------- | ------- | -------------------------------------------- |
+| `FEATURE_CAPITAL_STACK_ENABLED`  | `false` | User/admin API gate — **production: `true`** |
+| `FEATURE_CAPITAL_STACK_KARAFIEL` | `false` | Outbound Karafiel capital-flow               |
+| `FEATURE_CAPITAL_STACK_DETECTOR` | `false` | Auto-detection on txn sync (Phase 3)         |
 
 ## API
 
@@ -31,6 +31,8 @@ User routes under `/v1/capital-stack/*` (JWT). Admin under `/v1/admin/capital-st
 Karafiel callbacks: `/v1/internal/compliance/*` (HMAC).
 
 See [RFC-6](../../../docs/rfcs/owner-operator-capital-stack.md).
+
+**Production (2026-06-18):** Module deployed; MADFAM operator bootstrap applied. Karafiel bridge stub only until Karafiel ships `POST /v1/compliance/capital-flow`.
 
 ## Bootstrap
 

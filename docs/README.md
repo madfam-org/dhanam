@@ -1,6 +1,6 @@
 # Dhanam Documentation
 
-Last updated: 2026-06-15
+Last updated: 2026-06-18
 
 This is the canonical human and agent documentation map for Dhanam. Prefer this
 file over older phase summaries when choosing what to read first.
@@ -42,7 +42,8 @@ live in `internal-devops` — paths listed in [Monetization Session](MONETIZATIO
 | [Deployment Guide](DEPLOYMENT.md)                                              | Enclii-first deploy, staging, rollback, current rollout blockers                    |
 | [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)                    | Current truth about production, staging, DNS, health, and remaining stability gaps  |
 | [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)                | Concise final status from the latest production-stability push                      |
-| [Session Wrap-Up 2026-06-15](SESSION_WRAP_UP_2026-06-15.md)                    | **Latest handoff** — landing Phases A–G live, ES copy, deploy gaps, next picks      |
+| [Session Wrap-Up 2026-06-18](SESSION_WRAP_UP_2026-06-18.md)                    | **Latest handoff** — RFC-6 Capital Stack Phase 1 prod, operator slice bootstrap     |
+| [Session Wrap-Up 2026-06-15](SESSION_WRAP_UP_2026-06-15.md)                    | Landing Phases A–G live, ES copy, deploy gaps                                       |
 | [Tech Debt Register](TECH_DEBT.md)                                             | Current technical debt, active stability gaps, and historical debt archive          |
 | [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md)            | Latest corpus audit: coverage, interconnection, remediation backlog                 |
 | [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md)            | Prior audit (historical context)                                                    |
