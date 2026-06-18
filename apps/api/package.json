@@ -44,7 +44,7 @@
     "@dhanam/esg": "workspace:*",
     "@dhanam/shared": "workspace:*",
     "@dhanam/simulations": "workspace:*",
-    "@fastify/compress": "^8.3.1",
+    "@fastify/compress": "^9.0.0",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.2.0",
     "@fastify/csrf-protection": "^7.1.0",
