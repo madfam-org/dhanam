@@ -33,6 +33,12 @@ spec:
               value: "true"
             - name: FEATURE_STRIPE_MXN_LIVE
               value: "false"
+            - name: FEATURE_CAPITAL_STACK_ENABLED
+              value: "true"
+            - name: FEATURE_CAPITAL_STACK_KARAFIEL
+              value: "false"
+            - name: FEATURE_CAPITAL_STACK_DETECTOR
+              value: "false"
             - name: PADDLE_ENVIRONMENT
               value: "sandbox"
             # Webhook relay: set PRODUCT_WEBHOOK_URLS in dhanam-secrets (Vault) when

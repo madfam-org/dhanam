@@ -64,6 +64,7 @@ live in `internal-devops` — paths listed in [Monetization Session](MONETIZATIO
 | [Catalog Truth 2026-05-20](CATALOG_TRUTH_2026-05-20.md)                                                  | Product catalog drift gate and production sync truth                              |
 | [Credential Onboarding](CREDENTIAL_ONBOARDING.md)                                                        | Provider credential activation runbook                                            |
 | [PP.2 Staging Audit](PP_2_STAGING_AUDIT.md)                                                              | Staging pipeline gap analysis (RFC 0001)                                          |
+| [Owner Capital + Karafiel Ops](runbooks/OWNER_CAPITAL_KARAFIEL_OPS.md)                                   | Owner–operator capital stack bootstrap and Karafiel tandem workflow (RFC-6)       |
 | [Break-glass runbook](runbooks/BREAK_GLASS.md)                                                           | Documented raw-access procedures when Enclii adapters are missing                 |
 | [Incident: dhanam-web prod rollout 2026-06-15](runbooks/incidents/2026-06-15-dhanam-web-prod-rollout.md) | Stale Argo sync after promote; post-promote dispatch required                     |
 | [Compliance appendix](../claudedocs/README.md)                                                           | SOC2 / SRE historical procedures                                                  |
@@ -96,21 +97,22 @@ Full guide index: [guides/README.md](guides/README.md).
 | [Hero Tablet Showcase](HERO_IPAD_SHOWCASE.md)                       | 3D hero tablet + live embed demo (tour, screen insets, rate limits, test matrix)       |
 | [Competitive Benchmarks](market-research/competitive-benchmarks.md) | Pricing and feature matrix (complements landing UX plan)                               |
 
-| Document                                                                       | Use                                        |
-| ------------------------------------------------------------------------------ | ------------------------------------------ |
-| [All feature guides](guides/README.md)                                         | Complete guide catalog                     |
-| [Billing Integration](guides/BILLING_INTEGRATION.md)                           | Billing and subscription integration notes |
-| [AI Categorization](guides/AI_CATEGORIZATION_GUIDE.md)                         | Transaction categorization workflow        |
-| [Goal Tracking](guides/GOAL_TRACKING_GUIDE.md)                                 | Goal tracking UX and behavior              |
-| [Manual Assets](guides/MANUAL_ASSETS.md)                                       | Manual asset tracking                      |
-| [Estate Planning](guides/ESTATE_PLANNING_GUIDE.md)                             | Life Beat and executor workflows           |
-| [Household Features](guides/HOUSEHOLD_FEATURES_GUIDE.md)                       | Household ownership and sharing            |
-| [Long-Term Projections](guides/LONG_TERM_PROJECTIONS_GUIDE.md)                 | Projection workflows                       |
-| [Monte Carlo](guides/MONTE_CARLO_GUIDE.md)                                     | Simulation API and UX details              |
-| [DeFi/Web3](guides/DEFI_WEB3_GUIDE.md)                                         | DeFi and crypto portfolio tracking         |
-| [Multi-Provider Redundancy](guides/MULTI_PROVIDER_REDUNDANCY.md)               | Provider failover approach                 |
-| [Transaction Execution User Guide](guides/transaction-execution-user-guide.md) | Transaction execution feature guide        |
-| [Transaction Execution API](api/transaction-execution-api.md)                  | Transaction execution endpoint reference   |
+| Document                                                                       | Use                                           |
+| ------------------------------------------------------------------------------ | --------------------------------------------- |
+| [All feature guides](guides/README.md)                                         | Complete guide catalog                        |
+| [Billing Integration](guides/BILLING_INTEGRATION.md)                           | Billing and subscription integration notes    |
+| [AI Categorization](guides/AI_CATEGORIZATION_GUIDE.md)                         | Transaction categorization workflow           |
+| [Goal Tracking](guides/GOAL_TRACKING_GUIDE.md)                                 | Goal tracking UX and behavior                 |
+| [Manual Assets](guides/MANUAL_ASSETS.md)                                       | Manual asset tracking                         |
+| [Estate Planning](guides/ESTATE_PLANNING_GUIDE.md)                             | Life Beat and executor workflows              |
+| [Household Features](guides/HOUSEHOLD_FEATURES_GUIDE.md)                       | Household ownership and sharing               |
+| [Owner–Operator Capital Stack](guides/OWNER_OPERATOR_CAPITAL_STACK.md)         | Owner–entity capital flows + Karafiel (RFC-6) |
+| [Long-Term Projections](guides/LONG_TERM_PROJECTIONS_GUIDE.md)                 | Projection workflows                          |
+| [Monte Carlo](guides/MONTE_CARLO_GUIDE.md)                                     | Simulation API and UX details                 |
+| [DeFi/Web3](guides/DEFI_WEB3_GUIDE.md)                                         | DeFi and crypto portfolio tracking            |
+| [Multi-Provider Redundancy](guides/MULTI_PROVIDER_REDUNDANCY.md)               | Provider failover approach                    |
+| [Transaction Execution User Guide](guides/transaction-execution-user-guide.md) | Transaction execution feature guide           |
+| [Transaction Execution API](api/transaction-execution-api.md)                  | Transaction execution endpoint reference      |
 
 ## ADRs
 
@@ -127,13 +129,15 @@ Full guide index: [guides/README.md](guides/README.md).
 
 ## RFCs And Research
 
-| Document                                                            | Use                         |
-| ------------------------------------------------------------------- | --------------------------- |
-| [Cross-Service Event Bus](rfcs/cross-service-event-bus.md)          | NATS event bus proposal     |
-| [Connect Marketplace](rfcs/connect-marketplace.md)                  | Marketplace integration RFC |
-| [Belvo Payments Evaluation](rfcs/belvo-payments-evaluation.md)      | Belvo payments evaluation   |
-| [Pricing Tiers](market-research/pricing-tiers.md)                   | Market research             |
-| [Competitive Benchmarks](market-research/competitive-benchmarks.md) | Competitive analysis        |
+| Document                                                                 | Use                                                        |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| [Owner–Operator Capital Stack](rfcs/owner-operator-capital-stack.md)     | Beneficial owner ↔ entity capital flows + Karafiel (RFC-6) |
+| [Karafiel Capital Flow Contract](rfcs/karafiel-capital-flow-contract.md) | Dhanam↔Karafiel API companion to RFC-6                     |
+| [Cross-Service Event Bus](rfcs/cross-service-event-bus.md)               | NATS event bus proposal                                    |
+| [Connect Marketplace](rfcs/connect-marketplace.md)                       | Marketplace integration RFC                                |
+| [Belvo Payments Evaluation](rfcs/belvo-payments-evaluation.md)           | Belvo payments evaluation                                  |
+| [Pricing Tiers](market-research/pricing-tiers.md)                        | Market research                                            |
+| [Competitive Benchmarks](market-research/competitive-benchmarks.md)      | Competitive analysis                                       |
 
 ## Infrastructure Docs
 

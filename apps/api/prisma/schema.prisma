@@ -65,10 +65,10 @@ enum Currency {
 }
 
 enum SubscriptionTier {
-  community  // Free tier — acquisition funnel (MXN 0). Source of truth: catalog.yaml
+  community // Free tier — acquisition funnel (MXN 0). Source of truth: catalog.yaml
   essentials // USD 4.99 / MXN 79 per mo
-  pro        // USD 14.99 / MXN 299 per mo
-  premium    // USD 29.99 / MXN 599 per mo
+  pro // USD 14.99 / MXN 299 per mo
+  premium // USD 29.99 / MXN 599 per mo
 }
 
 enum BillingEventType {
@@ -226,6 +226,43 @@ enum HouseholdType {
   trust
   estate
   partnership
+  owner_operator
+}
+
+enum CapitalPurpose {
+  personal_life
+  owner_facility
+  entity_operating
+  equity_stake
+}
+
+enum OwnerCapitalFlowType {
+  capital_contribution
+  shareholder_loan
+  loan_repayment
+  owner_draw
+  distribution
+}
+
+enum OwnerCapitalJournalStatus {
+  draft
+  proposed
+  matched
+  compliance_pending
+  compliance_sealed
+  manual_review
+  void
+}
+
+enum ComplianceBridgeDirection {
+  dhanam_to_karafiel
+  karafiel_to_dhanam
+}
+
+enum ComplianceBridgeResolution {
+  auto
+  manual
+  skipped
 }
 
 enum RelationshipType {
@@ -344,37 +381,41 @@ model User {
   deletedAt DateTime? @map("deleted_at")
 
   // Relations
-  userSpaces            UserSpace[]
-  sessions              Session[]
-  auditLogs             AuditLog[]
-  providerConnections   ProviderConnection[]
-  preferences           UserPreferences?
-  billingEvents         BillingEvent[]
-  usageMetrics          UsageMetric[]
-  householdMembers      HouseholdMember[]
-  simulations           Simulation[]
-  ownedAccounts         Account[] // For "Yours/Mine/Ours" visibility
-  transactionSplits     TransactionSplit[]
-  sharedAccounts        AccountSharingPermission[] @relation("SharedAccounts")
-  createdGoals          Goal[]                     @relation("GoalCreator")
-  goalShares            GoalShare[]                @relation("GoalShares")
-  sentGoalInvites       GoalShare[]                @relation("GoalInvites")
-  goalActivities        GoalActivity[]             @relation("GoalActivities")
-  notifications         UserNotification[]
-  inactivityAlerts      InactivityAlert[]
-  executorAssignments   ExecutorAssignment[]       @relation("AccountHolder")
-  assignedAsExecutor    ExecutorAssignment[]       @relation("Executor")
-  savedReports          SavedReport[]              @relation("SavedReportCreator")
-  generatedReports      GeneratedReport[]          @relation("GeneratedReports")
-  reportShares          ReportShare[]              @relation("ReportShares")
-  reportInvites         ReportShare[]              @relation("ReportInvites")
-  reportShareTokens     ReportShareToken[]         @relation("ReportShareTokens")
-  dripEvents            DripEvent[]
-  cancellationIntents   CancellationIntent[]
-  identityVerifications IdentityVerification[]
-  ambassadorProfile     AmbassadorProfile?
-  merchantAccounts      MerchantAccount[]
-  platformConfigUpdates PlatformConfig[]           @relation("PlatformConfigUpdates")
+  userSpaces                UserSpace[]
+  sessions                  Session[]
+  auditLogs                 AuditLog[]
+  providerConnections       ProviderConnection[]
+  preferences               UserPreferences?
+  billingEvents             BillingEvent[]
+  usageMetrics              UsageMetric[]
+  householdMembers          HouseholdMember[]
+  simulations               Simulation[]
+  ownedAccounts             Account[] // For "Yours/Mine/Ours" visibility
+  transactionSplits         TransactionSplit[]
+  sharedAccounts            AccountSharingPermission[] @relation("SharedAccounts")
+  createdGoals              Goal[]                     @relation("GoalCreator")
+  goalShares                GoalShare[]                @relation("GoalShares")
+  sentGoalInvites           GoalShare[]                @relation("GoalInvites")
+  goalActivities            GoalActivity[]             @relation("GoalActivities")
+  notifications             UserNotification[]
+  inactivityAlerts          InactivityAlert[]
+  executorAssignments       ExecutorAssignment[]       @relation("AccountHolder")
+  assignedAsExecutor        ExecutorAssignment[]       @relation("Executor")
+  savedReports              SavedReport[]              @relation("SavedReportCreator")
+  generatedReports          GeneratedReport[]          @relation("GeneratedReports")
+  reportShares              ReportShare[]              @relation("ReportShares")
+  reportInvites             ReportShare[]              @relation("ReportInvites")
+  reportShareTokens         ReportShareToken[]         @relation("ReportShareTokens")
+  dripEvents                DripEvent[]
+  cancellationIntents       CancellationIntent[]
+  identityVerifications     IdentityVerification[]
+  ambassadorProfile         AmbassadorProfile?
+  merchantAccounts          MerchantAccount[]
+  platformConfigUpdates     PlatformConfig[]           @relation("PlatformConfigUpdates")
+  beneficialOwnerHouseholds Household[]                @relation("BeneficialOwner")
+  spaceOperatorBindings     SpaceOperatorBinding[]     @relation("SpaceOperator")
+  beneficialOwnerBindings   SpaceOperatorBinding[]     @relation("BeneficialOwnerBinding")
+  ownerCapitalJournals      OwnerCapitalJournal[]      @relation("JournalCreatedBy")
 
   @@index([onboardingCompleted, createdAt(sort: Desc)])
   @@index([lastLoginAt(sort: Desc)])
@@ -600,23 +641,26 @@ model Space {
   deletedAt   DateTime? @map("deleted_at")
 
   // Relations
-  household          Household?          @relation(fields: [householdId], references: [id], onDelete: SetNull)
-  userSpaces         UserSpace[]
-  accounts           Account[]
-  budgets            Budget[]
-  transactionRules   TransactionRule[]
-  goals              Goal[]
-  transactionOrders  TransactionOrder[]
-  simulations        Simulation[]
-  manualAssets       ManualAsset[]
-  documents          Document[]
-  connectionAttempts ConnectionAttempt[]
-  subscriptions      Subscription[]
-  incomeEvents       IncomeEvent[]
-  savedReports       SavedReport[]
-  generatedReports   GeneratedReport[]
-  cashflowForecasts  CashflowForecast[]
-  tags               Tag[]
+  household            Household?            @relation(fields: [householdId], references: [id], onDelete: SetNull)
+  userSpaces           UserSpace[]
+  accounts             Account[]
+  budgets              Budget[]
+  transactionRules     TransactionRule[]
+  goals                Goal[]
+  transactionOrders    TransactionOrder[]
+  simulations          Simulation[]
+  manualAssets         ManualAsset[]
+  documents            Document[]
+  connectionAttempts   ConnectionAttempt[]
+  subscriptions        Subscription[]
+  incomeEvents         IncomeEvent[]
+  savedReports         SavedReport[]
+  generatedReports     GeneratedReport[]
+  cashflowForecasts    CashflowForecast[]
+  tags                 Tag[]
+  operatorBinding      SpaceOperatorBinding?
+  journalSourceEntries OwnerCapitalJournal[] @relation("JournalSourceSpace")
+  journalTargetEntries OwnerCapitalJournal[] @relation("JournalTargetSpace")
 
   @@index([householdId])
   @@index([deletedAt])
@@ -648,6 +692,7 @@ model Account {
   currency             Currency
   balance              Decimal          @default(0) @db.Decimal(19, 4)
   ownership            AccountOwnership @default(individual)
+  capitalPurpose       CapitalPurpose   @default(personal_life) @map("capital_purpose")
   ownerId              String?          @map("owner_id") // UserID for individual accounts
   encryptedCredentials Json?            @map("encrypted_credentials")
   metadata             Json?
@@ -684,6 +729,7 @@ model Account {
   @@unique([spaceId, provider, providerAccountId])
   @@index([spaceId])
   @@index([spaceId, ownership])
+  @@index([spaceId, capitalPurpose])
   @@index([spaceId, ownerId])
   @@index([spaceId, lastSyncedAt(sort: Desc)])
   @@index([spaceId, deletedAt])
@@ -727,11 +773,13 @@ model Transaction {
   deletedAt             DateTime? @map("deleted_at")
 
   // Relations
-  account   Account               @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  category  Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  recurring RecurringTransaction? @relation(fields: [recurringId], references: [id], onDelete: SetNull)
-  splits    TransactionSplit[]
-  tags      TransactionTag[]
+  account              Account               @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category             Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  recurring            RecurringTransaction? @relation(fields: [recurringId], references: [id], onDelete: SetNull)
+  splits               TransactionSplit[]
+  tags                 TransactionTag[]
+  journalSourceEntries OwnerCapitalJournal[] @relation("JournalSourceTransaction")
+  journalTargetEntries OwnerCapitalJournal[] @relation("JournalTargetTransaction")
 
   @@unique([accountId, providerTransactionId])
   @@index([accountId, date(sort: Desc)])
@@ -1570,21 +1618,27 @@ model Simulation {
 }
 
 model Household {
-  id           String        @id @default(uuid())
-  name         String
-  type         HouseholdType @default(family)
-  baseCurrency Currency      @default(USD)
-  description  String?
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id                    String        @id @default(uuid())
+  name                  String
+  type                  HouseholdType @default(family)
+  baseCurrency          Currency      @default(USD)
+  description           String?
+  beneficialOwnerUserId String?       @map("beneficial_owner_user_id")
+  metadata              Json?
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
 
   // Relations
-  members HouseholdMember[]
-  spaces  Space[]
-  goals   Goal[]
-  wills   Will[]
+  beneficialOwner      User?                 @relation("BeneficialOwner", fields: [beneficialOwnerUserId], references: [id], onDelete: SetNull)
+  members              HouseholdMember[]
+  spaces               Space[]
+  goals                Goal[]
+  wills                Will[]
+  ownerCapitalJournals OwnerCapitalJournal[]
 
   @@index([createdAt])
+  @@index([beneficialOwnerUserId])
+  @@index([type])
   @@map("households")
 }
 
@@ -2690,8 +2744,94 @@ model ComplianceRecord {
   sealedAt        DateTime? @map("sealed_at")
   createdAt       DateTime  @default(now()) @map("created_at")
 
+  ownerCapitalJournals OwnerCapitalJournal[]
+
   @@index([spaceId])
   @@map("compliance_records")
+}
+
+/// Business space governance: operator identity vs beneficial owner.
+model SpaceOperatorBinding {
+  id                    String   @id @default(uuid())
+  spaceId               String   @unique @map("space_id")
+  operatorUserId        String   @map("operator_user_id")
+  beneficialOwnerUserId String   @map("beneficial_owner_user_id")
+  legalName             String   @map("legal_name")
+  taxId                 String   @map("tax_id")
+  ownershipPercent      Decimal  @default(100) @map("ownership_percent") @db.Decimal(5, 2)
+  metadata              Json?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  space           Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  operator        User  @relation("SpaceOperator", fields: [operatorUserId], references: [id], onDelete: Cascade)
+  beneficialOwner User  @relation("BeneficialOwnerBinding", fields: [beneficialOwnerUserId], references: [id], onDelete: Cascade)
+
+  @@index([operatorUserId])
+  @@index([beneficialOwnerUserId])
+  @@map("space_operator_bindings")
+}
+
+/// Cross-space owner capital flow (paired personal ↔ entity ledger entries).
+model OwnerCapitalJournal {
+  id                  String                    @id @default(uuid())
+  entityGroupId       String                    @map("entity_group_id")
+  flowType            OwnerCapitalFlowType      @map("flow_type")
+  status              OwnerCapitalJournalStatus @default(draft)
+  sourceSpaceId       String?                   @map("source_space_id")
+  targetSpaceId       String?                   @map("target_space_id")
+  sourceTransactionId String?                   @map("source_transaction_id")
+  targetTransactionId String?                   @map("target_transaction_id")
+  amount              Decimal                   @db.Decimal(19, 4)
+  currency            Currency
+  runningBalanceMinor BigInt?                   @map("running_balance_minor")
+  detectionConfidence Decimal?                  @map("detection_confidence") @db.Decimal(4, 3)
+  karafielCaseId      String?                   @map("karafiel_case_id")
+  complianceRecordId  String?                   @map("compliance_record_id")
+  createdByUserId     String?                   @map("created_by_user_id")
+  notes               String?
+  metadata            Json?
+  createdAt           DateTime                  @default(now()) @map("created_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+
+  entityGroup       Household               @relation(fields: [entityGroupId], references: [id], onDelete: Cascade)
+  sourceSpace       Space?                  @relation("JournalSourceSpace", fields: [sourceSpaceId], references: [id], onDelete: SetNull)
+  targetSpace       Space?                  @relation("JournalTargetSpace", fields: [targetSpaceId], references: [id], onDelete: SetNull)
+  sourceTransaction Transaction?            @relation("JournalSourceTransaction", fields: [sourceTransactionId], references: [id], onDelete: SetNull)
+  targetTransaction Transaction?            @relation("JournalTargetTransaction", fields: [targetTransactionId], references: [id], onDelete: SetNull)
+  complianceRecord  ComplianceRecord?       @relation(fields: [complianceRecordId], references: [id], onDelete: SetNull)
+  createdBy         User?                   @relation("JournalCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  bridgeEvents      ComplianceBridgeEvent[]
+
+  @@index([entityGroupId, status])
+  @@index([entityGroupId, flowType])
+  @@index([sourceTransactionId])
+  @@index([targetTransactionId])
+  @@index([karafielCaseId])
+  @@index([createdAt(sort: Desc)])
+  @@map("owner_capital_journals")
+}
+
+/// Audit log for Dhanam ↔ Karafiel capital-flow messages.
+model ComplianceBridgeEvent {
+  id            String                     @id @default(uuid())
+  journalId     String?                    @map("journal_id")
+  direction     ComplianceBridgeDirection
+  eventType     String                     @map("event_type")
+  correlationId String                     @map("correlation_id")
+  resolution    ComplianceBridgeResolution @default(auto)
+  payload       Json?
+  resolvedBy    String?                    @map("resolved_by")
+  resolvedAt    DateTime?                  @map("resolved_at")
+  createdAt     DateTime                   @default(now()) @map("created_at")
+
+  journal OwnerCapitalJournal? @relation(fields: [journalId], references: [id], onDelete: SetNull)
+
+  @@index([journalId])
+  @@index([correlationId])
+  @@index([eventType])
+  @@index([createdAt(sort: Desc)])
+  @@map("compliance_bridge_events")
 }
 
 enum PlatformConfigScope {

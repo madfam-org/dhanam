@@ -13,19 +13,20 @@ work, start at [docs/README.md](../README.md) and
 
 ## Finance features
 
-| Guide                                                        | Topic                    |
-| ------------------------------------------------------------ | ------------------------ |
-| [AI Categorization](AI_CATEGORIZATION_GUIDE.md)              | ML categorization        |
-| [Goal Tracking](GOAL_TRACKING_GUIDE.md)                      | Goals                    |
-| [Goal Rebalancing](goal-rebalancing-user-guide.md)           | Rebalancing UX           |
-| [Manual Assets](MANUAL_ASSETS.md)                            | Manual assets            |
-| [Zero-Based Allocation](ZERO_BASED_ALLOCATION.md)            | Budget allocation        |
-| [Household Features](HOUSEHOLD_FEATURES_GUIDE.md)            | Households               |
-| [Long-Term Projections](LONG_TERM_PROJECTIONS_GUIDE.md)      | Projections              |
-| [Monte Carlo](MONTE_CARLO_GUIDE.md)                          | Simulations              |
-| [DeFi/Web3](DEFI_WEB3_GUIDE.md)                              | DeFi portfolios          |
-| [Estate Planning](ESTATE_PLANNING_GUIDE.md)                  | Life Beat, wills         |
-| [Transaction Execution](transaction-execution-user-guide.md) | Transaction execution UX |
+| Guide                                                           | Topic                                             |
+| --------------------------------------------------------------- | ------------------------------------------------- |
+| [AI Categorization](AI_CATEGORIZATION_GUIDE.md)                 | ML categorization                                 |
+| [Goal Tracking](GOAL_TRACKING_GUIDE.md)                         | Goals                                             |
+| [Goal Rebalancing](goal-rebalancing-user-guide.md)              | Rebalancing UX                                    |
+| [Manual Assets](MANUAL_ASSETS.md)                               | Manual assets                                     |
+| [Zero-Based Allocation](ZERO_BASED_ALLOCATION.md)               | Budget allocation                                 |
+| [Household Features](HOUSEHOLD_FEATURES_GUIDE.md)               | Households                                        |
+| [Owner–Operator Capital Stack](OWNER_OPERATOR_CAPITAL_STACK.md) | Entity groups, owner facilities, Karafiel (RFC-6) |
+| [Long-Term Projections](LONG_TERM_PROJECTIONS_GUIDE.md)         | Projections                                       |
+| [Monte Carlo](MONTE_CARLO_GUIDE.md)                             | Simulations                                       |
+| [DeFi/Web3](DEFI_WEB3_GUIDE.md)                                 | DeFi portfolios                                   |
+| [Estate Planning](ESTATE_PLANNING_GUIDE.md)                     | Life Beat, wills                                  |
+| [Transaction Execution](transaction-execution-user-guide.md)    | Transaction execution UX                          |
 
 ## Providers and data
 

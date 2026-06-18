@@ -151,4 +151,38 @@ export class KarafielService {
       digest,
     };
   }
+
+  /**
+   * Register an owner capital journal flow with Karafiel (RFC-6).
+   * Full HTTP implementation lives in KarafielCapitalBridgeService; this
+   * method is the typed contract anchor for Karafiel integration tests.
+   */
+  async registerCapitalFlow(
+    payload: Record<string, unknown>
+  ): Promise<{ karafiel_case_id: string; status: string; review_required: boolean }> {
+    if (!this.isConfigured()) {
+      const correlation = String(payload.correlation_id ?? 'unknown');
+      return {
+        karafiel_case_id: `MOCK-CAP-${correlation.slice(0, 8)}`,
+        status: 'accepted',
+        review_required: true,
+      };
+    }
+
+    const response = await firstValueFrom(
+      this.http.post<{ karafiel_case_id: string; status: string; review_required: boolean }>(
+        `${this.baseUrl}/v1/compliance/capital-flow`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+            'X-Source': 'dhanam',
+          },
+          timeout: 15_000,
+        }
+      )
+    );
+    return response.data;
+  }
 }
