@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 
-import { HeroTabletSkeleton } from './hero-tablet-skeleton';
 import { HERO_TABLET_SCREEN_INSET_CLASSES } from './hero-tablet-layout';
+import { HeroTabletSkeleton } from './hero-tablet-skeleton';
 
 describe('HeroTabletSkeleton', () => {
   it('matches production screen inset classes before hydration', () => {
