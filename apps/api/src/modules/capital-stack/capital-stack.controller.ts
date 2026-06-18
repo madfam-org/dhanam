@@ -12,19 +12,18 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { CurrentUser, AuthenticatedUser } from '@core/auth/decorators/current-user.decorator';
-
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
 import { OwnerCapitalFlowType, OwnerCapitalJournalStatus } from '@db';
 
-import { EntityGroupService } from './entity-group.service';
-import { OwnerCapitalJournalService } from './owner-capital-journal.service';
-import { KarafielCapitalBridgeService } from './karafiel-capital-bridge.service';
 import {
   CreateJournalDto,
   MatchJournalDto,
   UpdateCapitalPurposeDto,
 } from './dto/capital-stack.dto';
+import { EntityGroupService } from './entity-group.service';
+import { KarafielCapitalBridgeService } from './karafiel-capital-bridge.service';
+import { OwnerCapitalJournalService } from './owner-capital-journal.service';
 
 @ApiTags('Capital Stack')
 @ApiBearerAuth()

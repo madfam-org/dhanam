@@ -36,7 +36,7 @@ export class CapitalFlowDetectorService {
 
   async evaluateTransaction(
     transactionId: string,
-    userId: string
+    _userId: string
   ): Promise<DetectionCandidate | null> {
     const transaction = await this.prisma.transaction.findUnique({
       where: { id: transactionId },

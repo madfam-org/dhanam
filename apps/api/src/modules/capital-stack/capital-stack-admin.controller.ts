@@ -11,13 +11,14 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
-import { AdminGuard } from '../admin/guards/admin.guard';
 import { CurrentUser, AuthenticatedUser } from '@core/auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from '@core/auth/guards/jwt-auth.guard';
+
+import { AdminGuard } from '../admin/guards/admin.guard';
 
 import { ComplianceBridgeEventService } from './compliance-bridge-event.service';
-import { OwnerCapitalJournalService } from './owner-capital-journal.service';
 import { ResolveJournalDto } from './dto/capital-stack.dto';
+import { OwnerCapitalJournalService } from './owner-capital-journal.service';
 
 @ApiTags('Admin Capital Stack')
 @ApiBearerAuth()

@@ -1,15 +1,15 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
 import { ComplianceBridgeDirection, OwnerCapitalJournalStatus, Prisma } from '@db';
 
+import { PrismaService } from '../../core/prisma/prisma.service';
 import { KarafielService, type ExtractedTransactionData } from '../integrations/karafiel.service';
 
 import { ComplianceBridgeEventService } from './compliance-bridge-event.service';
 import { OwnerCapitalJournalService } from './owner-capital-journal.service';
-import { PrismaService } from '../../core/prisma/prisma.service';
 
 export interface KarafielCapitalFlowPayload {
   correlation_id: string;
