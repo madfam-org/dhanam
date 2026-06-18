@@ -6,6 +6,10 @@ Operator runbook for the **Owner–Operator Capital Stack** (RFC-6): beneficial
 owner personal facilities funding a legal entity, with Karafiel compliance
 orchestration and manual intervention.
 
+**Production (2026-06-18):** Phase 1 API deployed; `FEATURE_CAPITAL_STACK_ENABLED=true`.
+DB bootstrap + account classification applied for Innovaciones MADFAM. Session handoff:
+[SESSION_WRAP_UP_2026-06-18.md](../SESSION_WRAP_UP_2026-06-18.md).
+
 **Canonical spec:** [RFC-6 Owner–Operator Capital Stack](../rfcs/owner-operator-capital-stack.md)
 
 **Karafiel contract:** [Karafiel Capital Flow API](../rfcs/karafiel-capital-flow-contract.md)
@@ -19,15 +23,15 @@ orchestration and manual intervention.
 
 ## Environment variables
 
-| Variable                         | Required      | Description                          |
-| -------------------------------- | ------------- | ------------------------------------ |
-| `BENEFICIAL_OWNER_EMAIL`         | Bootstrap     | Owner email from Vault               |
-| `OPERATOR_EMAIL`                 | Bootstrap     | Entity operator email from Vault     |
-| `MADFAM_BUSINESS_RFC`            | Bootstrap     | Business RFC from Vault              |
-| `FEATURE_CAPITAL_STACK_ENABLED`  | No            | API module gate (default `false`)    |
-| `FEATURE_CAPITAL_STACK_KARAFIEL` | No            | Karafiel auto-send (default `false`) |
-| `KARAFIEL_API_KEY`               | Karafiel path | Outbound compliance API              |
-| `DHANAM_WEBHOOK_SECRET`          | Karafiel path | Inbound HMAC verification            |
+| Variable                         | Required      | Description                                     |
+| -------------------------------- | ------------- | ----------------------------------------------- |
+| `BENEFICIAL_OWNER_EMAIL`         | Bootstrap     | Owner email from Vault                          |
+| `OPERATOR_EMAIL`                 | Bootstrap     | Entity operator email from Vault                |
+| `MADFAM_BUSINESS_RFC`            | Bootstrap     | Business RFC from Vault                         |
+| `FEATURE_CAPITAL_STACK_ENABLED`  | No            | API module gate — **prod: `true`** (2026-06-18) |
+| `FEATURE_CAPITAL_STACK_KARAFIEL` | No            | Karafiel auto-send (default `false`)            |
+| `KARAFIEL_API_KEY`               | Karafiel path | Outbound compliance API                         |
+| `DHANAM_WEBHOOK_SECRET`          | Karafiel path | Inbound HMAC verification                       |
 
 ## Phase 0 — Prod hygiene
 
@@ -92,6 +96,18 @@ Creates:
 - Links spaces to household
 
 Dry-run: add `--dry-run`.
+
+### Migration note (bootstrap before deploy)
+
+If Phase 1 SQL/bootstrap runs before the API image with `20260618000000_add_capital_stack`
+reaches production, `prisma migrate deploy` may fail with `type "CapitalPurpose" already exists`.
+Mark the migration applied (operator break-glass):
+
+```sql
+UPDATE _prisma_migrations
+SET finished_at = NOW(), logs = NULL
+WHERE migration_name = '20260618000000_add_capital_stack' AND finished_at IS NULL;
+```
 
 ## Karafiel tandem workflow
 

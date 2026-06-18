@@ -1,7 +1,7 @@
 # Dhanam Landing — Design System
 
-**Version:** 1.0  
-**Date:** 2026-06-15  
+**Version:** 1.1  
+**Date:** 2026-06-18  
 **Status:** Approved for landing remediation  
 **Scope:** Marketing surfaces at `dhan.am` only (does not replace the in-app Dhanam dashboard design system)
 
@@ -110,6 +110,37 @@ Apply via wrapper:
 | ----------------------- | ------------------------------------------------- |
 | Blue → purple multi-hue | Generic SaaS; violates repo aesthetic rules       |
 | Full-bleed rainbow      | Competes with data visualization in product shots |
+
+---
+
+## Background surfaces
+
+### Art Deco basketweave (2026-06-18)
+
+Reusable tiling pattern for marketing and future app shells. Implemented in
+`@dhanam/ui` (`BasketweaveSurface`, `patterns/basketweave.css`).
+
+| Token                   | Light (landing)     | Dark          |
+| ----------------------- | ------------------- | ------------- |
+| `--basketweave-rib-h`   | Teal `168 36% 34%`  | `168 20% 58%` |
+| `--basketweave-rib-v`   | Copper `32 52% 48%` | `36 40% 66%`  |
+| `--basketweave-opacity` | `0.065`             | `0.11`        |
+| `--basketweave-tile`    | `52px`              | `52px`        |
+
+**Usage (landing):**
+
+```tsx
+import { BasketweaveSurface } from '@dhanam/ui';
+
+<BasketweaveSurface variant="landing" drift className="absolute inset-0 -z-10" />;
+```
+
+- `variant="landing"` applies Regenerative Ledger teal/copper overrides on `.landing-basketweave`.
+- `drift` enables imperceptible parallax drift; disabled when `prefers-reduced-motion: reduce`.
+- Keep content on opaque/semi-opaque cards (`bg-card`, `backdrop-blur`) for contrast.
+
+**Adoption beyond landing:** wrap dashboard or auth shells with `BasketweaveSurface`
+and tune tokens per surface; do not copy landing opacity onto dense data UIs.
 
 ---
 

@@ -31,3 +31,6 @@ export * from './hooks/use-toast';
 
 // Utils
 export * from './lib/utils';
+
+// Surface patterns (cross-app backgrounds)
+export * from './patterns';
