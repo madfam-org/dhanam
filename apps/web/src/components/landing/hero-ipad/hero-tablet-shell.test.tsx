@@ -53,5 +53,6 @@ describe('HeroTabletShell', () => {
 
     expect(screen.getAllByTestId('hero-embed')).toHaveLength(1);
     expect(document.querySelector('[data-hero-tablet-shell]')).toBeTruthy();
+    expect(document.querySelector('[data-hero-tablet-screen]')).toHaveClass('lg:inset-x-[3.21%]');
   });
 });
