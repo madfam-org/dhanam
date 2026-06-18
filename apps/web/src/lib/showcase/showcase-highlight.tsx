@@ -15,7 +15,9 @@ export function ShowcaseHighlight({ target, durationMs = 2400 }: ShowcaseHighlig
       return undefined;
     }
 
-    const selector = `[data-showcase="${target}"], [data-tour="${target}"]`;
+    const selector = target.startsWith('nav-')
+      ? `[data-showcase-nav-item="${target.slice(4)}"]`
+      : `[data-showcase="${target}"], [data-tour="${target}"]`;
     const element = document.querySelector<HTMLElement>(selector);
     if (!element) {
       return undefined;

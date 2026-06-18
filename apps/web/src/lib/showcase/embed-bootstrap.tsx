@@ -10,6 +10,8 @@ import { setDemoModeCookie } from '~/lib/demo/session-cookies';
 import { useAuth } from '~/lib/hooks/use-auth';
 import { useSpaceStore } from '~/stores/space';
 
+import { useShowcaseLocaleSync } from './use-showcase-locale-sync';
+
 const VALID_PERSONAS: ShowcasePersona[] = ['maria', 'patricia'];
 
 function normalizePersona(value: string | null): ShowcasePersona {
@@ -52,10 +54,12 @@ export function EmbedBootstrap() {
   const queryClient = useQueryClient();
   const bootstrappedRef = useRef(false);
   const bootstrappingRef = useRef(false);
+  const showcase = searchParams.get('showcase') === '1';
+
+  useShowcaseLocaleSync(showcase);
 
   useEffect(() => {
     const persona = normalizePersona(searchParams.get('persona'));
-    const showcase = searchParams.get('showcase') === '1';
     if (!showcase) {
       return;
     }
@@ -84,7 +88,7 @@ export function EmbedBootstrap() {
         bootstrappingRef.current = false;
       }
     })();
-  }, [isAuthenticated, queryClient, searchParams, setAuth, user?.email]);
+  }, [isAuthenticated, queryClient, searchParams, setAuth, showcase, user?.email]);
 
   return null;
 }

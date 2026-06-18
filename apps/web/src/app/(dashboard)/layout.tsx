@@ -21,6 +21,7 @@ import { useSpaces } from '~/lib/hooks/use-spaces';
 import { EmbedBootstrap } from '~/lib/showcase/embed-bootstrap';
 import { useEmbedMode, useShowcaseEmbed } from '~/lib/showcase/embed-mode';
 import { ShowcaseProvider } from '~/lib/showcase/showcase-provider';
+import { ShowcaseTabletChrome } from '~/lib/showcase/showcase-tablet-chrome';
 
 /**
  * Loading skeleton shown during SSR and initial client hydration.
@@ -163,7 +164,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Suspense fallback={null}>
         <ShowcaseProvider>
           <div
-            className={`min-h-screen bg-background ${isEmbedMode ? 'embed-mode' : ''} ${isShowcaseEmbed ? 'embed-showcase h-full min-h-0' : ''}`}
+            className={`min-h-screen bg-background ${isEmbedMode ? 'embed-mode' : ''} ${isShowcaseEmbed ? 'embed-showcase flex h-full min-h-0 flex-col' : ''}`}
           >
             {!isEmbedMode && <SkipLink />}
             {!isEmbedMode && <DashboardHeader />}
@@ -171,7 +172,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {!isEmbedMode && <DemoModeBanner />}
             {!isEmbedMode && <DemoTour />}
             {!isEmbedMode && <KeyboardShortcuts />}
-            <div className="flex">
+            {isShowcaseEmbed ? <ShowcaseTabletChrome /> : null}
+            <div className={`flex ${isShowcaseEmbed ? 'min-h-0 flex-1' : ''}`}>
               {!isEmbedMode && (
                 <div className="hidden md:block">
                   <DashboardNav />
@@ -179,7 +181,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               )}
               <main
                 id="main-content"
-                className={`flex-1 ${isShowcaseEmbed ? 'overflow-hidden p-2' : isEmbedMode ? 'p-3 md:p-4' : 'p-6 pb-20 md:pb-6'}`}
+                className={`flex-1 ${isShowcaseEmbed ? 'showcase-tablet-main min-h-0 overflow-y-auto overflow-x-hidden p-2' : isEmbedMode ? 'p-3 md:p-4' : 'p-6 pb-20 md:pb-6'}`}
               >
                 <div className={isEmbedMode ? 'mx-auto max-w-full' : 'mx-auto max-w-7xl'}>
                   <PageTransition>{content}</PageTransition>

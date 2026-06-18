@@ -1,6 +1,10 @@
 # Landing hero tablet model
 
-## Bundled asset
+Production hero uses **ProceduralTabletMesh** (React Three Fiber) for the bezel; geometry
+constants live in `hero-tablet-layout.ts` (`TABLET_MESH`) and must stay aligned with the DOM
+screen inset (`HERO_TABLET_SCREEN_INSET_CLASSES`). See `docs/HERO_IPAD_SHOWCASE.md`.
+
+## Bundled GLB asset (legacy / optional)
 
 | File | `ipad-pro.glb` |
 | Size | ~5 KB |

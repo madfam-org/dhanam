@@ -3,10 +3,12 @@
 import {
   isAllowedShowcaseParentOrigin,
   isShowcaseMessage,
+  normalizeShowcaseLocale,
   SHOWCASE_MESSAGE_TYPE,
   type ShowcaseChildEvent,
   type ShowcaseParentCommand,
   type ShowcasePersona,
+  useLocale,
 } from '@dhanam/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
@@ -20,6 +22,7 @@ import { useSpaceStore } from '~/stores/space';
 
 import { ShowcaseGhostCursor } from './showcase-ghost-cursor';
 import { ShowcaseHighlight } from './showcase-highlight';
+import { persistShowcaseLocale, toAppLocale } from './showcase-locale';
 
 const VALID_PERSONAS: ShowcasePersona[] = ['maria', 'patricia'];
 
@@ -41,6 +44,7 @@ export function ShowcaseProvider({ children }: { children: React.ReactNode }) {
   const router = useDemoRouter();
   const searchParams = useSearchParams();
   const { setAuth } = useAuth();
+  const { setLocale } = useLocale();
   const queryClient = useQueryClient();
   const showcaseEnabled = searchParams.get('showcase') === '1';
   const [highlightTarget, setHighlightTarget] = useState<string | null>(null);
@@ -150,11 +154,17 @@ export function ShowcaseProvider({ children }: { children: React.ReactNode }) {
           }
           break;
         }
+        case 'set-locale': {
+          const landingLocale = normalizeShowcaseLocale(command.locale);
+          setLocale(toAppLocale(landingLocale));
+          persistShowcaseLocale(landingLocale);
+          break;
+        }
         default:
           break;
       }
     },
-    [emitReady, paused, queryClient, router, setAuth]
+    [emitReady, paused, queryClient, router, setAuth, setLocale]
   );
 
   useEffect(() => {

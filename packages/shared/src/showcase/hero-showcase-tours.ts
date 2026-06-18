@@ -90,3 +90,24 @@ export const HERO_SHOWCASE_TOURS = [MARIA_HERO_TOUR, PATRICIA_HERO_TOUR] as cons
 export function getHeroTourForPersona(persona: ShowcaseTour['persona']): ShowcaseTour {
   return persona === 'patricia' ? PATRICIA_HERO_TOUR : MARIA_HERO_TOUR;
 }
+
+/** Sidebar keys aligned with dashboard i18n `sidebar.*` — used by showcase tablet chrome. */
+export const MARIA_SHOWCASE_NAV = [
+  { key: 'dashboard', path: '/dashboard' },
+  { key: 'transactions', path: '/transactions' },
+  { key: 'budgets', path: '/budgets' },
+  { key: 'analytics', path: '/analytics' },
+  { key: 'goals', path: '/goals' },
+] as const;
+
+export const PATRICIA_SHOWCASE_NAV = [
+  { key: 'dashboard', path: '/dashboard' },
+  { key: 'assets', path: '/assets' },
+  { key: 'projections', path: '/projections' },
+  { key: 'scenarios', path: '/scenarios' },
+  { key: 'estatePlanning', path: '/estate-planning' },
+] as const;
+
+export function getShowcaseNavForPersona(persona: ShowcaseTour['persona']) {
+  return persona === 'patricia' ? PATRICIA_SHOWCASE_NAV : MARIA_SHOWCASE_NAV;
+}

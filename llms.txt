@@ -42,6 +42,7 @@ cutover; stay in dhanam for product/engineering work.
 - `docs/SESSION_WRAP_UP_2026-06-15.md` — latest session handoff (landing live, deploy ops, next picks).
 - `docs/LANDING_REMEDIATION.md` — Dhanam marketing landing (`dhan.am`) UX remediation program.
 - `docs/LANDING_DESIGN_SYSTEM.md` — landing typography, tokens, components (Dhanam product vs MADFAM company).
+- `docs/HERO_IPAD_SHOWCASE.md` — hero 3D tablet + live embed showcase (tour, insets, rate limits).
 - `ECOSYSTEM.md` — MADFAM ecosystem and Enclii deployment context when present.
 - `llms-full.txt` — full context map and durable operating contract.
 - `tools/agent-manifest.json` — machine-readable repo metadata.

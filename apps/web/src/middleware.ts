@@ -153,6 +153,14 @@ export function middleware(request: NextRequest) {
       maxAge: AUTH_CONSTANTS.DEMO_COOKIE_MAX_AGE_S,
       sameSite: 'lax',
     });
+    const embedLocale = request.nextUrl.searchParams.get('locale');
+    if (embedLocale && SUPPORTED_LOCALES.includes(embedLocale)) {
+      response.cookies.set('dhanam_locale', embedLocale, {
+        maxAge: AUTH_CONSTANTS.GEO_COOKIE_MAX_AGE_S,
+        path: '/',
+        sameSite: 'lax',
+      });
+    }
     return withPublicSurfaceHeaders(response, hostname, path);
   }
 

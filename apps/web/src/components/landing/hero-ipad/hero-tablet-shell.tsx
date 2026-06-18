@@ -6,7 +6,11 @@ import { useEffect, useState } from 'react';
 
 import { HeroEmbedFrame } from './hero-embed-frame';
 import { isHeroIpad3dEnabled } from './hero-ipad-config';
-import { HERO_TABLET_MAX_WIDTH_PX, HERO_TABLET_SCENE_HEIGHT } from './hero-tablet-layout';
+import {
+  HERO_TABLET_MAX_WIDTH_PX,
+  HERO_TABLET_SCENE_HEIGHT,
+  HERO_TABLET_SCREEN_INSET_CLASSES,
+} from './hero-tablet-layout';
 import { HeroTabletSkeleton } from './hero-tablet-skeleton';
 import { useHeroTabletMotion } from './use-hero-tablet-motion';
 
@@ -126,7 +130,7 @@ export function HeroTabletShell({ locale }: HeroTabletShellProps) {
           ) : null}
 
           <div
-            className="z-20 overflow-hidden max-lg:relative max-lg:h-full max-lg:w-full max-lg:rounded-[1.2rem] max-lg:border max-lg:border-white/5 max-lg:bg-black/40 max-lg:ring-1 max-lg:ring-white/10 lg:absolute lg:inset-x-[3.21%] lg:inset-y-[2.82%] lg:rounded-[0.85rem] lg:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+            className={`z-20 overflow-hidden max-lg:relative max-lg:h-full max-lg:w-full max-lg:rounded-[1.2rem] max-lg:border max-lg:border-white/5 max-lg:bg-black/40 max-lg:ring-1 max-lg:ring-white/10 lg:absolute ${HERO_TABLET_SCREEN_INSET_CLASSES} lg:rounded-[0.85rem] lg:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]`}
             data-hero-tablet-screen
           >
             <HeroEmbedFrame locale={locale} chromeless className="h-full w-full" />

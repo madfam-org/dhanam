@@ -93,6 +93,7 @@ Full guide index: [guides/README.md](guides/README.md).
 | ------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | [Landing Remediation Plan](LANDING_REMEDIATION.md)                  | **Canonical program** — competitive analysis, phases, tickets, tests, Dhanam vs MADFAM |
 | [Landing Design System](LANDING_DESIGN_SYSTEM.md)                   | Typography, color tokens, motion, component specs for the Dhanam marketing site        |
+| [Hero Tablet Showcase](HERO_IPAD_SHOWCASE.md)                       | 3D hero tablet + live embed demo (tour, screen insets, rate limits, test matrix)       |
 | [Competitive Benchmarks](market-research/competitive-benchmarks.md) | Pricing and feature matrix (complements landing UX plan)                               |
 
 | Document                                                                       | Use                                        |

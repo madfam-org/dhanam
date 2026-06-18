@@ -20,7 +20,7 @@ export { translations as i18n } from './translations-map';
 // Export React components and hooks
 export { I18nProvider, I18nContext, withI18n } from '../contexts/I18nContext';
 export type { I18nContextValue, I18nProviderProps } from '../contexts/I18nContext';
-export { useTranslation } from '../hooks/useTranslation';
+export { useTranslation, useLocale } from '../hooks/useTranslation';
 
 // Server-safe translation helpers (RSC, metadata, OG routes)
 export { getTranslation, getNamespaceTranslation, getLandingTranslation } from './get-translation';

@@ -29,3 +29,9 @@ export const HERO_EMBED_VIEWPORT = {
 
 /** Portrait tablet screen aspect ratio for CSS layout. */
 export const HERO_TABLET_SCREEN_ASPECT = `${HERO_EMBED_VIEWPORT.width} / ${HERO_EMBED_VIEWPORT.height}`;
+
+/**
+ * Tailwind inset utilities for lg:absolute screen layers.
+ * Must stay in sync with HERO_TABLET_SCREEN_INSET (TABLET_MESH geometry).
+ */
+export const HERO_TABLET_SCREEN_INSET_CLASSES = 'lg:inset-x-[3.21%] lg:inset-y-[2.82%]' as const;

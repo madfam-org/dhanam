@@ -2,7 +2,7 @@
 
 import type { LandingLocale } from '@dhanam/shared';
 
-import { HERO_TABLET_SCENE_HEIGHT } from './hero-tablet-layout';
+import { HERO_TABLET_SCENE_HEIGHT, HERO_TABLET_SCREEN_INSET_CLASSES } from './hero-tablet-layout';
 
 interface HeroTabletSkeletonProps {
   locale: LandingLocale;
@@ -17,7 +17,9 @@ export function HeroTabletSkeleton({ locale: _locale }: HeroTabletSkeletonProps)
       style={{ ['--hero-tablet-height' as string]: HERO_TABLET_SCENE_HEIGHT }}
       aria-hidden
     >
-      <div className="relative h-full w-full max-lg:aspect-[3/4] lg:absolute lg:inset-[9.5%_10.5%_13.5%_10.5%]">
+      <div
+        className={`relative h-full w-full max-lg:aspect-[820/1100] lg:absolute ${HERO_TABLET_SCREEN_INSET_CLASSES}`}
+      >
         <div className="h-full w-full animate-pulse rounded-[1.2rem] bg-muted/50 lg:rounded-[0.85rem]" />
       </div>
     </div>

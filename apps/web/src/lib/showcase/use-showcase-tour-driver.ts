@@ -3,6 +3,7 @@
 import type { ShowcasePersona } from '@dhanam/shared';
 import {
   getHeroTourForPersona,
+  getShowcaseNavForPersona,
   isShowcaseMessage,
   SHOWCASE_LOOP_BREAK_MS,
   SHOWCASE_MESSAGE_TYPE,
@@ -91,6 +92,14 @@ export function useShowcaseTourDriver({
         postCommand('navigate', { path: step.path });
         await sleep(SHOWCASE_STEP_GAP_MS + 500);
 
+        const navKey = getShowcaseNavForPersona(persona).find(
+          (item) => item.path === step.path
+        )?.key;
+        if (navKey) {
+          postCommand('highlight', { target: `nav-${navKey}`, durationMs: 900 });
+          await sleep(350);
+        }
+
         if (step.scrollY !== undefined) {
           postCommand('scroll', { y: step.scrollY, behavior: 'smooth' });
           await sleep(400);
@@ -154,6 +163,7 @@ export function useShowcaseTourDriver({
         if (event.data.persona) {
           personaRef.current = event.data.persona as ShowcasePersona;
         }
+        postCommand('set-locale', { locale });
         analytics.track('showcase_iframe_ready', {
           persona: event.data.persona ?? personaRef.current,
           locale,
