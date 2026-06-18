@@ -339,14 +339,14 @@ Implementation files: `landing-page-client.tsx`, `landing-nav.tsx`, `landing-her
 
 **Objective:** Match Monarch/Rocket Money visual impact in first viewport.
 
-| Ticket | Work                                                           | Primary files                                                           |
-| ------ | -------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **B1** | `LandingNav` — sticky, blur, anchor links, mobile drawer       | `landing-nav.tsx` — **partial** (nav extracted; sticky/blur in Phase B) |
-| **B2** | Hero copy — outcome-led, all locales                           | `landing.ts` `hero.*`                                                   |
-| **B3** | `HeroProductPreview` — dashboard mockup (PNG → animated cycle) | New + `public/landing/`                                                 |
-| **B4** | (Stretch) Embedded mini-demo iframe `app.dhan.am/demo?embed=1` | Demo app + hero                                                         |
-| **B5** | `LandingTrustStrip` — trial, encryption, read-only             | New component                                                           |
-| **B6** | Design token migration — remove blue-purple gradients          | `final-cta.tsx` ✅; hero actions use `primary`                          |
+| Ticket | Work                                                              | Primary files                                                           |
+| ------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **B1** | `LandingNav` — sticky, blur, anchor links, mobile drawer          | `landing-nav.tsx` — **partial** (nav extracted; sticky/blur in Phase B) |
+| **B2** | Hero copy — outcome-led, all locales                              | `landing.ts` `hero.*`                                                   |
+| **B3** | `HeroProductPreview` — dashboard mockup (PNG → animated cycle)    | New + `public/landing/`                                                 |
+| **B4** | Embedded live-demo iframe (`app.dhan.am/embed/demo/*?showcase=1`) | ✅ — see [HERO_IPAD_SHOWCASE.md](./HERO_IPAD_SHOWCASE.md)               |
+| **B5** | `LandingTrustStrip` — trial, encryption, read-only                | New component                                                           |
+| **B6** | Design token migration — remove blue-purple gradients             | `final-cta.tsx` ✅; hero actions use `primary`                          |
 
 **Copy direction (English examples — translate in ES/PT)**
 
@@ -526,14 +526,14 @@ See [guides/POSTHOG_INTEGRATION.md](guides/POSTHOG_INTEGRATION.md).
 
 ## 14. Risk register
 
-| Risk                            | Mitigation                                                                 |
-| ------------------------------- | -------------------------------------------------------------------------- |
-| SSR + Janua provider complexity | Landing shell avoids auth-dependent render; auth redirect in client island |
-| Cross-origin demo embed (B4)    | Ship static mockup first                                                   |
-| Screenshot drift vs product     | Regenerate from demo personas or CI snapshot job                           |
-| Pricing API failure             | Keep static MXN fallback in `pricing.tsx`                                  |
-| Scope creep (comparison pages)  | F4 optional after core landing                                             |
-| E2E demo flow mismatch          | Fix in PR-1; document cross-origin behavior                                |
+| Risk                            | Mitigation                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------------- |
+| SSR + Janua provider complexity | Landing shell avoids auth-dependent render; auth redirect in client island      |
+| Cross-origin demo embed (B4)    | Shipped — [HERO_IPAD_SHOWCASE.md](./HERO_IPAD_SHOWCASE.md) (hero tablet + tour) |
+| Screenshot drift vs product     | Regenerate from demo personas or CI snapshot job                                |
+| Pricing API failure             | Keep static MXN fallback in `pricing.tsx`                                       |
+| Scope creep (comparison pages)  | F4 optional after core landing                                                  |
+| E2E demo flow mismatch          | Fix in PR-1; document cross-origin behavior                                     |
 
 ---
 

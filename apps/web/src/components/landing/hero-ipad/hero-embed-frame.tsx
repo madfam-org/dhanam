@@ -29,7 +29,7 @@ export function HeroEmbedFrame({
   const [failed, setFailed] = useState(false);
   const [paused, setPaused] = useState(false);
   const [iframeReady, setIframeReady] = useState(false);
-  const src = buildEmbedDemoUrl(appUrl, { persona, path: '/dashboard' });
+  const src = buildEmbedDemoUrl(appUrl, { persona, path: '/dashboard', locale });
 
   const { pause, resume } = useShowcaseTourDriver({
     iframeRef,

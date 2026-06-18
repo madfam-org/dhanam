@@ -1,5 +1,6 @@
 'use client';
 
+import type { Locale } from '@dhanam/shared';
 import { I18nProvider } from '@dhanam/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect, useCallback, useRef, type ComponentType } from 'react';
@@ -243,7 +244,13 @@ function SSRSafeJanuaProvider({ children }: { children: React.ReactNode }) {
   return <Wrapper>{children}</Wrapper>;
 }
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -258,7 +265,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nProvider>
+      <I18nProvider defaultLocale={initialLocale}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

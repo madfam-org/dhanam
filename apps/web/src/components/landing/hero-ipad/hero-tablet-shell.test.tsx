@@ -53,6 +53,10 @@ describe('HeroTabletShell', () => {
 
     expect(screen.getAllByTestId('hero-embed')).toHaveLength(1);
     expect(document.querySelector('[data-hero-tablet-shell]')).toBeTruthy();
-    expect(document.querySelector('[data-hero-tablet-screen]')).toHaveClass('lg:inset-x-[3.21%]');
+    const screenSlot = document.querySelector('[data-hero-tablet-screen]');
+    expect(screenSlot).toHaveClass('lg:inset-x-[3.21%]');
+    expect(screenSlot).toHaveClass('lg:inset-y-[2.82%]');
+    expect(screenSlot).not.toHaveClass('lg:h-full');
+    expect(screenSlot).not.toHaveClass('lg:w-full');
   });
 });

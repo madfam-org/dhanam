@@ -34,6 +34,11 @@ jest.mock('~/lib/posthog', () => ({
   optOutPostHog: () => mockOptOut(),
 }));
 
+const mockUseShowcaseEmbed = jest.fn(() => false);
+jest.mock('~/lib/showcase/embed-mode', () => ({
+  useShowcaseEmbed: () => mockUseShowcaseEmbed(),
+}));
+
 function clearCookies() {
   document.cookie.split(';').forEach((c) => {
     document.cookie = c
@@ -47,6 +52,7 @@ describe('CookieConsentBanner', () => {
     clearCookies();
     mockOptIn.mockClear();
     mockOptOut.mockClear();
+    mockUseShowcaseEmbed.mockReturnValue(false);
   });
 
   it('should render when no consent cookie exists', () => {
@@ -94,5 +100,11 @@ describe('CookieConsentBanner', () => {
     render(<CookieConsentBanner />);
     const link = screen.getByText('Learn more');
     expect(link.closest('a')).toHaveAttribute('href', '/cookies');
+  });
+
+  it('should not render inside showcase embed routes', () => {
+    mockUseShowcaseEmbed.mockReturnValue(true);
+    render(<CookieConsentBanner />);
+    expect(screen.queryByText(/We use cookies/)).not.toBeInTheDocument();
   });
 });

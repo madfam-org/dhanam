@@ -2,6 +2,8 @@
  * Cross-origin showcase protocol between dhan.am (parent) and app.dhan.am/embed (child).
  */
 
+import { normalizeLandingLocale, type LandingLocale } from '../i18n/translations-map';
+
 export const SHOWCASE_MESSAGE_TYPE = 'dhanam:showcase' as const;
 
 /** Sent by embed iframe API calls so auth throttles can skip trusted showcase traffic. */
@@ -31,7 +33,8 @@ export type ShowcaseParentCommand =
       durationMs: number;
     }
   | { type: typeof SHOWCASE_MESSAGE_TYPE; action: 'pause' | 'resume' | 'restart' }
-  | { type: typeof SHOWCASE_MESSAGE_TYPE; action: 'switch-persona'; persona: ShowcasePersona };
+  | { type: typeof SHOWCASE_MESSAGE_TYPE; action: 'switch-persona'; persona: ShowcasePersona }
+  | { type: typeof SHOWCASE_MESSAGE_TYPE; action: 'set-locale'; locale: LandingLocale };
 
 export type ShowcaseChildEvent =
   | { type: typeof SHOWCASE_MESSAGE_TYPE; event: 'ready'; path: string; persona?: string }
@@ -92,9 +95,21 @@ export function isShowcaseMessage(
   return (value as { type?: string }).type === SHOWCASE_MESSAGE_TYPE;
 }
 
+export function normalizeShowcaseLocale(raw: string | null | undefined): LandingLocale {
+  if (!raw) {
+    return 'es';
+  }
+  return normalizeLandingLocale(raw);
+}
+
 export function buildEmbedDemoUrl(
   appUrl: string,
-  options: { persona: ShowcasePersona; path?: string; showcase?: boolean }
+  options: {
+    persona: ShowcasePersona;
+    path?: string;
+    showcase?: boolean;
+    locale?: LandingLocale;
+  }
 ): string {
   const base = appUrl.replace(/\/$/, '');
   const path = options.path ?? '/dashboard';
@@ -102,6 +117,7 @@ export function buildEmbedDemoUrl(
   const params = new URLSearchParams({
     persona: options.persona,
     ...(options.showcase === false ? {} : { showcase: '1' }),
+    ...(options.locale ? { locale: options.locale } : {}),
   });
   return `${base}/embed/demo${normalizedPath}?${params.toString()}`;
 }

@@ -1,3 +1,4 @@
+import type { Locale } from '@dhanam/shared';
 import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
 import { Toaster } from 'sonner';
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
-  const locale = cookieStore.get('dhanam_locale')?.value || 'es';
+  const locale = (cookieStore.get('dhanam_locale')?.value || 'es') as Locale;
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -86,7 +87,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers initialLocale={locale}>{children}</Providers>
         <Toaster theme="system" position="top-right" richColors />
         {/*
           Ecosystem banner mounts at the very bottom of <body>, OUTSIDE the

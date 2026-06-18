@@ -3,6 +3,8 @@ import {
   isAllowedShowcaseParentOrigin,
   isShowcaseMessage,
   SHOWCASE_MESSAGE_TYPE,
+  SHOWCASE_REQUEST_HEADER,
+  SHOWCASE_REQUEST_HEADER_VALUE,
 } from './protocol';
 
 describe('showcase protocol', () => {
@@ -50,10 +52,23 @@ describe('showcase protocol', () => {
       );
     });
 
+    it('includes locale when provided', () => {
+      expect(buildEmbedDemoUrl('https://app.dhan.am', { persona: 'maria', locale: 'es' })).toBe(
+        'https://app.dhan.am/embed/demo/dashboard?persona=maria&showcase=1&locale=es'
+      );
+    });
+
     it('supports custom paths', () => {
       expect(
         buildEmbedDemoUrl('https://app.dhan.am', { persona: 'patricia', path: '/assets' })
       ).toBe('https://app.dhan.am/embed/demo/assets?persona=patricia&showcase=1');
+    });
+  });
+
+  describe('showcase request header', () => {
+    it('exports stable header name and value for API throttle bypass', () => {
+      expect(SHOWCASE_REQUEST_HEADER).toBe('x-dhanam-showcase');
+      expect(SHOWCASE_REQUEST_HEADER_VALUE).toBe('1');
     });
   });
 });
