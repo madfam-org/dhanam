@@ -2,8 +2,10 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle2, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 import { billingApi, type CheckoutRouteRecommendation } from '~/lib/api/billing';
+import { useShowcaseEmbed } from '~/lib/showcase/embed-mode';
 
 function formatMinor(amountMinor: number, currency: string): string {
   try {
@@ -26,6 +28,7 @@ export function CheckoutPaymentRecommendations({
   selectable = false,
   selectedPaymentMethod,
   onSelectPaymentMethod,
+  deferUntilVisible = false,
 }: {
   countryCode?: string;
   plan?: string;
@@ -35,7 +38,37 @@ export function CheckoutPaymentRecommendations({
   selectable?: boolean;
   selectedPaymentMethod?: string;
   onSelectPaymentMethod?: (paymentMethod: string) => void;
+  /** Delay the API call until the block scrolls near the viewport (landing pages). */
+  deferUntilVisible?: boolean;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(!deferUntilVisible);
+  const isShowcaseEmbed = useShowcaseEmbed();
+
+  useEffect(() => {
+    if (!deferUntilVisible || visible) {
+      return undefined;
+    }
+
+    const element = containerRef.current;
+    if (!element) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '240px', threshold: 0.01 }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [deferUntilVisible, visible]);
+
   const { data, isLoading } = useQuery({
     queryKey: ['checkout-route-recommendation', countryCode, plan, amountMinor, currency],
     queryFn: () =>
@@ -45,12 +78,16 @@ export function CheckoutPaymentRecommendations({
         amountMinor,
         currency,
       }),
-    enabled: Boolean(countryCode),
+    enabled: Boolean(countryCode) && visible && !isShowcaseEmbed,
     staleTime: 60_000,
   });
 
-  if (!countryCode || isLoading || !data?.feeOptimization) {
+  if (!countryCode || isShowcaseEmbed) {
     return null;
+  }
+
+  if (!visible || isLoading || !data?.feeOptimization) {
+    return <div ref={containerRef} className="min-h-px" aria-hidden />;
   }
 
   const { feeOptimization } = data;
@@ -157,7 +194,7 @@ export function CheckoutPaymentRecommendations({
     ) : null;
 
   return (
-    <div className={containerClass}>
+    <div ref={containerRef} className={containerClass}>
       {summary}
       {instrumentList}
     </div>
