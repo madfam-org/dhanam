@@ -253,6 +253,7 @@ export function Pricing({ onSignUpClick }: PricingProps) {
             amountMinor={recommendationAmountMinor}
             currency={recommendedTier?.currency ?? pricing?.currency ?? 'MXN'}
             variant="compact"
+            deferUntilVisible
           />
         </div>
 

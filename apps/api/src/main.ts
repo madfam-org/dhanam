@@ -17,6 +17,8 @@ import { LoggingInterceptor } from '@core/interceptors/logging.interceptor';
 import { RequestIdMiddleware } from '@core/middleware/request-id.middleware';
 import { HealthService } from '@core/monitoring/health.service';
 import { SentryService } from '@core/monitoring/sentry.service';
+import { resolveClientIp } from '@core/security/client-ip.util';
+import { isShowcaseRateLimitBypass } from '@core/security/showcase-request.util';
 import { QueueService } from '@modules/jobs/queue.service';
 
 import { AppModule } from './app.module';
@@ -38,6 +40,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter({
       logger: true,
+      trustProxy: process.env.TRUST_PROXY !== 'false',
     })
   );
 
@@ -91,6 +94,7 @@ async function bootstrap() {
       ? corsOrigins.split(',')
       : ['http://localhost:3000', 'http://localhost:3040', 'http://localhost:19006'],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID', 'X-Dhanam-Showcase'],
   });
 
   // Compression
@@ -109,23 +113,30 @@ async function bootstrap() {
   // Rate limiting. E2E runs boot the production entrypoint with NODE_ENV=test
   // and need deterministic auth/bootstrap calls without global IP throttling.
   if (configService.get('NODE_ENV') !== 'test') {
+    const healthPaths = [
+      '/v1/monitoring/health',
+      '/v1/monitoring/health/live',
+      '/v1/monitoring/health/ready',
+      '/v1/monitoring/ready',
+      '/metrics',
+      '/health',
+      '/health/full',
+      '/ready',
+    ];
+
     await app.register(fastifyRateLimit as any, {
       max: configService.get('RATE_LIMIT_MAX')
         ? parseInt(configService.get('RATE_LIMIT_MAX')!)
-        : 100,
+        : 300,
       timeWindow: (configService.get('RATE_LIMIT_WINDOW') as string) || '15 minutes',
-      allowList: (req) => {
+      keyGenerator: (req: { ip?: string; headers?: Record<string, unknown> }) =>
+        resolveClientIp(req),
+      allowList: (req: { url?: string; headers?: Record<string, unknown> }) => {
         const path = req.url?.split('?')[0] || '';
-        return [
-          '/v1/monitoring/health',
-          '/v1/monitoring/health/live',
-          '/v1/monitoring/health/ready',
-          '/v1/monitoring/ready',
-          '/metrics',
-          '/health',
-          '/health/full',
-          '/ready',
-        ].includes(path);
+        if (healthPaths.includes(path)) {
+          return true;
+        }
+        return isShowcaseRateLimitBypass(req);
       },
     });
   }

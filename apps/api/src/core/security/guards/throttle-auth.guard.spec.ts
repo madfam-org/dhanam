@@ -23,7 +23,7 @@ describe('ThrottleAuthGuard', () => {
       const skip = await guard['shouldSkip'](
         mockContext({
           [SHOWCASE_REQUEST_HEADER]: SHOWCASE_REQUEST_HEADER_VALUE,
-          referer: 'https://dhan.am/es',
+          origin: 'https://dhan.am',
         })
       );
       expect(skip).toBe(true);
@@ -39,6 +39,15 @@ describe('ThrottleAuthGuard', () => {
       expect(skip).toBe(true);
     });
 
+    it('skips throttling when showcase header is present without referer', async () => {
+      const skip = await guard['shouldSkip'](
+        mockContext({
+          [SHOWCASE_REQUEST_HEADER]: SHOWCASE_REQUEST_HEADER_VALUE,
+        })
+      );
+      expect(skip).toBe(true);
+    });
+
     it('does not skip without showcase header', async () => {
       const skip = await guard['shouldSkip'](
         mockContext({
@@ -48,14 +57,24 @@ describe('ThrottleAuthGuard', () => {
       expect(skip).toBe(false);
     });
 
-    it('does not skip showcase header from untrusted referer', async () => {
+    it('does not skip showcase header from untrusted origin', async () => {
       const skip = await guard['shouldSkip'](
         mockContext({
           [SHOWCASE_REQUEST_HEADER]: SHOWCASE_REQUEST_HEADER_VALUE,
-          referer: 'https://evil.example/login',
+          origin: 'https://evil.example/login',
         })
       );
       expect(skip).toBe(false);
+    });
+  });
+
+  describe('getTracker', () => {
+    it('uses cf-connecting-ip for per-visitor tracking', async () => {
+      const tracker = await guard['getTracker']({
+        ip: '10.0.0.1',
+        headers: { 'cf-connecting-ip': '203.0.113.44' },
+      });
+      expect(tracker).toBe('203.0.113.44');
     });
   });
 });
