@@ -5,6 +5,7 @@ import { Button } from '@dhanam/ui';
 import { useEffect, useState } from 'react';
 
 import { optInPostHog, optOutPostHog } from '~/lib/posthog';
+import { useShowcaseEmbed } from '~/lib/showcase/embed-mode';
 
 function getCookie(name: string): string | undefined {
   if (typeof document === 'undefined') return undefined;
@@ -20,13 +21,17 @@ function setCookie(name: string, value: string, days: number): void {
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
   const { t } = useTranslation('common');
+  const isShowcaseEmbed = useShowcaseEmbed();
 
   useEffect(() => {
+    if (isShowcaseEmbed) {
+      return;
+    }
     const consent = getCookie('dhanam_consent');
     if (!consent) {
       setVisible(true);
     }
-  }, []);
+  }, [isShowcaseEmbed]);
 
   const handleAccept = () => {
     setCookie('dhanam_consent', 'accepted', 365);
@@ -40,7 +45,7 @@ export function CookieConsentBanner() {
     setVisible(false);
   };
 
-  if (!visible) return null;
+  if (!visible || isShowcaseEmbed) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9999] border-t bg-background p-4 shadow-lg">

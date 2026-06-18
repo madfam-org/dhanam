@@ -97,7 +97,11 @@ export function HeroTabletShell({ locale }: HeroTabletShellProps) {
         onPointerLeave={onPointerLeave}
       >
         <div
-          className="relative h-full w-full max-lg:aspect-[820/1100] lg:h-full"
+          className={
+            show3dBezel
+              ? 'relative h-full w-full max-lg:aspect-[820/1100] lg:absolute lg:inset-0'
+              : 'relative h-full w-full max-lg:aspect-[820/1100]'
+          }
           style={{
             transform: show3dBezel ? transform : undefined,
             transformStyle: show3dBezel ? 'preserve-3d' : undefined,
@@ -122,7 +126,7 @@ export function HeroTabletShell({ locale }: HeroTabletShellProps) {
           ) : null}
 
           <div
-            className="relative z-20 h-full w-full overflow-hidden max-lg:rounded-[1.2rem] max-lg:border max-lg:border-white/5 max-lg:bg-black/40 max-lg:ring-1 max-lg:ring-white/10 lg:absolute lg:top-[9.5%] lg:right-[10.5%] lg:bottom-[13.5%] lg:left-[10.5%] lg:rounded-[0.85rem] lg:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
+            className="z-20 overflow-hidden max-lg:relative max-lg:h-full max-lg:w-full max-lg:rounded-[1.2rem] max-lg:border max-lg:border-white/5 max-lg:bg-black/40 max-lg:ring-1 max-lg:ring-white/10 lg:absolute lg:inset-x-[3.21%] lg:inset-y-[2.82%] lg:rounded-[0.85rem] lg:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]"
             data-hero-tablet-screen
           >
             <HeroEmbedFrame locale={locale} chromeless className="h-full w-full" />
