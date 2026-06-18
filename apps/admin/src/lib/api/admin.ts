@@ -456,6 +456,19 @@ export interface WebhookDlqResolveResult {
 }
 
 // API client
+export interface CapitalStackJournalEntry {
+  id: string;
+  entityGroupId: string;
+  flowType: string;
+  status: string;
+  amount: number;
+  currency: string;
+  notes?: string | null;
+  karafielCaseId?: string | null;
+  detectionConfidence?: number | null;
+  createdAt: string;
+}
+
 export const adminApi = {
   async searchUsers(params: UserSearchParams = {}): Promise<PaginatedResponse<UserDetails>> {
     const response = await apiClient.get<
@@ -680,5 +693,19 @@ export const adminApi = {
 
   async getProviderHealth(): Promise<{ providers: ProviderHealth[] }> {
     return apiClient.get<{ providers: ProviderHealth[] }>('/admin/providers/health');
+  },
+
+  async getCapitalStackReviewQueue(): Promise<CapitalStackJournalEntry[]> {
+    return apiClient.get<CapitalStackJournalEntry[]>('/admin/capital-stack/review-queue');
+  },
+
+  async resolveCapitalStackJournal(
+    journalId: string,
+    body: { resolution: 'sealed' | 'void'; karafielCaseId?: string; notes?: string }
+  ): Promise<CapitalStackJournalEntry> {
+    return apiClient.post<CapitalStackJournalEntry>(
+      `/admin/capital-stack/journal/${journalId}/resolve`,
+      body
+    );
   },
 };

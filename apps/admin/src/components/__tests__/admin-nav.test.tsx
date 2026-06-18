@@ -85,7 +85,7 @@ describe('AdminNav', () => {
     render(<AdminNav />);
 
     const allLinks = screen.getAllByRole('link').filter((link) => link.closest('nav'));
-    // 1 (Overview) + 4 (SRE) + 4 (Data) + 3 (Commerce) + 2 (Analytics) + 1 (Compliance) = 15
-    expect(allLinks).toHaveLength(15);
+    // 1 (Overview) + 4 (SRE) + 4 (Data) + 3 (Commerce) + 2 (Analytics) + 2 (Compliance) = 16
+    expect(allLinks).toHaveLength(16);
   });
 });

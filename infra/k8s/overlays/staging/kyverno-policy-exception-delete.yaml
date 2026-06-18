@@ -1,0 +1,5 @@
+apiVersion: kyverno.io/v2beta1
+kind: PolicyException
+metadata:
+  name: dhanam-gitops-rollout-signature
+$patch: delete

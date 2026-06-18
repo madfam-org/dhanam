@@ -6,10 +6,12 @@ import { PrismaModule } from '../../core/prisma/prisma.module';
 import { KarafielService } from '../integrations/karafiel.service';
 
 import { CapitalFlowDetectorService } from './capital-flow-detector.service';
+import { CapitalStackAccountsService } from './capital-stack-accounts.service';
 import {
   CapitalStackAdminController,
   ComplianceBridgeAdminController,
 } from './capital-stack-admin.controller';
+import { CapitalStackTransactionHookService } from './capital-stack-transaction-hook.service';
 import { CapitalStackController } from './capital-stack.controller';
 import { ComplianceBridgeEventService } from './compliance-bridge-event.service';
 import { EntityGroupService } from './entity-group.service';
@@ -31,6 +33,8 @@ import { OwnerCapitalJournalService } from './owner-capital-journal.service';
     ComplianceBridgeEventService,
     KarafielCapitalBridgeService,
     CapitalFlowDetectorService,
+    CapitalStackAccountsService,
+    CapitalStackTransactionHookService,
     KarafielService,
   ],
   exports: [
@@ -39,6 +43,8 @@ import { OwnerCapitalJournalService } from './owner-capital-journal.service';
     ComplianceBridgeEventService,
     KarafielCapitalBridgeService,
     CapitalFlowDetectorService,
+    CapitalStackAccountsService,
+    CapitalStackTransactionHookService,
   ],
 })
 export class CapitalStackModule {}

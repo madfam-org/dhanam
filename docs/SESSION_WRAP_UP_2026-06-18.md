@@ -52,11 +52,18 @@ Removed: `arantza.orquidea@gmail.com`. Retained: demo users + Tulana service acc
 
 ## Open blockers
 
-| Item                                        | Owner               | Notes                                                              |
-| ------------------------------------------- | ------------------- | ------------------------------------------------------------------ |
-| Janua account for `aldo@madfam.io`          | Platform / operator | Dhanam user exists; SSO login blocked until Janua provisioned      |
-| Karafiel `POST /v1/compliance/capital-flow` | Karafiel repo       | Companion RFC drafted; flip `FEATURE_CAPITAL_STACK_KARAFIEL` after |
-| Phase 2–5 (UI, detector, admin queue)       | Engineering         | See RFC-6 phased delivery table                                    |
+| Item                                        | Owner               | Notes                                                                                                  |
+| ------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------ |
+| Janua account for `aldo@madfam.io`          | Platform / operator | Dhanam user exists; SSO login blocked until Janua provisioned                                          |
+| Staging ArgoCD sync                         | Platform            | Kyverno GHCR DENIED — **fix staged** in `overlays/staging/kyverno-policy-exception.yaml` (push + sync) |
+| Karafiel `POST /v1/compliance/capital-flow` | Karafiel repo       | Companion RFC drafted; flip `FEATURE_CAPITAL_STACK_KARAFIEL` after                                     |
+| Phase 2–5 (UI, detector, admin queue)       | Engineering         | Phases 2–4 largely shipped; E2E + backfill job remain                                                  |
+
+## Production promotion (2026-06-18 evening)
+
+- **Promote run:** [#27745183656](https://github.com/madfam-org/dhanam/actions/runs/27745183656) — `f6e7cc69`
+- **ArgoCD:** `dhanam-services` Synced / Healthy
+- **Digests:** API `e56c6db4…`, Web `8b5dab91…`, Admin `9423f97a…`
 
 ---
 

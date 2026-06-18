@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Optional } from '@nestjs/common';
 
 import type { InputJsonValue } from '@db';
 import { Transaction, Prisma } from '@db';
 
 import { PrismaService } from '../../core/prisma/prisma.service';
+import { CapitalStackTransactionHookService } from '../capital-stack/capital-stack-transaction-hook.service';
 import { SpacesService } from '../spaces/spaces.service';
 
 import { CreateTransactionDto, UpdateTransactionDto, TransactionsFilterDto } from './dto';
@@ -12,7 +13,8 @@ import { CreateTransactionDto, UpdateTransactionDto, TransactionsFilterDto } fro
 export class TransactionsService {
   constructor(
     private prisma: PrismaService,
-    private spacesService: SpacesService
+    private spacesService: SpacesService,
+    @Optional() private capitalStackHook?: CapitalStackTransactionHookService
   ) {}
 
   async findAll(
@@ -169,6 +171,8 @@ export class TransactionsService {
         },
       },
     });
+
+    void this.capitalStackHook?.onTransactionCreated(transaction.id, userId);
 
     return transaction;
   }

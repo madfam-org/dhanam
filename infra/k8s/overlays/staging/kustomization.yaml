@@ -27,6 +27,7 @@ namespace: enclii-dhanam-staging
 resources:
   - ../../production
   - external-secrets-staging.yaml
+  - kyverno-policy-exception.yaml
 
 # Staging replicas: 1 everywhere. HPAs are pinned min=max=1 via patch — the
 # deployments ignore HPA when they're at max.
@@ -96,3 +97,9 @@ patches:
     target:
       kind: ExternalSecret
       name: dhanam-janua-secrets
+
+  # Production PolicyException targets namespace `dhanam`; replace with staging-scoped exception.
+  - path: kyverno-policy-exception-delete.yaml
+    target:
+      kind: PolicyException
+      name: dhanam-gitops-rollout-signature

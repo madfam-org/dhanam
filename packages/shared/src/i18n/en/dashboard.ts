@@ -12,6 +12,7 @@ export const dashboard = {
     help: 'Help',
     estatePlanning: 'Estate Planning',
     households: 'Households',
+    capitalStack: 'Capital Stack',
     projections: 'Projections',
     assets: 'Assets',
     goals: 'Goals',
