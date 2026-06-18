@@ -160,6 +160,15 @@ spec:
             - name: FEATURE_STRIPE_MXN_LIVE
               value: "true"
 
+            # Owner–operator capital stack (RFC-6). Karafiel auto-send stays off
+            # until KARAFIEL_API_KEY is mounted in dhanam-secrets.
+            - name: FEATURE_CAPITAL_STACK_ENABLED
+              value: "true"
+            - name: FEATURE_CAPITAL_STACK_KARAFIEL
+              value: "false"
+            - name: FEATURE_CAPITAL_STACK_DETECTOR
+              value: "false"
+
             # =================================================================
             # Billing - Conekta (LATAM card + SPEI direct gateway)
             # =================================================================

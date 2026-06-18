@@ -13,6 +13,7 @@ import { AdminModule } from '@modules/admin/admin.module';
 import { AnalyticsModule } from '@modules/analytics/analytics.module';
 import { BillingModule } from '@modules/billing/billing.module';
 import { BudgetsModule } from '@modules/budgets/budgets.module';
+import { CapitalStackModule } from '@modules/capital-stack/capital-stack.module';
 import { CategoriesModule } from '@modules/categories/categories.module';
 import { DocumentsModule } from '@modules/documents/documents.module';
 import { EmailModule } from '@modules/email/email.module';
@@ -107,6 +108,7 @@ function redisOptionsFromUrl(redisUrl?: string) {
     GoalsModule,
     KycModule,
     HouseholdsModule,
+    CapitalStackModule,
     EstatePlanningModule,
     SimulationsModule,
     TransactionExecutionModule,

@@ -26,6 +26,12 @@ export const MADFAM_IMPORT_ENV_MAP: Record<MadfamImportConfigKey, string> = {
   [MADFAM_IMPORT_CONFIG_KEYS.accountSuffixPersonal]: 'MADFAM_ACCOUNT_SUFFIX_PERSONAL',
 };
 
+export {
+  CAPITAL_STACK_CONFIG_KEYS,
+  CAPITAL_STACK_CONFIG_PREFIX,
+  DEFAULT_CAPITAL_STACK_THRESHOLDS,
+} from '../capital-stack/capital-stack.config';
+
 export function jsonConfigToString(value: unknown): string | null {
   if (value === null || value === undefined) return null;
   if (typeof value === 'string') return value.trim() || null;
