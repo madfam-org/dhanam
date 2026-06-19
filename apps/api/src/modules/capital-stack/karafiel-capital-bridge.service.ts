@@ -78,10 +78,27 @@ export class KarafielCapitalBridgeService {
             },
           },
         },
-        sourceTransaction: true,
-        targetTransaction: true,
+        sourceTransaction: {
+          include: { account: { select: { capitalPurpose: true, spaceId: true } } },
+        },
+        targetTransaction: {
+          include: { account: { select: { capitalPurpose: true, spaceId: true } } },
+        },
       },
     });
+
+    if (
+      journal.karafielCaseId &&
+      (journal.status === OwnerCapitalJournalStatus.compliance_pending ||
+        journal.status === OwnerCapitalJournalStatus.manual_review ||
+        journal.status === OwnerCapitalJournalStatus.compliance_sealed)
+    ) {
+      return {
+        karafiel_case_id: journal.karafielCaseId,
+        status: 'accepted',
+        review_required: journal.status === OwnerCapitalJournalStatus.manual_review,
+      };
+    }
 
     const businessSpace = journal.entityGroup.spaces.find((s) => s.type === 'business');
     const binding =
@@ -112,6 +129,12 @@ export class KarafielCapitalBridgeService {
         rfc: binding.taxId,
         operator_dhanam_user_id: binding.operatorUserId,
       },
+      source_transaction: journal.sourceTransaction
+        ? this.mapTransactionPayload(journal.sourceTransaction)
+        : undefined,
+      target_transaction: journal.targetTransaction
+        ? this.mapTransactionPayload(journal.targetTransaction)
+        : undefined,
       detection: journal.detectionConfidence
         ? {
             confidence: Number(journal.detectionConfidence),
@@ -195,6 +218,32 @@ export class KarafielCapitalBridgeService {
       description: data.description,
       cfdi_uuid: data.cfdiUuid,
       confidence: data.confidence,
+    };
+  }
+
+  private mapTransactionPayload(txn: {
+    id: string;
+    date: Date;
+    amount: { toString(): string };
+    currency: string;
+    description: string;
+    merchant: string | null;
+    metadata: unknown;
+    account: { capitalPurpose: string | null; spaceId: string };
+  }) {
+    const metadata = txn.metadata as Record<string, unknown> | null;
+    const amountMinor = Math.round(Number(txn.amount) * 100);
+
+    return {
+      dhanam_transaction_id: txn.id,
+      space_id: txn.account.spaceId,
+      date: txn.date.toISOString(),
+      amount_minor: amountMinor,
+      currency: txn.currency,
+      description: txn.description,
+      capital_purpose: txn.account.capitalPurpose,
+      merchant: txn.merchant ?? undefined,
+      metadata_rfc: typeof metadata?.rfc === 'string' ? metadata.rfc : undefined,
     };
   }
 }

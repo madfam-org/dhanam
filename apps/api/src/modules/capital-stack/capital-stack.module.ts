@@ -6,6 +6,7 @@ import { PrismaModule } from '../../core/prisma/prisma.module';
 import { KarafielService } from '../integrations/karafiel.service';
 
 import { CapitalFlowDetectorService } from './capital-flow-detector.service';
+import { CapitalFlowBackfillJob } from './jobs/capital-flow-backfill.job';
 import { CapitalStackAccountsService } from './capital-stack-accounts.service';
 import {
   CapitalStackAdminController,
@@ -35,6 +36,7 @@ import { OwnerCapitalJournalService } from './owner-capital-journal.service';
     CapitalFlowDetectorService,
     CapitalStackAccountsService,
     CapitalStackTransactionHookService,
+    CapitalFlowBackfillJob,
     KarafielService,
   ],
   exports: [
@@ -45,6 +47,7 @@ import { OwnerCapitalJournalService } from './owner-capital-journal.service';
     CapitalFlowDetectorService,
     CapitalStackAccountsService,
     CapitalStackTransactionHookService,
+    CapitalFlowBackfillJob,
   ],
 })
 export class CapitalStackModule {}

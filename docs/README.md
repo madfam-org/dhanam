@@ -27,29 +27,29 @@ live in `internal-devops` — paths listed in [Monetization Session](MONETIZATIO
 
 ## Start Here
 
-| Document                                                                       | Use                                                                                 |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| [Repository README](../README.md)                                              | Product overview, local quick start, common commands                                |
-| [Development Guide](DEVELOPMENT.md)                                            | Local setup, ports, env files, testing workflow                                     |
-| [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)                            | Full program: technical stability GA, commercial GA, consumer GA (phases 0–7)       |
-| [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md)        | G4: remove operator secrets from public git; CI leakage guard                       |
-| [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md)        | 100% G4 sanitization + 100% admin@madfam.io operator prod slice (6-sprint program)  |
-| [Roadmap](ROADMAP.md)                                                          | Stability priorities P0–P8 and milestones M1–M7                                     |
-| [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)                | Billing router and internal MADFAM POS completion plan                              |
-| [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                          | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                 |
-| [Tulana SKU and Catalog Handoff](TULANA_SKU_AND_CATALOG_HANDOFF_2026-05-29.md) | Tulana readiness, billing catalogue mirror, and Selva-approved price apply contract |
-| [Commercial Staging Credentials](COMMERCIAL_STAGING_CREDENTIALS.md)            | Vendor test-key checklist for staging commercial soak                               |
-| [Deployment Guide](DEPLOYMENT.md)                                              | Enclii-first deploy, staging, rollback, current rollout blockers                    |
-| [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)                    | Current truth about production, staging, DNS, health, and remaining stability gaps  |
-| [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)                | Concise final status from the latest production-stability push                      |
-| [Session Wrap-Up 2026-06-18](SESSION_WRAP_UP_2026-06-18.md)                    | **Latest handoff** — RFC-6 Capital Stack Phase 1 prod, operator slice bootstrap     |
-| [Session Wrap-Up 2026-06-15](SESSION_WRAP_UP_2026-06-15.md)                    | Landing Phases A–G live, ES copy, deploy gaps                                       |
-| [Tech Debt Register](TECH_DEBT.md)                                             | Current technical debt, active stability gaps, and historical debt archive          |
-| [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md)            | Latest corpus audit: coverage, interconnection, remediation backlog                 |
-| [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md)            | Prior audit (historical context)                                                    |
-| [API Reference](API.md)                                                        | REST API narrative overview                                                         |
-| [API index](api/README.md)                                                     | OpenAPI export, Swagger, specialized API docs                                       |
-| [Mobile Guide](MOBILE.md)                                                      | React Native and Expo app notes                                                     |
+| Document                                                                       | Use                                                                                              |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| [Repository README](../README.md)                                              | Product overview, local quick start, common commands                                             |
+| [Development Guide](DEVELOPMENT.md)                                            | Local setup, ports, env files, testing workflow                                                  |
+| [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)                            | Full program: technical stability GA, commercial GA, consumer GA (phases 0–7)                    |
+| [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md)        | G4: remove operator secrets from public git; CI leakage guard                                    |
+| [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md)        | 100% G4 sanitization + 100% admin@madfam.io operator prod slice (6-sprint program)               |
+| [Roadmap](ROADMAP.md)                                                          | Stability priorities P0–P8 and milestones M1–M7                                                  |
+| [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)                | Billing router and internal MADFAM POS completion plan                                           |
+| [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                          | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                              |
+| [Tulana SKU and Catalog Handoff](TULANA_SKU_AND_CATALOG_HANDOFF_2026-05-29.md) | Tulana readiness, billing catalogue mirror, and Selva-approved price apply contract              |
+| [Commercial Staging Credentials](COMMERCIAL_STAGING_CREDENTIALS.md)            | Vendor test-key checklist for staging commercial soak                                            |
+| [Deployment Guide](DEPLOYMENT.md)                                              | Enclii-first deploy, staging, rollback, current rollout blockers                                 |
+| [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)                    | Current truth about production, staging, DNS, health, and remaining stability gaps               |
+| [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)                | Concise final status from the latest production-stability push                                   |
+| [Session Wrap-Up 2026-06-18](SESSION_WRAP_UP_2026-06-18.md)                    | **Latest handoff** — RFC-6 Phases 0–5 shipped; operator-gated checklist (Janua, Karafiel, flags) |
+| [Session Wrap-Up 2026-06-15](SESSION_WRAP_UP_2026-06-15.md)                    | Landing Phases A–G live, ES copy, deploy gaps                                                    |
+| [Tech Debt Register](TECH_DEBT.md)                                             | Current technical debt, active stability gaps, and historical debt archive                       |
+| [Documentation Audit 2026-05-22](DOCUMENTATION_AUDIT_2026-05-22.md)            | Latest corpus audit: coverage, interconnection, remediation backlog                              |
+| [Documentation Audit 2026-05-19](DOCUMENTATION_AUDIT_2026-05-19.md)            | Prior audit (historical context)                                                                 |
+| [API Reference](API.md)                                                        | REST API narrative overview                                                                      |
+| [API index](api/README.md)                                                     | OpenAPI export, Swagger, specialized API docs                                                    |
+| [Mobile Guide](MOBILE.md)                                                      | React Native and Expo app notes                                                                  |
 
 ## Architecture And Operations
 

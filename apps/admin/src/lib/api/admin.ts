@@ -469,6 +469,17 @@ export interface CapitalStackJournalEntry {
   createdAt: string;
 }
 
+export interface ComplianceBridgeEventEntry {
+  id: string;
+  journalId?: string | null;
+  direction: string;
+  eventType: string;
+  correlationId: string;
+  resolution?: string | null;
+  resolvedBy?: string | null;
+  createdAt: string;
+}
+
 export const adminApi = {
   async searchUsers(params: UserSearchParams = {}): Promise<PaginatedResponse<UserDetails>> {
     const response = await apiClient.get<
@@ -706,6 +717,16 @@ export const adminApi = {
     return apiClient.post<CapitalStackJournalEntry>(
       `/admin/capital-stack/journal/${journalId}/resolve`,
       body
+    );
+  },
+
+  async getComplianceBridgeEvents(params?: {
+    journalId?: string;
+    correlationId?: string;
+  }): Promise<ComplianceBridgeEventEntry[]> {
+    return apiClient.get<ComplianceBridgeEventEntry[]>(
+      '/admin/compliance-bridge/events',
+      params as Record<string, unknown>
     );
   },
 };
