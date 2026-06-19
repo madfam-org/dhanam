@@ -36,9 +36,34 @@ See [RFC-6](../../../docs/rfcs/owner-operator-capital-stack.md).
 
 **Phase 2 (2026-06-18):** Owner cockpit UI at `apps/web/src/app/(dashboard)/capital-stack/page.tsx` — lists entity groups, dashboard metrics, journal table, account classification. Sidebar nav + i18n (`capitalStack` namespace).
 
-**Phase 3 (2026-06-18):** `CapitalStackTransactionHookService` fires detector on manual txn create when `FEATURE_CAPITAL_STACK_DETECTOR=true`. Bulk account classify: `POST /v1/capital-stack/accounts/bulk-capital-purpose`.
+**Phase 3 (2026-06-18):** `CapitalStackTransactionHookService` + `CapitalFlowBackfillJob` (daily 4:30 UTC). S2 amount-window pairing in detector. Enable with `FEATURE_CAPITAL_STACK_DETECTOR=true`.
 
-**Phase 4 (2026-06-18):** Admin review queue at `apps/admin/src/app/(dashboard)/capital-stack/page.tsx` — seal/void journal entries.
+**Phase 4 (2026-06-18):** Karafiel bridge sends full transaction payloads; idempotent resend; internal HMAC callbacks. Admin review queue + compliance bridge audit at `apps/admin/.../capital-stack/page.tsx`. Web journal match + send-to-Karafiel actions.
+
+**Phase 5 (2026-06-18):** Golden journey E2E `apps/api/test/e2e/capital-stack.e2e-spec.ts`. Staging enables detector flag in `infra/k8s/overlays/staging/env-patch-api.yaml`.
+
+## Operator-gated checklist
+
+Engineering complete — see [SESSION_WRAP_UP](../../../docs/SESSION_WRAP_UP_2026-06-18.md#operator-gated-checklist) for the numbered gate table.
+
+| Gate                             | Prod today                  | Flip when                     |
+| -------------------------------- | --------------------------- | ----------------------------- |
+| Janua `aldo@madfam.io`           | Blocked                     | Platform provisions SSO       |
+| `FEATURE_CAPITAL_STACK_KARAFIEL` | `false` (mock `MOCK-CAP-*`) | Karafiel staging proof passes |
+| `FEATURE_CAPITAL_STACK_DETECTOR` | `false`                     | After Karafiel stable on prod |
+| PlatformConfig thresholds        | Operator sets in Vault      | Before tuning auto-send       |
+
+Full runbook: [OWNER_CAPITAL_KARAFIEL_OPS.md](../../../docs/runbooks/OWNER_CAPITAL_KARAFIEL_OPS.md).
+
+## Surfaces
+
+| App       | Path                                                              |
+| --------- | ----------------------------------------------------------------- |
+| Web       | `/capital-stack` — cockpit, classify, match, send                 |
+| Admin     | `/capital-stack` — review queue + bridge audit                    |
+| API user  | `/v1/capital-stack/*`                                             |
+| API admin | `/v1/admin/capital-stack/*`, `/v1/admin/compliance-bridge/events` |
+| Internal  | `/v1/internal/compliance/*` (Karafiel HMAC)                       |
 
 ## Bootstrap
 

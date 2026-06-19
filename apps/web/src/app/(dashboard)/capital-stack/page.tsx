@@ -101,49 +101,163 @@ function EntityGroupHeader({ group }: { group: CapitalStackEntityGroup }) {
 function JournalTable({
   entries,
   t,
+  onChanged,
 }: {
   entries: OwnerCapitalJournalEntry[];
   t: (key: string) => string;
+  onChanged: () => void;
 }) {
+  const [matchingId, setMatchingId] = useState<string | null>(null);
+  const [targetTxnId, setTargetTxnId] = useState('');
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const handleMatch = async (journalId: string) => {
+    if (!targetTxnId.trim()) return;
+    setBusyId(journalId);
+    try {
+      await capitalStackApi.matchJournal(journalId, targetTxnId.trim());
+      toast.success(t('journal.matchSuccess'));
+      setMatchingId(null);
+      setTargetTxnId('');
+      onChanged();
+    } catch {
+      toast.error(t('error'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const handleSendKarafiel = async (journalId: string) => {
+    setBusyId(journalId);
+    try {
+      await capitalStackApi.sendToKarafiel(journalId);
+      toast.success(t('journal.sentKarafiel'));
+      onChanged();
+    } catch {
+      toast.error(t('error'));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   if (entries.length === 0) {
     return <p className="py-8 text-center text-sm text-muted-foreground">{t('journal.empty')}</p>;
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[640px] text-left text-sm">
-        <thead>
-          <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
-            <th className="px-3 py-2 font-medium">{t('journal.flowType')}</th>
-            <th className="px-3 py-2 font-medium">{t('journal.amount')}</th>
-            <th className="px-3 py-2 font-medium">{t('journal.status')}</th>
-            <th className="px-3 py-2 font-medium">{t('journal.created')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.map((entry) => (
-            <tr
-              key={entry.id}
-              className="border-b border-border/60 transition-colors hover:bg-muted/30"
-            >
-              <td className="px-3 py-3">
-                {t(`flowType.${entry.flowType}` as 'flowType.capital_contribution')}
-              </td>
-              <td className="px-3 py-3 font-mono tabular-nums">
-                {formatMoney(entry.amount, entry.currency)}
-              </td>
-              <td className="px-3 py-3">
-                <Badge variant="secondary" className="font-normal">
-                  {t(`status.${entry.status}` as 'status.draft')}
-                </Badge>
-              </td>
-              <td className="px-3 py-3 text-muted-foreground">
-                {new Date(entry.createdAt).toLocaleDateString()}
-              </td>
+    <div className="space-y-4">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[720px] text-left text-sm">
+          <thead>
+            <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
+              <th className="px-3 py-2 font-medium">{t('journal.flowType')}</th>
+              <th className="px-3 py-2 font-medium">{t('journal.amount')}</th>
+              <th className="px-3 py-2 font-medium">{t('journal.status')}</th>
+              <th className="px-3 py-2 font-medium">{t('journal.created')}</th>
+              <th className="px-3 py-2 text-right font-medium">{t('journal.actions')}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {entries.map((entry) => {
+              const canMatch =
+                (entry.status === 'proposed' || entry.status === 'draft') &&
+                !entry.targetTransactionId;
+              const canSend =
+                entry.status === 'matched' ||
+                entry.status === 'proposed' ||
+                entry.status === 'manual_review';
+
+              return (
+                <tr
+                  key={entry.id}
+                  className="border-b border-border/60 transition-colors hover:bg-muted/30"
+                >
+                  <td className="px-3 py-3">
+                    {t(`flowType.${entry.flowType}` as 'flowType.capital_contribution')}
+                  </td>
+                  <td className="px-3 py-3 font-mono tabular-nums">
+                    {formatMoney(entry.amount, entry.currency)}
+                  </td>
+                  <td className="px-3 py-3">
+                    <Badge variant="secondary" className="font-normal">
+                      {t(`status.${entry.status}` as 'status.draft')}
+                    </Badge>
+                  </td>
+                  <td className="px-3 py-3 text-muted-foreground">
+                    {new Date(entry.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-3 py-3">
+                    <div className="flex justify-end gap-2">
+                      {canMatch && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={busyId === entry.id}
+                          onClick={() => {
+                            setMatchingId(entry.id);
+                            setTargetTxnId('');
+                          }}
+                        >
+                          {t('journal.match')}
+                        </Button>
+                      )}
+                      {canSend && (
+                        <Button
+                          size="sm"
+                          disabled={busyId === entry.id}
+                          onClick={() => void handleSendKarafiel(entry.id)}
+                        >
+                          {busyId === entry.id ? (
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                          ) : null}
+                          {t('journal.sendKarafiel')}
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {matchingId && (
+        <Card className="border-dashed bg-muted/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">{t('journal.matchTitle')}</CardTitle>
+            <p className="text-sm text-muted-foreground">{t('journal.matchHint')}</p>
+          </CardHeader>
+          <CardContent className="flex flex-wrap items-end gap-3">
+            <label className="flex min-w-[240px] flex-1 flex-col gap-1 text-sm">
+              <span className="text-muted-foreground">{t('journal.targetTxnId')}</span>
+              <input
+                className="rounded-md border bg-background px-3 py-2 font-mono text-sm"
+                value={targetTxnId}
+                onChange={(e) => setTargetTxnId(e.target.value)}
+                placeholder="uuid"
+              />
+            </label>
+            <Button
+              size="sm"
+              disabled={!targetTxnId.trim() || busyId === matchingId}
+              onClick={() => void handleMatch(matchingId)}
+            >
+              {t('journal.matchSubmit')}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setMatchingId(null);
+                setTargetTxnId('');
+              }}
+            >
+              {t('journal.cancel')}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -430,7 +544,7 @@ export default function CapitalStackPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : (
-              <JournalTable entries={journalQuery.data ?? []} t={t} />
+              <JournalTable entries={journalQuery.data ?? []} t={t} onChanged={handleRefresh} />
             )}
           </CardContent>
         </Card>

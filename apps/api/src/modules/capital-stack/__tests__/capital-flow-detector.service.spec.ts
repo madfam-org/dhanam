@@ -11,19 +11,25 @@ import { OwnerCapitalJournalService } from '../owner-capital-journal.service';
 describe('CapitalFlowDetectorService', () => {
   let service: CapitalFlowDetectorService;
   let prisma: {
-    transaction: { findUnique: jest.Mock };
+    transaction: { findUnique: jest.Mock; findFirst: jest.Mock; findMany: jest.Mock };
     space: { findFirst: jest.Mock };
     spaceOperatorBinding: { findFirst: jest.Mock };
+    ownerCapitalJournal: { findMany: jest.Mock };
   };
   let journals: { create: jest.Mock };
 
   beforeEach(async () => {
     prisma = {
-      transaction: { findUnique: jest.fn() },
+      transaction: {
+        findUnique: jest.fn(),
+        findFirst: jest.fn().mockResolvedValue(null),
+        findMany: jest.fn().mockResolvedValue([]),
+      },
       space: { findFirst: jest.fn().mockResolvedValue({ id: 'biz-space' }) },
       spaceOperatorBinding: {
         findFirst: jest.fn().mockResolvedValue({ taxId: 'IMA2501164Y7' }),
       },
+      ownerCapitalJournal: { findMany: jest.fn().mockResolvedValue([]) },
     };
 
     journals = {
@@ -50,6 +56,7 @@ describe('CapitalFlowDetectorService', () => {
       id: 'txn-1',
       amount: 500,
       currency: 'MXN',
+      date: new Date('2026-06-18'),
       metadata: {},
       account: {
         capitalPurpose: CapitalPurpose.personal_life,
@@ -67,6 +74,7 @@ describe('CapitalFlowDetectorService', () => {
       id: 'txn-2',
       amount: 1200,
       currency: 'MXN',
+      date: new Date('2026-06-18'),
       metadata: { rfc: 'IMA2501164Y7' },
       account: {
         capitalPurpose: CapitalPurpose.owner_facility,

@@ -16,6 +16,7 @@ import { CapitalStackController } from './capital-stack.controller';
 import { ComplianceBridgeEventService } from './compliance-bridge-event.service';
 import { EntityGroupService } from './entity-group.service';
 import { InternalComplianceController } from './internal-compliance.controller';
+import { CapitalFlowBackfillJob } from './jobs/capital-flow-backfill.job';
 import { KarafielCapitalBridgeService } from './karafiel-capital-bridge.service';
 import { OwnerCapitalJournalService } from './owner-capital-journal.service';
 
@@ -35,6 +36,7 @@ import { OwnerCapitalJournalService } from './owner-capital-journal.service';
     CapitalFlowDetectorService,
     CapitalStackAccountsService,
     CapitalStackTransactionHookService,
+    CapitalFlowBackfillJob,
     KarafielService,
   ],
   exports: [
@@ -45,6 +47,7 @@ import { OwnerCapitalJournalService } from './owner-capital-journal.service';
     CapitalFlowDetectorService,
     CapitalStackAccountsService,
     CapitalStackTransactionHookService,
+    CapitalFlowBackfillJob,
   ],
 })
 export class CapitalStackModule {}

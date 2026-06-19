@@ -71,6 +71,10 @@ export interface OwnerCapitalJournalEntry {
   amount: number;
   currency: string;
   notes?: string | null;
+  sourceTransactionId?: string | null;
+  targetTransactionId?: string | null;
+  karafielCaseId?: string | null;
+  detectionConfidence?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -109,5 +113,24 @@ export const capitalStackApi = {
       entityGroupId,
       updates,
     });
+  },
+
+  matchJournal(
+    journalId: string,
+    targetTransactionId: string,
+    targetSpaceId?: string
+  ): Promise<OwnerCapitalJournalEntry> {
+    return apiClient.post<OwnerCapitalJournalEntry>(`/capital-stack/journal/${journalId}/match`, {
+      targetTransactionId,
+      targetSpaceId,
+    });
+  },
+
+  sendToKarafiel(journalId: string): Promise<{
+    karafiel_case_id: string;
+    status: string;
+    review_required: boolean;
+  }> {
+    return apiClient.post(`/capital-stack/journal/${journalId}/send-to-karafiel`);
   },
 };

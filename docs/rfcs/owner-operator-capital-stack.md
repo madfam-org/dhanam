@@ -1,6 +1,6 @@
 # RFC-6: Owner–Operator Capital Stack
 
-**Status:** Accepted — **Phase 1 shipped** (2026-06-18); Phases 2–5 in backlog
+**Status:** Accepted — **Phases 0–5 shipped** (2026-06-18); Karafiel live API gated on `FEATURE_CAPITAL_STACK_KARAFIEL`
 **Date:** 2026-06-18
 **Authors:** Engineering
 **Stakeholders:** Platform, MADFAM operator slice, Karafiel, Compliance, Admin
@@ -211,24 +211,41 @@ env emails from Vault — never hardcoded).
 
 ## Phased delivery
 
-| Phase | Scope                                                                   | Status (2026-06-18)                                                        |
-| ----- | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| **0** | Prod hygiene: account classify, remove duplicate space, Janua for aldo@ | **Mostly done** — Janua for `aldo@madfam.io` pending                       |
-| **1** | Schema, module skeleton, CRUD journal, capitalPurpose                   | **Shipped** — prod API + DB bootstrap                                      |
-| **2** | Dashboard, match/mirror, account migration tool                         | **Shipped** — `/capital-stack` cockpit + bulk account classify API         |
-| **3** | Detector + backfill job                                                 | **Shipped** — detector rules + txn hook (`FEATURE_CAPITAL_STACK_DETECTOR`) |
-| **4** | Karafiel bridge + admin review queue                                    | **Partial** — bridge stub + admin review UI at `/capital-stack`            |
-| **5** | E2E, runbook, staging proof, GA flag                                    | Partial — runbook + unit tests                                             |
+| Phase | Scope                                                                   | Status (2026-06-18)                                                     |
+| ----- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **0** | Prod hygiene: account classify, remove duplicate space, Janua for aldo@ | **Done except Janua** — `aldo@madfam.io` SSO pending (operator gate #1) |
+| **1** | Schema, module skeleton, CRUD journal, capitalPurpose                   | **Shipped** — prod API + DB bootstrap                                   |
+| **2** | Dashboard, match/mirror, account migration tool                         | **Shipped** — `/capital-stack` cockpit + bulk account classify API      |
+| **3** | Detector + backfill job                                                 | **Shipped** — S2 pairing, txn hook, nightly backfill job                |
+| **4** | Karafiel bridge + admin review queue                                    | **Shipped** — bridge payload, callbacks, admin queue + bridge audit     |
+| **5** | E2E, runbook, staging proof, GA flag                                    | **Shipped** — golden E2E, staging detector on, prod API enabled         |
+
+## Operator-gated rollout
+
+Engineering for Phases 0–5 is complete in Dhanam. The following require **operator
+or cross-repo action** before full GA:
+
+| Gate                                         | Owner            | Blocks                                 |
+| -------------------------------------------- | ---------------- | -------------------------------------- |
+| Janua SSO for `aldo@madfam.io`               | Platform / Janua | Owner web cockpit login                |
+| Karafiel `POST /v1/compliance/capital-flow`  | Karafiel         | Live compliance (prod uses mock today) |
+| `FEATURE_CAPITAL_STACK_KARAFIEL=true`        | Operator         | Outbound live Karafiel registration    |
+| `FEATURE_CAPITAL_STACK_DETECTOR=true` (prod) | Operator         | Auto-journals on new transactions      |
+| Staging web smoke (API origin header)        | Platform         | Automated staging promote smoke only   |
+| PlatformConfig RFC + thresholds              | Operator         | Tuned auto-send / review thresholds    |
+
+Canonical checklist with verification commands:
+[SESSION_WRAP_UP_2026-06-18.md](../SESSION_WRAP_UP_2026-06-18.md#operator-gated-checklist).
+Operator procedures: [OWNER_CAPITAL_KARAFIEL_OPS.md](../runbooks/OWNER_CAPITAL_KARAFIEL_OPS.md).
 
 ## Testing
 
-| Layer       | Focus                                                |
-| ----------- | ---------------------------------------------------- |
-| Unit        | Journal status machine, balance math, detector rules |
-| Integration | Cross-space match, Karafiel mock callback            |
-| Contract    | Capital-flow envelope ↔ Karafiel schema              |
-| E2E         | Owner contribution → proposed → sealed               |
-| Ops         | DLQ drill when Karafiel unavailable                  |
+| Layer       | Focus                                               | Location                                                                            |
+| ----------- | --------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Unit        | Journal status machine, detector, bridge, backfill  | `apps/api/src/modules/capital-stack/__tests__/`                                     |
+| Integration | HMAC callbacks, Karafiel mock send                  | `internal-compliance.controller.spec.ts`, `karafiel-capital-bridge.service.spec.ts` |
+| E2E         | Owner contribution → match → mock Karafiel → sealed | `apps/api/test/e2e/capital-stack.e2e-spec.ts`                                       |
+| Ops         | DLQ drill when Karafiel unavailable                 | [OWNER_CAPITAL_KARAFIEL_OPS.md](../runbooks/OWNER_CAPITAL_KARAFIEL_OPS.md)          |
 
 Golden scenario: personal LOC outflow → proposed journal → business inflow match
 → Karafiel seal → `compliance_sealed`.

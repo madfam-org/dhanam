@@ -4,10 +4,15 @@ import { Badge, Button, Card, Skeleton } from '@dhanam/ui';
 import { CheckCircle2, Layers, XCircle } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
-import { adminApi, type CapitalStackJournalEntry } from '@/lib/api/admin';
+import {
+  adminApi,
+  type CapitalStackJournalEntry,
+  type ComplianceBridgeEventEntry,
+} from '@/lib/api/admin';
 
 export default function CapitalStackAdminPage() {
   const [entries, setEntries] = useState<CapitalStackJournalEntry[]>([]);
+  const [bridgeEvents, setBridgeEvents] = useState<ComplianceBridgeEventEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
@@ -16,8 +21,12 @@ export default function CapitalStackAdminPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminApi.getCapitalStackReviewQueue();
-      setEntries(data);
+      const [queue, events] = await Promise.all([
+        adminApi.getCapitalStackReviewQueue(),
+        adminApi.getComplianceBridgeEvents(),
+      ]);
+      setEntries(queue);
+      setBridgeEvents(events);
     } catch {
       setError('Failed to load capital stack review queue.');
     } finally {
@@ -139,6 +148,59 @@ export default function CapitalStackAdminPage() {
                           Void
                         </Button>
                       </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="border-b px-4 py-3">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
+            Compliance bridge audit
+          </h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Recent Dhanam ↔ Karafiel capital-flow messages
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium">Event</th>
+                <th className="px-4 py-3 text-left font-medium">Direction</th>
+                <th className="px-4 py-3 text-left font-medium">Correlation</th>
+                <th className="px-4 py-3 text-left font-medium">When</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8">
+                    <Skeleton className="h-8 w-full" />
+                  </td>
+                </tr>
+              ) : bridgeEvents.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-4 py-10 text-center text-gray-500">
+                    No bridge events yet
+                  </td>
+                </tr>
+              ) : (
+                bridgeEvents.slice(0, 25).map((event) => (
+                  <tr key={event.id} className="border-t border-gray-100 dark:border-gray-800">
+                    <td className="px-4 py-3">{event.eventType}</td>
+                    <td className="px-4 py-3">
+                      <Badge variant="outline">{event.direction}</Badge>
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs">
+                      {event.correlationId.slice(0, 8)}…
+                    </td>
+                    <td className="px-4 py-3 text-gray-500">
+                      {new Date(event.createdAt).toLocaleString()}
                     </td>
                   </tr>
                 ))

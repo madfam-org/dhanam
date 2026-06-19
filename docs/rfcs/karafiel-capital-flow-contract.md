@@ -189,9 +189,15 @@ Each case should expose:
 
 ## Contract tests
 
-Location: `apps/api/src/modules/capital-stack/__tests__/karafiel-capital-flow.contract.spec.ts`
+Implemented in Dhanam (Karafiel repo still pending live receiver):
 
-Golden fixtures: `apps/api/test/contract/fixtures/karafiel-capital-flow/`.
+| Suite                            | Path                                                                                   |
+| -------------------------------- | -------------------------------------------------------------------------------------- |
+| Bridge payload + mock/live paths | `apps/api/src/modules/capital-stack/__tests__/karafiel-capital-bridge.service.spec.ts` |
+| Inbound HMAC callbacks           | `apps/api/src/modules/capital-stack/__tests__/internal-compliance.controller.spec.ts`  |
+| Golden journey                   | `apps/api/test/e2e/capital-stack.e2e-spec.ts`                                          |
+
+Fixture directory (optional future Zod contract): `apps/api/test/contract/fixtures/karafiel-capital-flow/`.
 
 ## Karafiel repo checklist
 
