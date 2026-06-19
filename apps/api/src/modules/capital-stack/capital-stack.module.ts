@@ -6,7 +6,6 @@ import { PrismaModule } from '../../core/prisma/prisma.module';
 import { KarafielService } from '../integrations/karafiel.service';
 
 import { CapitalFlowDetectorService } from './capital-flow-detector.service';
-import { CapitalFlowBackfillJob } from './jobs/capital-flow-backfill.job';
 import { CapitalStackAccountsService } from './capital-stack-accounts.service';
 import {
   CapitalStackAdminController,
@@ -17,6 +16,7 @@ import { CapitalStackController } from './capital-stack.controller';
 import { ComplianceBridgeEventService } from './compliance-bridge-event.service';
 import { EntityGroupService } from './entity-group.service';
 import { InternalComplianceController } from './internal-compliance.controller';
+import { CapitalFlowBackfillJob } from './jobs/capital-flow-backfill.job';
 import { KarafielCapitalBridgeService } from './karafiel-capital-bridge.service';
 import { OwnerCapitalJournalService } from './owner-capital-journal.service';
 
