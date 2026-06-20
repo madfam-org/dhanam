@@ -75,48 +75,55 @@ export class PriceResolverService {
   }
 
   /**
+   * Resolve catalog amount in minor units (centavos/cents) for fee previews.
+   */
+  async resolveAmountMinor(tier: string, region: number): Promise<number | null> {
+    const parsed = this.parseCatalogTier(tier, region);
+    if (!parsed) {
+      return null;
+    }
+
+    try {
+      const price = await this.prisma.productPrice.findFirst({
+        where: {
+          product: { slug: parsed.productSlug },
+          tierSlug: parsed.tierSlug,
+          currency: parsed.currency,
+          interval: parsed.interval,
+          status: 'active',
+        },
+        select: { amountCents: true },
+      });
+
+      if (price?.amountCents != null) {
+        return price.amountCents;
+      }
+    } catch (err) {
+      this.logger.debug(`Catalog amount resolution skipped for ${tier}: ${(err as Error).message}`);
+    }
+
+    return null;
+  }
+
+  /**
    * Look up Stripe price ID from the ProductPrice catalog DB.
    *
    * Parses plan slugs like "karafiel_pro", "essentials", "pro_yearly" etc.
    * Returns null if no catalog entry or no stripePriceId stored.
    */
   private async resolveFromCatalog(tier: string, region: number): Promise<string | null> {
-    const currency = this.currencyForRegion(region);
-    const lower = tier.toLowerCase();
-
-    // Strip billing period suffix for DB lookup
-    let coreTier = lower;
-    let interval: 'monthly' | 'yearly' = 'monthly';
-    if (coreTier.endsWith('_yearly') || coreTier.endsWith('_annual')) {
-      coreTier = coreTier.replace(/_yearly$|_annual$/, '');
-      interval = 'yearly';
-    }
-    if (coreTier.endsWith('_monthly')) {
-      coreTier = coreTier.replace(/_monthly$/, '');
-    }
-
-    // Parse "{product}_{tier}" vs bare "{tier}"
-    const parts = coreTier.split('_');
-    let productSlug: string | undefined;
-    let tierSlug: string;
-
-    if (parts.length >= 2) {
-      // e.g., "karafiel_pro" -> product=karafiel, tier=pro
-      productSlug = parts[0];
-      tierSlug = parts.slice(1).join('_');
-    } else {
-      // Bare tier like "pro" -> default to dhanam product
-      tierSlug = coreTier;
-      productSlug = 'dhanam';
+    const parsed = this.parseCatalogTier(tier, region);
+    if (!parsed) {
+      return null;
     }
 
     try {
       const price = await this.prisma.productPrice.findFirst({
         where: {
-          product: { slug: productSlug },
-          tierSlug,
-          currency,
-          interval,
+          product: { slug: parsed.productSlug },
+          tierSlug: parsed.tierSlug,
+          currency: parsed.currency,
+          interval: parsed.interval,
           status: 'active',
           stripePriceId: { not: null },
         },
@@ -133,6 +140,43 @@ export class PriceResolverService {
     }
 
     return null;
+  }
+
+  private parseCatalogTier(
+    tier: string,
+    region: number
+  ): {
+    productSlug: string;
+    tierSlug: string;
+    currency: string;
+    interval: 'monthly' | 'yearly';
+  } | null {
+    const currency = this.currencyForRegion(region);
+    const lower = tier.toLowerCase();
+
+    let coreTier = lower;
+    let interval: 'monthly' | 'yearly' = 'monthly';
+    if (coreTier.endsWith('_yearly') || coreTier.endsWith('_annual')) {
+      coreTier = coreTier.replace(/_yearly$|_annual$/, '');
+      interval = 'yearly';
+    }
+    if (coreTier.endsWith('_monthly')) {
+      coreTier = coreTier.replace(/_monthly$/, '');
+    }
+
+    const parts = coreTier.split('_');
+    let productSlug: string;
+    let tierSlug: string;
+
+    if (parts.length >= 2) {
+      productSlug = parts[0]!;
+      tierSlug = parts.slice(1).join('_');
+    } else {
+      tierSlug = coreTier;
+      productSlug = 'dhanam';
+    }
+
+    return { productSlug, tierSlug, currency, interval };
   }
 
   /**

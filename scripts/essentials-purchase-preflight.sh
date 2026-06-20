@@ -98,10 +98,25 @@ if [ -n "$route_body" ]; then
   provider="$(json_get "$route_body" route_provider)"
   currency="$(json_get "$route_body" route_currency)"
   resolvable="$(json_get "$route_body" route_resolvable)"
+  route_amount="$(BODY="$route_body" KEY=route_amount python3 << 'PY'
+import json, os
+try:
+    d = json.loads(os.environ.get("BODY", ""))
+    root = d.get("data", d)
+    print(root.get("amountMinor", ""))
+except Exception:
+    pass
+PY
+)"
   if [ "$provider" = "stripe_mx" ] && [ "$currency" = "MXN" ] && [ "$resolvable" = "true" ]; then
     log_pass "Checkout route: stripe_mx / MXN / priceIdResolvable"
   else
     log_fail "Route preview unexpected (provider=${provider} currency=${currency} resolvable=${resolvable})"
+  fi
+  if [ "$PLAN" = "essentials" ] && [ "$route_amount" = "7900" ]; then
+    log_pass "Route amountMinor matches Essentials catalog (7900 centavos)"
+  elif [ "$PLAN" = "essentials" ] && [ -n "$route_amount" ]; then
+    log_fail "Route amountMinor mismatch for essentials (got ${route_amount}, want 7900)"
   fi
   fi
 else
@@ -119,8 +134,8 @@ if command -v kubectl >/dev/null 2>&1 && kubectl -n dhanam get deploy dhanam-api
     log_warn "FEATURE_STRIPE_MXN_LIVE=${live_flag:-unset} — flip after staging proof, before live card"
   fi
 
-  for secret_check in DHANAM_WEBHOOK_SECRET STRIPE_MX_SECRET_KEY STRIPE_WEBHOOK_SECRET; do
-    if kubectl -n dhanam exec deploy/dhanam-api -c api -- sh -c "[ -n \"\${${secret_check}:-}\" ]" 2>/dev/null; then
+  for secret_check in DHANAM_WEBHOOK_SECRET STRIPE_MX_SECRET_KEY STRIPE_MX_WEBHOOK_SECRET; do
+    if kubectl -n dhanam exec deploy/dhanam-api -c api -- printenv "$secret_check" 2>/dev/null | grep -q .; then
       log_pass "${secret_check} mounted on dhanam-api"
     else
       log_fail "${secret_check} missing on dhanam-api pod"

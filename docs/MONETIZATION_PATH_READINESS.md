@@ -1,6 +1,6 @@
 # Monetization-Path Readiness — Dhanam
 
-**Last Updated:** 2026-06-16  
+**Last Updated:** 2026-06-19  
 **Agent entrypoint:** [`MONETIZATION_SESSION.md`](MONETIZATION_SESSION.md) — read that
 file first for session routing and the private ops boundary.
 
@@ -40,6 +40,23 @@ are Phase 1, not the first transaction.
 - **Prisma `SubscriptionTier` comments corrected** to match catalog truth
   (essentials 4.99/79, pro 14.99/299, premium 29.99/599). Comment-only; no migration.
 
+## Shipped 2026-06-19 (sprint — this repo)
+
+- **Route recommendation catalog amount** — `GET /billing/checkout/route-recommendation`
+  now resolves `amountMinor` from `product_prices.amount_cents` when `plan` + `product`
+  are supplied (Essentials → 7900 centavos, not the legacy 19900 default). Fee previews
+  and preflight scripts align with live checkout pricing.
+- **Preflight hardening** — `scripts/essentials-purchase-preflight.sh` checks
+  `STRIPE_MX_*` + `DHANAM_WEBHOOK_SECRET` on prod pods; asserts `amountMinor=7900`.
+- **Sprint orchestration** — `internal-devops/scripts/run-first-peso-sprint-verify.sh`
+  and `internal-devops/runbooks/2026-06-19-first-peso-sprint-execution.md`.
+
+## Shipped 2026-06-17 (platform ops — Essentials anchor)
+
+- **`FEATURE_STRIPE_MXN_LIVE=true`** on prod; preflight 10/10 pass.
+- Billing fixes #571–#573 promoted; Karafiel CFDI bridge merged (#62).
+- **Binding gate shifted to Karafiel:** CSD upload + `FEATURE_CFDI_AUTO_ISSUE` flip.
+
 ## Shipped 2026-06-16 (platform ops — private record)
 
 - **Phase 0 secret store restored** — `dhanam-secrets` sync green, `dhanam-api`
@@ -69,27 +86,28 @@ are Phase 1, not the first transaction.
 
 ## Gates Dhanam owns (G0–G9)
 
-| Gate                     | Status | Dhanam action to close                                                                                       |
-| ------------------------ | ------ | ------------------------------------------------------------------------------------------------------------ |
-| G0 Catalog truth         | Ready  | Keep `catalog.yaml` the single source; re-run `sync-catalog.ts` after the Free tier                          |
-| G1 Pricing evidence      | Ready  | Apply Tulana proposals (see `tulana/docs/dhanam-pricing-readiness-2026-06-13.md`)                            |
-| G5 Live checkout         | OPEN   | UI shipped (#522); flip `FEATURE_STRIPE_MXN_LIVE` after Stripe MX live (Phase 0 secrets **done** 2026-06-16) |
-| G6 Payment + ledger      | OPEN   | Prove one idempotent `BillingEvent` per payment, no duplicate revenue                                        |
-| G7 Entitlement + fan-out | OPEN   | Activate paid tier/credits + signed product webhook; close Karafiel CFDI staging proof (TD-1010)             |
+| Gate                     | Status | Dhanam action to close                                                              |
+| ------------------------ | ------ | ----------------------------------------------------------------------------------- |
+| G0 Catalog truth         | Ready  | Keep `catalog.yaml` the single source; re-run `sync-catalog.ts` after the Free tier |
+| G1 Pricing evidence      | Ready  | Apply Tulana proposals (see `tulana/docs/dhanam-pricing-readiness-2026-06-13.md`)   |
+| G5 Live checkout         | READY  | Flag live; authenticated checkout smoke + one live charge remain (sprint Step 5)    |
+| G6 Payment + ledger      | OPEN   | Prove one idempotent `BillingEvent` per payment on live Essentials charge           |
+| G7 Entitlement + fan-out | OPEN   | Karafiel CSD upload + CFDI flip (sprint Steps 1–3); then live CFDI UUID (TD-1010)   |
 
 (G2–G4 Selva/PhyndCRM, G8 BBVA, G9 Converge are owned outside this repo.)
 
 ## Open Dhanam tasks (ranked)
 
-1. **Flip live MXN** after the test-key SPEI→CFDI roundtrip — `docs/runbooks/STRIPE_MXN_LIVE_FLIP.md`.
-2. **Production catalog/Stripe sync (TD-1014):** populate the GitHub Production env
+1. **Karafiel CFDI go-live (binding)** — CSD upload → `cfdi-go-live-flip.sh flip` → webhook smoke → staging/live CFDI UUID. Sprint: `internal-devops/runbooks/2026-06-19-first-peso-sprint-execution.md`.
+2. **Live Essentials charge** — one real MXN card through `POST /v1/billing/upgrade`; verify G6/G7 evidence.
+3. **Production catalog/Stripe sync (TD-1014):** populate the GitHub Production env
    (`DATABASE_URL` + Stripe secrets) and run `scripts/sync-catalog.ts` against prod.
-3. **Adopt `@madfam/webhook-attribution`** in `MadfamEventsController` for the
+4. **Adopt `@madfam/webhook-attribution`** in `MadfamEventsController` for the
    inbound RouteCraft fan-out (replaces bespoke HMAC handling; idempotency by `event_id`).
-4. **Close Karafiel CFDI staging proof (TD-1010)** so MXN B2B charges emit a CFDI egreso.
-5. **Mercado Pago gap:** referenced ecosystem-wide but not implemented in Dhanam.
+5. **Close Karafiel CFDI staging proof (TD-1010)** so MXN B2B charges emit a CFDI egreso.
+6. **Mercado Pago gap:** referenced ecosystem-wide but not implemented in Dhanam.
    Decide build-vs-defer; until built, do not advertise MP as a checkout path.
-6. **Enable `STAGING_COMMERCIAL_STRICT=true` (TD-1009)** so staging hard-gates before prod promote.
+7. **Enable `STAGING_COMMERCIAL_STRICT=true` (TD-1009)** so staging hard-gates before prod promote.
 
 ## SKU architecture (consumer, MXN)
 
