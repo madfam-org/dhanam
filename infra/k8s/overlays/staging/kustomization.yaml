@@ -27,6 +27,7 @@ namespace: enclii-dhanam-staging
 resources:
   - ../../production
   - external-secrets-staging.yaml
+  - external-secret-core-staging.yaml
   - kyverno-policy-exception.yaml
 
 # Staging replicas: 1 everywhere. HPAs are pinned min=max=1 via patch — the
@@ -83,13 +84,6 @@ patches:
   - path: hpa-disable-patch.yaml
     target:
       kind: HorizontalPodAutoscaler
-
-  # Keep staging on staging-scoped Vault paths. Without this patch, the
-  # production ExternalSecret base would read secret/dhanam in staging too.
-  - path: external-secret-core-patch.yaml
-    target:
-      kind: ExternalSecret
-      name: dhanam-secrets
 
   # Keep the production Janua bridge ExternalSecret but point it at the
   # staging-scoped source secret in the Enclii namespace.
