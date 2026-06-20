@@ -152,7 +152,14 @@ export class CheckoutRoutingPolicyService {
             ? 'MXN'
             : 'USD'
           : (providerConfig?.currency ?? 'USD'));
-    const amountMinor = resolvedContext.amountMinor ?? this.defaultAmountMinor(countryCode);
+    const amountMinor =
+      resolvedContext.amountMinor ??
+      (await this.resolveCatalogAmountMinor(
+        resolvedContext.plan,
+        resolvedContext.product,
+        resolvedContext.countryCode
+      )) ??
+      this.defaultAmountMinor(countryCode);
     const feeOptimization = this.buildFeeOptimizationPreview({
       countryCode,
       currency,
@@ -187,20 +194,24 @@ export class CheckoutRoutingPolicyService {
   /**
    * Public fee-aware recommendation for visitors and checkout UI (no auth).
    */
-  getPublicRouteRecommendation(params: {
+  async getPublicRouteRecommendation(params: {
     countryCode: string;
     plan?: string;
     product?: string;
     amountMinor?: number;
     currency?: string;
     paymentMethod?: PaymentInstrumentId;
-  }): CheckoutRoutingPreview & { amountMinor: number } {
+  }): Promise<CheckoutRoutingPreview & { amountMinor: number }> {
     const countryCode = params.countryCode.toUpperCase();
+    const plan = params.plan ?? 'pro';
     const currency = params.currency?.toUpperCase() ?? (countryCode === 'MX' ? 'MXN' : 'USD');
-    const amountMinor = params.amountMinor ?? this.defaultAmountMinor(countryCode);
+    const amountMinor =
+      params.amountMinor ??
+      (await this.resolveCatalogAmountMinor(plan, params.product, countryCode)) ??
+      this.defaultAmountMinor(countryCode);
     const context: CheckoutRoutingContext = {
       userId: 'public-route-recommendation',
-      plan: params.plan ?? 'pro',
+      plan,
       product: params.product,
       countryCode,
       currency,
@@ -221,6 +232,7 @@ export class CheckoutRoutingPolicyService {
 
     const gateway = this.gatewayRegistry.get(this.gatewayRegistry.toGatewayId(provider));
     const providerConfig = gateway?.getProviderConfig?.(countryCode) ?? null;
+    const priceId = await this.resolvePriceId(plan, params.product, countryCode);
 
     return {
       provider,
@@ -233,10 +245,30 @@ export class CheckoutRoutingPolicyService {
       unifiedRoutingEnabled: this.isUnifiedRoutingEnabled(),
       hybridRouterAvailable: this.isHybridRouterAvailable(countryCode),
       legacyStripeAvailable: this.isLegacyStripeConfigured(),
-      priceIdResolvable: true,
+      priceIdResolvable: Boolean(priceId),
       catalogPlanId: this.normalizeCatalogPlanId(context.plan, context.product),
       feeOptimization,
     };
+  }
+
+  private async resolveCatalogAmountMinor(
+    plan: string,
+    product: string | undefined,
+    countryCode: string
+  ): Promise<number | null> {
+    if (!this.priceResolver) {
+      return null;
+    }
+
+    const catalogPlanId = this.normalizeCatalogPlanId(plan, product);
+    try {
+      return await this.priceResolver.resolveAmountMinor(
+        catalogPlanId,
+        this.regionForCountry(countryCode)
+      );
+    } catch {
+      return null;
+    }
   }
 
   private defaultAmountMinor(countryCode: string): number {

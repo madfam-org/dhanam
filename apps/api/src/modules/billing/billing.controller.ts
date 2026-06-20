@@ -238,7 +238,7 @@ export class BillingController {
     summary: 'Get fee-optimal checkout route and payment instrument suggestions',
   })
   @ApiOkResponse({ description: 'Route recommendation with fee estimates' })
-  getCheckoutRouteRecommendation(@Query() query: CheckoutRouteRecommendationQueryDto) {
+  async getCheckoutRouteRecommendation(@Query() query: CheckoutRouteRecommendationQueryDto) {
     return this.checkoutRouting.getPublicRouteRecommendation({
       countryCode: query.country,
       plan: query.plan,

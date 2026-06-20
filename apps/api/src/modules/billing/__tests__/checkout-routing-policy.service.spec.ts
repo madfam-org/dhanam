@@ -89,6 +89,7 @@ describe('CheckoutRoutingPolicyService', () => {
           provide: PriceResolverService,
           useValue: {
             resolve: jest.fn().mockResolvedValue({ priceId: 'price_dhanam_pro' }),
+            resolveAmountMinor: jest.fn().mockResolvedValue(null),
           },
         },
       ],
@@ -132,6 +133,35 @@ describe('CheckoutRoutingPolicyService', () => {
       expect(preview.currency).toBe('MXN');
       expect(preview.priceIdResolvable).toBe(true);
       expect(preview.catalogPlanId).toBe('dhanam_pro');
+    });
+  });
+
+  describe('getPublicRouteRecommendation', () => {
+    it('uses catalog amount for essentials when resolver returns amountCents', async () => {
+      priceResolver.resolveAmountMinor.mockResolvedValue(7900);
+      priceResolver.resolve.mockResolvedValue({ priceId: 'price_dhanam_essentials' });
+
+      const recommendation = await service.getPublicRouteRecommendation({
+        countryCode: 'MX',
+        plan: 'essentials',
+        product: 'dhanam',
+      });
+
+      expect(recommendation.amountMinor).toBe(7900);
+      expect(recommendation.priceIdResolvable).toBe(true);
+      expect(recommendation.catalogPlanId).toBe('dhanam_essentials');
+    });
+
+    it('falls back to default MX amount when catalog amount is unavailable', async () => {
+      priceResolver.resolveAmountMinor.mockResolvedValue(null);
+
+      const recommendation = await service.getPublicRouteRecommendation({
+        countryCode: 'MX',
+        plan: 'pro',
+        product: 'dhanam',
+      });
+
+      expect(recommendation.amountMinor).toBe(19_900);
     });
   });
 

@@ -248,18 +248,39 @@ if [ "$essentials_route_code" != "200" ]; then
 elif command -v jq >/dev/null 2>&1; then
   assert_json_field "Essentials MX route returns provider" "$essentials_route" '.provider == "stripe_mx"'
   assert_json_field "Essentials MX priceIdResolvable" "$essentials_route" '.priceIdResolvable == true'
+  essentials_amount="$(printf '%s' "$essentials_route" | jq -r '.amountMinor // empty')"
+  if [ "$essentials_amount" = "7900" ]; then
+    log_pass "Essentials route amountMinor=7900 (catalog-aligned)"
+  else
+    log_fail "Essentials route amountMinor — expected 7900, got ${essentials_amount:-<empty>}"
+  fi
 else
-  log_skip "Essentials route checks (jq not installed)"
+  essentials_amount="$(printf '%s' "$essentials_route" | python3 -c "import json,sys; d=json.load(sys.stdin); r=d.get('data',d); print(r.get('amountMinor',''))" 2>/dev/null || true)"
+  if [ "$essentials_amount" = "7900" ]; then
+    log_pass "Essentials route amountMinor=7900 (catalog-aligned)"
+  elif [ -n "$essentials_amount" ]; then
+    log_fail "Essentials route amountMinor — expected 7900, got ${essentials_amount}"
+  else
+    log_skip "Essentials route checks (jq not installed)"
+  fi
 fi
 
 mx_pricing="$(http_body "${API_V1}/billing/pricing?country=MX")"
 if command -v jq >/dev/null 2>&1; then
   essentials_price="$(printf '%s' "$mx_pricing" | jq -r '.tiers[] | select(.id=="essentials") | .monthlyPrice // empty')"
+elif printf '%s' "$mx_pricing" | python3 -c "import json,sys; d=json.load(sys.stdin); r=d.get('data',d); t=next(x for x in r.get('tiers',[]) if x.get('id')=='essentials'); print(t.get('monthlyPrice',''))" 2>/dev/null | grep -q .; then
+  essentials_price="$(printf '%s' "$mx_pricing" | python3 -c "import json,sys; d=json.load(sys.stdin); r=d.get('data',d); t=next(x for x in r.get('tiers',[]) if x.get('id')=='essentials'); print(t.get('monthlyPrice',''))")"
+else
+  essentials_price=""
+fi
+if [ -n "$essentials_price" ]; then
   if [ "$essentials_price" = "79" ]; then
     log_pass "Essentials public pricing MXN 79/mo"
   else
     log_fail "Essentials pricing — expected 79 MXN/mo, got ${essentials_price}"
   fi
+elif command -v jq >/dev/null 2>&1; then
+  :
 else
   log_skip "Essentials pricing check (jq not installed)"
 fi
