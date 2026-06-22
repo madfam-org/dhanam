@@ -80,7 +80,9 @@ async function main() {
   console.log('========================================');
   console.log('  LunchMoney → Dhanam Migration');
   console.log(`  Target user: ${targetEmail}`);
-  console.log(`  LM budget: "${preflight.budgetName}" (account_id=${preflight.lunchMoneyAccountId})`);
+  console.log(
+    `  LM budget: "${preflight.budgetName}" (account_id=${preflight.lunchMoneyAccountId})`
+  );
   console.log(`  Date range: ${START_DATE} → ${preflight.dateRange.endDate}`);
   console.log(`  Dry run: ${DRY_RUN}`);
   console.log('========================================\n');

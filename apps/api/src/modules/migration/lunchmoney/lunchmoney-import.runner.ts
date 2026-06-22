@@ -2,6 +2,11 @@ import { RecurringStatus, type PrismaClient } from '@db';
 
 import { IdMap } from './id-map';
 import { LunchMoneyClient } from './lunchmoney-client';
+import type {
+  LunchMoneyImportResult,
+  LunchMoneyImportRunOptions,
+  LunchMoneyPreflightResult,
+} from './lunchmoney-import.types';
 import {
   mapCurrency,
   mapAssetToAccount,
@@ -10,11 +15,6 @@ import {
   mapRecurringItem,
   decodeHtmlEntities,
 } from './lunchmoney-mapper';
-import type {
-  LunchMoneyImportResult,
-  LunchMoneyImportRunOptions,
-  LunchMoneyPreflightResult,
-} from './lunchmoney-import.types';
 
 const DEFAULT_START_DATE = '2024-01-01';
 

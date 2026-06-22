@@ -19,8 +19,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
-import { STRIPE_API_VERSION } from '../stripe-api-version';
 import { InfrastructureException } from '../../../core/exceptions/domain-exceptions';
+
+import { STRIPE_API_VERSION } from '../stripe-api-version';
 
 export interface StripeMxCheckoutParams {
   customerId?: string;

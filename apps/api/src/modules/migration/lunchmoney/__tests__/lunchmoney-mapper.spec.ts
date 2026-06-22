@@ -452,8 +452,8 @@ describe('IdMap', () => {
 
       expect(result).toBeInstanceOf(Map);
       expect(result.size).toBe(2);
-      expect(result.get(1)).toBe('uuid-1');
-      expect(result.get(2)).toBe('uuid-2');
+      expect(result.get('1')).toBe('uuid-1');
+      expect(result.get('2')).toBe('uuid-2');
     });
   });
 });
