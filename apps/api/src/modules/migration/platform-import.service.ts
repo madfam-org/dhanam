@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuditService } from '@core/audit/audit.service';
 import { CryptoService } from '@core/crypto/crypto.service';
 import { PrismaService } from '@core/prisma/prisma.service';
+import { PostHogService } from '@modules/analytics/posthog.service';
 import { QueueService } from '@modules/jobs/queue.service';
 import { SpacesService } from '@modules/spaces/spaces.service';
 import { PlatformImportSource, PlatformImportStatus } from '@db';
@@ -31,7 +32,8 @@ export class PlatformImportService {
     private readonly cryptoService: CryptoService,
     private readonly auditService: AuditService,
     private readonly queueService: QueueService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly postHogService: PostHogService
   ) {
     this.runner = new LunchMoneyImportRunner(prisma);
   }
@@ -125,6 +127,13 @@ export class PlatformImportService {
         preflightCounts: preflightSummary.counts,
       },
       severity: 'medium',
+    });
+
+    void this.trackMigration('migration_started', userId, {
+      spaceId,
+      source: PlatformImportSource.lunchmoney,
+      jobId: job.id,
+      startDate: effectiveStart,
     });
 
     return this.sanitizeJob(
@@ -227,6 +236,13 @@ export class PlatformImportService {
         },
         severity: 'medium',
       });
+
+      void this.trackMigration('migration_completed', job.userId, {
+        spaceId: job.spaceId,
+        source: job.source,
+        jobId: job.id,
+        counts: result.counts,
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Import failed';
       await this.markFailed(job.id, job.userId, job.spaceId, message);
@@ -258,6 +274,22 @@ export class PlatformImportService {
       resourceId: jobId,
       metadata: { spaceId, error: message },
       severity: 'high',
+    });
+
+    void this.trackMigration('migration_failed', userId, {
+      spaceId,
+      jobId,
+      error: message,
+    });
+  }
+
+  private trackMigration(
+    event: 'migration_started' | 'migration_completed' | 'migration_failed',
+    userId: string,
+    properties: Record<string, unknown>
+  ): void {
+    void this.postHogService.capture({ distinctId: userId, event, properties }).catch((err) => {
+      this.logger.warn(`PostHog ${event} capture failed: ${err instanceof Error ? err.message : err}`);
     });
   }
 

@@ -14,7 +14,8 @@ When the goal is first revenue, checkout, billing, catalog, or entitlements:
 - `docs/runbooks/ESSENTIALS_CFDI_RELAY.md` — Dhanam ↔ Karafiel Essentials CFDI relay (PR #573).
 - `catalog.yaml` + `scripts/sync-catalog.ts` — SKU source of truth and Stripe/DB sync.
 - `apps/api/src/modules/billing/README.md` — billing module (checkout, ledger, webhooks).
-- `docs/TECH_DEBT.md` — active debt (TD-1009, TD-1010, TD-1014).
+- `docs/TECH_DEBT.md` — active debt (TD-1009, TD-1010, TD-1014, TD-1017 migration).
+- `docs/PLATFORM_MIGRATION_ROADMAP.md` — consumer import wizards (PM-1–PM-4).
 
 Phase 0 platform blockers **MITIGATED 2026-06-16** — see
 `internal-devops/runbooks/2026-06-16-dhanam-secrets-recovery-session.md`.

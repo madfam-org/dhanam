@@ -169,6 +169,10 @@ spec:
             - name: FEATURE_CAPITAL_STACK_DETECTOR
               value: "false"
 
+            # Platform migration wizards (PM-1). Keep false until PM-1m staging proof.
+            - name: FEATURE_LUNCHMONEY_IMPORT
+              value: "false"
+
             # =================================================================
             # Billing - Conekta (LATAM card + SPEI direct gateway)
             # =================================================================

@@ -170,7 +170,7 @@ Plaid + Belvo reconnect, ML categorization loop, multi-budget isolation via
 | PM-1i | Wizard: paste API token → link to LM docs → preflight → confirm → progress |
 | PM-1j | Post-import step: “Reconnect your banks” with Belvo/Plaid CTAs             |
 | PM-1k | i18n keys under `import.lunchmoney.*`                                      |
-| PM-1l | PostHog: `migration_started`, `migration_completed`, `migration_failed`    |
+| PM-1l | PostHog: `migration_started`, `migration_completed`, `migration_failed`    | Shipped (2026-06-22) |
 
 **Ops / QA**
 

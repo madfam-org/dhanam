@@ -9,8 +9,8 @@ codebase and production implementation across `dhan.am`, `www.dhan.am`,
 **GA program:** For the full phased implementation plan toward technical
 stability GA, commercial GA, and consumer product GA, read
 [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md). That document is the
-canonical execution program; this file defines stability priorities P0–P8 and
-milestones M1–M5.
+canonical execution program; this file defines stability priorities P0–P9 and
+milestones M1–M8.
 
 **Implementation language:** All code, comments, commits, API contracts, and
 technical documentation must be written in English. Product UI strings use the
@@ -23,6 +23,7 @@ Read this with:
 - [Stability Audit 2026-05-19](STABILITY_AUDIT_2026-05-19.md)
 - [Stability Wrap-Up 2026-05-20](STABILITY_WRAP_UP_2026-05-20.md)
 - [Tech Debt Register](TECH_DEBT.md)
+- [Platform Migration Roadmap](PLATFORM_MIGRATION_ROADMAP.md) (consumer import wizards)
 - [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) (G4 + operator slice)
 - [Deployment Guide](DEPLOYMENT.md)
 - [Testing Overview](testing/TEST_SUMMARY.md)
@@ -350,6 +351,18 @@ Acceptance:
 - React 19 migration is unblocked or explicitly deferred with current evidence.
 - Current docs remain indexed from [docs/README.md](README.md).
 
+### P9: Platform Migration Wizards (Consumer G3 Enabler)
+
+Status: **PM-1 shipped** (2026-06-22), flag-gated. Canonical program:
+[Platform Migration Roadmap](PLATFORM_MIGRATION_ROADMAP.md).
+
+Work remaining: PM-1m staging LM smoke, PM-1o entitlements, PM-2+ competitor wizards.
+
+Acceptance:
+
+- Self-serve LM wizard passes staging smoke with `FEATURE_LUNCHMONEY_IMPORT=true`.
+- No marketing migration claims until M8 sign-off in the roadmap.
+
 ## Execution Order
 
 Detailed phase breakdown, workstreams, risks, and GA sign-off checklist:
@@ -381,6 +394,7 @@ Summary:
 | M5        | Enclii adapter gaps closed; provider health semantics encoded; lower-severity debt controlled. | 99%+               |
 | M6        | Consumer product GA per agreed scope (web and/or mobile).                                      | G3                 |
 | M7        | Operational proof: drills, 30-day clean health, GA sign-off checklist complete.                | 100%               |
+| M8        | Platform migration wizards: LM staging proof, entitlements, G3 marketing gate.                   | G3 migration       |
 
 The final 1 percent is operational proof over repeated clean deploys, clean
 health windows, and absence of undocumented manual paths. See
