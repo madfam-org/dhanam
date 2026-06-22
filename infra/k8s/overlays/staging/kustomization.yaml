@@ -97,3 +97,9 @@ patches:
     target:
       kind: PolicyException
       name: dhanam-gitops-rollout-signature
+
+  # Catalog sync job inherits production manifest; stamp staging NODE_ENV.
+  - path: catalog-sync-env-patch.yaml
+    target:
+      kind: CronJob
+      name: dhanam-catalog-sync

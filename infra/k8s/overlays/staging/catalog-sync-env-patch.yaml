@@ -1,0 +1,15 @@
+# Staging catalog sync CronJob: tag NODE_ENV for log clarity.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dhanam-catalog-sync
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sync
+              env:
+                - name: NODE_ENV
+                  value: "staging"

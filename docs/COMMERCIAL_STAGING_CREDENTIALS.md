@@ -78,6 +78,28 @@ POS timeline shows `cfdiUuid` when Karafiel returns it in the webhook response b
 | `STAGING_COMMERCIAL_CHARGE_ENABLED` | Variable | `true` when Stripe test keys work       |
 | `STAGING_COMMERCIAL_STRICT`         | Variable | `true` to fail CI without admin secrets |
 
+## Staging catalog sync (Essentials `priceIdResolvable`)
+
+Commercial smoke expects `GET /v1/billing/checkout/route-recommendation?plan=essentials`
+to return `priceIdResolvable: true`. Staging DB often has catalog **amounts** but no
+`ProductPrice.stripePriceId` until an in-cluster sync runs.
+
+**Preferred (Enclii-first):** GitHub Actions → **Sync staging catalog** workflow
+(`.github/workflows/sync-catalog-staging.yml`). Requires `ARC_BOOTSTRAP_COMPLETE=true`
+and `KUBECONFIG_PRODUCTION` on `madfam-runners-blue`.
+
+**Break-glass (kubectl):**
+
+```bash
+kubectl -n enclii-dhanam-staging create job "catalog-sync-$(date +%Y%m%d-%H%M)" \
+  --from=cronjob/dhanam-catalog-sync
+kubectl -n enclii-dhanam-staging logs -f "job/catalog-sync-…"
+```
+
+Prereq: `dhanam-billing-secrets` holds `STRIPE_MX_SECRET_KEY` (`sk_test_...`).
+Optional fallback env keys: `STRIPE_ESSENTIALS_PRICE_ID`, `STRIPE_PREMIUM_PRICE_ID`
+(see `infra/k8s/staging-secrets-template.yaml`).
+
 ## Verification commands
 
 ```bash
