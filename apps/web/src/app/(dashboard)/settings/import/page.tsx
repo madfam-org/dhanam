@@ -1,7 +1,15 @@
 'use client';
 
 import { useTranslation } from '@dhanam/shared';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge } from '@dhanam/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Badge,
+} from '@dhanam/ui';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -50,7 +58,9 @@ export default function ImportSettingsPage() {
         <LunchMoneyImportWizard spaceId={spaceId} />
       ) : (
         <Card>
-          <CardContent className="py-10 text-center text-muted-foreground">{t('hub.disabled')}</CardContent>
+          <CardContent className="py-10 text-center text-muted-foreground">
+            {t('hub.disabled')}
+          </CardContent>
         </Card>
       )}
 
