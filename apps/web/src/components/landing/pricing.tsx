@@ -50,40 +50,54 @@ export function Pricing({ onSignUpClick }: PricingProps) {
       });
   }, []);
 
-  // Fallback static pricing — anchored to the Tulana v0.1 recommended Consumer
-  // tiers (MXN/mo): Free $0 / Copilot Pro 199 / Family Plus 499. Source of
-  // truth: internal-devops/decisions/2026-04-25-tulana-ecosystem-pricing.md.
-  // Confidence is low and pricing is subject to validation with real users.
+  // Fallback when pricing API unavailable — Essentials anchor (IVA-incl. gross MXN).
   const tiers = pricing?.tiers || [
     {
       id: 'free',
       name: 'Free',
       monthlyPrice: 0,
+      monthlyPriceNet: null,
+      monthlyPriceGross: null,
       promoPrice: null,
       currency: 'MXN',
+      ivaRate: null,
+      priceDisplayMode: 'list' as const,
       features: [],
     },
     {
-      id: 'copilot_pro',
-      name: 'Copilot Pro',
-      monthlyPrice: 199,
+      id: 'essentials',
+      name: 'Essentials',
+      monthlyPrice: 92,
+      monthlyPriceNet: 79,
+      monthlyPriceGross: 92,
       promoPrice: null,
       currency: 'MXN',
+      ivaRate: 0.16,
+      priceDisplayMode: 'iva_inclusive_ceil' as const,
       features: [],
     },
     {
-      id: 'family_plus',
-      name: 'Family Plus',
-      monthlyPrice: 499,
+      id: 'pro',
+      name: 'Pro',
+      monthlyPrice: 347,
+      monthlyPriceNet: 299,
+      monthlyPriceGross: 347,
       promoPrice: null,
       currency: 'MXN',
+      ivaRate: 0.16,
+      priceDisplayMode: 'iva_inclusive_ceil' as const,
       features: [],
     },
   ];
   const trial = pricing?.trial || { daysWithoutCC: 14, daysWithCC: 30, promoMonths: 3 };
   const hasPromo = tiers.some((t) => t.promoPrice !== null);
-  const recommendedTier = tiers.find((t) => t.id === 'copilot_pro' || t.id === 'pro') ?? tiers[1];
-  const recommendationPlan = recommendedTier?.id === 'copilot_pro' ? 'copilot_pro' : 'pro';
+  const recommendedTier = tiers.find((t) => t.id === 'essentials' || t.id === 'pro') ?? tiers[1];
+  const recommendationPlan =
+    recommendedTier?.id === 'essentials'
+      ? 'essentials'
+      : recommendedTier?.id === 'pro'
+        ? 'pro'
+        : 'pro';
   const recommendationAmountMinor = recommendedTier
     ? Math.round((recommendedTier.promoPrice ?? recommendedTier.monthlyPrice) * 100)
     : undefined;
@@ -101,7 +115,10 @@ export function Pricing({ onSignUpClick }: PricingProps) {
 
   const showCoffeeAnchor =
     (geoCountry === 'MX' || tiers.some((tier) => tier.currency === 'MXN')) &&
-    tiers.some((tier) => tier.id === 'copilot_pro' || tier.id === 'pro');
+    tiers.some((tier) => tier.id === 'essentials' || tier.id === 'pro');
+  const showIvaInclusive =
+    geoCountry === 'MX' ||
+    tiers.some((tier) => tier.currency === 'MXN' && tier.priceDisplayMode === 'iva_inclusive_ceil');
 
   return (
     <section className="container mx-auto px-6 py-16" id="pricing">
@@ -119,8 +136,7 @@ export function Pricing({ onSignUpClick }: PricingProps) {
             </div>
           )}
           <p className="mt-3 text-xs text-muted-foreground max-w-xl mx-auto">
-            Indicative pricing in MXN per month, anchored to the Tulana v0.1 ecosystem
-            recommendation and subject to validation with real users.
+            {showIvaInclusive ? t('pricing.ivaInclusiveHint') : t('pricing.subtitle')}
           </p>
 
           <div className="mt-6 inline-flex items-center rounded-full border bg-muted/40 p-1">
@@ -210,6 +226,9 @@ export function Pricing({ onSignUpClick }: PricingProps) {
                           {display.suffix}
                         </span>
                       </p>
+                      {showIvaInclusive && tier.currency === 'MXN' && tier.monthlyPrice > 0 && (
+                        <p className="text-xs text-muted-foreground">{t('pricing.ivaIncluded')}</p>
+                      )}
                       {billingPeriod === 'annual' &&
                         display.equivalent !== null &&
                         baseMonthly > 0 && (

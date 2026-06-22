@@ -90,7 +90,14 @@ describe('PricingEngineService', () => {
     expect(pricing.region).toBe(3);
     expect(pricing.regionName).toBe('latam');
     expect(pricing.currency).toBe('MXN');
-    expect(pricing.tiers.map((tier) => tier.monthlyPrice)).toEqual([79, 299, 599]);
+    expect(pricing.tiers.map((tier) => tier.monthlyPrice)).toEqual([92, 347, 695]);
+    expect(pricing.tiers.map((tier) => tier.monthlyPriceNet)).toEqual([79, 299, 599]);
+    expect(pricing.tiers.map((tier) => tier.monthlyPriceGross)).toEqual([92, 347, 695]);
+    expect(pricing.tiers.map((tier) => tier.priceDisplayMode)).toEqual([
+      'iva_inclusive_ceil',
+      'iva_inclusive_ceil',
+      'iva_inclusive_ceil',
+    ]);
     expect(pricing.tiers.map((tier) => tier.promoPrice)).toEqual([null, null, null]);
     expect(pricing.tiers[1].features).toEqual(['Unlimited provider connections']);
   });

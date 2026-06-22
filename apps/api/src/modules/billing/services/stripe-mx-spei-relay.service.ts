@@ -85,6 +85,7 @@
 
 import { randomUUID, createHmac } from 'node:crypto';
 
+import { mxnSplitGrossCentavos, MXN_PRICING_RULE } from '@dhanam/shared';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type Stripe from 'stripe';
@@ -111,6 +112,9 @@ export interface DhanamPaymentEnvelope {
     payment_id: string;
     amount: string;
     amount_minor: number;
+    amount_net_minor?: number;
+    amount_tax_minor?: number;
+    pricing_rule?: string;
     currency: 'MXN';
     failure_reason?: string;
     failure_code?: string;
@@ -307,6 +311,7 @@ export class StripeMxSpeiRelayService {
     }
 
     const amountMinor = pi.amount ?? 0;
+    const taxSplit = mxnSplitGrossCentavos(amountMinor);
     const base: DhanamPaymentEnvelope = {
       type,
       id: randomUUID(),
@@ -317,6 +322,9 @@ export class StripeMxSpeiRelayService {
         payment_id: pi.id,
         amount: (amountMinor / 100).toFixed(2),
         amount_minor: amountMinor,
+        amount_net_minor: taxSplit.netCentavos,
+        amount_tax_minor: taxSplit.ivaCentavos,
+        pricing_rule: MXN_PRICING_RULE,
         currency: 'MXN',
       },
     };
@@ -502,6 +510,14 @@ export class StripeMxSpeiRelayService {
             paymentIntentId: envelope.data.payment_id,
             subscription_id: envelope.data.subscription_id,
             source: 'stripe_mx_spei_relay',
+            ...(envelope.data.amount_net_minor != null
+              ? {
+                  amount_net: (envelope.data.amount_net_minor / 100).toFixed(2),
+                  amount_tax: ((envelope.data.amount_tax_minor ?? 0) / 100).toFixed(2),
+                  amount_gross: (envelope.data.amount_minor / 100).toFixed(2),
+                  pricing_rule: envelope.data.pricing_rule ?? MXN_PRICING_RULE,
+                }
+              : {}),
           },
         },
       });

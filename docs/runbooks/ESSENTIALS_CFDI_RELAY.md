@@ -7,9 +7,9 @@ Last Updated: 2026-06-17
 
 ## Flow
 
-1. Stripe MX Checkout (Essentials, MXN 79/mo) captures `buyer_rfc` on the session.
+1. Stripe MX Checkout (Essentials, **MXN 92/mo IVA incl.** — net anchor 79) captures `buyer_rfc` on the session.
 2. `stripe-mx-spei-relay.service` emits a signed `payment.succeeded` envelope to Karafiel
-   (`buyer_rfc`, `payment_id` = Stripe PaymentIntent id).
+   (`amount_minor=9200`, `amount_net_minor=7931`, `amount_tax_minor=1269`, `buyer_rfc`, `payment_id` = Stripe PaymentIntent id).
 3. Karafiel auto-issues CFDI when `FEATURE_CFDI_AUTO_ISSUE=true` and emisor CSD is configured.
 4. Karafiel callbacks `POST /v1/internal/billing/cfdi-issued` (HMAC via `DHANAM_WEBHOOK_SECRET`).
 5. `CfdiTimelineService.attachCfdiUuid` writes `cfdiUuid` onto matching `BillingEvent.metadata`.

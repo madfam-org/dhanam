@@ -80,10 +80,10 @@ pricing_body="$(curl -sS "${API_V1}/billing/pricing?country=${COUNTRY}" 2>/dev/n
 if [ -n "$pricing_body" ]; then
   mx_price="$(json_get "$pricing_body" essentials_price)"
   mx_cur="$(json_get "$pricing_body" essentials_currency)"
-  if [ "$mx_price" = "79" ] && [ "$mx_cur" = "MXN" ]; then
-    log_pass "Public pricing: Essentials MXN 79/mo"
+  if [ "$mx_price" = "92" ] && [ "$mx_cur" = "MXN" ]; then
+    log_pass "Public pricing: Essentials MXN 92/mo IVA incl."
   else
-    log_fail "Public pricing mismatch (got ${mx_price} ${mx_cur}, want 79 MXN)"
+    log_fail "Public pricing mismatch (got ${mx_price} ${mx_cur}, want 92 MXN IVA incl.)"
   fi
 else
   log_fail "Could not parse /billing/pricing response"
@@ -113,10 +113,10 @@ PY
   else
     log_fail "Route preview unexpected (provider=${provider} currency=${currency} resolvable=${resolvable})"
   fi
-  if [ "$PLAN" = "essentials" ] && [ "$route_amount" = "7900" ]; then
-    log_pass "Route amountMinor matches Essentials catalog (7900 centavos)"
+  if [ "$PLAN" = "essentials" ] && [ "$route_amount" = "9200" ]; then
+    log_pass "Route amountMinor matches Essentials IVA-incl. charge (9200 centavos)"
   elif [ "$PLAN" = "essentials" ] && [ -n "$route_amount" ]; then
-    log_fail "Route amountMinor mismatch for essentials (got ${route_amount}, want 7900)"
+    log_fail "Route amountMinor mismatch for essentials (got ${route_amount}, want 9200)"
   fi
   fi
 else

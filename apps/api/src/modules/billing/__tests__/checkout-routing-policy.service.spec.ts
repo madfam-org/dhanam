@@ -137,8 +137,8 @@ describe('CheckoutRoutingPolicyService', () => {
   });
 
   describe('getPublicRouteRecommendation', () => {
-    it('uses catalog amount for essentials when resolver returns amountCents', async () => {
-      priceResolver.resolveAmountMinor.mockResolvedValue(7900);
+    it('uses catalog gross amount for essentials when resolver returns amountCents', async () => {
+      priceResolver.resolveAmountMinor.mockResolvedValue(9200);
       priceResolver.resolve.mockResolvedValue({ priceId: 'price_dhanam_essentials' });
 
       const recommendation = await service.getPublicRouteRecommendation({
@@ -147,7 +147,7 @@ describe('CheckoutRoutingPolicyService', () => {
         product: 'dhanam',
       });
 
-      expect(recommendation.amountMinor).toBe(7900);
+      expect(recommendation.amountMinor).toBe(9200);
       expect(recommendation.priceIdResolvable).toBe(true);
       expect(recommendation.catalogPlanId).toBe('dhanam_essentials');
     });
