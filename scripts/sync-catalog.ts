@@ -44,6 +44,30 @@ const pool = new Pool({ connectionString: DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
+/** Wait for cluster DNS / Postgres to become reachable (mirrors fx-spot-refresh retry). */
+async function warmDbPool(attempts = 60): Promise<void> {
+  if (DRY_RUN) {
+    return;
+  }
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      await pool.query('SELECT 1');
+      if (attempt > 1) {
+        console.log(`[SYNC] DB ready on attempt ${attempt}`);
+      }
+      return;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (attempt === attempts) {
+        throw err;
+      }
+      console.log(`[SYNC] DB not ready (attempt ${attempt}/${attempts}): ${message}`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+}
+
 // Initialize Stripe clients (MXN and/or USD)
 const stripeMx = process.env.STRIPE_MX_SECRET_KEY
   ? new Stripe(process.env.STRIPE_MX_SECRET_KEY, { typescript: true })
@@ -603,6 +627,8 @@ async function main(): Promise<void> {
       'WARNING: No Stripe API keys set. DB sync only (no Stripe products/prices created).'
     );
   }
+
+  await warmDbPool();
 
   // Sync products
   const slugs = Object.keys(catalog.products);
