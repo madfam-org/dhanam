@@ -1,11 +1,10 @@
 # Operator workflow: sync catalog.yaml → staging Dhanam DB + Stripe (test mode).
 #
-# Staging Postgres is reachable only in-cluster. This job runs on the ARC
-# runner (when bootstrapped), triggers the suspended dhanam-catalog-sync
-# CronJob in enclii-dhanam-staging, and verifies Essentials priceIdResolvable.
+# Primary path: run sync-catalog.ts on madfam-runners-blue using GitHub
+# Environment "staging" secrets (DATABASE_URL + STRIPE_MX_SECRET_KEY).
 #
-# Prereq: dhanam-billing-secrets in enclii-dhanam-staging must hold
-# STRIPE_MX_SECRET_KEY (sk_test_...). See docs/COMMERCIAL_STAGING_CREDENTIALS.md.
+# Fallback: trigger the in-cluster dhanam-catalog-sync CronJob via kubectl when
+# the runner can reach the API server (Enclii ops jobs trigger is preferred locally).
 
 name: Sync staging catalog
 
@@ -16,14 +15,94 @@ on:
         description: "Why are you syncing now? (audit log)"
         required: true
         type: string
+      mode:
+        description: "sync mode"
+        required: false
+        default: "direct"
+        type: choice
+        options:
+          - direct
+          - in-cluster
 
 concurrency:
   group: sync-catalog-staging
   cancel-in-progress: false
 
 jobs:
-  sync:
-    name: In-cluster catalog sync
+  direct-sync:
+    name: Direct sync (staging env secrets)
+    if: inputs.mode == 'direct'
+    runs-on: ${{ vars.ARC_BOOTSTRAP_COMPLETE == 'true' && 'madfam-runners-blue' || 'ubuntu-latest' }}
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+          standalone: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      - name: Configure npm registry
+        run: |
+          echo "@madfam:registry=https://npm.madfam.io" >> ~/.npmrc
+          echo "@dhanam:registry=https://npm.madfam.io" >> ~/.npmrc
+          echo "@janua:registry=https://npm.madfam.io" >> ~/.npmrc
+          echo "//npm.madfam.io/:_authToken=${{ secrets.NPM_MADFAM_TOKEN }}" >> ~/.npmrc
+
+      - name: Install dependencies
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+        run: pnpm install --frozen-lockfile
+
+      - name: Preflight staging secrets
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          STRIPE_MX_SECRET_KEY: ${{ secrets.STRIPE_MX_SECRET_KEY }}
+        run: |
+          set -euo pipefail
+          echo "Reason: ${{ inputs.reason }}"
+          missing=()
+          [ -z "${DATABASE_URL:-}" ] && missing+=("DATABASE_URL")
+          [ -z "${STRIPE_MX_SECRET_KEY:-}" ] && missing+=("STRIPE_MX_SECRET_KEY")
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::GitHub staging environment is missing secrets: ${missing[*]}"
+            exit 1
+          fi
+          echo "::add-mask::$DATABASE_URL"
+          echo "::add-mask::$STRIPE_MX_SECRET_KEY"
+          echo "DATABASE_URL=$DATABASE_URL" >> "$GITHUB_ENV"
+          echo "STRIPE_MX_SECRET_KEY=$STRIPE_MX_SECRET_KEY" >> "$GITHUB_ENV"
+
+      - name: Run catalog sync (live)
+        run: pnpm --filter @dhanam/api exec tsx ../../scripts/sync-catalog.ts
+
+      - name: Verify Essentials priceIdResolvable
+        run: |
+          set -euo pipefail
+          URL="https://staging-api.dhan.am/v1/billing/checkout/route-recommendation?country=MX&plan=essentials&product=dhanam"
+          for i in 1 2 3 4 5 6; do
+            body="$(curl -fsS --max-time 15 "$URL" || true)"
+            if printf '%s' "$body" | jq -e '.priceIdResolvable == true' >/dev/null 2>&1; then
+              echo "Essentials priceIdResolvable=true on attempt $i"
+              exit 0
+            fi
+            echo "attempt $i: priceIdResolvable still false, retrying"
+            sleep 15
+          done
+          echo "::error::Staging Essentials priceIdResolvable still false after catalog sync."
+          curl -fsS "$URL" | jq '{priceIdResolvable, catalogPlanId, amountMinor}' || true
+          exit 1
+
+  in-cluster-sync:
+    name: In-cluster CronJob sync
+    if: inputs.mode == 'in-cluster'
     runs-on: ${{ vars.ARC_BOOTSTRAP_COMPLETE == 'true' && 'madfam-runners-blue' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v4
@@ -48,14 +127,12 @@ jobs:
           set -euo pipefail
           if [ "${{ vars.ARC_BOOTSTRAP_COMPLETE }}" != "true" ]; then
             echo "reachable=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::ARC_BOOTSTRAP_COMPLETE is not true — in-cluster sync requires madfam-runners-blue."
             exit 0
           fi
           if kubectl version --request-timeout=10s >/dev/null 2>&1; then
             echo "reachable=true" >> "$GITHUB_OUTPUT"
           else
             echo "reachable=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Cluster API unreachable from this runner."
           fi
 
       - name: Trigger staging catalog sync job
@@ -66,12 +143,8 @@ jobs:
           STAMP="$(date -u +%Y%m%d-%H%M%S)"
           JOB="catalog-sync-${STAMP}"
           echo "Reason: ${{ inputs.reason }}"
-          if ! kubectl -n "$NS" get cronjob dhanam-catalog-sync >/dev/null 2>&1; then
-            echo "::error::CronJob dhanam-catalog-sync not found in $NS — confirm ArgoCD reconciled staging overlay."
-            exit 1
-          fi
           kubectl -n "$NS" create job "$JOB" --from=cronjob/dhanam-catalog-sync
-          kubectl -n "$NS" wait --for=condition=complete "job/$JOB" --timeout=600s
+          kubectl -n "$NS" wait --for=condition=complete "job/$JOB" --timeout=900s
           kubectl -n "$NS" logs "job/$JOB"
 
       - name: Verify Essentials priceIdResolvable
@@ -85,16 +158,12 @@ jobs:
               echo "Essentials priceIdResolvable=true on attempt $i"
               exit 0
             fi
-            echo "attempt $i: priceIdResolvable still false, retrying"
             sleep 15
           done
-          echo "::error::Staging Essentials priceIdResolvable still false after catalog sync."
-          curl -fsS "$URL" | jq '{priceIdResolvable, catalogPlanId, amountMinor}' || true
           exit 1
 
-      - name: ARC runner required (skipped)
+      - name: Cluster unreachable
         if: steps.cluster.outputs.reachable != 'true'
         run: |
-          echo "::error::In-cluster staging catalog sync requires madfam-runners-blue with cluster API access."
-          echo "Operator fallback: kubectl -n enclii-dhanam-staging create job catalog-sync-\$(date +%Y%m%d-%H%M) --from=cronjob/dhanam-catalog-sync"
+          echo "::error::Use mode=direct or enclii ops jobs trigger dhanam-catalog-sync -n enclii-dhanam-staging"
           exit 1
