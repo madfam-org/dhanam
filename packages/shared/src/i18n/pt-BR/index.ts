@@ -28,3 +28,4 @@ export { legal } from './legal';
 export { analytics } from './analytics';
 export { reports } from './reports';
 export { capitalStack } from './capital-stack';
+export { importTranslations as platformImport } from './import';

@@ -57,12 +57,14 @@ jobs:
       - name: Install dependencies
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/dhanam_test
+          LOCAL_DB: yes
         run: pnpm install --frozen-lockfile
 
       - name: Check for schema drift
         working-directory: apps/api
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/dhanam_test
+          LOCAL_DB: yes
         run: |
           # Generate Prisma Client
           pnpm db:generate
@@ -166,12 +168,14 @@ jobs:
       - name: Install dependencies
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/dhanam_test
+          LOCAL_DB: yes
         run: pnpm install --frozen-lockfile
 
       - name: Test rollback capability
         working-directory: apps/api
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/dhanam_test
+          LOCAL_DB: yes
         run: |
           # Apply all migrations
           pnpm db:migrate:deploy

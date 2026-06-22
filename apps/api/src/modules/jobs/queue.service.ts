@@ -92,13 +92,23 @@ export interface ReferralRewardJobData {
   };
 }
 
+export interface PlatformImportJobData {
+  type: 'platform-import';
+  payload: {
+    importJobId: string;
+    spaceId: string;
+    userId: string;
+  };
+}
+
 export type QueueJobData =
   | SyncTransactionsJobData
   | CategorizeTransactionsJobData
   | ESGUpdateJobData
   | ValuationSnapshotJobData
   | EmailJobData
-  | ReferralRewardJobData;
+  | ReferralRewardJobData
+  | PlatformImportJobData;
 
 @Injectable()
 export class QueueService implements OnModuleInit, OnModuleDestroy {
@@ -193,6 +203,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       'email-notifications',
       'system-maintenance',
       'referral-rewards',
+      'platform-import',
     ];
 
     // Initialize dead letter queue first
@@ -521,6 +532,19 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
     return queue.add('referral-reward-apply', data, {
       priority,
       jobId: data.rewardId,
+    });
+  }
+
+  async addPlatformImportJob(
+    data: PlatformImportJobData['payload'],
+    priority: number = 40
+  ): Promise<Job | null> {
+    const queue = this.getQueueOrSkip('platform-import');
+    if (!queue) return null;
+
+    return queue.add('platform-import', data, {
+      priority,
+      jobId: data.importJobId,
     });
   }
 

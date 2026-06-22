@@ -3,24 +3,28 @@
  * for idempotent migration across all entity types.
  */
 export class IdMap {
-  private maps: Map<string, Map<number, string>> = new Map();
+  private maps: Map<string, Map<string, string>> = new Map();
 
-  set(entityType: string, lmId: number, dhanamId: string): void {
+  private key(lmId: number | string): string {
+    return String(lmId);
+  }
+
+  set(entityType: string, lmId: number | string, dhanamId: string): void {
     if (!this.maps.has(entityType)) {
       this.maps.set(entityType, new Map());
     }
-    this.maps.get(entityType)!.set(lmId, dhanamId);
+    this.maps.get(entityType)!.set(this.key(lmId), dhanamId);
   }
 
-  get(entityType: string, lmId: number): string | undefined {
-    return this.maps.get(entityType)?.get(lmId);
+  get(entityType: string, lmId: number | string): string | undefined {
+    return this.maps.get(entityType)?.get(this.key(lmId));
   }
 
-  has(entityType: string, lmId: number): boolean {
-    return this.maps.get(entityType)?.has(lmId) ?? false;
+  has(entityType: string, lmId: number | string): boolean {
+    return this.maps.get(entityType)?.has(this.key(lmId)) ?? false;
   }
 
-  getAll(entityType: string): Map<number, string> {
+  getAll(entityType: string): Map<string, string> {
     return this.maps.get(entityType) || new Map();
   }
 

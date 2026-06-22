@@ -72,7 +72,7 @@ describe('Capital Stack Golden Journey', () => {
         personalSpaceId,
         businessSpaceId,
         legalName: 'Innovaciones MADFAM S.A.S. de C.V.',
-        taxId: 'IMA2501164Y7',
+        taxId: 'XAXX010101000',
       },
       ownerId
     );

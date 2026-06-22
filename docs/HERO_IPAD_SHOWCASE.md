@@ -229,7 +229,7 @@ the console shows `Refused to connect because it violates CSP`.
 correctly). Direct URL `/landing/models/ipad-pro.glb` is optional smoke only.
 
 **Layer 3 — Rollout lag:** If git manifest has a new digest but the URL still 404s,
-ArgoCD may not have rolled pods ([incident runbook](../runbooks/incidents/2026-06-15-dhanam-web-prod-rollout.md)).
+ArgoCD may not have rolled pods ([incident runbook](runbooks/incidents/2026-06-15-dhanam-web-prod-rollout.md)).
 Hard-refresh `dhanam-services` from operator kubeconfig or Enclii.
 
 **Layer 4 — Untextured materials:** `ipad-gltf-body.tsx` strips embedded GLB textures

@@ -412,6 +412,7 @@ model User {
   ambassadorProfile         AmbassadorProfile?
   merchantAccounts          MerchantAccount[]
   platformConfigUpdates     PlatformConfig[]           @relation("PlatformConfigUpdates")
+  platformImportJobs        PlatformImportJob[]
   beneficialOwnerHouseholds Household[]                @relation("BeneficialOwner")
   spaceOperatorBindings     SpaceOperatorBinding[]     @relation("SpaceOperator")
   beneficialOwnerBindings   SpaceOperatorBinding[]     @relation("BeneficialOwnerBinding")
@@ -661,6 +662,7 @@ model Space {
   operatorBinding      SpaceOperatorBinding?
   journalSourceEntries OwnerCapitalJournal[] @relation("JournalSourceSpace")
   journalTargetEntries OwnerCapitalJournal[] @relation("JournalTargetSpace")
+  platformImportJobs   PlatformImportJob[]
 
   @@index([householdId])
   @@index([deletedAt])
@@ -2855,4 +2857,47 @@ model PlatformConfig {
   @@unique([key, scope, scopeId])
   @@index([scope, scopeId])
   @@map("platform_config")
+}
+
+enum PlatformImportSource {
+  lunchmoney
+  csv
+}
+
+enum PlatformImportStatus {
+  pending
+  running
+  completed
+  failed
+  cancelled
+}
+
+/// Tracks async competitor → Dhanam import jobs (LunchMoney, CSV presets).
+model PlatformImportJob {
+  id               String               @id @default(uuid())
+  spaceId          String               @map("space_id")
+  userId           String               @map("user_id")
+  source           PlatformImportSource
+  status           PlatformImportStatus @default(pending)
+  bullmqJobId      String?              @map("bullmq_job_id")
+  /// Encrypted LunchMoney API token — cleared after successful import.
+  encryptedToken   String?              @map("encrypted_token")
+  tokenExpiresAt   DateTime?            @map("token_expires_at")
+  startDate        String?              @map("start_date")
+  options          Json?
+  preflightSummary Json?                @map("preflight_summary")
+  resultSummary    Json?                @map("result_summary")
+  errorMessage     String?              @map("error_message")
+  startedAt        DateTime?            @map("started_at")
+  completedAt      DateTime?            @map("completed_at")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([spaceId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("platform_import_jobs")
 }
