@@ -228,6 +228,9 @@ export const landing = {
   pricing: {
     title: 'Plans for Every Stage',
     subtitle: 'Start free, grow into the tools you need',
+    ivaInclusiveHint:
+      'Prices in MXN per month, IVA included (16%). Rounded up to the nearest peso for Mexico.',
+    ivaIncluded: 'IVA incl.',
     billingMonthly: 'Monthly',
     billingAnnual: 'Annual',
     annualSave: 'Save ~17% · 2 months free',

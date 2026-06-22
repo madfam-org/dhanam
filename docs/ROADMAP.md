@@ -394,7 +394,7 @@ Summary:
 | M5        | Enclii adapter gaps closed; provider health semantics encoded; lower-severity debt controlled. | 99%+               |
 | M6        | Consumer product GA per agreed scope (web and/or mobile).                                      | G3                 |
 | M7        | Operational proof: drills, 30-day clean health, GA sign-off checklist complete.                | 100%               |
-| M8        | Platform migration wizards: LM staging proof, entitlements, G3 marketing gate.                   | G3 migration       |
+| M8        | Platform migration wizards: LM staging proof, entitlements, G3 marketing gate.                 | G3 migration       |
 
 The final 1 percent is operational proof over repeated clean deploys, clean
 health windows, and absence of undocumented manual paths. See

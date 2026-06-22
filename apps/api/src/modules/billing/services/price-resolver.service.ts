@@ -1,3 +1,4 @@
+import { mxnGrossCentavosFromNet } from '@dhanam/shared';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -96,6 +97,9 @@ export class PriceResolverService {
       });
 
       if (price?.amountCents != null) {
+        if (parsed.currency === 'MXN') {
+          return mxnGrossCentavosFromNet(price.amountCents);
+        }
         return price.amountCents;
       }
     } catch (err) {

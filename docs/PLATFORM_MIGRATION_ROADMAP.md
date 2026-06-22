@@ -165,7 +165,7 @@ Plaid + Belvo reconnect, ML categorization loop, multi-budget isolation via
 **Web**
 
 | ID    | Task                                                                       |
-| ----- | -------------------------------------------------------------------------- |
+| ----- | -------------------------------------------------------------------------- | -------------------- |
 | PM-1h | Settings → Import hub with LunchMoney card                                 |
 | PM-1i | Wizard: paste API token → link to LM docs → preflight → confirm → progress |
 | PM-1j | Post-import step: “Reconnect your banks” with Belvo/Plaid CTAs             |

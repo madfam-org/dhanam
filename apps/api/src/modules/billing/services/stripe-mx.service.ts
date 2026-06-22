@@ -20,7 +20,6 @@ import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
 import { InfrastructureException } from '../../../core/exceptions/domain-exceptions';
-
 import { STRIPE_API_VERSION } from '../stripe-api-version';
 
 export interface StripeMxCheckoutParams {
@@ -149,7 +148,9 @@ export class StripeMxService {
           region: 'MX',
         },
       },
-      // Mexican tax configuration
+      // Mexican tax: Stripe MX Prices use tax_behavior=inclusive at whole-peso
+      // gross amounts (see sync-catalog.ts). automatic_tax extracts IVA from
+      // the inclusive line item — do not stack exclusive tax on top.
       automatic_tax: {
         enabled: true,
       },

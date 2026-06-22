@@ -9,13 +9,13 @@ behind `FEATURE_LUNCHMONEY_IMPORT` (default `false`).
 
 JWT-scoped routes under `/v1/spaces/:spaceId/migration/`:
 
-| Method | Path | Purpose |
-| ------ | ---- | ------- |
-| GET | `status` | Feature flags (`lunchMoney`, `csv`) |
-| POST | `lunchmoney/preflight` | Read-only LM counts |
-| POST | `lunchmoney/start` | Enqueue async import |
-| GET | `jobs` | Recent jobs for space |
-| GET | `jobs/:jobId` | Job status + summary |
+| Method | Path                   | Purpose                             |
+| ------ | ---------------------- | ----------------------------------- |
+| GET    | `status`               | Feature flags (`lunchMoney`, `csv`) |
+| POST   | `lunchmoney/preflight` | Read-only LM counts                 |
+| POST   | `lunchmoney/start`     | Enqueue async import                |
+| GET    | `jobs`                 | Recent jobs for space               |
+| GET    | `jobs/:jobId`          | Job status + summary                |
 
 ## Architecture
 
@@ -32,10 +32,10 @@ JWT-scoped routes under `/v1/spaces/:spaceId/migration/`:
 
 ## Subpackages
 
-| Path          | Purpose                                                         |
-| ------------- | --------------------------------------------------------------- |
-| `lunchmoney/` | LunchMoney API client, runner, mappers, ID map                   |
-| `madfam-csv/` | MADFAM CSV row types, routing config, prod continuity helpers   |
+| Path          | Purpose                                                       |
+| ------------- | ------------------------------------------------------------- |
+| `lunchmoney/` | LunchMoney API client, runner, mappers, ID map                |
+| `madfam-csv/` | MADFAM CSV row types, routing config, prod continuity helpers |
 
 ## Operator CLI (white-glove)
 

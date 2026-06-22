@@ -25,6 +25,7 @@ import Stripe from 'stripe';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 import { PrismaClient } from '../apps/api/generated/prisma';
+import { mxnGrossCentavosFromNet } from '../packages/shared/src/utils/mxn-pricing';
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -147,7 +148,8 @@ async function findStripePrice(
   productId: string,
   currency: string,
   interval: string,
-  tierSlug: string
+  tierSlug: string,
+  expectedUnitAmount: number
 ): Promise<Stripe.Price | null> {
   const prices = await stripe.prices.list({
     product: productId,
@@ -159,6 +161,7 @@ async function findStripePrice(
   return (
     prices.data.find(
       (p) =>
+        p.unit_amount === expectedUnitAmount &&
         p.recurring?.interval === (interval === 'yearly' ? 'year' : 'month') &&
         p.recurring?.interval_count === 1 &&
         p.metadata?.madfam_tier === tierSlug &&
@@ -166,6 +169,13 @@ async function findStripePrice(
         p.metadata?.madfam_interval === interval
     ) ?? null
   );
+}
+
+function stripeUnitAmount(currency: string, netCentavos: number): number {
+  if (currency === 'MXN') {
+    return mxnGrossCentavosFromNet(netCentavos);
+  }
+  return netCentavos;
 }
 
 function catalogPriceKey(tierSlug: string, currency: string, interval: string): string {
@@ -326,24 +336,38 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
           // Create/find Stripe Price
           const stripe = getStripeForCurrency(currency);
           const stripeProductId = stripeProductIds[currency];
-          if (stripe && stripeProductId && !dbPrice.stripePriceId) {
-            let stripePrice = await findStripePrice(
-              stripe,
-              stripeProductId,
-              currency,
-              billingInterval,
-              tierSlug
-            );
+          const unitAmount = stripeUnitAmount(currency, amount);
+          if (stripe && stripeProductId) {
+            let stripePrice = dbPrice.stripePriceId
+              ? await stripe.prices.retrieve(dbPrice.stripePriceId).catch(() => null)
+              : null;
+            if (stripePrice && stripePrice.unit_amount !== unitAmount) {
+              log(
+                'Price',
+                `Stale Stripe price ${stripePrice.id} unit ${stripePrice.unit_amount} != ${unitAmount}; re-resolving`
+              );
+              stripePrice = null;
+            }
+            if (!stripePrice) {
+              stripePrice = await findStripePrice(
+                stripe,
+                stripeProductId,
+                currency,
+                billingInterval,
+                tierSlug,
+                unitAmount
+              );
+            }
 
             if (stripePrice) {
               log(
                 'Price',
-                `Found ${slug}/${tierSlug} ${currency} ${billingInterval}: ${stripePrice.id}`
+                `Found ${slug}/${tierSlug} ${currency} ${billingInterval}: ${stripePrice.id} (${unitAmount} centavos)`
               );
             } else {
-              stripePrice = await stripe.prices.create({
+              const createParams: Stripe.PriceCreateParams = {
                 product: stripeProductId,
-                unit_amount: amount,
+                unit_amount: unitAmount,
                 currency: currency.toLowerCase(),
                 recurring: { interval: billingInterval === 'yearly' ? 'year' : 'month' },
                 metadata: {
@@ -351,11 +375,22 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
                   madfam_tier: tierSlug,
                   madfam_currency: currency,
                   madfam_interval: billingInterval,
+                  ...(currency === 'MXN'
+                    ? {
+                        madfam_net_centavos: String(amount),
+                        madfam_gross_centavos: String(unitAmount),
+                        madfam_pricing_rule: 'ceil_whole_peso_iva',
+                      }
+                    : {}),
                 },
-              });
+              };
+              if (currency === 'MXN') {
+                createParams.tax_behavior = 'inclusive';
+              }
+              stripePrice = await stripe.prices.create(createParams);
               log(
                 'Price',
-                `Created ${slug}/${tierSlug} ${currency} ${billingInterval}: ${stripePrice.id}`
+                `Created ${slug}/${tierSlug} ${currency} ${billingInterval}: ${stripePrice.id} (${unitAmount} centavos)`
               );
             }
 
@@ -366,9 +401,10 @@ async function syncProduct(slug: string, config: YamlProduct): Promise<void> {
             });
           }
         } else {
+          const unitAmount = stripeUnitAmount(currency, amount);
           log(
             'Price',
-            `Would sync ${slug}/${tierSlug} ${currency} ${billingInterval}: ${amount} centavos`
+            `Would sync ${slug}/${tierSlug} ${currency} ${billingInterval}: net ${amount} → charge ${unitAmount} centavos`
           );
         }
       }

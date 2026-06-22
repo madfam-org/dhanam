@@ -1,3 +1,4 @@
+import { MXN_IVA_RATE, mxnGrossMajorFromNetCentavos } from '@dhanam/shared';
 import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 
 import { PrismaService } from '@core/prisma/prisma.service';
@@ -6,16 +7,24 @@ import { CatalogProduct, ProductCatalogService } from './product-catalog.service
 
 interface RegionalPrice {
   monthlyPrice: number;
+  monthlyPriceNet: number | null;
+  monthlyPriceGross: number | null;
   promoPrice: number | null;
   currency: string;
+  ivaRate: number | null;
+  priceDisplayMode: 'iva_inclusive_ceil' | 'list';
 }
 
 interface PricingTier {
   id: string;
   name: string;
   monthlyPrice: number;
+  monthlyPriceNet: number | null;
+  monthlyPriceGross: number | null;
   promoPrice: number | null;
   currency: string;
+  ivaRate: number | null;
+  priceDisplayMode: 'iva_inclusive_ceil' | 'list';
   features: string[];
 }
 
@@ -170,10 +179,29 @@ export class PricingEngineService {
         );
       }
 
+      if (priceCurrency === 'MXN') {
+        const netMajor = monthlyCents / 100;
+        const grossMajor = mxnGrossMajorFromNetCentavos(monthlyCents);
+        return {
+          monthlyPrice: grossMajor,
+          monthlyPriceNet: netMajor,
+          monthlyPriceGross: grossMajor,
+          promoPrice: null,
+          currency: priceCurrency,
+          ivaRate: MXN_IVA_RATE,
+          priceDisplayMode: 'iva_inclusive_ceil',
+        };
+      }
+
+      const listMajor = monthlyCents / 100;
       return {
-        monthlyPrice: monthlyCents / 100,
+        monthlyPrice: listMajor,
+        monthlyPriceNet: null,
+        monthlyPriceGross: null,
         promoPrice: null,
         currency: priceCurrency,
+        ivaRate: null,
+        priceDisplayMode: 'list',
       };
     };
 
@@ -204,8 +232,12 @@ export class PricingEngineService {
       id,
       name,
       monthlyPrice: price.monthlyPrice,
+      monthlyPriceNet: price.monthlyPriceNet,
+      monthlyPriceGross: price.monthlyPriceGross,
       promoPrice: price.promoPrice,
       currency: price.currency,
+      ivaRate: price.ivaRate,
+      priceDisplayMode: price.priceDisplayMode,
       features: catalogTier.get(id)?.features ?? [],
     });
 

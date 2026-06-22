@@ -40,7 +40,7 @@ For execution order and milestone targets, read the
 | TD-1014 | Production catalog sync ops    | High     | Active   | GitHub Production environment lacks `DATABASE_URL`/Stripe secrets; live catalog drift (e.g. missing `voxa`) until `sync-catalog.ts` runs. Weekly drift workflow + hardened operator runbook shipped. | [Catalog Truth](CATALOG_TRUTH_2026-05-20.md)                            |
 | TD-1015 | Prod public surface URL drift  | High     | Closed   | Staging-built web on prod hostnames fixed via hostname-aware URLs, prod web rebuild on promote, PR #513 rollout, preflight green on `dhan.am` / `app.dhan.am`.                                       | `scripts/production-preflight.sh`                                       |
 | TD-1016 | Vault extended secret backfill | High     | Active   | `vault-store` cannot read `secret/dhanam`; git ES removed from kustomization. Platform ES + retained keys interim. Re-enable after Lockbox backfill.                                                 | `infra/k8s/production/external-secret.yaml`                             |
-| TD-1017 | Platform migration (G3)        | Medium   | Active   | PM-1 landed (LM wizard + API + queue) behind `FEATURE_LUNCHMONEY_IMPORT`. Remaining: PM-1m staging smoke, PM-1o entitlements, PM-2+ wizards.                                                      | [Platform Migration Roadmap](PLATFORM_MIGRATION_ROADMAP.md)             |
+| TD-1017 | Platform migration (G3)        | Medium   | Active   | PM-1 landed (LM wizard + API + queue) behind `FEATURE_LUNCHMONEY_IMPORT`. Remaining: PM-1m staging smoke, PM-1o entitlements, PM-2+ wizards.                                                         | [Platform Migration Roadmap](PLATFORM_MIGRATION_ROADMAP.md)             |
 
 ## Remediation Notes
 

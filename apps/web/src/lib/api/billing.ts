@@ -37,8 +37,12 @@ export interface RegionalPrice {
   id: string;
   name: string;
   monthlyPrice: number;
+  monthlyPriceNet?: number | null;
+  monthlyPriceGross?: number | null;
   promoPrice: number | null;
   currency: string;
+  ivaRate?: number | null;
+  priceDisplayMode?: 'iva_inclusive_ceil' | 'list';
   features: string[];
 }
 

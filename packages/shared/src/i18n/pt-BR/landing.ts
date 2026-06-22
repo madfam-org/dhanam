@@ -228,6 +228,9 @@ export const landing = {
   pricing: {
     title: 'Planos para Cada Etapa',
     subtitle: 'Comece grátis, cresça com as ferramentas que você precisa',
+    ivaInclusiveHint:
+      'Preços em MXN por mês, IVA incluído (16%). Arredondamento para cima ao peso inteiro no México.',
+    ivaIncluded: 'IVA incl.',
     billingMonthly: 'Mensal',
     billingAnnual: 'Anual',
     annualSave: 'Economize ~17% · 2 meses grátis',
