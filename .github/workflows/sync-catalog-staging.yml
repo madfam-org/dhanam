@@ -1,0 +1,100 @@
+# Operator workflow: sync catalog.yaml → staging Dhanam DB + Stripe (test mode).
+#
+# Staging Postgres is reachable only in-cluster. This job runs on the ARC
+# runner (when bootstrapped), triggers the suspended dhanam-catalog-sync
+# CronJob in enclii-dhanam-staging, and verifies Essentials priceIdResolvable.
+#
+# Prereq: dhanam-billing-secrets in enclii-dhanam-staging must hold
+# STRIPE_MX_SECRET_KEY (sk_test_...). See docs/COMMERCIAL_STAGING_CREDENTIALS.md.
+
+name: Sync staging catalog
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why are you syncing now? (audit log)"
+        required: true
+        type: string
+
+concurrency:
+  group: sync-catalog-staging
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: In-cluster catalog sync
+    runs-on: ${{ vars.ARC_BOOTSTRAP_COMPLETE == 'true' && 'madfam-runners-blue' || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        if: vars.ARC_BOOTSTRAP_COMPLETE == 'true'
+        uses: azure/setup-kubectl@v5
+
+      - name: Configure kubeconfig
+        if: vars.ARC_BOOTSTRAP_COMPLETE == 'true'
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_PRODUCTION }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.kube
+          printf '%s' "$KUBECONFIG_DATA" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Preflight cluster reachability
+        id: cluster
+        run: |
+          set -euo pipefail
+          if [ "${{ vars.ARC_BOOTSTRAP_COMPLETE }}" != "true" ]; then
+            echo "reachable=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::ARC_BOOTSTRAP_COMPLETE is not true — in-cluster sync requires madfam-runners-blue."
+            exit 0
+          fi
+          if kubectl version --request-timeout=10s >/dev/null 2>&1; then
+            echo "reachable=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "reachable=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Cluster API unreachable from this runner."
+          fi
+
+      - name: Trigger staging catalog sync job
+        if: steps.cluster.outputs.reachable == 'true'
+        run: |
+          set -euo pipefail
+          NS="enclii-dhanam-staging"
+          STAMP="$(date -u +%Y%m%d-%H%M%S)"
+          JOB="catalog-sync-${STAMP}"
+          echo "Reason: ${{ inputs.reason }}"
+          if ! kubectl -n "$NS" get cronjob dhanam-catalog-sync >/dev/null 2>&1; then
+            echo "::error::CronJob dhanam-catalog-sync not found in $NS — confirm ArgoCD reconciled staging overlay."
+            exit 1
+          fi
+          kubectl -n "$NS" create job "$JOB" --from=cronjob/dhanam-catalog-sync
+          kubectl -n "$NS" wait --for=condition=complete "job/$JOB" --timeout=600s
+          kubectl -n "$NS" logs "job/$JOB"
+
+      - name: Verify Essentials priceIdResolvable
+        if: steps.cluster.outputs.reachable == 'true'
+        run: |
+          set -euo pipefail
+          URL="https://staging-api.dhan.am/v1/billing/checkout/route-recommendation?country=MX&plan=essentials&product=dhanam"
+          for i in 1 2 3 4 5 6; do
+            body="$(curl -fsS --max-time 15 "$URL" || true)"
+            if printf '%s' "$body" | jq -e '.priceIdResolvable == true' >/dev/null 2>&1; then
+              echo "Essentials priceIdResolvable=true on attempt $i"
+              exit 0
+            fi
+            echo "attempt $i: priceIdResolvable still false, retrying"
+            sleep 15
+          done
+          echo "::error::Staging Essentials priceIdResolvable still false after catalog sync."
+          curl -fsS "$URL" | jq '{priceIdResolvable, catalogPlanId, amountMinor}' || true
+          exit 1
+
+      - name: ARC runner required (skipped)
+        if: steps.cluster.outputs.reachable != 'true'
+        run: |
+          echo "::error::In-cluster staging catalog sync requires madfam-runners-blue with cluster API access."
+          echo "Operator fallback: kubectl -n enclii-dhanam-staging create job catalog-sync-\$(date +%Y%m%d-%H%M) --from=cronjob/dhanam-catalog-sync"
+          exit 1

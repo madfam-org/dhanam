@@ -176,7 +176,7 @@ Plaid + Belvo reconnect, ML categorization loop, multi-budget isolation via
 
 | ID    | Task                                                                |
 | ----- | ------------------------------------------------------------------- |
-| PM-1m | Staging smoke: sandbox LM token → job → entity count assertion      |
+| PM-1m | Staging smoke: sandbox LM token → job → entity count assertion (`scripts/pm1-lunchmoney-staging-smoke.sh`; flag flipped on staging API) |
 | PM-1n | Support runbook: white-glove CLI fallback (`migrate-lunchmoney.ts`) |
 | PM-1o | Entitlement gate: Pro+ or operator flag for beta                    |
 
