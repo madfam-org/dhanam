@@ -365,7 +365,7 @@ jobs:
           API_URL="${{ vars.STAGING_WEB_API_URL || 'https://staging-api.dhan.am/v1' }}"
           API_ORIGIN="${API_URL%/v1}"
           for i in 1 2 3 4 5 6; do
-            HEADERS="$(curl -fsSI --max-time 10 "$URL" || true)"
+            HEADERS="$(curl -fsSIL --max-time 10 "$URL" || true)"
             if printf '%s' "$HEADERS" | grep -F "$API_ORIGIN" > /dev/null; then
               echo "Web smoke passed on attempt $i"
               exit 0
@@ -382,7 +382,7 @@ jobs:
           API_URL="${{ vars.STAGING_ADMIN_API_URL || vars.STAGING_WEB_API_URL || 'https://staging-api.dhan.am/v1' }}"
           API_ORIGIN="${API_URL%/v1}"
           for i in 1 2 3 4 5 6; do
-            HEADERS="$(curl -fsSI --max-time 10 "$URL/login" || true)"
+            HEADERS="$(curl -fsSIL --max-time 10 "$URL/login" || true)"
             if printf '%s' "$HEADERS" | grep -F "$API_ORIGIN" > /dev/null; then
               echo "Admin smoke passed on attempt $i"
               exit 0

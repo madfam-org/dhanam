@@ -34,7 +34,8 @@ live in `internal-devops` — paths listed in [Monetization Session](MONETIZATIO
 | [GA Remediation Roadmap](GA_REMEDIATION_ROADMAP.md)                            | Full program: technical stability GA, commercial GA, consumer GA (phases 0–7)                    |
 | [Public Repo Security Remediation](PUBLIC_REPO_SECURITY_REMEDIATION.md)        | G4: remove operator secrets from public git; CI leakage guard                                    |
 | [Full Remediation Plan](FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md)        | 100% G4 sanitization + 100% admin@madfam.io operator prod slice (6-sprint program)               |
-| [Roadmap](ROADMAP.md)                                                          | Stability priorities P0–P8 and milestones M1–M7                                                  |
+| [Roadmap](ROADMAP.md)                                                          | Stability priorities P0–P9 and milestones M1–M8                                                  |
+| [Platform Migration Roadmap](PLATFORM_MIGRATION_ROADMAP.md)                    | Consumer import wizards (LunchMoney, YNAB, CSV) — PM-1–PM-4                                    |
 | [Commercial Stability Roadmap](COMMERCIAL_STABILITY_ROADMAP.md)                | Billing router and internal MADFAM POS completion plan                                           |
 | [Commercial GA Execution](COMMERCIAL_GA_EXECUTION.md)                          | G2 runbook: WS1–WS6 staging smoke, proof gates, GitHub secrets/vars                              |
 | [Tulana SKU and Catalog Handoff](TULANA_SKU_AND_CATALOG_HANDOFF_2026-05-29.md) | Tulana readiness, billing catalogue mirror, and Selva-approved price apply contract              |

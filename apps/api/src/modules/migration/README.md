@@ -1,93 +1,47 @@
 # Migration Module
 
-Last updated: 2026-05-23
+Last updated: 2026-06-22
 
-**Library-only** import mappers and clients — not a registered NestJS HTTP
-module. Used by scripts, admin flows, or future import jobs to migrate external
-data into Dhanam spaces.
+NestJS module for competitor → Dhanam platform imports. **PM-1 (LunchMoney)** shipped
+behind `FEATURE_LUNCHMONEY_IMPORT` (default `false`).
+
+## HTTP API
+
+JWT-scoped routes under `/v1/spaces/:spaceId/migration/`:
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| GET | `status` | Feature flags (`lunchMoney`, `csv`) |
+| POST | `lunchmoney/preflight` | Read-only LM counts |
+| POST | `lunchmoney/start` | Enqueue async import |
+| GET | `jobs` | Recent jobs for space |
+| GET | `jobs/:jobId` | Job status + summary |
+
+## Architecture
+
+- `PlatformImportService` — credentials, audit, job lifecycle
+- `platform-import` BullMQ queue — async worker in `jobs/platform-import.processor.ts`
+- `LunchMoneyImportRunner` — shared engine for API + operator CLI
+- Encrypted LM tokens cleared after successful import
 
 ## Related docs
 
+- [Platform Migration Roadmap](../../../../docs/PLATFORM_MIGRATION_ROADMAP.md) (PM-1–PM-4)
 - [Module index](../README.md)
-- [Full Remediation Plan](../../../../docs/FULL_REMEDIATION_PLAN_G4_AND_OPERATOR_SLICE.md) (operator slice)
-- Product note: LunchMoney import is idempotent per API token (see root README)
+- Operator CLI: `apps/api/scripts/migrate-lunchmoney.ts` (white-glove fallback)
 
 ## Subpackages
 
 | Path          | Purpose                                                         |
 | ------------- | --------------------------------------------------------------- |
-| `lunchmoney/` | LunchMoney API client, type definitions, ID map, entity mappers |
+| `lunchmoney/` | LunchMoney API client, runner, mappers, ID map                   |
 | `madfam-csv/` | MADFAM CSV row types, routing config, prod continuity helpers   |
 
-## LunchMoney client
-
-| File                   | Role                                                    |
-| ---------------------- | ------------------------------------------------------- |
-| `lunchmoney-client.ts` | HTTP client (`https://dev.lunchmoney.app`)              |
-| `lunchmoney-mapper.ts` | Map LM accounts/assets/crypto/recurring → Dhanam schema |
-| `lunchmoney-types.ts`  | API response types                                      |
-| `id-map.ts`            | Stable LM id → Dhanam UUID mapping                      |
-
-## MADFAM CSV
-
-| File                        | Role                                                         |
-| --------------------------- | ------------------------------------------------------------ |
-| `madfam-csv-config.ts`      | Env-based RFC, space keys, suffixes                          |
-| `madfam-csv-mapper.ts`      | Map CSV rows to accounts/transactions                        |
-| `madfam-import-compat.ts`   | Prod continuity: discover spaces, preflight, budget backfill |
-| `madfam-platform-config.ts` | Hydrate import env from `platform_config` when enabled       |
-| `madfam-csv-types.ts`       | Row and mapping types                                        |
-
-### Production continuity (`app.dhan.am`)
-
-Existing operator data (Janua admin account + `madfam-csv-*` accounts) must not
-be duplicated on re-import:
-
-1. Set `TARGET_USER_EMAIL` to the operator account email from Vault (not in git).
-2. Set `MADFAM_BUSINESS_RFC` from Vault or `platform_config` (`madfam.import.*`).
-3. **Omit** `MADFAM_SPACE_NAME_*` when prod already has import accounts — spaces
-   are auto-discovered from `providerAccountId` patterns (`-afac` partner,
-   `-personal`, unsuffixed business).
-4. Partner suffix defaults to `-afac` (matches first prod import).
-5. Preflight: `pnpm --filter @dhanam/api tsx scripts/verify-madfam-import-compat.ts`
-6. Operator env template: `apps/api/scripts/madfam-import.env.example`
-
-**Platform config (optional):** set `PLATFORM_CONFIG_SOURCE=db` to load
-`madfam.import.*` keys from the `platform_config` table (env vars override).
-Admin API: `GET/PATCH /v1/admin/platform-config/madfam-import`.  
-Admin UI: `https://admin.dhan.am/madfam-import` (after admin deploy).
-
-**Production bootstrap (kubectl):**
+## Operator CLI (white-glove)
 
 ```bash
 cd apps/api
-export TARGET_USER_EMAIL=<operator-email-from-vault>
-bash scripts/bootstrap-madfam-prod-env.sh      # writes madfam-import.local.env (gitignored)
-bash scripts/run-prod-madfam-import-verify.sh  # read-only continuity check in-cluster
-bash scripts/run-prod-madfam-budget-backfill.sh  # idempotent budget metadata tag (DRY_RUN=true first)
+LUNCHMONEY_API_TOKEN=... TARGET_USER_EMAIL=... pnpm tsx scripts/migrate-lunchmoney.ts
 ```
 
-Scripts: `import-madfam-csv.ts`, `verify-madfam-import-compat.ts`,
-`backfill-madfam-budget-metadata.ts`, `bootstrap-madfam-prod-env.sh`,
-`run-prod-madfam-import-verify.sh`, `run-prod-madfam-budget-backfill.sh`,
-`seed-madfam-platform-config.ts`, `run-prod-seed-madfam-platform-config.sh`
-
-## Tests
-
-- `lunchmoney/__tests__/lunchmoney-mapper.spec.ts`
-- `madfam-csv/__tests__/madfam-csv-mapper.spec.ts`
-- `madfam-csv/__tests__/madfam-import-compat.spec.ts`
-- `madfam-csv/__tests__/madfam-platform-config.spec.ts`
-
-## Environment variables
-
-LunchMoney import flows expect a caller-supplied LunchMoney API token at runtime
-(not a global env var in this library). Wire secrets through the invoking job or
-admin script.
-
-MADFAM CSV import env vars are documented in `apps/api/scripts/madfam-import.env.example`.
-
-## HTTP surface
-
-None in this module. Platform import settings are exposed via the Admin module:
-`GET/PATCH /v1/admin/platform-config/madfam-import`.
+Optional: `TARGET_SPACE_ID`, `START_DATE`, `DRY_RUN=true`, `LUNCHMONEY_BUDGET_LABEL`.

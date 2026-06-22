@@ -1,10 +1,11 @@
 import { ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PlatformImportSource, PlatformImportStatus } from '@db';
 
 import { AuditService } from '@core/audit/audit.service';
 import { CryptoService } from '@core/crypto/crypto.service';
 import { PrismaService } from '@core/prisma/prisma.service';
+import { PlatformImportSource, PlatformImportStatus } from '@db';
+import { PostHogService } from '@modules/analytics/posthog.service';
 import { QueueService } from '@modules/jobs/queue.service';
 import { SpacesService } from '@modules/spaces/spaces.service';
 
@@ -20,6 +21,7 @@ describe('PlatformImportService', () => {
   let cryptoService: jest.Mocked<CryptoService>;
   let queueService: jest.Mocked<QueueService>;
   let configService: jest.Mocked<ConfigService>;
+  let postHogService: jest.Mocked<PostHogService>;
 
   const mockPreflight = {
     budgetName: 'Personal',
@@ -72,6 +74,10 @@ describe('PlatformImportService', () => {
       }),
     } as unknown as jest.Mocked<ConfigService>;
 
+    postHogService = {
+      capture: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<PostHogService>;
+
     (LunchMoneyImportRunner as jest.Mock).mockImplementation(() => ({
       preflight: jest.fn().mockResolvedValue(mockPreflight),
       run: jest.fn().mockResolvedValue({ counts: { transactionsCreated: 5 } }),
@@ -83,7 +89,8 @@ describe('PlatformImportService', () => {
       cryptoService,
       { logEvent: jest.fn() } as unknown as AuditService,
       queueService,
-      configService
+      configService,
+      postHogService
     );
   });
 
@@ -125,6 +132,9 @@ describe('PlatformImportService', () => {
       userId: 'user-1',
     });
     expect(result).not.toHaveProperty('encryptedToken');
+    expect(postHogService.capture).toHaveBeenCalledWith(
+      expect.objectContaining({ event: 'migration_started', distinctId: 'user-1' })
+    );
   });
 
   it('sanitizes job responses', async () => {

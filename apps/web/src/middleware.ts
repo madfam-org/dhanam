@@ -213,7 +213,10 @@ export function middleware(request: NextRequest) {
     const geoLocale = getLocaleFromCountry(request.cookies.get('dhanam_geo')?.value || countryCode);
     const locale = savedLocale && SUPPORTED_LOCALES.includes(savedLocale) ? savedLocale : geoLocale;
 
-    return NextResponse.redirect(new URL(`/${locale}`, request.url));
+    return withPublicSurfaceHeaders(
+      NextResponse.redirect(new URL(`/${locale}`, request.url)),
+      hostname
+    );
   }
 
   if (isLandingSite && localeMatch) {

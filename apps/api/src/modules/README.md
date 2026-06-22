@@ -56,7 +56,7 @@ local `README.md` describing purpose, main endpoints, jobs, and env vars.
 | [webhook-outbound](webhook-outbound/README.md) | Yes    | Svix outbound webhooks                  |
 | [events](events/README.md)                     | Yes    | Redis Streams billing events            |
 | [integrations](integrations/README.md)         | Yes    | Third-party integrations                |
-| [migration](migration/README.md)               | Yes    | Import libraries (LunchMoney, CSV)      |
+| [migration](migration/README.md)               | Yes    | Platform import API + LunchMoney wizard (PM-1, flag-gated) |
 
 ## Analytics, ML, and simulations
 
