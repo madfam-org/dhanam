@@ -103,3 +103,9 @@ patches:
     target:
       kind: CronJob
       name: dhanam-catalog-sync
+
+  # Schedule catalog sync off control-plane nodes (DNS flake on foundry-cp).
+  - path: catalog-sync-scheduling-patch.yaml
+    target:
+      kind: CronJob
+      name: dhanam-catalog-sync
