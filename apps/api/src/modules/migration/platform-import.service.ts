@@ -10,10 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import { AuditService } from '@core/audit/audit.service';
 import { CryptoService } from '@core/crypto/crypto.service';
 import { PrismaService } from '@core/prisma/prisma.service';
+import { PlatformImportSource, PlatformImportStatus } from '@db';
 import { PostHogService } from '@modules/analytics/posthog.service';
 import { QueueService } from '@modules/jobs/queue.service';
 import { SpacesService } from '@modules/spaces/spaces.service';
-import { PlatformImportSource, PlatformImportStatus } from '@db';
 
 import { LunchMoneyImportRunner } from './lunchmoney/lunchmoney-import.runner';
 import type { LunchMoneyPreflightResult } from './lunchmoney/lunchmoney-import.types';
@@ -289,7 +289,9 @@ export class PlatformImportService {
     properties: Record<string, unknown>
   ): void {
     void this.postHogService.capture({ distinctId: userId, event, properties }).catch((err) => {
-      this.logger.warn(`PostHog ${event} capture failed: ${err instanceof Error ? err.message : err}`);
+      this.logger.warn(
+        `PostHog ${event} capture failed: ${err instanceof Error ? err.message : err}`
+      );
     });
   }
 
