@@ -249,17 +249,17 @@ elif command -v jq >/dev/null 2>&1; then
   assert_json_field "Essentials MX route returns provider" "$essentials_route" '.provider == "stripe_mx"'
   assert_json_field "Essentials MX priceIdResolvable" "$essentials_route" '.priceIdResolvable == true'
   essentials_amount="$(printf '%s' "$essentials_route" | jq -r '.amountMinor // empty')"
-  if [ "$essentials_amount" = "7900" ]; then
-    log_pass "Essentials route amountMinor=7900 (catalog-aligned)"
+  if [ "$essentials_amount" = "9200" ]; then
+    log_pass "Essentials route amountMinor=9200 (IVA-inclusive gross)"
   else
-    log_fail "Essentials route amountMinor — expected 7900, got ${essentials_amount:-<empty>}"
+    log_fail "Essentials route amountMinor — expected 9200, got ${essentials_amount:-<empty>}"
   fi
 else
   essentials_amount="$(printf '%s' "$essentials_route" | python3 -c "import json,sys; d=json.load(sys.stdin); r=d.get('data',d); print(r.get('amountMinor',''))" 2>/dev/null || true)"
-  if [ "$essentials_amount" = "7900" ]; then
-    log_pass "Essentials route amountMinor=7900 (catalog-aligned)"
+  if [ "$essentials_amount" = "9200" ]; then
+    log_pass "Essentials route amountMinor=9200 (IVA-inclusive gross)"
   elif [ -n "$essentials_amount" ]; then
-    log_fail "Essentials route amountMinor — expected 7900, got ${essentials_amount}"
+    log_fail "Essentials route amountMinor — expected 9200, got ${essentials_amount}"
   else
     log_skip "Essentials route checks (jq not installed)"
   fi
@@ -274,10 +274,10 @@ else
   essentials_price=""
 fi
 if [ -n "$essentials_price" ]; then
-  if [ "$essentials_price" = "79" ]; then
-    log_pass "Essentials public pricing MXN 79/mo"
+  if [ "$essentials_price" = "92" ]; then
+    log_pass "Essentials public pricing MXN 92/mo (IVA-inclusive)"
   else
-    log_fail "Essentials pricing — expected 79 MXN/mo, got ${essentials_price}"
+    log_fail "Essentials pricing — expected 92 MXN/mo, got ${essentials_price}"
   fi
 elif command -v jq >/dev/null 2>&1; then
   :
