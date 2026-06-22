@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 
 import { PrismaService } from '@core/prisma/prisma.service';
 import { Prisma } from '@db';
+import { STRIPE_API_VERSION } from '../stripe-api-version';
 
 @Injectable()
 export class ReconciliationJob {
@@ -27,7 +28,7 @@ export class ReconciliationJob {
     if (this.stripeClient) return this.stripeClient;
     const key = this.config.get<string>('STRIPE_SECRET_KEY');
     if (!key) return null;
-    this.stripeClient = new Stripe(key, { apiVersion: '2026-02-25.clover' });
+    this.stripeClient = new Stripe(key, { apiVersion: STRIPE_API_VERSION });
     return this.stripeClient;
   }
 

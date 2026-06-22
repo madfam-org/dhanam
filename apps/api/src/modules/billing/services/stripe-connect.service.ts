@@ -29,6 +29,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
+import { STRIPE_API_VERSION } from '../stripe-api-version';
 import { ErrorCode, InfrastructureException } from '../../../core/exceptions/domain-exceptions';
 
 import {
@@ -70,7 +71,7 @@ export class StripeConnectService {
       return;
     }
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2026-02-25.clover',
+      apiVersion: STRIPE_API_VERSION,
       typescript: true,
       appInfo: { name: 'Dhanam Connect', version: '0.3.0' },
     });

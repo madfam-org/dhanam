@@ -39,6 +39,8 @@ spec:
               value: "false"
             - name: FEATURE_CAPITAL_STACK_DETECTOR
               value: "true"
+            - name: FEATURE_LUNCHMONEY_IMPORT
+              value: "false"
             - name: PADDLE_ENVIRONMENT
               value: "sandbox"
             # Webhook relay: set PRODUCT_WEBHOOK_URLS in dhanam-secrets (Vault) when

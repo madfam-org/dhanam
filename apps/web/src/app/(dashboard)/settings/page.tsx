@@ -31,7 +31,9 @@ import {
   Gauge,
   CreditCard,
   ExternalLink,
+  Download,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -552,6 +554,21 @@ export default function SettingsPage() {
           <CardDescription>{t('section.backup.description')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Import from other apps
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Lunch Money, YNAB, Monarch, and CSV — migrate your financial history.
+              </p>
+            </div>
+            <Button variant="outline" asChild>
+              <Link href="/settings/import">Import</Link>
+            </Button>
+          </div>
+          <Separator />
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>{t('backup.autoBackup.label')}</Label>

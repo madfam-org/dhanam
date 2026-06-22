@@ -80,6 +80,8 @@ export const validationSchema = Joi.object({
   POSTHOG_API_KEY: Joi.string().optional(),
   POSTHOG_HOST: Joi.string().uri().default('https://analytics.madfam.io'),
 
+  FEATURE_LUNCHMONEY_IMPORT: Joi.string().valid('true', 'false').default('false'),
+
   // Application URLs
   WEB_URL: Joi.when('NODE_ENV', {
     is: 'production',

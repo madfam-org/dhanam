@@ -2,7 +2,7 @@
   "extends": "@dhanam/config/typescript/nestjs.json",
   "compilerOptions": {
     "strictNullChecks": true,
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "outDir": "./dist",
     "rootDir": "./src",

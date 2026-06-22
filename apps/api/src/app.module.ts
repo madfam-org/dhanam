@@ -27,6 +27,7 @@ import { IntegrationsModule } from '@modules/integrations/integrations.module';
 import { JobsModule } from '@modules/jobs/jobs.module';
 import { KycModule } from '@modules/kyc/kyc.module';
 import { ManualAssetsModule } from '@modules/manual-assets/manual-assets.module';
+import { MigrationModule } from '@modules/migration/migration.module';
 import { OnboardingModule } from '@modules/onboarding/onboarding.module';
 import { PreferencesModule } from '@modules/preferences/preferences.module';
 import { ProvidersModule } from '@modules/providers/providers.module';
@@ -117,6 +118,7 @@ function redisOptionsFromUrl(redisUrl?: string) {
     RecurringModule,
     ReferralModule,
     SubscriptionsModule,
+    MigrationModule,
     SearchModule,
     TagsModule,
   ],

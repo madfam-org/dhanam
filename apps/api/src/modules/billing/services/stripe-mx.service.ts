@@ -19,6 +19,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
+import { STRIPE_API_VERSION } from '../stripe-api-version';
 import { InfrastructureException } from '../../../core/exceptions/domain-exceptions';
 
 export interface StripeMxCheckoutParams {
@@ -63,7 +64,7 @@ export class StripeMxService {
     }
 
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2026-02-25.clover',
+      apiVersion: STRIPE_API_VERSION,
       typescript: true,
       appInfo: {
         name: 'Dhanam',
