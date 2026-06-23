@@ -50,7 +50,7 @@
     "@fastify/csrf-protection": "^7.1.0",
     "@fastify/helmet": "^13.0.2",
     "@fastify/multipart": "^10.0.0",
-    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/rate-limit": "^11.0.0",
     "@fastify/static": "^8.0.0",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bull": "^11.0.0",
