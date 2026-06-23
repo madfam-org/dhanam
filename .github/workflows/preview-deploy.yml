@@ -79,7 +79,7 @@ jobs:
       short: ${{ steps.sha.outputs.short }}
       pr: ${{ github.event.pull_request.number }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -117,7 +117,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           # Need write access to push back to the PR branch. Default
@@ -170,7 +170,7 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Wait for ArgoCD reconcile
         # ApplicationSet regen cadence (~30s) + ArgoCD sync + pod warmup.
